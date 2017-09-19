@@ -1,0 +1,246 @@
+﻿<main class="container-fluid adjust-height" id="main-container" role="main" tabindex="0">
+    <div *ngIf="titleForStorySet">
+        <h3>{{titleForStorySet}}</h3>
+    </div>
+    <button class="back-button back-button--mobile" (click)="goBack()">
+        <svg class="back-button__chevron" width="12px" height="20px" viewBox="0 0 12 20" xmlns="http://www.w3.org/2000/svg">
+            <title>
+                Chevron left indicating to go back to the previous page
+            </title>
+            <path d="M10 0L0 10l10 10 1.494662-1.494662L2.989324 10l8.505338-8.505338" fill-rule="nonzero" fill="#704b2b"/>
+        </svg>
+        Back to maker directory
+    </button>
+
+    <!-- Bio profile -->
+    <div class="row">
+        <div class="headshot col-lg-3 col-md-3 col-sm-4 col-xs-12"  *ngIf="tailoredImage">
+
+            <!-- Headshot and personal info -->
+            <section class="headshot__container">
+                <div class="headshot__image-box">
+                    <img src="{{tailoredImage}}" class="headshot__image" alt="{{bioDetail.preferredName}}" />
+                </div>
+                <div class="bio-details bio-details--desktop">
+                    <h2 class="bio-details__title">{{bioDetail.preferredName}} </h2>
+                    <dl class="panel-body panel-tight-text-vertically bio-details__list">
+                        <div class="bio-details__def" *ngIf="bioDetail.birthDate" ><dt>Born: </dt> <dd>{{tailoredBirthDate}}</dd></div>
+                        <div class="bio-details__def" *ngIf="tailoredBirthLocation"><dt>Birth Location: </dt> <dd>{{tailoredBirthLocation}}</dd></div>
+                        <div class="bio-details__def" *ngIf="bioDetail.deceasedDate"><dt>Died: </dt> <dd>{{tailoredDeceasedDate}}</dd></div>
+                        <div class="bio-details__def" *ngIf="bioDetail.region"><dt>Residence: </dt> <dd>{{bioDetail.region}}</dd></div>
+                        <div class="bio-details__def" *ngIf="tailoredMakerGroupList"><dt>Category: </dt> <dd>{{tailoredMakerGroupList}}</dd></div>
+                        <div class="bio-details__def" *ngIf="tailoredJobFamilyList"><dt>Job Type(s): </dt> <dd>{{tailoredJobFamilyList}}</dd></div>
+                        <div class="bio-details__def" *ngIf="tailoredOccupationList"><dt>Occupation(s): </dt> <dd>{{tailoredOccupationList}}</dd></div>
+                        <div class="bio-details__def" *ngIf="biographyFavoriteColor"><dt>Favorite Color: </dt> <dd>{{biographyFavoriteColor}}</dd></div>
+                        <div class="bio-details__def" *ngIf="biographyFavoriteFood"><dt>Favorite Food: </dt> <dd>{{biographyFavoriteFood}}</dd></div>
+                        <div class="bio-details__def" *ngIf="biographyFavoriteTimeOfYear"><dt>Favorite Time of Year: </dt> <dd>{{biographyFavoriteTimeOfYear}}</dd></div>
+                        <div class="bio-details__def" *ngIf="biographyFavoriteVacationSpot"><dt>Favorite Vacation Spot: </dt> <dd>{{biographyFavoriteVacationSpot}}</dd></div>
+                        <div class="bio-details__def" *ngIf="biographyFavoriteQuote"><dt>Favorite Quote: </dt> <dd>{{biographyFavoriteQuote}}</dd></div>
+                    </dl>
+                    <p class="bio-details__interview" *ngFor="let oneInterview of bioSessionDetails">
+                        {{oneInterview}}
+                    </p>
+                </div>
+            </section>
+
+            <!-- Bio details collapsible for mobile -->
+            <section class="panel panel-default panel--first bio-details bio-details--mobile" aria-hidden="true">
+                <div class="">
+                    <a class="bio-details__title-container" data-toggle="collapse" href="#bio-details-mobile">
+                        <h2 class="bio-details__title">{{bioDetail.preferredName}} </h2><span class="caret"></span>
+                    </a>
+                </div>
+                <div id="bio-details-mobile" class="panel-collapse collapse">
+                    <dl class="panel-body panel-tight-text-vertically bio-details__list">
+                        <div class="bio-details__def" *ngIf="bioDetail.birthDate" ><dt>Born: </dt> <dd>{{tailoredBirthDate}}</dd></div>
+                        <div class="bio-details__def" *ngIf="tailoredBirthLocation"><dt>Birth Location: </dt> <dd>{{tailoredBirthLocation}}</dd></div>
+                        <div class="bio-details__def" *ngIf="bioDetail.deceasedDate"><dt>Died: </dt> <dd>{{tailoredDeceasedDate}}</dd></div>
+                        <div class="bio-details__def" *ngIf="bioDetail.region"><dt>Residence: </dt> <dd>{{bioDetail.region}}</dd></div>
+                        <div class="bio-details__def" *ngIf="tailoredMakerGroupList"><dt>Category: </dt> <dd>{{tailoredMakerGroupList}}</dd></div>
+                        <div class="bio-details__def" *ngIf="tailoredJobFamilyList"><dt>Job Type(s): </dt> <dd>{{tailoredJobFamilyList}}</dd></div>
+                        <div class="bio-details__def" *ngIf="tailoredOccupationList"><dt>Occupation(s): </dt> <dd>{{tailoredOccupationList}}</dd></div>
+                        <div class="bio-details__def" *ngIf="biographyFavoriteColor"><dt>Favorite Color: </dt> <dd>{{biographyFavoriteColor}}</dd></div>
+                        <div class="bio-details__def" *ngIf="biographyFavoriteFood"><dt>Favorite Food: </dt> <dd>{{biographyFavoriteFood}}</dd></div>
+                        <div class="bio-details__def" *ngIf="biographyFavoriteTimeOfYear"><dt>Favorite Time of Year: </dt> <dd>{{biographyFavoriteTimeOfYear}}</dd></div>
+                        <div class="bio-details__def" *ngIf="biographyFavoriteVacationSpot"><dt>Favorite Vacation Spot: </dt> <dd>{{biographyFavoriteVacationSpot}}</dd></div>
+                        <div class="bio-details__def" *ngIf="biographyFavoriteQuote"><dt>Favorite Quote: </dt> <dd>{{biographyFavoriteQuote}}</dd></div>
+                    </dl>
+                    <p class="bio-details__interview" *ngFor="let oneInterview of bioSessionDetails">
+                        {{oneInterview}}
+                    </p>
+                </div>
+            </section>
+
+            <!-- Biography for mobile -->
+            <section class="panel panel-default biography--mobile" aria-hidden="true">
+                <div class="biography__header">
+                    <a class="biography__title-container" data-toggle="collapse" href="#biography">
+                        <h2 class="biography__title">Biography </h2><span class="caret"></span>
+                    </a>
+                </div>
+                <div id="biography" class="panel-collapse collapse">
+                    <div class="panel-body panel-tight-text-vertically">
+                        <p class="biography__abstract">
+                            {{bioDetail.biographyShort}}
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Biography for tablet and small laptops -->
+            <div class="biography biography--tablet">
+                <div class="biography__header">
+                    <h2 class="biography__title">Biography </h2>
+                </div>
+                <p *ngIf="bioDetail" class="biography__abstract">{{bioDetail.biographyShort}}</p>
+
+                <!-- My Playlist-->
+                <playlist [allowMyPlaylistView]=true></playlist>
+            </div>
+        </div>
+
+        <!-- Biography for desktop layout -->
+        <div class="biography biography--desktop" aria-hidden="true">
+            <div class="biography__header">
+                <h2 class="biography__title">Biography </h2>
+            </div>
+            <p *ngIf="bioDetail" class="biography__abstract">{{bioDetail.biographyShort}}</p>
+
+            <!-- My Playlist-->
+            <playlist [allowMyPlaylistView]=true></playlist>
+        </div>
+
+        <!-- Desktop story search, restricted to just stories from this particular person; shown only after person is loaded -->
+        <div *ngIf="bioDetail" class="story-search col-lg-9 col-md-9 col-sm-8">
+            <!-- Search Form -->
+            <section class="search search--desktop" >
+
+                <!-- Search input with dropdown -->
+                <div class="input-dropdown">
+                    <label>
+                        <input type="text" class="input-dropdown__input" [(ngModel)]="txtQuery" placeholder={{inputPlaceholder}} (keyup.enter)="doSearch()" />
+                    </label>
+                    <div class="dropdown">
+                        <button class="dropdown-toggle input-dropdown__button" type="button" id="fieldFilter" data-toggle="dropdown">
+                            {{searchByField}}
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu" role="menu" aria-labelledby="fieldFilter">
+                            <li role="presentation" *ngFor="let field of fields">
+                                <button class="dropdown__option" role="menuitem" value="field" *ngIf="field !== searchByField" (click)="searchFieldChange(field)">{{field}}</button>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Submit button -->
+                <button class="search__submit" [disabled]="noNeedForSearch()" (click)="doSearch(); toggleMenu()" value="Search">
+                    <span>Search
+                        <svg class="search__submit-icon" width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                            <title aria-hidden="true">
+                                Search Magnifying Glass Icon
+                            </title>
+                            <path d="M17.477 2.523C15.797.84 13.59 0 11.387 0 9.183 0 6.98.84 5.297 2.523c-3.037 3.036-3.33 7.775-.885 11.142L.398 17.678c-.53.53-.53 1.392 0 1.924.266.265.614.398.962.398s.696-.133.962-.398l4.013-4.014c1.502 1.09 3.277 1.638 5.052 1.638 2.204 0 4.41-.84 6.09-2.523 3.364-3.363 3.364-8.817 0-12.18zM16.13 13.357c-1.266 1.267-2.95 1.965-4.743 1.965-1.792 0-3.477-.698-4.744-1.965-2.616-2.616-2.616-6.872 0-9.488C7.91 2.6 9.595 1.903 11.387 1.903c1.792 0 3.477.698 4.744 1.965 1.268 1.266 1.966 2.95 1.966 4.743 0 1.792-.698 3.477-1.965 4.744z" fill-rule="nonzero" fill="#FFF"/>
+                        </svg>
+                    </span>
+                    <span class="sr-only">Submit</span>
+                </button>
+
+                <!-- Search links -->
+                <div class="search__links-container">
+                    <!-- TODO: perhaps resurrecte routerLink but workaround is fine; routerLink did not work from child component up to parent, so using (click) below instead: <span class="search__advanced"><a routerLink="/storyadvs" routerLinkActive="active">Advanced Search and Tips</a></span> -->
+                    <div class="search__advanced"><a href="/storyadvs" class="search__routerLink" (click)="routeToAdvancedSearch()">Advanced Search and Tips</a></div>
+                </div>
+
+                <!-- Results per page -->
+                <div class="search__rpp-container">
+                    <div class="dropdown search__res-per-pg">
+                        <button class="search__res-per-pg-button dropdown-toggle" type="button" id="pgSizeEntry" data-toggle="dropdown">
+                            Results per Page: {{resultsSize}}
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu" role="menu" aria-labelledby="pgSizeEntry">
+                            <li role="presentation"><button class="dropdown__option" role="menuitem" (click)="setPageSize(10)">10</button></li>
+                            <li role="presentation"><button class="dropdown__option" role="menuitem" (click)="setPageSize(30)">30</button></li>
+                            <li role="presentation"><button class="dropdown__option" role="menuitem" (click)="setPageSize(60)">60</button></li>
+                            <li role="presentation"><button class="dropdown__option" role="menuitem" (click)="setPageSize(100)">100</button></li>
+                            <li role="presentation"><button class="dropdown__option" role="menuitem" (click)="setPageSize(300)">300</button></li>
+                        </ul>
+                    </div>
+                </div>
+
+            </section>
+            <!-- End Search Form-->
+        </div>
+
+        <!-- Tapes and filters -->
+        <section class="tapes-and-filters col-lg-9 col-md-9 col-sm-8 col-xs-12">
+
+            <div class="page-view-row">
+
+                <!-- Page view options -->
+                <div class="page-view-options">
+                    <p class="total-segments">{{tailoredStoryCountInfo}}</p>
+
+                    <!-- Stamp view and page view buttons-->
+                    <div class="view">
+                        <div class="view__button-container">
+                            <button class="view__grid-button" (click)="cardView = true" [class.active]="cardView">
+                                <svg class="" viewBox="0 0 22 22" xmlns="http://www.w3.org/2000/svg">
+                                    <title>
+                                        Grid icon
+                                    </title>
+                                    <path class="grid" d="M10 1v8c0 .28-.096667.516667-.289333.71C9.516667 9.903333 9.28 10 9 10H1c-.28 0-.516667-.096667-.71-.29C.096667 9.516667 0 9.28 0 9V1C0 .72.096667.483333.29.29.483333.097333.72 0 1 0h8c.28 0 .516667.097333.710667.29C9.903333.483333 10 .72 10 1c0 0 0-.28 0 0zm0 12v8c0 .28-.096667.516667-.289333.71C9.516667 21.903333 9.28 22 9 22H1c-.28 0-.516667-.096667-.71-.29C.096667 21.516667 0 21.28 0 21v-8c0-.28.096667-.516667.29-.71.193333-.192667.43-.29.71-.29h8c.28 0 .516667.097333.710667.29.192666.193333.289333.43.289333.71 0 0 0-.28 0 0zM22 1v8c0 .28-.096667.516667-.289333.71-.194.193333-.430667.29-.710667.29h-8c-.28 0-.516667-.096667-.71-.29-.193333-.193333-.29-.43-.29-.71V1c0-.28.096667-.516667.29-.71.193333-.192667.43-.29.71-.29h8c.28 0 .516667.097333.710667.29C21.903333.483333 22 .72 22 1c0 0 0-.28 0 0zm0 12v8c0 .28-.096667.516667-.289333.71-.194.193333-.430667.29-.710667.29h-8c-.28 0-.516667-.096667-.71-.29-.193333-.193333-.29-.43-.29-.71v-8c0-.28.096667-.516667.29-.71.193333-.192667.43-.29.71-.29h8c.28 0 .516667.097333.710667.29.192666.193333.289333.43.289333.71z" fill="currentColor" fill-rule="evenodd"/>
+                                </svg>
+                            </button>
+                        </div>
+
+                        <div class="view__button-container">
+                            <button class="view__list-button" (click)="cardView = false" [class.active]="!cardView">
+                                <svg class="" viewBox="0 0 24 22" xmlns="http://www.w3.org/2000/svg">
+                                    <title>
+                                        List icon
+                                    </title>
+                                    <path class="list" d="M6 1v4c0 .28-.096667.516667-.289333.71C5.516667 5.903333 5.28 6 5 6H1c-.28 0-.516667-.096667-.71-.29C.096667 5.516667 0 5.28 0 5V1C0 .72.096667.483333.29.29.483333.097333.72 0 1 0h4c.28 0 .516667.097333.710667.29C5.903333.483333 6 .72 6 1c0 0 0-.28 0 0zm0 12V9c0-.28-.096667-.516667-.289333-.71C5.516667 8.097333 5.28 8 5 8H1c-.28 0-.516667.097333-.71.29C.096667 8.483333 0 8.72 0 9v4c0 .28.096667.516667.29.71.193333.193333.43.29.71.29h4c.28 0 .516667-.096667.710667-.29C5.903333 13.516667 6 13.28 6 13c0 0 0 .28 0 0zm0 4v4c0 .28-.096667.516667-.289333.71C5.516667 21.903333 5.28 22 5 22H1c-.28 0-.516667-.096667-.71-.29C.096667 21.516667 0 21.28 0 21v-4c0-.28.096667-.516667.29-.71.193333-.192667.43-.29.71-.29h4c.28 0 .516667.097333.710667.29C5.903333 16.483333 6 16.72 6 17c0 0 0-.28 0 0zM24 1v4c0 .28-.096667.516667-.289333.71C23.516667 5.903333 23.28 6 23 6H9c-.28 0-.516667-.096667-.71-.29C8.096667 5.516667 8 5.28 8 5V1c0-.28.096667-.516667.29-.71C8.483333.097333 8.72 0 9 0h14c.28 0 .516667.097333.710667.29C23.903333.483333 24 .72 24 1c0 0 0-.28 0 0zm0 8v4c0 .28-.096667.516667-.289333.71-.194.193333-.430667.29-.710667.29H9c-.28 0-.516667-.096667-.71-.29-.193333-.193333-.29-.43-.29-.71V9c0-.28.096667-.516667.29-.71.193333-.192667.43-.29.71-.29h14c.28 0 .516667.097333.710667.29C23.903333 8.483333 24 8.72 24 9c0 0 0-.28 0 0zm0 8v4c0 .28-.096667.516667-.289333.71-.194.193333-.430667.29-.710667.29H9c-.28 0-.516667-.096667-.71-.29-.193333-.193333-.29-.43-.29-.71v-4c0-.28.096667-.516667.29-.71.193333-.192667.43-.29.71-.29h14c.28 0 .516667.097333.710667.29.192666.193333.289333.43.289333.71z" fill="currentColor" fill-rule="evenodd"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <button class="summaries-button" [class.summaries-button--active]="tapeSummariesShown" *ngIf="needToggleDetails" (click)="toggleDetails()">{{toggleDetailsLabel}}</button>
+                </div>
+
+                <!-- Back button desktop -->
+                <button class="back-button back-button--desktop" (click)="goBack()">
+                    <svg class="back-button__chevron" width="12px" height="20px" viewBox="0 0 12 20" xmlns="http://www.w3.org/2000/svg">
+                        <title>
+                            Chevron left indicating to go back to the previous page
+                        </title>
+                        <path class="back-button__chevron" d="M10 0L0 10l10 10 1.494662-1.494662L2.989324 10l8.505338-8.505338" fill-rule="nonzero" fill="#704b2b"/>
+                    </svg>
+                    Back&nbsp;<span class="back-button__ext-text"> to maker directory</span>
+                </button>
+            </div>
+
+            <!-- Tapes -->
+            <div>
+                <div *ngFor="let oneSummary of tapeSummariesCache;let m=index">
+                    <h4 class="tapes__title" >{{tapeTitlesCache[m]}}</h4>
+                    <p *ngIf="tapeSummariesShown">{{oneSummary}}</p>
+                    <ul class="tapes list-without-styles" [class.tapes--list]="!cardView">
+                        <li class="tape" *ngFor="let oneStory of myStoryListByTape[m];let j=index" [class.tape--list]="!cardView">
+                            <thda-story
+                                (storyForPlaylist)="toggleAddToPlaylist($event)"
+                                [cardView]="cardView"
+                                [story]="myStoryListByTape[m][j]"
+                                [selectedID]="selectedStoryID"
+                                (onSelected)="onSelected($event)"
+                                [highlights]="myStoryListByTape[m][j].highlights"
+                            ></thda-story>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+        </section>
+    </div><!--close .row-->
+</main>

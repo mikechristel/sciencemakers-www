@@ -1,0 +1,46 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>The ScienceMakers HTML5 Digital Archive</title>
+  <base href="/">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="shortcut icon" href="assets/THM_favicon.png" type="image/png" /> <!-- note: more work on favicon TBD -->
+
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+  <!-- Capture configuration values to pass to app -->
+  <script src="myPaths.config.js"></script>
+
+  <!-- jQuery library -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <!-- Latest compiled JavaScript -->
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+</head>
+<body>
+  <my-app >Loading...</my-app>
+  <!-- Google Analytics -->
+  <script>
+
+    // deciding on a GA code for ScienceMakers also TBD...
+    var ga_code = 'UA-90449642-28';
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+    ga('create', ga_code , 'auto');
+    // If interested, check the code comment within app.ts discussing not having a send pageview here....
+
+    // initialize bootstrap tooltips
+    $( document ).ready(function() {
+      $('[data-toggle="tooltip"]').tooltip()
+    });
+    $(function () {
+      $('[data-toggle="tooltip"]').tooltip()
+    });
+  </script>
+</body>
+</html>

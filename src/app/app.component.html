@@ -1,0 +1,160 @@
+﻿<div class="full-page-view" id="hammer-swipe-target" >
+    <a [ngx-scroll-to]="'main-container'" (click)="shiftFocus('main-container')" (keyup.enter)="shiftFocus('main-container')" href="javascript:void(0)" class="skip">Skip to content</a>
+    <story-search [mobile]="true" [mobileSearch]="mobileSearchOpen" (menuState)='toggleMobileSearch($event)'></story-search>
+    <header class="header" id="header">
+
+        <div class="header__content-container">
+            <div class="header__top-row">
+
+                <!-- Logo -->
+                <svg class="header__logo" width="472" height="56" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 124.88333 14.816667" routerLink="/home">
+                  <title>The ScienceMakers logo</title>
+                  <g
+                      transform="translate(-62.188157,-154.58758)"
+                      id="smlayer1">
+                    <text
+                        id="text34"
+                        y="165.52673"
+                        x="64.240959"
+                        style="font-style:normal;font-weight:normal;font-size:10.58333302px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+                        xml:space="preserve"><tspan
+                          style="stroke-width:0.26458332"
+                          y="165.52673"
+                          x="64.240959"
+                          id="smtspan32">THE <tspan
+                    id="smtspan36"
+                    style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:10.58333302px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start">SCIENCE</tspan>MAKERS</tspan></text>
+                  </g>
+                </svg>
+
+                <!-- search icon -->
+                <svg class="header__search-icon animated" width="34" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" (click)="toggleMobileSearch()" [class.header__search-icon--open]="mobileSearchOpen" [class.hide]="mobileSearchOpen">
+                    <title aria-hidden="true">
+                        Search Icon
+                    </title>
+                    <path d="M27.964 4.036C25.274 1.346 21.746 0 18.22 0c-3.527 0-7.054 1.345-9.745 4.036-4.858 4.858-5.33 12.44-1.416 17.828l-6.422 6.42c-.85.85-.85 2.23 0 3.078.424.425.98.638 1.538.638.557 0 1.114-.213 1.54-.638l6.42-6.42c2.403 1.745 5.243 2.62 8.083 2.62 3.526 0 7.053-1.346 9.744-4.037 5.38-5.382 5.38-14.107 0-19.49zM25.81 21.37c-2.028 2.028-4.723 3.145-7.59 3.145-2.868 0-5.564-1.116-7.59-3.144-4.186-4.184-4.186-10.995 0-15.18 2.026-2.027 4.722-3.144 7.59-3.144 2.867 0 5.562 1.116 7.59 3.144 2.027 2.028 3.144 4.723 3.144 7.59 0 2.868-1.117 5.564-3.144 7.59z" fill-rule="nonzero" fill="currentColor"/>
+                </svg>
+
+                <!-- close icon for search  -->
+                <svg (click)="toggleMobileSearch()" [class.fadeIn]="mobileSearchOpen" [class.hide]="!mobileSearchOpen" class="header__search-icon header__search-icon--open animated" width="34" height="32" viewBox="0 0 17 17" xmlns="http://www.w3.org/2000/svg">
+                    <title aria-hidden="true">
+                        Remove from playlist
+                    </title>
+                    <path d="M14.612.47c-.355-.356-.928-.356-1.284 0L8.142 5.656 2.956.47C2.6.114 2.028.114 1.672.47L.47 1.672c-.356.356-.356.928 0 1.284l5.186 5.186L.47 13.328c-.356.356-.356.93 0 1.284l1.202 1.202c.356.356.928.356 1.284 0l5.186-5.186 5.186 5.186c.356.356.93.356 1.284 0l1.202-1.202c.356-.355.356-.928 0-1.284l-5.186-5.186 5.186-5.186c.356-.356.356-.928 0-1.284L14.612.47z" fill-rule="nonzero" fill="currentColor"/>
+                </svg>
+
+
+                <!-- menu icon -->
+                <svg class="header__menu-icon" width="39" height="30" viewBox="0 0 39 30" xmlns="http://www.w3.org/2000/svg" (click)="toggleMenu()" [class.header__menu-icon--open]="menuOpen" [class.hide]="menuOpen">
+                    <title aria-hidden="true">
+                        Menu Icon
+                    </title>
+                    <path d="M0 2C0 .895.964 0 2.152 0h34.696C38.036 0 39 .888 39 2c0 1.105-.964 2-2.152 2H2.152C.964 4 0 3.112 0 2zm0 13c0-1.105.964-2 2.152-2h34.696c1.188 0 2.152.888 2.152 2 0 1.105-.964 2-2.152 2H2.152C.964 17 0 16.112 0 15zm0 13c0-1.105.964-2 2.152-2h34.696c1.188 0 2.152.888 2.152 2 0 1.105-.964 2-2.152 2H2.152C.964 30 0 29.112 0 28z" fill-rule="nonzero" fill="currentColor"/>
+                </svg>
+
+                <!-- close icon for menu  -->
+                <svg (click)="toggleMenu()" [class.fadeIn]="menuOpen" [class.hide]="!menuOpen" class="header__menu-icon header__menu-icon--open animated" width="39" height="30" viewBox="0 0 17 17" xmlns="http://www.w3.org/2000/svg">
+                    <title aria-hidden="true">
+                        Remove from playlist
+                    </title>
+                    <path d="M14.612.47c-.355-.356-.928-.356-1.284 0L8.142 5.656 2.956.47C2.6.114 2.028.114 1.672.47L.47 1.672c-.356.356-.356.928 0 1.284l5.186 5.186L.47 13.328c-.356.356-.356.93 0 1.284l1.202 1.202c.356.356.928.356 1.284 0l5.186-5.186 5.186 5.186c.356.356.93.356 1.284 0l1.202-1.202c.356-.355.356-.928 0-1.284l-5.186-5.186 5.186-5.186c.356-.356.356-.928 0-1.284L14.612.47z" fill-rule="nonzero" fill="currentColor"/>
+                </svg>
+
+            </div>
+
+            <div class="header__bottom-row">
+                <p class="header__tagline">ScienceMakers from the Nation’s Largest <br />African American Video Oral History Collection </p>
+            </div>
+
+            <nav class="nav" [class.nav--open]="menuOpen">
+                <h2 class="sr-only">Navigation</h2>
+                <div class="nav__logo-container" routerLink="/home" routerLinkActive="active" (click)="toggleMenu('close')">
+                  <svg class="nav__logo" width="472" height="56" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 124.88333 14.816667" routerLink="/home">
+                    <title>The ScienceMakers logo</title>
+                    <g
+                        transform="translate(-62.188157,-154.58758)"
+                        id="smnavlayer1">
+                      <text
+                          id="text34"
+                          y="165.52673"
+                          x="64.240959"
+                          style="font-style:normal;font-weight:normal;font-size:10.58333302px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+                          xml:space="preserve"><tspan
+                            style="stroke-width:0.26458332"
+                            y="165.52673"
+                            x="64.240959"
+                            id="smnavtspan32">THE <tspan
+                      id="smnavtspan36"
+                      style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:10.58333302px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start">SCIENCE</tspan>MAKERS</tspan></text>
+                    </g>
+                  </svg>
+                </div>
+                <ul class="nav__links">
+                    <li class="nav__links-item">
+                        <a class="nav__link" routerLink="/home" routerLinkActive="active" (click)="toggleMenu('close')">
+                            Home
+                        </a>
+                    </li>
+                    <li class="nav__links-item">
+                        <a class="nav__link" routerLink="/all" routerLinkActive="active" (click)="toggleMenu('close')">
+                            Maker Directory
+                        </a>
+                    </li>
+                    <li class="nav__links-item">
+                        <a class="nav__link nav__link--playlist" routerLink="/stories/7" routerLinkActive="active" (click)="toggleMenu('close')">
+                            My Playlist <span class="badge badge-pill nav__badge" >{{playlist.length}}</span>
+                        </a>
+                    </li>
+                    <li class="nav__links-item">
+                        <a class="nav__link" href="#myModal" data-toggle="modal" data-target="#myModal" routerLinkActive="active" (click)="toggleMenu('close')">
+                            Contact Us
+                        </a>
+                    </li>
+                    <li class="nav__links-item">
+                        <a class="nav__link" routerLink="/help" routerLinkActive="active" (click)="toggleMenu('close')">
+                            FAQ/Help
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Modal -->
+    <div id="myModal" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-lg">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" (click)="cancelFeedback()" data-dismiss="modal">
+                        <svg width="17px" height="17px" viewBox="0 0 17 17" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                            <title>Close Modal</title>
+                            <defs></defs>
+                            <g id="close-modal" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                <path d="M7.29241999,-1.85786438 C6.78933126,-1.85786438 6.38432326,-1.45285565 6.38432326,-0.949767649 L6.38432326,6.38432326 L-0.949767649,6.38432326 C-1.45285492,6.38432326 -1.85786438,6.78933126 -1.85786438,7.29241999 L-1.85786438,8.99185126 C-1.85786438,9.49493999 -1.45285492,9.89994799 -0.949767649,9.89994799 L6.38432326,9.89994799 L6.38432326,17.2340389 C6.38432326,17.7371269 6.78933126,18.1421356 7.29241999,18.1421356 L8.99185126,18.1421356 C9.49493999,18.1421356 9.89994799,17.7371269 9.89994799,17.2340389 L9.89994799,9.89994799 L17.2340389,9.89994799 C17.7371269,9.89994799 18.1421356,9.49493999 18.1421356,8.99185126 L18.1421356,7.29241999 C18.1421356,6.78933126 17.7371269,6.38432326 17.2340389,6.38432326 L9.89994799,6.38432326 L9.89994799,-0.949767649 C9.89994799,-1.45285565 9.49493999,-1.85786438 8.99185126,-1.85786438 L7.29241999,-1.85786438 Z" id="add" fill="#525E16" fill-rule="nonzero" transform="translate(8.142136, 8.142136) rotate(-315.000000) translate(-8.142136, -8.142136) "></path>
+                            </g>
+                        </svg>
+                    </button>
+                    <h4 class="modal-title">How can we make the experience better for you?</h4>
+                </div>
+                <div class="modal-body">
+                    <textarea class="form-control textarea-feedback" [(ngModel)]="givenFeedback" maxlength="1024" rows="4" placeholder="Your suggestions and/or complaints will greatly help us..."></textarea>
+                    <p>You are welcome to email us as well at <a href="mailto:info@thehistorymakers.org">info@thehistorymakers.org</a>.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" data-dismiss="modal" (click)="postFeedback()">Submit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="header__offset">
+        <router-outlet></router-outlet>
+    </div>
+
+     <div class="container-fluid">
+        <button [ngx-scroll-to]="'header'" (click)="shiftFocus('header')" (keyup.enter)="shiftFocus('header')" class="back-button">Back to top</button>
+    </div>
+
+</div>

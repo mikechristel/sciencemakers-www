@@ -1,0 +1,16 @@
+﻿<a class="card" *ngIf="cardView" tabindex="0"
+     [class.selected]="isSelected(bio)" [thdaScrollToMe]="isSelected(bio)"
+     (click)="onSelect(bio)" (keyup.enter)="onSelect(bio)">
+     <div class="card__overlay" ></div>
+    <img class="card__img" src="{{myMediaBase}}biography/image/{{bio.document.biographyID}}"
+             alt="" />
+    <div class="card__info-overlay">
+        {{bio.document.preferredName}}
+    </div>
+</a>
+<a class="list" *ngIf="!cardView" [class.selected]="isSelected(bio)" [thdaScrollToMe]="isSelected(bio)"
+     (click)="onSelect(bio)">
+    <h4 class="list__name">{{bio.document.preferredName}}</h4>
+    <span class="bold">Born:</span> {{bio.document.birthDate | date}}
+    <div *ngIf="bio.highlights"><span *ngFor="let description of bio.highlights.descriptionShort" [innerHTML]="description"></span></div>
+</a>

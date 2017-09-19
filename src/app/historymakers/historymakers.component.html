@@ -1,0 +1,554 @@
+﻿<main class="container-fluid" [class.hide-under-menu]="mobileFiltersOpen" id="main-container" role="main" tabindex="-1">
+    <div class="row">
+
+        <!-- Page title section -->
+        <section class="page-title-section col-lg-5 col-md-3 col-sm-4 col-xs-12">
+            <h1 class="page-title">Maker Directory</h1>
+            <p class="welcome-paragraph" *ngIf="totalBiographiesFound"><span class="">{{totalBiographiesFound}}</span></p>
+            <button class="filters__button" (click)="toggleMobileFilters()" [disabled]="pages.length < 1">
+                <svg class="filters__button-icon" width="24px" height="27px" viewBox="0 0 24 27" xmlns="http://www.w3.org/2000/svg">
+                    <title>
+                        Icon for Filter Button
+                    </title>
+                    <g fill-rule="nonzero" fill="#FFF">
+                        <path d="M22.336422 12.623774h-1.868784c-.474612-1.956227-2.254407-3.453963-4.30117-3.453963-2.046764 0-3.796895 1.46717-4.30117 3.453964H1.09754C.474612 12.623774 0 13.11283 0 13.754717c0 .641887.474612 1.130943 1.09754 1.130943h10.79742c.474613 1.956227 2.254407 3.453963 4.271508 3.453963 2.0171 0 3.796895-1.46717 4.30117-3.453963h1.868784c.622928 0 1.09754-.489056 1.09754-1.130943 0-.641887-.504275-1.130943-1.09754-1.130943zm-6.169954 3.85132c-1.4535 0-2.64003-1.22264-2.64003-2.720377 0-1.497736 1.18653-2.720377 2.64003-2.720377 1.4535 0 2.640028 1.22264 2.640028 2.720377 0 1.497736-1.156866 2.720377-2.640028 2.720377zM1.096152 5.71585h1.9553c.47401 1.956225 2.251556 3.45396 4.295732 3.45396s3.792095-1.467168 4.295733-3.45396H22.33781c.62214 0 1.096152-.489058 1.096152-1.130944 0-.641887-.474012-1.130944-1.096152-1.130944H11.61329C11.13928 1.497736 9.361736 0 7.31756 0 5.273382 0 3.525463 1.436604 3.05145 3.453962H1.096153C.474012 3.453962 0 3.94302 0 4.584906 0 5.226792.503638 5.71585 1.096152 5.71585zm6.221406-3.851322c1.451662 0 2.63669 1.222642 2.63669 2.720378 0 1.497736-1.185028 2.720377-2.63669 2.720377-1.45166 0-2.63669-1.22264-2.63669-2.720377 0-1.497736 1.18503-2.720378 2.63669-2.720378zM22.33781 21.28415H11.642917c-.474012-1.956225-2.251557-3.45396-4.295733-3.45396S3.55509 19.297357 3.05145 21.28415H1.096153C.474012 21.28415 0 21.77321 0 22.415095c0 .641887.474012 1.130944 1.096152 1.130944h1.9553C3.52546 25.502264 5.303007 27 7.347183 27s3.792095-1.46717 4.295733-3.453962H22.33781c.62214 0 1.096152-.489057 1.096152-1.130944 0-.641886-.503637-1.130943-1.096152-1.130943zM7.347184 25.135473c-1.45166 0-2.63669-1.222642-2.63669-2.720378 0-1.497736 1.18503-2.720377 2.63669-2.720377 1.451662 0 2.63669 1.22264 2.63669 2.720377 0 1.497736-1.155403 2.720378-2.63669 2.720378z"/>
+                    </g>
+                </svg>
+                <span>Filters</span>
+            </button>
+        </section>
+
+        <section class="filters filters--mobile" [class.filters--show]="mobileFiltersOpen" aria-hidden="true">
+            <header class="filters__header">
+                <button class="filters__header-button" href="" (click)="clearFilters()">Reset</button>
+                <h2 class="filters__header-title">Filter Results</h2>
+                <button class="filters__header-button" href="" (click)="toggleMobileFilters()">Cancel</button>
+            </header>
+
+            <div class="filters__body">
+                <section *ngIf="myCurrentBiographySearchSorting >= 0" class="filters__section"> <!-- let i=-->
+                    <h4 class="filters__section-title">Sort by</h4>
+                    <div *ngFor="let oneSortField of bioSearchSortFields;let i=index">
+                        <div *ngIf="i % 2 == 0">
+                            <div *ngIf="i < bioSearchSortFields.length" class="filters__2-col">
+                                <button class="filters__button" [class.selected]="bioSearchSortFields[i].selected"
+                                  (click)="setBioSearchSortingAndDoTheSort(bioSearchSortFields[i].id)">{{bioSearchSortFields[i].value}}
+                                  </button>
+                                <button *ngIf="i < bioSearchSortFields.length - 1" class="filters__button" [class.selected]="bioSearchSortFields[i+1].selected"
+                                  (click)="setBioSearchSortingAndDoTheSort(bioSearchSortFields[i+1].id)">{{bioSearchSortFields[i+1].value}}
+                                  </button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="filters__section">
+                    <h4 class="filters__section-title">View as</h4>
+                    <div class="filters__2-col">
+                        <button class="filters__button filters__button--inverted" (click)="cardView = true" [class.filters__button--inverted]="cardView">
+                            <div class="filters__button-content">
+                                <svg class="filters__button-icon" width="22px" height="22px" viewBox="0 0 22 22" xmlns="http://www.w3.org/2000/svg">
+                                    <title>
+                                        Grid icon
+                                    </title>
+                                    <path class="grid" d="M10 1v8c0 .28-.096667.516667-.289333.71C9.516667 9.903333 9.28 10 9 10H1c-.28 0-.516667-.096667-.71-.29C.096667 9.516667 0 9.28 0 9V1C0 .72.096667.483333.29.29.483333.097333.72 0 1 0h8c.28 0 .516667.097333.710667.29C9.903333.483333 10 .72 10 1c0 0 0-.28 0 0zm0 12v8c0 .28-.096667.516667-.289333.71C9.516667 21.903333 9.28 22 9 22H1c-.28 0-.516667-.096667-.71-.29C.096667 21.516667 0 21.28 0 21v-8c0-.28.096667-.516667.29-.71.193333-.192667.43-.29.71-.29h8c.28 0 .516667.097333.710667.29.192666.193333.289333.43.289333.71 0 0 0-.28 0 0zM22 1v8c0 .28-.096667.516667-.289333.71-.194.193333-.430667.29-.710667.29h-8c-.28 0-.516667-.096667-.71-.29-.193333-.193333-.29-.43-.29-.71V1c0-.28.096667-.516667.29-.71.193333-.192667.43-.29.71-.29h8c.28 0 .516667.097333.710667.29C21.903333.483333 22 .72 22 1c0 0 0-.28 0 0zm0 12v8c0 .28-.096667.516667-.289333.71-.194.193333-.430667.29-.710667.29h-8c-.28 0-.516667-.096667-.71-.29-.193333-.193333-.29-.43-.29-.71v-8c0-.28.096667-.516667.29-.71.193333-.192667.43-.29.71-.29h8c.28 0 .516667.097333.710667.29.192666.193333.289333.43.289333.71z" fill="currentColor" fill-rule="evenodd"/>
+                                </svg>
+                                <span>Grid</span>
+                            </div>
+                        </button>
+                        <button class="filters__button" (click)="cardView = false" [class.filters__button--inverted]="!cardView">
+                            <div class="filters__button-content">
+                                <svg class="filters__button-icon" width="24px" height="22px" viewBox="0 0 24 22" xmlns="http://www.w3.org/2000/svg">
+                                    <title>
+                                        List icon
+                                    </title>
+                                    <path class="list" d="M6 1v4c0 .28-.096667.516667-.289333.71C5.516667 5.903333 5.28 6 5 6H1c-.28 0-.516667-.096667-.71-.29C.096667 5.516667 0 5.28 0 5V1C0 .72.096667.483333.29.29.483333.097333.72 0 1 0h4c.28 0 .516667.097333.710667.29C5.903333.483333 6 .72 6 1c0 0 0-.28 0 0zm0 12V9c0-.28-.096667-.516667-.289333-.71C5.516667 8.097333 5.28 8 5 8H1c-.28 0-.516667.097333-.71.29C.096667 8.483333 0 8.72 0 9v4c0 .28.096667.516667.29.71.193333.193333.43.29.71.29h4c.28 0 .516667-.096667.710667-.29C5.903333 13.516667 6 13.28 6 13c0 0 0 .28 0 0zm0 4v4c0 .28-.096667.516667-.289333.71C5.516667 21.903333 5.28 22 5 22H1c-.28 0-.516667-.096667-.71-.29C.096667 21.516667 0 21.28 0 21v-4c0-.28.096667-.516667.29-.71.193333-.192667.43-.29.71-.29h4c.28 0 .516667.097333.710667.29C5.903333 16.483333 6 16.72 6 17c0 0 0-.28 0 0zM24 1v4c0 .28-.096667.516667-.289333.71C23.516667 5.903333 23.28 6 23 6H9c-.28 0-.516667-.096667-.71-.29C8.096667 5.516667 8 5.28 8 5V1c0-.28.096667-.516667.29-.71C8.483333.097333 8.72 0 9 0h14c.28 0 .516667.097333.710667.29C23.903333.483333 24 .72 24 1c0 0 0-.28 0 0zm0 8v4c0 .28-.096667.516667-.289333.71-.194.193333-.430667.29-.710667.29H9c-.28 0-.516667-.096667-.71-.29-.193333-.193333-.29-.43-.29-.71V9c0-.28.096667-.516667.29-.71.193333-.192667.43-.29.71-.29h14c.28 0 .516667.097333.710667.29C23.903333 8.483333 24 8.72 24 9c0 0 0-.28 0 0zm0 8v4c0 .28-.096667.516667-.289333.71-.194.193333-.430667.29-.710667.29H9c-.28 0-.516667-.096667-.71-.29-.193333-.193333-.29-.43-.29-.71v-4c0-.28.096667-.516667.29-.71.193333-.192667.43-.29.71-.29h14c.28 0 .516667.097333.710667.29.192666.193333.289333.43.289333.71z" fill="currentColor" fill-rule="evenodd"/>
+                                </svg>
+                                <span>List</span>
+                            </div>
+                        </button>
+                    </div>
+                </section>
+
+                <section class="filters__section">
+                    <h4 class="filters__section-title">People per Page</h4>
+                    <!-- People per page for current results on mobile -->
+                    <div class="dropdown search__res-per-pg">
+                        <button class="search__res-per-pg-button dropdown-toggle" type="button" id="pgSizeEntryEnd" data-toggle="dropdown">
+                            <span>Showing {{myCurrentPageSize}} People per Page</span>
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu" role="menu" aria-labelledby="pgSizeEntryEnd">
+                            <li role="presentation"><a class="dropdown__option" role="menuitem" (click)="setPageSize(10)">10</a></li>
+                            <li role="presentation"><a class="dropdown__option" role="menuitem" (click)="setPageSize(30)">30</a></li>
+                            <li role="presentation"><a class="dropdown__option" role="menuitem" (click)="setPageSize(60)">60</a></li>
+                            <li role="presentation"><a class="dropdown__option" role="menuitem" (click)="setPageSize(100)">100</a></li>
+                            <li role="presentation"><a class="dropdown__option" role="menuitem" (click)="setPageSize(300)">300</a></li>
+                        </ul>
+                    </div>
+                </section>
+
+                <div class="filters__applied" *ngIf="activeJobFacets.length > 0 || activeGenderFacets.length > 0 || activeYearFacets.length > 0 || activeLastInitialFacets.length > 0">
+                    <h4 class="filters__applied-title">Current Filters:</h4>
+                    <div class="filter" *ngFor="let chosenFacet of activeLastInitialFacets">
+                        <span class="filter__name">{{chosenFacet.value}}</span>
+                        <svg width="29" height="30" viewBox="0 0 13 14" xmlns="http://www.w3.org/2000/svg" class="filter__remove" (click)="clearLastInitialFacet(chosenFacet.ID, chosenFacet.value)">
+                            <title>
+                                Remove filter from being applied
+                            </title>
+                            <path d="M0 0h12.444v14H0V0zm3.457 10.825h1.36L5.68 9.1c.177-.38.343-.75.53-1.198h.045c.222.448.4.817.587 1.198l.885 1.725h1.427l-2.058-3.72L9.02 3.5H7.66l-.763 1.624c-.166.336-.31.683-.487 1.12h-.044c-.22-.437-.376-.784-.553-1.12L5.016 3.5H3.59l1.924 3.55-2.057 3.775z" fill="#704b2b" fill-rule="evenodd"/>
+                        </svg>
+                    </div>
+                    <div class="filter" *ngFor="let chosenFacet of activeGenderFacets">
+                        <span class="filter__name">{{chosenFacet.value}}</span>
+                        <svg width="29" height="30" viewBox="0 0 13 14" xmlns="http://www.w3.org/2000/svg" class="filter__remove" (click)="clearGenderFacet(chosenFacet.ID, chosenFacet.value)">
+                            <title>
+                                Remove filter from being applied
+                            </title>
+                            <path d="M0 0h12.444v14H0V0zm3.457 10.825h1.36L5.68 9.1c.177-.38.343-.75.53-1.198h.045c.222.448.4.817.587 1.198l.885 1.725h1.427l-2.058-3.72L9.02 3.5H7.66l-.763 1.624c-.166.336-.31.683-.487 1.12h-.044c-.22-.437-.376-.784-.553-1.12L5.016 3.5H3.59l1.924 3.55-2.057 3.775z" fill="#704b2b" fill-rule="evenodd"/>
+                        </svg>
+                    </div>
+                    <div class="filter" *ngFor="let chosenFacet of activeJobFacets">
+                        <span class="filter__name">{{chosenFacet.value}}</span>
+                        <svg width="29" height="30" viewBox="0 0 13 14" xmlns="http://www.w3.org/2000/svg" class="filter__remove" (click)="clearJobFacet(chosenFacet.ID)">
+                            <title>
+                                Remove filter from being applied
+                            </title>
+                            <path d="M0 0h12.444v14H0V0zm3.457 10.825h1.36L5.68 9.1c.177-.38.343-.75.53-1.198h.045c.222.448.4.817.587 1.198l.885 1.725h1.427l-2.058-3.72L9.02 3.5H7.66l-.763 1.624c-.166.336-.31.683-.487 1.12h-.044c-.22-.437-.376-.784-.553-1.12L5.016 3.5H3.59l1.924 3.55-2.057 3.775z" fill="#704b2b" fill-rule="evenodd"/>
+                        </svg>
+                    </div>
+                    <div class="filter" *ngFor="let chosenFacet of activeYearFacets">
+                        <span class="filter__name">{{chosenFacet.value}}</span>
+                        <svg width="29" height="30" viewBox="0 0 13 14" xmlns="http://www.w3.org/2000/svg" class="filter__remove" (click)="clearYearFacet(chosenFacet.ID)">
+                            <title>
+                                Remove filter from being applied
+                            </title>
+                            <path d="M0 0h12.444v14H0V0zm3.457 10.825h1.36L5.68 9.1c.177-.38.343-.75.53-1.198h.045c.222.448.4.817.587 1.198l.885 1.725h1.427l-2.058-3.72L9.02 3.5H7.66l-.763 1.624c-.166.336-.31.683-.487 1.12h-.044c-.22-.437-.376-.784-.553-1.12L5.016 3.5H3.59l1.924 3.55-2.057 3.775z" fill="#704b2b" fill-rule="evenodd"/>
+                        </svg>
+                    </div>
+                </div>
+
+                <section class="filters__section">
+                    <h4 class="filters__section-title">Refine Results</h4>
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a data-toggle="collapse" href="#lastNameMobile">
+                                    <span>Last Name </span><span class="caret"></span>
+                                </a>
+                            </h4>
+                        </div>
+                        <div id="lastNameMobile" class="panel-collapse collapse in">
+                            <div class="panel-body panel-tight-text-vertically">
+                                <p class="filter--alphabet" *ngFor="let lastInitial of lastInitialFacets">
+                                    <span class="filter__name" (click)="chooseLastInitialFacet(lastInitial.ID, lastInitial.value); activeFacet(lastInitial)" [class.active]="lastInitial.active">{{lastInitial.value}}</span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="panel panel-default panel--first">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">
+                                <a data-toggle="collapse" href="#collapse2">
+                                    <span>Gender </span>
+                                    <span class="caret"></span>
+                                </a>
+                            </h3>
+                        </div>
+                        <div id="collapse2" class="panel-collapse collapse">
+                            <div class="panel-body panel-tight-text-vertically">
+                                <p class="filter" *ngFor="let gender of genderFacets">
+                                    <span class="actionAsSpanText filter__name" [class.active]="gender.active" (click)="chooseGenderFacet(gender.ID, gender.value); activeFacet(gender)">{{gender.value}}&nbsp;({{gender.count}})</span>
+                                    <svg width="12px" height="11px" viewBox="0 0 12 11" xmlns="http://www.w3.org/2000/svg" class="filter__check" (click)="clearGenderFacet(gender.ID, gender.value)" *ngIf="gender.active">
+                                        <title aria-hidden="true">
+                                            Checkmark
+                                        </title>
+                                        <path d="M2.115 3.986l2.052 2.065L9.887 0 12 2.115l-7.823 8.172L0 6.101" fill="#704b2b" fill-rule="evenodd"/>
+                                    </svg>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">
+                                <a data-toggle="collapse" href="#collapse3">
+                                    <span>Decade of Birth </span>
+                                    <span class="caret"></span>
+                                </a>
+                            </h3>
+                        </div>
+                        <div id="collapse3" class="panel-collapse collapse">
+                            <div class="panel-body panel-tight-text-vertically">
+                                <p class="filter" *ngFor="let birthDecade of yearFacets">
+                                    <span class="actionAsSpanText filter__name" [class.active]="birthDecade.active" (click)="chooseYearFacet(birthDecade.ID, birthDecade.value); activeFacet(birthDecade)">{{birthDecade.value}}&nbsp;({{birthDecade.count}})</span>
+                                    <svg width="12px" height="11px" viewBox="0 0 12 11" xmlns="http://www.w3.org/2000/svg" class="filter__check" (click)="clearYearFacet(birthDecade.ID)" *ngIf="birthDecade.active">
+                                        <title aria-hidden="true">
+                                            Checkmark
+                                        </title>
+                                        <path d="M2.115 3.986l2.052 2.065L9.887 0 12 2.115l-7.823 8.172L0 6.101" fill="#704b2b" fill-rule="evenodd"/>
+                                    </svg>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">
+                                <a data-toggle="collapse" href="#collapse4">
+                                    <span>Job Type</span> <span class="caret"></span>
+                                </a>
+                            </h3>
+                        </div>
+                        <div id="collapse4" class="panel-collapse collapse">
+                            <div class="panel-body panel-tight-text-vertically">
+                                <p class="filter" *ngFor="let occupation of jobTypeFacets">
+                                    <span class="actionAsSpanText filter__name" [class.active]="occupation.active" (click)="chooseJobFacet(occupation.ID, occupation.value); activeFacet(occupation)">{{occupation.value}}&nbsp;({{occupation.count}})</span>
+                                    <svg width="12px" height="11px" viewBox="0 0 12 11" xmlns="http://www.w3.org/2000/svg" class="filter__check" (click)="clearJobFacet(occupation.ID)" *ngIf="occupation.active">
+                                        <title aria-hidden="true">
+                                            Checkmark
+                                        </title>
+                                        <path d="M2.115 3.986l2.052 2.065L9.887 0 12 2.115l-7.823 8.172L0 6.101" fill="#704b2b" fill-rule="evenodd"/>
+                                    </svg>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                </section>
+
+            </div>
+
+        </section>
+
+        <!-- Search section -->
+        <section class="search col-xs-12 col-sm-8 col-md-8 col-lg-6 col-lg-offset-1 col-md-offset-1">
+            <!-- Search input with dropdown -->
+            <div class="input-dropdown">
+                <label>
+                    <input type="text" class="input-dropdown__input" [(ngModel)]="textQuery" placeholder="Search Makers..." (keyup.enter)="doBiographySearch()" />
+                </label>
+                <div class="dropdown">
+                    <button class="dropdown-toggle input-dropdown__button" type="button" id="desktop-fieldFilter" data-toggle="dropdown">
+                        {{searchByField}}
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu" role="menu" aria-labelledby="desktop-fieldFilter">
+                        <li role="presentation" *ngFor="let field of fields">
+                            <button class="dropdown__option" role="menuitem" value="field" *ngIf="field !== searchByField" (click)="searchFieldChange(field)">{{field}}</button>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="search__bottom-row">
+                <div>
+                    <!-- Search links -->
+                    <div class="search__links-container">
+                        <div class="search__advanced"><a routerLink="/bioadvs" routerLinkActive="active">Advanced Search and Tips</a></div>
+                    </div>
+
+                    <!-- People (i.e., biography search result documents) per page -->
+                    <div class="search__ppp-container">
+                        <div class="dropdown search__res-per-pg">
+                            <button class="search__res-per-pg-button dropdown-toggle" type="button" id="desktop-pgSizeEntry" data-toggle="dropdown">
+                                People per Page: {{bioResultsPageSize}}
+                                <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu" role="menu" aria-labelledby="desktop-pgSizeEntry">
+                                <li role="presentation"><a class="dropdown__option" role="menuitem" (click)="setSearchPageSize(10)">10</a></li>
+                                <li role="presentation"><a class="dropdown__option" role="menuitem" (click)="setSearchPageSize(30)">30</a></li>
+                                <li role="presentation"><a class="dropdown__option" role="menuitem" (click)="setSearchPageSize(60)">60</a></li>
+                                <li role="presentation"><a class="dropdown__option" role="menuitem" (click)="setSearchPageSize(100)">100</a></li>
+                                <li role="presentation"><a class="dropdown__option" role="menuitem" (click)="setSearchPageSize(300)">300</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Submit button -->
+                <button class="search__submit" [disabled]="noNeedForBiographySearch()" (click)="doBiographySearch()" value="Search">
+                    <span>Search
+                        <svg class="search__submit-icon" width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                            <title aria-hidden="true">
+                                Search Magnifying Glass Icon
+                            </title>
+                            <path d="M17.477 2.523C15.797.84 13.59 0 11.387 0 9.183 0 6.98.84 5.297 2.523c-3.037 3.036-3.33 7.775-.885 11.142L.398 17.678c-.53.53-.53 1.392 0 1.924.266.265.614.398.962.398s.696-.133.962-.398l4.013-4.014c1.502 1.09 3.277 1.638 5.052 1.638 2.204 0 4.41-.84 6.09-2.523 3.364-3.363 3.364-8.817 0-12.18zM16.13 13.357c-1.266 1.267-2.95 1.965-4.743 1.965-1.792 0-3.477-.698-4.744-1.965-2.616-2.616-2.616-6.872 0-9.488C7.91 2.6 9.595 1.903 11.387 1.903c1.792 0 3.477.698 4.744 1.965 1.268 1.266 1.966 2.95 1.966 4.743 0 1.792-.698 3.477-1.965 4.744z" fill-rule="nonzero" fill="#FFF"/>
+                        </svg>
+                    </span>
+                    <span class="sr-only">Submit</span>
+                </button>
+
+            </div>
+
+        </section>
+    </div>
+
+    <div class="row maker-directory__bottom-row">
+        <div class="visible-lg-block col-lg-3 visible-md-block col-md-3 visible-sm-block col-sm-4 visible-xs-block col-xs-12">
+
+            <!-- Results filters section -->
+            <section class="filters" *ngIf="pages.length >= 1">
+                <h2 class="filters__title">Filter Results</h2>
+                <div class="filters__applied" *ngIf="activeJobFacets.length > 0 || activeGenderFacets.length > 0 || activeYearFacets.length > 0 || activeLastInitialFacets.length > 0">
+                    <h3 class="filters__applied-title">Current Filters:</h3>
+                    <ul class="list-without-styles">
+                        <li class="filter" *ngFor="let chosenFacet of activeGenderFacets" (keyup.enter)="clearGenderFacet(chosenFacet.ID, chosenFacet.value)">
+                            <span class="filter__name">{{chosenFacet.value}}</span>
+                            <svg width="29" height="30" viewBox="0 0 13 14" xmlns="http://www.w3.org/2000/svg" class="filter__remove" (click)="clearGenderFacet(chosenFacet.ID, chosenFacet.value)">
+                                <title>
+                                    Remove filter from being applied
+                                </title>
+                                <path d="M0 0h12.444v14H0V0zm3.457 10.825h1.36L5.68 9.1c.177-.38.343-.75.53-1.198h.045c.222.448.4.817.587 1.198l.885 1.725h1.427l-2.058-3.72L9.02 3.5H7.66l-.763 1.624c-.166.336-.31.683-.487 1.12h-.044c-.22-.437-.376-.784-.553-1.12L5.016 3.5H3.59l1.924 3.55-2.057 3.775z" fill="#704b2b" fill-rule="evenodd"/>
+                            </svg>
+                        </li>
+                        <li class="filter" *ngFor="let chosenFacet of activeLastInitialFacets" (keyup.enter)="clearLastInitialFacet(chosenFacet.ID, chosenFacet.value)">
+                            <span class="filter__name">{{chosenFacet.value}}</span>
+                            <svg width="29" height="30" viewBox="0 0 13 14" xmlns="http://www.w3.org/2000/svg" class="filter__remove" (click)="clearLastInitialFacet(chosenFacet.ID, chosenFacet.value)">
+                                <title>
+                                    Remove filter from being applied
+                                </title>
+                                <path d="M0 0h12.444v14H0V0zm3.457 10.825h1.36L5.68 9.1c.177-.38.343-.75.53-1.198h.045c.222.448.4.817.587 1.198l.885 1.725h1.427l-2.058-3.72L9.02 3.5H7.66l-.763 1.624c-.166.336-.31.683-.487 1.12h-.044c-.22-.437-.376-.784-.553-1.12L5.016 3.5H3.59l1.924 3.55-2.057 3.775z" fill="#704b2b" fill-rule="evenodd"/>
+                            </svg>
+                        </li>
+                        <li class="filter" *ngFor="let chosenFacet of activeJobFacets" (keyup.enter)="clearJobFacet(chosenFacet.ID)">
+                            <span class="filter__name">{{chosenFacet.value}}</span>
+                            <svg width="29" height="30" viewBox="0 0 13 14" xmlns="http://www.w3.org/2000/svg" class="filter__remove" (click)="clearJobFacet(chosenFacet.ID)">
+                                <title>
+                                    Remove filter from being applied
+                                </title>
+                                <path d="M0 0h12.444v14H0V0zm3.457 10.825h1.36L5.68 9.1c.177-.38.343-.75.53-1.198h.045c.222.448.4.817.587 1.198l.885 1.725h1.427l-2.058-3.72L9.02 3.5H7.66l-.763 1.624c-.166.336-.31.683-.487 1.12h-.044c-.22-.437-.376-.784-.553-1.12L5.016 3.5H3.59l1.924 3.55-2.057 3.775z" fill="#704b2b" fill-rule="evenodd"/>
+                            </svg>
+                        </li>
+                        <li class="filter" *ngFor="let chosenFacet of activeYearFacets" (keyup.enter)="clearYearFacet(chosenFacet.ID)">
+                            <span class="filter__name">{{chosenFacet.value}}</span>
+                            <svg width="29" height="30" viewBox="0 0 13 14" xmlns="http://www.w3.org/2000/svg" class="filter__remove" (click)="clearYearFacet(chosenFacet.ID)">
+                                <title>
+                                    Remove filter from being applied
+                                </title>
+                                <path d="M0 0h12.444v14H0V0zm3.457 10.825h1.36L5.68 9.1c.177-.38.343-.75.53-1.198h.045c.222.448.4.817.587 1.198l.885 1.725h1.427l-2.058-3.72L9.02 3.5H7.66l-.763 1.624c-.166.336-.31.683-.487 1.12h-.044c-.22-.437-.376-.784-.553-1.12L5.016 3.5H3.59l1.924 3.55-2.057 3.775z" fill="#704b2b" fill-rule="evenodd"/>
+                            </svg>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="visible-lg-block visible-md-block visible-sm-block">
+                    <div class="panel panel-default">
+                        <div class="panel-heading" aria-expanded="true">
+                            <h4 class="panel-title">
+                                <a data-toggle="collapse" href="#lastName">
+                                    <span>Last Name </span><span class="caret"></span>
+                                </a>
+                            </h4>
+                        </div>
+                        <div id="lastName" class="panel-collapse collapse in">
+                            <ul class="panel-body panel-tight-text-vertically">
+                                <li class="filter filter--alphabet" *ngFor="let lastInitial of lastInitialFacets" tabindex="0" (click)="chooseLastInitialFacet(lastInitial.ID, lastInitial.value); activeFacet(lastInitial)" (keyup.enter)="chooseLastInitialFacet(lastInitial.ID, lastInitial.value); activeFacet(lastInitial)" >
+                                    <span class="filter__name" [class.active]="lastInitial.active">{{lastInitial.value}}</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="panel panel-default">
+                        <div class="panel-heading" aria-expanded="false">
+                            <h4 class="panel-title">
+                                <a data-toggle="collapse" href="#gender" class="collapsed">
+                                    <span>Gender </span>
+                                    <span class="caret"></span>
+                                </a>
+                            </h4>
+                        </div>
+                        <div id="gender" class="panel-collapse collapse">
+                            <ul class="panel-body panel-tight-text-vertically">
+                                <li class="filter" *ngFor="let gender of genderFacets" (click)="chooseGenderFacet(gender.ID, gender.value); activeFacet(gender)" (keyup.enter)="chooseGenderFacet(gender.ID, gender.value); activeFacet(gender)">
+                                    <span class="filter__name" [class.active]="gender.active" >{{gender.value}}&nbsp;({{gender.count}})</span>
+                                    <svg width="12px" height="11px" viewBox="0 0 12 11" xmlns="http://www.w3.org/2000/svg" class="filter__check" (click)="clearGenderFacet(gender.ID, gender.value)" *ngIf="gender.active">
+                                        <title aria-hidden="true">
+                                            Checkmark
+                                        </title>
+                                        <path d="M2.115 3.986l2.052 2.065L9.887 0 12 2.115l-7.823 8.172L0 6.101" fill="#704b2b" fill-rule="evenodd"/>
+                                    </svg>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="panel panel-default">
+                        <div class="panel-heading" aria-expanded="false">
+                            <h4 class="panel-title">
+                                <a data-toggle="collapse" href="#birthDecade" class="collapsed">
+                                    <span>Decade of Birth </span>
+                                    <span class="caret"></span>
+                                </a>
+                            </h4>
+                        </div>
+
+                        <div id="birthDecade" class="panel-collapse collapse">
+                            <ul class="panel-body panel-tight-text-vertically">
+                                <li class="filter" *ngFor="let birthDecade of yearFacets" (click)="chooseYearFacet(birthDecade.ID, birthDecade.value); activeFacet(birthDecade)" (keyup.enter)="chooseYearFacet(birthDecade.ID, birthDecade.value); activeFacet(birthDecade)">
+                                    <span class="filter__name" [class.active]="birthDecade.active" >{{birthDecade.value}}&nbsp;({{birthDecade.count}})</span>
+                                    <svg width="12px" height="11px" viewBox="0 0 12 11" xmlns="http://www.w3.org/2000/svg" class="filter__check" (click)="clearYearFacet(birthDecade.ID)" *ngIf="birthDecade.active">
+                                        <title aria-hidden="true">
+                                            Checkmark
+                                        </title>
+                                        <path d="M2.115 3.986l2.052 2.065L9.887 0 12 2.115l-7.823 8.172L0 6.101" fill="#704b2b" fill-rule="evenodd"/>
+                                    </svg>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="panel panel-default">
+                        <div class="panel-heading" aria-expanded="false">
+                            <h4 class="panel-title">
+                                <a data-toggle="collapse" href="#job-type" class="collapsed">
+                                    <span>Job Type</span> <span class="caret"></span>
+                                </a>
+                            </h4>
+                        </div>
+                        <div id="job-type" class="panel-collapse collapse">
+                            <ul class="panel-body panel-tight-text-vertically">
+                                <li class="filter" *ngFor="let occupation of jobTypeFacets" (click)="chooseJobFacet(occupation.ID, occupation.value); activeFacet(occupation)" (keyup.enter)="chooseJobFacet(occupation.ID, occupation.value); activeFacet(occupation)">
+                                    <span class="filter__name" [class.active]="occupation.active" >{{occupation.value}}&nbsp;({{occupation.count}})</span>
+                                    <svg width="12px" height="11px" viewBox="0 0 12 11" xmlns="http://www.w3.org/2000/svg" class="filter__check" (click)="clearJobFacet(occupation.ID)" *ngIf="occupation.active">
+                                        <title aria-hidden="true">
+                                            Checkmark
+                                        </title>
+                                        <path d="M2.115 3.986l2.052 2.065L9.887 0 12 2.115l-7.823 8.172L0 6.101" fill="#704b2b" fill-rule="evenodd"/>
+                                    </svg>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- My Playlist-->
+            <playlist [allowMyPlaylistView]=false></playlist>
+
+        </div>
+        <div class="col-xs-12 col-sm-8 col-md-9 col-lg-9">
+            <h2 class="biography-set__title">{{biographySetTitle}}</h2>
+
+            <!-- Results view options section -->
+            <section class="addBottomMargin page-view-options">
+
+                <!-- Pagination -->
+                <h3 class="sr-only">Display Options</h3>
+                <h4 class="sr-only">Pagination</h4>
+                <!--  TODO: Make links inside of list items -->
+                <ul class="pagination list-without-styles" *ngIf="pages.length > 1">
+                    <li class="pagination__prev" (click)="goBackPage()" *ngIf="myCurrentPage !== 1" tabindex="0"><span class="" aria-label="go back a page">«</span></li>
+                    <li class="pagination__button"
+                        tabindex="0"
+                        (click)="goToPage(page)"
+                        *ngFor="let page of pages"
+                        [class.active]="myCurrentPage === page"
+                        [class.pagination__button--mobile-hidden]="page >= pages[6]">{{page}}</li>
+                    <li class="pagination__next" (click)="goFwdPage()" *ngIf="myCurrentPage !== pages.length" tabindex="0"><span aria-label="go forward a page">»</span></li>
+                </ul>
+
+                <div class="page-view-options__sort-and-display">
+
+                    <!-- Sort results -->
+                    <div *ngIf="myCurrentBiographySearchSorting >= 0 && pages.length > 1" class="sort-results">
+                        <label for="sort-results">Sort results by</label>
+                        <div class="dropdown search__res-per-pg" id="sort-results">
+                            <button class="search__res-per-pg-button dropdown-toggle" type="button" role="menu" id="desktop-sortBioSearch" aria-label="Sort results by" data-toggle="dropdown" aria-expanded="false">
+                                {{bioSearchSortFields[myCurrentBiographySearchSorting].value}}
+                                <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="desktop-sortBioSearch">
+                                <li *ngFor="let oneBioSearchField of bioSearchSortFields" role="presentation">
+                                    <a class="dropdown__option" role="link" tabindex="0" (click)="setBioSearchSortingAndDoTheSort(oneBioSearchField.id)">{{oneBioSearchField.value}}</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Stamp view and page view buttons-->
+                    <div class="view" *ngIf="pages.length > 0">
+                        <div class="view__button-container">
+                            <button class="view__grid-button" (click)="cardView = true" (keyup.enter)="cardView = true" [class.active]="cardView" >
+                                <svg class="" viewBox="0 0 22 22" xmlns="http://www.w3.org/2000/svg">
+                                    <title>
+                                        Grid icon
+                                    </title>
+                                    <path class="grid" d="M10 1v8c0 .28-.096667.516667-.289333.71C9.516667 9.903333 9.28 10 9 10H1c-.28 0-.516667-.096667-.71-.29C.096667 9.516667 0 9.28 0 9V1C0 .72.096667.483333.29.29.483333.097333.72 0 1 0h8c.28 0 .516667.097333.710667.29C9.903333.483333 10 .72 10 1c0 0 0-.28 0 0zm0 12v8c0 .28-.096667.516667-.289333.71C9.516667 21.903333 9.28 22 9 22H1c-.28 0-.516667-.096667-.71-.29C.096667 21.516667 0 21.28 0 21v-8c0-.28.096667-.516667.29-.71.193333-.192667.43-.29.71-.29h8c.28 0 .516667.097333.710667.29.192666.193333.289333.43.289333.71 0 0 0-.28 0 0zM22 1v8c0 .28-.096667.516667-.289333.71-.194.193333-.430667.29-.710667.29h-8c-.28 0-.516667-.096667-.71-.29-.193333-.193333-.29-.43-.29-.71V1c0-.28.096667-.516667.29-.71.193333-.192667.43-.29.71-.29h8c.28 0 .516667.097333.710667.29C21.903333.483333 22 .72 22 1c0 0 0-.28 0 0zm0 12v8c0 .28-.096667.516667-.289333.71-.194.193333-.430667.29-.710667.29h-8c-.28 0-.516667-.096667-.71-.29-.193333-.193333-.29-.43-.29-.71v-8c0-.28.096667-.516667.29-.71.193333-.192667.43-.29.71-.29h8c.28 0 .516667.097333.710667.29.192666.193333.289333.43.289333.71z" fill="currentColor" fill-rule="evenodd"/>
+                                </svg>
+                            </button>
+                        </div>
+
+                        <div class="view__button-container" *ngIf="pages.length > 0">
+                            <button class="view__list-button" (click)="cardView = false" (keyup.enter)="cardView = false" [class.active]="!cardView" >
+                                <svg class="" viewBox="0 0 24 22" xmlns="http://www.w3.org/2000/svg">
+                                    <title>
+                                        List icon
+                                    </title>
+                                    <path class="list" d="M6 1v4c0 .28-.096667.516667-.289333.71C5.516667 5.903333 5.28 6 5 6H1c-.28 0-.516667-.096667-.71-.29C.096667 5.516667 0 5.28 0 5V1C0 .72.096667.483333.29.29.483333.097333.72 0 1 0h4c.28 0 .516667.097333.710667.29C5.903333.483333 6 .72 6 1c0 0 0-.28 0 0zm0 12V9c0-.28-.096667-.516667-.289333-.71C5.516667 8.097333 5.28 8 5 8H1c-.28 0-.516667.097333-.71.29C.096667 8.483333 0 8.72 0 9v4c0 .28.096667.516667.29.71.193333.193333.43.29.71.29h4c.28 0 .516667-.096667.710667-.29C5.903333 13.516667 6 13.28 6 13c0 0 0 .28 0 0zm0 4v4c0 .28-.096667.516667-.289333.71C5.516667 21.903333 5.28 22 5 22H1c-.28 0-.516667-.096667-.71-.29C.096667 21.516667 0 21.28 0 21v-4c0-.28.096667-.516667.29-.71.193333-.192667.43-.29.71-.29h4c.28 0 .516667.097333.710667.29C5.903333 16.483333 6 16.72 6 17c0 0 0-.28 0 0zM24 1v4c0 .28-.096667.516667-.289333.71C23.516667 5.903333 23.28 6 23 6H9c-.28 0-.516667-.096667-.71-.29C8.096667 5.516667 8 5.28 8 5V1c0-.28.096667-.516667.29-.71C8.483333.097333 8.72 0 9 0h14c.28 0 .516667.097333.710667.29C23.903333.483333 24 .72 24 1c0 0 0-.28 0 0zm0 8v4c0 .28-.096667.516667-.289333.71-.194.193333-.430667.29-.710667.29H9c-.28 0-.516667-.096667-.71-.29-.193333-.193333-.29-.43-.29-.71V9c0-.28.096667-.516667.29-.71.193333-.192667.43-.29.71-.29h14c.28 0 .516667.097333.710667.29C23.903333 8.483333 24 8.72 24 9c0 0 0-.28 0 0zm0 8v4c0 .28-.096667.516667-.289333.71-.194.193333-.430667.29-.710667.29H9c-.28 0-.516667-.096667-.71-.29-.193333-.193333-.29-.43-.29-.71v-4c0-.28.096667-.516667.29-.71.193333-.192667.43-.29.71-.29h14c.28 0 .516667.097333.710667.29.192666.193333.289333.43.289333.71z" fill="currentColor" fill-rule="evenodd"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- People per page for current results -->
+                    <div class="dropdown search__res-per-pg" *ngIf="pages.length > 1">
+                        <button class="search__res-per-pg-button dropdown-toggle" type="button" id="desktop-pgSizeEntryEnd" data-toggle="dropdown" role="menu" aria-expanded="false" aria-label="People per page">
+                            People per Page: {{myCurrentPageSize}}
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="desktop-pgSizeEntryEnd">
+                            <li role="presentation"><a class="dropdown__option" role="link" tabindex="0" (click)="setPageSize(10)">10</a></li>
+                            <li role="presentation"><a class="dropdown__option" role="link" tabindex="0" (click)="setPageSize(30)">30</a></li>
+                            <li role="presentation"><a class="dropdown__option" role="link" tabindex="0" (click)="setPageSize(60)">60</a></li>
+                            <li role="presentation"><a class="dropdown__option" role="link" tabindex="0" (click)="setPageSize(100)">100</a></li>
+                            <li role="presentation"><a class="dropdown__option" role="link" tabindex="0" (click)="setPageSize(300)">300</a></li>
+                        </ul>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- Biography Stamps section -->
+
+            <ul class="biographies">
+                <li class="biography" *ngFor="let oneBio of biographies;let i=index" [class.biography--list]="!cardView">
+                    <thda-bio [cardView]="cardView" [bio]="biographies[i]" [selectedID]="selectedBiographyID" (onSelected)="onSelected($event)"></thda-bio>
+                </li>
+            </ul>
+
+            <!-- Pagination -->
+            <h3 class="sr-only">Display Options</h3>
+            <ul class="pagination" *ngIf="pages.length > 1">
+                <li class="pagination__prev" (click)="goBackPage()" *ngIf="myCurrentPage !== 1" role="link" tabindex="0"><span class="" aria-label="go back a page">«</span></li>
+                <li class="pagination__button"
+                    role="link"
+                    tabindex="0"
+                    aria-label="page link"
+                    (click)="goToPage(page)"
+                    *ngFor="let page of pages"
+                    [class.active]="myCurrentPage === page"
+                    [class.pagination__button--mobile-hidden]="page >= pages[6]">{{page}}</li>
+                <li class="pagination__next" (click)="goFwdPage()" *ngIf="myCurrentPage !== pages.length" role="link" tabindex="0"><span aria-label="go forward a page">»</span></li>
+            </ul>
+
+        </div>
+    </div>
+</main>
+<button class="apply-filters" [class.apply-filters--show]="mobileFiltersOpen" aria-hidden="true" (click)="toggleMobileFilters()">
+    <div class="apply-filters__button-container">
+        <svg class="filters__button-icon" width="24px" height="27px" viewBox="0 0 24 27" xmlns="http://www.w3.org/2000/svg">
+            <title>
+                Icon for Filter Button
+            </title>
+            <g fill-rule="nonzero" fill="#FFF">
+                <path d="M22.336422 12.623774h-1.868784c-.474612-1.956227-2.254407-3.453963-4.30117-3.453963-2.046764 0-3.796895 1.46717-4.30117 3.453964H1.09754C.474612 12.623774 0 13.11283 0 13.754717c0 .641887.474612 1.130943 1.09754 1.130943h10.79742c.474613 1.956227 2.254407 3.453963 4.271508 3.453963 2.0171 0 3.796895-1.46717 4.30117-3.453963h1.868784c.622928 0 1.09754-.489056 1.09754-1.130943 0-.641887-.504275-1.130943-1.09754-1.130943zm-6.169954 3.85132c-1.4535 0-2.64003-1.22264-2.64003-2.720377 0-1.497736 1.18653-2.720377 2.64003-2.720377 1.4535 0 2.640028 1.22264 2.640028 2.720377 0 1.497736-1.156866 2.720377-2.640028 2.720377zM1.096152 5.71585h1.9553c.47401 1.956225 2.251556 3.45396 4.295732 3.45396s3.792095-1.467168 4.295733-3.45396H22.33781c.62214 0 1.096152-.489058 1.096152-1.130944 0-.641887-.474012-1.130944-1.096152-1.130944H11.61329C11.13928 1.497736 9.361736 0 7.31756 0 5.273382 0 3.525463 1.436604 3.05145 3.453962H1.096153C.474012 3.453962 0 3.94302 0 4.584906 0 5.226792.503638 5.71585 1.096152 5.71585zm6.221406-3.851322c1.451662 0 2.63669 1.222642 2.63669 2.720378 0 1.497736-1.185028 2.720377-2.63669 2.720377-1.45166 0-2.63669-1.22264-2.63669-2.720377 0-1.497736 1.18503-2.720378 2.63669-2.720378zM22.33781 21.28415H11.642917c-.474012-1.956225-2.251557-3.45396-4.295733-3.45396S3.55509 19.297357 3.05145 21.28415H1.096153C.474012 21.28415 0 21.77321 0 22.415095c0 .641887.474012 1.130944 1.096152 1.130944h1.9553C3.52546 25.502264 5.303007 27 7.347183 27s3.792095-1.46717 4.295733-3.453962H22.33781c.62214 0 1.096152-.489057 1.096152-1.130944 0-.641886-.503637-1.130943-1.096152-1.130943zM7.347184 25.135473c-1.45166 0-2.63669-1.222642-2.63669-2.720378 0-1.497736 1.18503-2.720377 2.63669-2.720377 1.451662 0 2.63669 1.22264 2.63669 2.720377 0 1.497736-1.155403 2.720378-2.63669 2.720378z"/>
+            </g>
+        </svg>
+        <span>Apply Filters</span>
+    </div>
+</button>

@@ -1,0 +1,329 @@
+@import '../theme/base';
+
+.search {
+    @extend %source-sans;
+
+    display: flex;
+    flex-wrap: wrap;
+    font-size: 1rem;
+
+    &.search--mobile {
+        @extend %mobile-only;
+
+        background-color: color(light-grey);
+        box-shadow: 0 5px 7px rgba(0,0,0,.2);
+        padding: em(30) em(15);
+        position: fixed;
+        transition: top .3s ease-in-out;
+        z-index: 900;
+        top: -300px;
+        width: 100%;
+
+        &.search--toggle {
+            top: em(50);
+
+            //IE
+            @media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
+                top: 5em;
+            }
+        }
+    }
+
+    &.search--desktop {
+        @extend %desktop-only;
+
+        .input-dropdown {
+            padding-right: 0;
+        }
+
+        .search__submit {
+            order: 4;
+        }
+    }
+
+}
+
+.search__submit {
+    @extend %source-sans-semi-bold;
+
+    align-items: center;
+    background-color: color(primary);
+    border-radius: 0;
+    color: #fff;
+    cursor: pointer;
+    display: flex;
+    font-size: em(20, 16);
+    height: em(43, 16);
+    justify-content: center;
+    letter-spacing: .5px;
+    order: 4;
+    text-transform: uppercase;
+    transition: box-shadow .15s ease-in-out;
+    width: 100%;
+
+    @media screen and (min-width: bp(small)) {
+        font-size: em(16);
+        margin-left: auto;
+        width: em(156, 16);
+    }
+
+    @media screen and (min-width: bp(large)) {
+        order: initial;
+    }
+
+    &:hover {
+        box-shadow: inset 0 0 5px rgba(51,51,51,.6);
+    }
+
+    &:disabled {
+        cursor: not-allowed;
+        opacity: .4;
+    }
+
+    span {
+        width: 100%;
+    }
+}
+
+.search__submit-icon {
+    height: em(16, 16);
+    margin-left: 8px;
+}
+
+.search__advanced {
+    color: color(primary);
+}
+
+.search__links-container {
+    margin-bottom: em(17);
+    width: 100%;
+
+    @media screen and (min-width: bp(small)) {
+        margin-bottom: 0;
+    }
+
+    @media screen and (min-width: bp(large)) {
+        margin-bottom: em(12);
+    }
+
+    &--no-rpp {
+        width: auto;
+    }
+}
+
+.search__routerLink {
+    cursor: pointer;
+}
+
+.search__rpp-container {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+    margin-top: auto;
+    margin-bottom: em(17);
+    margin-right: em(5);
+    width: auto;
+
+    @media screen and (min-width: bp(small)) {
+        margin-bottom: initial;
+        max-width: em(290);
+    }
+
+}
+
+.search__res-per-pg {
+    align-self: flex-end;
+    display: inline-block;
+}
+
+.search__res-per-pg-button {
+    @extend %source-sans;
+
+    align-items: center;
+    background-color: color(light-grey);
+    border-radius: 0;
+    border: 1px solid #cccccc;
+    color: #333333;
+    display: flex;
+    font-size: 1rem;
+    height: em(30);
+    justify-content: space-between;
+    padding: 0 em(10);
+    transition: background-color .2s ease-in-out, box-shadow .2s ease-in-out;
+
+    &[aria-expanded="true"] {
+        background-color: color(grey);
+        box-shadow: inset 0 0 5px rgba(51,51,51,.5);
+    }
+
+    .caret {
+        margin: 7% 0 7% 5px;
+    }
+
+    &:focus {
+        outline: 1px solid color(dark-grey);
+    }
+}
+
+.search__match {
+  left: -999em;
+  position: absolute;
+}
+
+.search__match-group {
+    display: flex;
+    flex-direction: column;
+    list-style-type: none;
+}
+
+.search__match-container {
+    align-items: center;
+    display: flex;
+    height: 100%;
+}
+
+.search__match-label {
+    align-items: center;
+    cursor: pointer;
+    display: flex;
+    font-weight: normal;
+    margin-bottom: 0;
+
+    &:before {
+        background: white;
+        box-shadow: 0 0 0 1px color(grey);
+        content: '\a0';
+        display: inline-block;
+        height: em(14);
+        line-height: 1.4;
+        margin-right: .6em;
+        text-indent: .15em;
+        vertical-align: .2em;
+        width: em(14);
+    }
+}
+
+.search__match:checked + .search__match-label:before {
+    background: url('/assets/checked.png') center no-repeat #fff;
+}
+
+
+.input-dropdown {
+    display: flex;
+    margin-right: auto;
+    margin-bottom: em(17);
+    width: 100%;
+
+    @media screen and (min-width: bp(small)) {
+        margin-bottom: em(12);
+    }
+
+    @media screen and (min-width: bp(large)) {
+        padding-right: em(10);
+    }
+
+    label {
+        display: flex;
+        flex: 2;
+        font-weight: inherit;
+        margin-bottom: 0;
+    }
+
+    .dropdown .input-dropdown__button:focus {
+        border: 1px solid color(dark-grey);
+        outline: 0;
+    }
+}
+
+.input-dropdown__input {
+    @extend %source-sans;
+
+    border-top: 1px solid color(grey);
+    border-left: 1px solid color(grey);
+    border-bottom: 1px solid color(grey);
+    border-right: 0;
+    border-radius: 0;
+    color: color(dark-grey);
+    font-size: em(16);
+    flex: 2;
+    height: em(43, 16);
+    padding-left: em(9, 16);
+    width: 100%;
+
+    @media screen and (min-width: bp(medium)) {
+        padding-left: em(26, 16);
+    }
+
+    @media screen and (min-width: bp(medium)) {
+        font-size: em(18);
+        height: em(43, 18);
+        padding-left: em(26, 18);
+    }
+
+    &:focus {
+        border: 1px solid color(dark-grey);
+        outline: 0;
+    }
+
+    // opacity used to override Firefox default value for placeholders
+    &::placeholder {
+        color: #999;
+        opacity: 1;
+        text-transform: capitalize;
+    }
+}
+
+.input-dropdown__button {
+    @extend %source-sans;
+
+    background-color: #fff;
+    border: 1px solid color(grey);
+    border-radius: 0;
+    color: color(dark-grey);
+    height: em(43, 16);
+    font-size: em(16);
+    text-transform: capitalize;
+    transition: background-color .2s ease-in-out, box-shadow .2s ease-in-out;
+    width: 90px;
+
+    &[aria-expanded="true"] {
+        background-color: color(grey);
+        box-shadow: inset 0 0 5px rgba(51,51,51,.5);
+    }
+
+    @media screen and (min-width: bp(small)) {
+        width: 126px;
+    }
+
+    @media screen and (max-width: 544px) {
+        padding: 0 em(5);
+    }
+
+    @media screen and (min-width: bp(large)) {
+        height: em(43, 18);
+        font-size: em(18);
+    }
+
+
+}
+
+.dropdown-menu {
+    border: 1px solid rgba(0,0,0,.1);
+    border-radius: 0;
+}
+
+.dropdown__option {
+    background: none;
+    border: none;
+    color: color(dark-grey);
+    cursor: arrow;
+    font-size: em(16);
+    line-height: em(26, 16);
+    padding: 0 em(17, 16);
+    text-transform: capitalize;
+
+    &:hover {
+        background: transparent;
+        color: color(primary);
+    }
+}

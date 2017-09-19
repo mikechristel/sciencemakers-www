@@ -1,0 +1,16 @@
+<div class="container-fluid adjust-height">
+    <h1 class="page-title">Playlist Creation and Sharing</h1>
+    <p class="helptext">Stories are represented as image stamps or text rows in sets of stories.  Whether shown as an image stamp or text row, an interface is present to let you add and remove stories from "My Playlist."</p>
+    <p class="helptext">You can mark a story to become part of your playlist by selecting the icon that looks like a + in a circle, perhaps shown with helper text "Add to Playlist."</p>
+    <p class="helptext">You can remove a story from your playlist by selecting the icon that looks like an X, perhaps shown with helper text "Remove from Playlist."</p>
+    <p class="helptext">Also, from the story's video playback page, there are buttons to let you add and remove this particular story from your playlist.</p>
+    <p class="helptext">You have access to your playlist, titled "MY PLAYLIST" in the main routes for the application, at any time.  Selecting MY PLAYLIST will show you the stories you have marked.
+      One main purpose of collecting a set is to then bookmark it for future recollection, or share it so others can make use of this set.  From the link at the top of the MY PLAYLIST page, which is named "Title your playlist to save/share",
+      you select this link to then be shown a dialog box where you enter the title for your playlist.  On clicking SUBMIT, that link is now in your clipboard which you can then copy into the browser address bar, into email to colleagues,
+      into your own bookmarks bar, etc., to save and share.</p>
+    <p class="helptext">For example, you looked through stories on baseball and kerosene and are intrigued by two, from Ted Radcliffe and Dorothy Jackson.  You select the "add to playlist" icon on each story representation.
+      You navigate to "MY PLAYLIST" and see these two stories in their story set. You select the "Title your playlist to save/share..." link and enter a title "Baseball and Kerosene."  The result is a link,
+      <a [routerLink]="['/stories/6',  {IDList: '8849,12017', ListTitle: 'Baseball and Kerosene'}]"  routerLinkActive="active">example titled set of two stories</a>, which is presented in a form on your clipboard that allows
+      you to paste and go with that link in browsers.  NOTE:  the character set for saved titles is limited to letters, numbers, dashes, quotes, periods, and spaces.</p>
+    <p class="helptext"><a routerLink="/help" routerLinkActive="active">Back to FAQ/Help...</a></p>
+</div>

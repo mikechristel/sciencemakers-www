@@ -1,0 +1,132 @@
+@import '../../shared/theme/base';
+
+video {
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.vg-controls {
+  align-items: center;
+  background-color: color(grey);
+  height: em(30);
+}
+
+.vg-controls__inner-wrapper {
+  align-items: center;
+  display: flex;
+  flex: 2;
+  margin: 0 auto;
+  max-width: em(500); 
+
+  //IE
+  @media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
+    max-width: 100%;
+  }
+}
+
+.vg-play-pause { width: em(30); }
+
+.vg-scrub-bar-current-time {
+  align-items: center;
+  background-color: color(dark-grey);
+  height: em(2);
+  position: relative;
+  top: initial;
+
+  .background {
+    border: 1px solid color(primary);
+  }
+
+  .slider {
+    background-color: color(primary);
+    box-shadow: none;
+    height: em(12);
+    margin-top: 0;
+    width: em(12);
+  }
+}
+
+.vg-play-pause,
+.vg-time-display,
+.vg-scrub-bar,
+.vg-volume {
+  align-items: center;
+  color: color(dark-grey);
+  height: em(30);
+}
+
+.vg-time-display {
+  flex: 0;
+  margin: 0 em(5);
+
+  //IE
+  @media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
+    flex: 0 1 auto;
+    width: auto;
+  }
+
+  //Safari
+  &:not(:root:root) {
+    flex: 0 1 auto;
+    width: auto;    
+  }  
+}
+
+.vg-scrub-bar {
+  display: flex;
+  width: 25.2777777777778%;
+
+  //IE
+  @media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
+    height: auto;
+  }
+}
+
+.vg-volume {
+  margin: 0 em(10);
+  width: 11.1111111111111%;
+}
+
+.vg-volume .volumeBackground { 
+  background-color: color(dark-grey);
+  height: em(2);
+}
+
+.vg-volume .volumeValue { 
+  background-color: color(primary); 
+  height: em(2)
+}
+
+.vg-volume .volumeKnob { 
+  background-color: color(primary); 
+  height: em(12);
+  width: em(12);
+}
+
+.vg-full-width {
+  margin: 0 em(10);
+}
+
+.vg-volume-speaker,
+.vg-volume,
+.vg-full-width {
+  @media screen and (max-width: bp(medium)) {
+    display: none;
+  }
+}
+
+
+*::-webkit-media-controls-panel {
+  display: none!important;
+  -webkit-appearance: none;
+}
+
+*::-webkit-media-controls-start-playback-button {
+  display: none!important;
+  -webkit-appearance: none;
+}
+
+*::--webkit-media-controls-play-button {
+  display: none!important;
+  -webkit-appearance: none;
+}

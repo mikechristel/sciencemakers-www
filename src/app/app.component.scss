@@ -1,0 +1,440 @@
+﻿@import './shared/theme/base';
+
+.modal-content {
+
+  .modal-header {
+    border-bottom: 0;
+
+    .modal-title {
+      @extend %oswald;
+      color: color(dark-grey);
+      font-size: em(22);
+      text-transform: uppercase;
+    }
+
+    button.close {
+      color: color(secondary);
+      text-shadow: none;
+      opacity: 1;
+    }
+
+    .close:focus,
+    .close:hover {
+      background: transparent;
+    }
+  }//header
+
+  .modal-body {
+
+    textarea,
+    textarea:focus {
+      @extend %source-sans;
+      border: 1px solid #ccc;
+      border-radius: 0;
+      box-shadow: none;
+      color: color(dark-grey);
+      font-size: em(16);
+      margin-bottom: em(15, 16);
+      resize: none;
+    }
+  }
+
+  .modal-footer {
+    border-top: 0;
+
+    button,
+    button:focus {
+      @extend %source-sans-semi-bold;
+      background: color(primary);
+      border-radius: 0;
+      font-size: em(16);
+      padding: em(10) em(26);
+      text-transform: uppercase;
+    }
+  }
+}
+
+.nav {
+  background-color: color(light-grey);
+  color: color(dark-grey);
+  display: flex;
+  font-size: rem(16);
+  justify-content: space-between;
+  transition: left .3s ease-in-out;
+  width: 100%;
+
+  &::before,
+  &::after { content: none }
+
+  @media screen and (max-width: bp(medium)) {
+    border-right: 1px solid #ccc;
+    box-shadow: 0 5px 7px rgba(0,0,0,.20);
+    flex-direction: column;
+    height: 100vh;
+    justify-content: initial;
+    left: - em(600, 16);
+    padding: 0 em(15,16) em(15,16);
+    position: absolute;
+    top: 0;
+    width: 78.75vw;
+    z-index: 1000;
+  }
+
+  &.nav--open {
+    left: 0;
+
+    //IE 11
+    @media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
+      justify-content: flex-start;
+    }
+
+  }
+}
+
+.nav__links-item {
+
+  @media screen and (max-width: bp(medium)) {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+
+  &:first-of-type {
+    @media screen and (max-width: bp(medium)) {
+      padding-top: em(10, 16)
+    }
+  }
+
+}
+
+.nav__links {
+  @extend %list-without-styles;
+
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+
+  @media screen and (max-width: bp(medium)) {
+    flex-direction: column;
+  }
+
+}
+
+.nav__logo-container {
+  @extend %mobile-only;
+
+  align-items: center;
+  display: flex;
+  height: em(61,16);
+}
+
+.nav__logo {
+  height: 100%;
+  width: 58vw;
+
+  &:active {
+    outline: 0;
+  }
+}
+
+.nav__link {
+  border-bottom: 1px solid #fff;
+  color: color(dark-grey);
+  font-weight: bold;
+  letter-spacing: em(.5, 16);
+  padding: em(14,16) 0;
+  text-transform: uppercase;
+  transition: all .2s ease-in-out;
+
+  @media screen and (min-width: bp(medium) + 1) {
+    border-bottom: em(3,16) solid transparent;
+    padding: 0 em(8,16) em(12,16) em(8,16);
+  }
+
+  &.active {
+    color: color(tertiary);
+
+    @media screen and (min-width: bp(medium) + 1) {
+      border-bottom: em(3,16) solid color(tertiary);
+      text-decoration: none;
+    }
+  }
+
+  &:hover {
+    border-bottom: 1px solid #fff;
+    color: color(tertiary);
+    text-decoration: none;
+
+    @media screen and (min-width: bp(medium) + 1) {
+      border-bottom: em(3,16) solid color(tertiary);
+    }
+  }
+}
+
+.nav__link--playlist { position: relative; }
+
+.nav__badge {
+    background-color: color(tertiary);
+    font-size: rem(12);
+    position: absolute;
+    right: 0;
+
+    @media screen and (min-width: bp(medium) + 1) {
+      right: - em(20, 12);
+      top: - em(10, 12);
+    }
+}
+
+.header__offset {
+  margin-top: em(55);
+
+  //IE 11
+  @media screen and (min-width: bp(small)) and (-ms-high-contrast: active), (-ms-high-contrast: none) {
+      margin-top: em(55);
+  }
+
+  @media screen and (min-width: bp(medium) + 1) {
+    margin-top: 0;
+  }
+}
+
+.header {
+  background-color: color(light-grey);
+  border-bottom: 1px solid #ccc;
+  box-shadow: 0 0 10px rgba(0,0,0,.15);
+  font-size: 1rem;
+  padding: em(14) em(15);
+  position: fixed;
+  width: 100%;
+  z-index: 1000;
+
+  @media screen and (min-width: bp(medium) + 1) {
+    max-height: 100%;
+    padding: em(14) 0 0;
+    position: relative;
+    width: auto;
+    z-index: initial;
+  }
+}
+
+.header__content-container {
+  margin: 0 auto;
+  max-width: em(1500);
+
+  @media screen and (min-width: bp(medium) + 1) {
+    padding-left: em(30);
+    padding-right: em(30);
+  }
+}
+
+.header__top-row {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  min-height: em(32);
+
+  @media screen and (min-width: bp(medium) + 1) {
+    display: inline-flex;
+    margin-bottom: em(26);
+    min-height: auto;
+  }
+
+  //IE 11
+  @media screen and (min-width: bp(medium) + 1) and (-ms-high-contrast: active), (-ms-high-contrast: none) {
+    height: em(60);
+  }
+
+  @media screen and (min-width: bp(large)) {
+    margin-bottom: em(22);
+  }
+
+  //IE
+  @media screen and (min-width: bp(medium)) and (-ms-high-contrast: active) and (-ms-high-contrast: none) {
+    display: inline-block;
+  }
+}
+
+.bannerLogo {
+  height: 100%;
+  max-width: 460px;
+}
+
+.header__logo {
+  cursor: pointer;
+  height: 100%;
+  outline: 0;
+  max-width: 58vw;
+
+  //IE
+  @media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
+    flex: 1 0 auto;
+  }
+
+  @media screen and (max-width: bp(small)) {
+    width: 65vw;
+  }
+
+  @media screen and (min-width: bp(medium)) {
+    height: rem(32);
+    min-width: em(405);
+    width: 90%;
+  }
+
+  @media screen and (min-width: bp(large)) {
+    height: rem(36);
+  }
+}
+
+.header__menu-icon {
+  @extend %mobile-only;
+
+  color: color(dark-grey);
+  transition: color .3s ease-in-out;
+
+  @media screen and (max-width: bp(small)) {
+    height: 8%;
+    width: em(34);
+  }
+
+  //IE 11
+  @media screen and (min-width: bp(small)) and (-ms-high-contrast: active), (-ms-high-contrast: none) {
+      height: em(30);
+      width: em(39);
+  }
+}
+
+.header__search-icon {
+  @extend %mobile-only;
+
+  color: color(dark-grey);
+  margin-left: auto;
+  margin-right: 15px;
+  transition: color .3s ease-in-out;
+
+  @media screen and (max-width: bp(small)) {
+    height: em(32);
+    width: em(32);
+  }
+
+  //IE 11
+  @media screen and (min-width: bp(small)) and (-ms-high-contrast: active), (-ms-high-contrast: none) {
+      height: em(32);
+      width: em(32);
+  }
+}
+
+.header__menu-icon--open,
+.header__search-icon--open {
+  color: color(tertiary);
+  height: em(30);
+}
+
+.header__bottom-row {
+  display: flex;
+  justify-content: space-between;
+
+  @media screen and (min-width: bp(medium)) {
+    display: inline-flex;
+    float: right;
+  }
+}
+
+.header__tagline {
+  @extend %source-sans-bold-italic;
+  @extend %desktop-only;
+
+  color: color(dark-grey);
+  font-size: em(12);
+  line-height: em(16, 12);
+  text-align: left;
+
+  @media screen and (min-width: bp(large)) {
+    font-size: em(14);
+    line-height: em(18);
+    text-align: right;
+  }
+}
+
+// a11y skip to main content
+.skip {
+	padding:6px;
+	position: absolute;
+	top:-40px;
+	left:0px;
+	color:white;
+	border-right:1px solid white;
+	border-bottom:1px solid white;
+	border-bottom-right-radius:8px;
+	background:transparent;
+  transition: top 1s ease-out, background 1s linear;
+  z-index: 100;
+}
+
+a.skip:focus {
+	position:absolute;
+	left:0px;
+	top:0px;
+	background:color(tertiary);
+	outline:0;
+  transition: top .1s ease-in, background .5s linear;
+}
+
+.back-button {
+    @extend %oswald;
+
+    align-items: center;
+    background-color: transparent;
+    color: color(primary);
+    display: inline-flex;
+    font-size: rem(18);
+    justify-content: flex-end;
+    text-transform: uppercase;
+}
+
+@keyframes fadeOutLeft {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+    transform: translate3d(-100%, 0, 0);
+  }
+}
+
+.fadeOutLeft {
+  animation-name: fadeOutLeft;
+}
+
+.animated {
+  animation-duration: 1s;
+  animation-fill-mode: both;
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+.fadeOut {
+  animation-name: fadeOut;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.fadeIn {
+  animation-name: fadeIn;
+}

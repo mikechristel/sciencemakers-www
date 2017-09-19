@@ -1,0 +1,107 @@
+﻿<main class="container-fluid adjust-height-home" id="main-container" role="main" tabindex="-1">
+
+    <div class="row">
+
+        <div class="col-sm-12 col-md-8 mobile-only">
+            <!-- Mobile -->
+            <h1 class="page-title">Welcome to The ScienceMakers Digital Archive</h1>
+        </div>
+
+        <div class="col-sm-12 col-md-8">
+
+            <h1 class="page-title desktop-only">Welcome to The ScienceMakers Digital Archive</h1>
+
+            <!-- Search Form -->
+            <section class="search" role="search">
+                <h2 class="sr-only">Search stories</h2>
+
+                <!-- Search input with dropdown -->
+                <div class="input-dropdown">
+                    <label>
+                        <input type="text" class="input-dropdown__input" [(ngModel)]="txtQuery" placeholder="Search stories..." (keyup.enter)="doSearch()" />
+                    </label>
+                    <div class="dropdown">
+                        <button class="dropdown-toggle input-dropdown__button" type="button" id="desktop-fieldFilter" data-toggle="dropdown">
+                            {{searchByField}}
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu" role="menu" aria-labelledby="desktop-fieldFilter">
+                            <li role="presentation" *ngFor="let field of fields">
+                                <button class="dropdown__option" role="menuitem" value="field" *ngIf="field !== searchByField" (click)="searchFieldChange(field)">{{field}}</button>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Submit button -->
+                <button class="search__submit" [disabled]="noNeedForSearch()" (click)="doSearch()" value="Search">
+                    <span>Search
+                        <svg class="search__submit-icon" width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                            <title aria-hidden="true">
+                                Search Magnifying Glass Icon
+                            </title>
+                            <path d="M17.477 2.523C15.797.84 13.59 0 11.387 0 9.183 0 6.98.84 5.297 2.523c-3.037 3.036-3.33 7.775-.885 11.142L.398 17.678c-.53.53-.53 1.392 0 1.924.266.265.614.398.962.398s.696-.133.962-.398l4.013-4.014c1.502 1.09 3.277 1.638 5.052 1.638 2.204 0 4.41-.84 6.09-2.523 3.364-3.363 3.364-8.817 0-12.18zM16.13 13.357c-1.266 1.267-2.95 1.965-4.743 1.965-1.792 0-3.477-.698-4.744-1.965-2.616-2.616-2.616-6.872 0-9.488C7.91 2.6 9.595 1.903 11.387 1.903c1.792 0 3.477.698 4.744 1.965 1.268 1.266 1.966 2.95 1.966 4.743 0 1.792-.698 3.477-1.965 4.744z" fill-rule="nonzero" fill="#FFF"/>
+                        </svg>
+                    </span>
+                </button>
+
+                <!-- Search links -->
+                <div class="search__links-container">
+                    <span class="search__advanced"><a routerLink="/storyadvs" routerLinkActive="active">Advanced Search and Tips</a></span>
+                </div>
+
+                <!-- Results per page container -->
+                <div class="search__rpp-container">
+                    <div class="dropdown search__res-per-pg">
+                        <button class="search__res-per-pg-button dropdown-toggle" type="button" id="desktop-pgSizeEntry" data-toggle="dropdown">
+                            Results per Page: {{resultsSize}}
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu" role="menu" aria-labelledby="desktop-pgSizeEntry">
+                            <li role="presentation"><button class="dropdown__option" role="menuitem" (click)="setPageSize(10)">10</button></li>
+                            <li role="presentation"><button class="dropdown__option" role="menuitem" (click)="setPageSize(30)">30</button></li>
+                            <li role="presentation"><button class="dropdown__option" role="menuitem" (click)="setPageSize(60)">60</button></li>
+                            <li role="presentation"><button class="dropdown__option" role="menuitem" (click)="setPageSize(100)">100</button></li>
+                            <li role="presentation"><button class="dropdown__option" role="menuitem" (click)="setPageSize(300)">300</button></li>
+                        </ul>
+                    </div>
+                </div>
+
+            </section>
+            <!-- End Search Form-->
+        </div>
+        <div class="col-sm-12 col-md-4">
+            <div *ngIf="scienceMakersBiographyCount && scienceMakersStoryCount;then welcomeWithScienceMakerCounts else generalWelcome"></div>
+            <ng-template #welcomeWithScienceMakerCounts>
+                <p class="welcome-paragraph gaptop" *ngIf="biographyCount && storyCount"><span class="welcome-paragraph__stories">{{scienceMakersStoryCount}}</span> stories are assembled here from life oral history interviews
+                  with {{scienceMakersBiographyCount}} historically significant African Americans in the sciences, i.e., ScienceMakers, as of {{today | date: 'longDate'}}.  The full HistoryMakers Digital Archive holds
+                  {{storyCount}} stories from {{biographyCount}} HistoryMakers.</p>
+            </ng-template>
+            <ng-template #generalWelcome>
+                <p class="welcome-paragraph gaptop" *ngIf="biographyCount && storyCount"><span class="welcome-paragraph__stories">{{storyCount}}</span> stories are assembled here from life oral history interviews with {{biographyCount}}
+                  historically significant African Americans as of {{today | date: 'longDate'}}.</p>
+            </ng-template>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12">
+            <h2 class="birthdays__title">ScienceMakers Born this Month</h2>
+        </div>
+    </div>
+    <div class="row" *ngIf="confirmedNoBirthdays">
+        <div class="col-xs-12">
+            <p class="birthdays__empty-message">There are no ScienceMakers born in this month.</p>
+        </div>
+    </div>
+    <div class="row" *ngIf="biographies && biographies.length > 0">
+        <div class="col-xs-12">
+            <!-- ScienceMakers Born This Month section -->
+
+            <ul class="biographies">
+                <li class="biography" *ngFor="let oneBio of biographies;let i=index" [class.biography--list]="!cardView">
+                    <thda-bio [cardView]="cardView" [bio]="biographies[i]" (onSelected)="onSelected($event)"></thda-bio>
+                </li>
+            </ul>
+        </div>
+    </div>
+</main>
