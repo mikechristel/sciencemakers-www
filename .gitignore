@@ -44,3 +44,6 @@ Thumbs.db
 # Debug workaround for VS vscode
 node.sh
 launch.json
+
+# Configuration files for development and production
+/assets/*.json
