@@ -4,13 +4,13 @@ import { Http, Headers, Response } from '@angular/http';
 
 import { SearchResult } from '../storyset/search-result';
 import { HistoryMakerService } from '../historymakers/historymaker.service';
-import { ServiceBase } from '../shared/config-paths';
+import { AppConfig } from '../config/app-config';
 
 @Injectable()
 export class IDSearchService {
     private idSearchURL = 'FavoritesSet?csvStoryIDs='; // require csv argument, so it is already tacked on
 
-    constructor(@Inject(ServiceBase) private serviceBase:string, private http: Http, private historyMakerService: HistoryMakerService) { }
+    constructor(private http: Http, private config: AppConfig, private historyMakerService: HistoryMakerService) { }
 
     getIDSearch(csvIDList: string, givenPage: number, givenPageSize: number, genderFacet: string, yearFacets: string, makerFacets: string, jobFacets: string): Promise<SearchResult> {
         var addedArgs: string = "";
@@ -30,7 +30,8 @@ export class IDSearchService {
         // NOTE: cannot proceed to an ID search before first having search facets all in place.
         return this.historyMakerService.getFacetDetails()
             .then(response => {
-                return this.http.get(this.serviceBase + this.idSearchURL + csvIDList + addedArgs)
+                let serviceBase:string = this.config.getConfig('serviceBase');
+                return this.http.get(serviceBase + this.idSearchURL + csvIDList + addedArgs)
                     .toPromise()
                     .then(response => {
                         return response.json();

@@ -11,7 +11,7 @@ import { PlaylistManagerService } from '../playlist-manager/playlist-manager.ser
 import { StorySetType} from '../storyset/storyset-type';
 import { StoryDocument} from '../storyset/story-document';
 import { GlobalState } from '../app.global-state';
-import { MediaBase } from '../shared/config-paths';
+import { AppConfig } from '../config/app-config';
 
 import { DetailedBiographyStorySet } from './detailed-biography-storyset';
 import { BiographyFavorites } from '../story/biography-favorites';
@@ -78,8 +78,9 @@ export class BiographyStorySetComponent implements OnInit {
     fields: string[] = ['all fields','title','transcript']
     searchByField: string;
     biographyIDForLimitingSearch: number;
+    myMediaBase: string;
 
-    constructor(@Inject(MediaBase) private mediaBase:string,
+    constructor(private config: AppConfig,
         private route: ActivatedRoute,
         private router: Router,
         private biographyStorySetService: BiographyStorySetService,
@@ -87,6 +88,8 @@ export class BiographyStorySetComponent implements OnInit {
         private titleManagerService: TitleManagerService,
         private menuService: MenuService,
         private playlistManagerService: PlaylistManagerService) {
+
+        this.myMediaBase = this.config.getConfig('mediaBase');
     }
 
     // NOTE: This component shows all the stories for a given biography.
@@ -303,7 +306,7 @@ export class BiographyStorySetComponent implements OnInit {
                 if (bioDetail != null) {
                     this.biographyIDForLimitingSearch = bioDetail.biographyID;
                     this.menuService.setBiographyID(bioDetail.biographyID);
-                    this.tailoredImage = this.mediaBase + "biography/image/" + bioDetail.biographyID;
+                    this.tailoredImage = this.myMediaBase + "biography/image/" + bioDetail.biographyID;
                     if (bioDetail.birthDate == null)
                         this.tailoredBirthDate = "";
                     else

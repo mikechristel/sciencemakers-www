@@ -4,7 +4,7 @@ import { Http, Headers, Response } from '@angular/http';
 
 import { SearchResult } from '../storyset/search-result';
 import { HistoryMakerService } from '../historymakers/historymaker.service';
-import { ServiceBase } from '../shared/config-paths';
+import { AppConfig } from '../config/app-config';
 import { GlobalState } from '../app.global-state';
 
 import { GoogleAnalyticsEventsService } from '../google-analytics-events.service';
@@ -13,8 +13,7 @@ import { GoogleAnalyticsEventsService } from '../google-analytics-events.service
 export class TextSearchService {
     private txtSearchURL = 'StorySearch?query='; // require query argument, so it is already tacked on
 
-    constructor(@Inject(ServiceBase) private serviceBase:string,
-      private http: Http,
+    constructor(private http: Http, private config: AppConfig,
       private historyMakerService: HistoryMakerService,
       private gaService: GoogleAnalyticsEventsService) { }
 
@@ -65,7 +64,8 @@ export class TextSearchService {
         // NOTE: cannot proceed to a text search before first having search facets all in place.
         return this.historyMakerService.getFacetDetails()
             .then(response => {
-                return this.http.get(this.serviceBase + this.txtSearchURL + query + addedArgs)
+                let serviceBase:string = this.config.getConfig('serviceBase');
+                return this.http.get(serviceBase + this.txtSearchURL + query + addedArgs)
                     .toPromise()
                     .then(response => {
                         var quickAnswerCheck: SearchResult = response.json();

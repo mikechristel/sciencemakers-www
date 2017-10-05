@@ -1,6 +1,6 @@
 ﻿import { Component, Input, Output, EventEmitter, Inject } from '@angular/core';
 import { BriefBio } from '../historymakers/brief-bio';
-import { MediaBase } from '../shared/config-paths';
+import { AppConfig } from '../config/app-config';
 
 @Component({
     selector: 'thda-bio',
@@ -21,8 +21,8 @@ export class BiographyStampComponent {
 
     public myMediaBase: string;
 
-    constructor(@Inject(MediaBase) private mediaBase:string) {
-      this.myMediaBase = mediaBase;
+    constructor(private config: AppConfig) {
+      this.myMediaBase = this.config.getConfig('mediaBase');
     }
 
     isSelected(bio: BriefBio) {

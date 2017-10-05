@@ -7,7 +7,7 @@ import { MenuService } from '../menu/menu.service';
 import { StorySetType } from '../storyset/storyset-type';
 
 import { GlobalState } from '../app.global-state';
-import { MediaBase } from '../shared/config-paths';
+import { AppConfig } from '../config/app-config';
 
 import { BriefBio } from '../historymakers/brief-bio';
 import { BiographyStampComponent } from '../biography-stamp/biography-stamp.component';
@@ -39,12 +39,12 @@ export class HomeComponent implements OnInit {
 
     public myMediaBase: string;
 
-    constructor(@Inject(MediaBase) private mediaBase:string,
+    constructor(private config: AppConfig,
         private router: Router,
         private historyMakerService: HistoryMakerService,
         private titleManagerService: TitleManagerService,
         private menuService: MenuService) {
-            this.myMediaBase = mediaBase;
+            this.myMediaBase = this.config.getConfig('mediaBase');
     }
 
     ngOnInit() {

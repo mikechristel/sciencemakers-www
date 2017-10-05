@@ -12,7 +12,7 @@ import { DetailedStory } from './detailed-story';
 import { StorySetType } from '../storyset/storyset-type';
 
 import { GlobalState } from '../app.global-state';
-import { MediaBase } from '../shared/config-paths';
+import { AppConfig } from '../config/app-config';
 import { TranscriptTiming } from './transcript-timing';
 import { VideoMatchLine } from './video-match-line';
 
@@ -95,9 +95,9 @@ export class StoryComponent implements OnInit {
     public mobilePopover: boolean = false;
     public mobileTooltipMessage: string;
     private timer: any;
+    public myMediaBase: string;
 
-
-    constructor(@Inject(MediaBase) private mediaBase:string,
+    constructor(private config: AppConfig,
         private _cdr: ChangeDetectorRef,
         private route: ActivatedRoute,
         private router: Router,
@@ -106,6 +106,7 @@ export class StoryComponent implements OnInit {
         private storyDetailService: StoryDetailService,
         private playlistManagerService: PlaylistManagerService
     ) {
+        this.myMediaBase = this.config.getConfig('mediaBase')
     }
 
     private computeTranscriptAreaHeight(fullWindowWidth: number, fullWindowHeight: number) {

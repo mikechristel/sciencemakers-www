@@ -2,7 +2,7 @@
 import { StoryDocument } from '../storyset/story-document';
 import { StoryHighlight } from '../storyset/story-highlight';
 import { GlobalState } from '../app.global-state';
-import { MediaBase } from '../shared/config-paths';
+import { AppConfig } from '../config/app-config';
 
 import { Playlist } from '../shared/playlist/playlist';
 import { PlaylistManagerService } from '../playlist-manager/playlist-manager.service';
@@ -40,8 +40,8 @@ export class StoryStampComponent {
     public mobileTooltipMessage: string;
     private timer: any;
 
-    constructor(@Inject(MediaBase) private mediaBase:string, private playlistManagerService: PlaylistManagerService) {
-      this.myMediaBase = mediaBase;
+    constructor(private config: AppConfig, private playlistManagerService: PlaylistManagerService) {
+      this.myMediaBase = this.config.getConfig('mediaBase');
       this.subscription = playlistManagerService.playlist$.subscribe((value) => {
             this.playlist = value;
             this.isInPlaylist(this.story);
@@ -67,13 +67,13 @@ export class StoryStampComponent {
     }
 
     togglePlaylist(story) {
-        
+
         this.storyForPlaylist.emit(story);
         this.isInPlaylist(story);
         this.toggleToolTip();
     }
 
-    // This custom tooltip implementation is a temporary workaround 
+    // This custom tooltip implementation is a temporary workaround
     // until ngx-bootstrap releases a fix for this issue: https://github.com/valor-software/ngx-bootstrap/issues/2257
     toggleToolTip() {
         this.inPlaylist ? this.mobileTooltipMessage = "Added to Playlist" : this.mobileTooltipMessage = "Removed from Playlist";

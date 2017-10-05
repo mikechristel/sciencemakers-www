@@ -1,3 +1,6 @@
+import { APP_INITIALIZER } from '@angular/core';
+import { AppConfig }       from './config/app-config';
+
 import { NgModule }      from '@angular/core';
 import { BrowserModule, Title } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
@@ -31,18 +34,19 @@ import { GoogleAnalyticsEventsService } from './google-analytics-events.service'
 import { ScrollToModule } from '@nicky-lenaers/ngx-scroll-to';
 
 import { GlobalState } from './app.global-state';
-import { ServiceBase } from './shared/config-paths';
-import { MediaBase } from './shared/config-paths';
 import { SharedModule } from './shared/shared.module';
 
-// NOTE: the following WILL BE defined in an external configuration JS file appropriate to a particular deployment.
-// TODO: !!!TBD!!!  For the moment, getting ng build to recognize the extra dependency is not yet implemented.
-// So, the values are expressed here:
-// Eventually something like: import { myServiceBase } from "myPaths.config";
-//                            import { myMediaBase } from "myPaths.config";
-// Placeholder for now:
-var myServiceBase: string = 'api/';
-var myMediaBase: string = 'https://thmdaprodmedia.blob.core.windows.net/media/';
+// NOTE: following advice in https://gist.github.com/fernandohu/122e88c3bcd210bbe41c608c36306db9 to load
+// configuration data before application startup in Angular 2; such config data will then initialize
+// both config.serviceBase and config.mediaBase via constructor(private config: AppConfig) instead of
+// just declaring variables here like var myServiceBase: string = 'blahblah'; all this work is done to
+// keep blahblah out of the source code repository, i.e., the config files used for AppConfig are listed
+// in .gitignore to keep them out of the source code repository; connection to service and media is
+// private knowledge as these are private resources.
+export function initConfig(config: AppConfig) {
+  return () => config.load()
+ }
+
 
 @NgModule({
     declarations: [
@@ -66,7 +70,12 @@ var myMediaBase: string = 'https://thmdaprodmedia.blob.core.windows.net/media/';
         ScrollToModule.forRoot(),
         HomeModule // NOTE: HomeModule must be last in this list, with its wildcard support to catch router-not-found paths
     ],
+    // NOTE:  via https://gist.github.com/fernandohu/122e88c3bcd210bbe41c608c36306db9,
+    // The first line makes AppConfig class available to Angular2.
+    // The second line uses APP_INITIALIZER to execute Config.load() method before application startup. The 'multi: true' is being used because an application can have more than one line of APP_INITIALIZER.
     providers: [
+        AppConfig,
+        { provide: APP_INITIALIZER, useFactory: initConfig, deps: [AppConfig], multi: true },
         Title,
         TitleManagerService,
         appRoutingProviders,
@@ -79,9 +88,7 @@ var myMediaBase: string = 'https://thmdaprodmedia.blob.core.windows.net/media/';
         MenuService,
         PlaylistManagerService,
         GoogleAnalyticsEventsService,
-        GlobalState,
-        {provide: ServiceBase, useValue: myServiceBase},
-        {provide: MediaBase, useValue: myMediaBase}
+        GlobalState
     ],
     bootstrap: [ AppComponent ]
 })

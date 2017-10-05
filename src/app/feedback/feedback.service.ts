@@ -3,16 +3,16 @@ import { OnInit } from '@angular/core';
 import { Http, Headers, RequestOptions, Response } from '@angular/http';
 
 import { FeedbackInfo } from './feedback-info';
-import { ServiceBase } from '../shared/config-paths';
+import { AppConfig } from '../config/app-config';
 
 @Injectable()
 export class FeedbackService {
     private postFeedbackURL = 'feedback';
 
 
-    constructor(@Inject(ServiceBase) private serviceBase:string, private http: Http) {}
+    constructor(private http: Http, private config: AppConfig) {}
 
-    postFeedback(feedbackMessage: string): Promise<string> {
+    postFeedback(feedbackMessage: string): Promise<any> {
         var UNKNOWN_MARKER: string = "*Unknown*";
         var feedbackInfo: FeedbackInfo = new FeedbackInfo();
         var language: string = UNKNOWN_MARKER;
@@ -43,7 +43,8 @@ export class FeedbackService {
 
         let headers = new Headers({ 'Content-Type': 'application/json' });
         let options = new RequestOptions({ headers: headers });
-        return this.http.post(this.serviceBase + this.postFeedbackURL, feedbackInfo, options)
+        let serviceBase:string = this.config.getConfig('serviceBase');
+        return this.http.post(serviceBase + this.postFeedbackURL, feedbackInfo, options)
             .toPromise()
             .then(this.extractData)
             .catch(this.handleError);

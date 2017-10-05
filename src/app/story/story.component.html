@@ -63,12 +63,12 @@ This is accomplished via code to set the height: [style.height.px]="transcriptAr
 
                 <!-- Video -->
                 <video-js #myVideoPlayer idx="myVideoPlayer"
-                            url="{{mediaBase}}story/video/{{myStory.storyID}}"
+                            url="{{myMediaBase}}story/video/{{myStory.storyID}}"
                             (loaded)="initTranscriptHeight()"
                             (time)="adjustVideoCurrentTime($event)"
                             (end)="autoAdvanceToNext()"
                             (toggleWide)="isWideScreen()"
-                            poster="{{mediaBase}}story/image/{{myStory.storyID}}">
+                            poster="{{myMediaBase}}story/image/{{myStory.storyID}}">
                 </video-js>
 
                 <!-- Prev and Next match buttons -->

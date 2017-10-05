@@ -3,18 +3,18 @@ import { OnInit } from '@angular/core';
 import { Http, Headers, Response } from '@angular/http';
 
 import { DetailedStory } from './detailed-story';
-import { ServiceBase } from '../shared/config-paths';
+import { AppConfig } from '../config/app-config';
 
 @Injectable()
 export class StoryDetailService {
     private storyDetailsURL = 'StoryDetails?storyID=';
     private storyDetailsQueryTermsArgument = '&queryTerms=';
 
-    constructor(@Inject(ServiceBase) private serviceBase:string, private http: Http) { }
+    constructor(private http: Http, private config: AppConfig) { }
 
     getStorySpecifics(ID: number, queryTerms: string): Promise<DetailedStory> {
         // NOTE: If ID not found in the data set, then null is returned to caller
-        var serviceURL: string = this.serviceBase + this.storyDetailsURL + ID;
+        var serviceURL: string = this.config.getConfig('serviceBase') + this.storyDetailsURL + ID;
 
         // TODO: (!!!TBD!!!): Perhaps add in another argument to optionally limit the length of the timing pairs array returned in this call.
         // (Currently the service decides whether to truncate timing pairs.)

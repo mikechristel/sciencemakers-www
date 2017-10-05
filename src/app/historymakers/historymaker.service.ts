@@ -12,7 +12,7 @@ import { CorpusSpecifics } from './corpus-specifics';
 
 import { SearchFacetsDetails } from './search-facets-details';
 
-import { ServiceBase } from '../shared/config-paths';
+import { AppConfig } from '../config/app-config';
 import { GlobalState } from '../app.global-state';
 
 import { GoogleAnalyticsEventsService } from '../google-analytics-events.service';
@@ -31,16 +31,16 @@ export class HistoryMakerService {
     private cachedMakerCategories: FacetDetail[] = [];
     private cachedOccupationTypes: FacetDetail[] = [];
 
-    constructor(@Inject(ServiceBase) private serviceBase:string,
-        private http: Http,
+    constructor(private http: Http, private config: AppConfig,
         private gaService: GoogleAnalyticsEventsService) {
     }
 
     getFacetDetails(): Promise<any> {
         if (this.cachedFacetDetails != null)
             return Promise.resolve(this.cachedFacetDetails);
-        else
-            return this.http.get(this.serviceBase + this.searchFacetsURL)
+        else {
+            let serviceBase:string = this.config.getConfig('serviceBase');
+            return this.http.get(serviceBase + this.searchFacetsURL)
                 .toPromise()
                 .then(response => {
                     var oneItem: FacetDetail;
@@ -64,12 +64,14 @@ export class HistoryMakerService {
                     return this.cachedFacetDetails;
                 })
                 .catch(this.handleError);
+        }
     }
 
     getCorpusSpecifics(): Promise<CorpusSpecifics> {
+        let serviceBase:string = this.config.getConfig('serviceBase');
         return this.getFacetDetails()
             .then(response => {
-                return this.http.get(this.serviceBase + this.corpusSpecificsURL)
+                return this.http.get(serviceBase + this.corpusSpecificsURL)
                     .toPromise()
                     .then(response => {
                         return response.json();
@@ -108,7 +110,8 @@ export class HistoryMakerService {
 
         return this.getFacetDetails()
             .then(response => {
-                return this.http.get(this.serviceBase + this.peopleBornThisMonthURL + addedArgs)
+                let serviceBase:string = this.config.getConfig('serviceBase');
+                return this.http.get(serviceBase + this.peopleBornThisMonthURL + addedArgs)
                     .toPromise()
                     .then(response => {
                         return response.json();
@@ -164,7 +167,8 @@ export class HistoryMakerService {
 
         return this.getFacetDetails()
             .then(response => {
-                return this.http.get(this.serviceBase + this.peopleURL + "?" + queryArg + addedArgs)
+                let serviceBase:string = this.config.getConfig('serviceBase');
+                return this.http.get(serviceBase + this.peopleURL + "?" + queryArg + addedArgs)
                     .toPromise()
                     .then(response => {
                         if (queryIssued) {

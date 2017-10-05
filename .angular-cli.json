@@ -9,8 +9,6 @@
         "assets": [
             "assets",
             "favicon.ico",
-            "myPaths.config.d.ts",
-            "myPaths.config.js",
             "Web.config"
         ],
         "index": "index.html",

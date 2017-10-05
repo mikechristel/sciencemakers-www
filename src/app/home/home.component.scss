@@ -45,18 +45,18 @@ input[type="radio"] {
 }
 
 //Rearrange in mobile
-@media screen and (max-width: bp(medium)) {
-
-    .container-fluid.adjust-height-home .row {
-        display: flex;
-        flex-direction: column-reverse;
-
-        .col-sm-8.mobile-only {
-            order: 1;
-            margin-top: 1.14286em;
-        }
-    }
-}
+//@media screen and (max-width: bp(medium)) {
+//
+//    .container-fluid.adjust-height-home .row {
+//        display: flex;
+//        flex-direction: column-reverse;
+//
+//        .col-sm-8.mobile-only {
+//            order: 1;
+//            margin-top: 1.14286em;
+//        }
+//    }
+//}
 
 .page-title {
     @extend %oswald;

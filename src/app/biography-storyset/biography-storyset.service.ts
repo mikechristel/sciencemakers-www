@@ -4,16 +4,17 @@ import { Http, Headers, Response } from '@angular/http';
 
 import { DetailedBiographyStorySet } from './detailed-biography-storyset';
 
-import { ServiceBase } from '../shared/config-paths';
+import { AppConfig } from '../config/app-config';
 
 @Injectable()
 export class BiographyStorySetService {
     private biographyStorySetDetailURL = 'biographyDetails?accession='; // must get an "accession" unique identifier tacked on to work of course
 
-    constructor(@Inject(ServiceBase) private serviceBase:string, private http: Http) {}
+    constructor(private http: Http, private config: AppConfig) {}
 
     getStoriesInBiography(accession: string): Promise<DetailedBiographyStorySet> {
-        return this.http.get(this.serviceBase + this.biographyStorySetDetailURL + accession)
+        let serviceBase:string = this.config.getConfig('serviceBase');
+        return this.http.get(serviceBase + this.biographyStorySetDetailURL + accession)
             .toPromise()
             .then(response => {
                 return response.json();
