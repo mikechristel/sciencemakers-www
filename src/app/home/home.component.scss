@@ -44,7 +44,9 @@ input[type="radio"] {
     margin-top: em(10);
 }
 
-//Rearrange in mobile
+// NOTE:  Removing this section as it is only needed for more complex home pages having
+// other elements like a "mixtape" section:
+// Rearrange in mobile
 //@media screen and (max-width: bp(medium)) {
 //
 //    .container-fluid.adjust-height-home .row {

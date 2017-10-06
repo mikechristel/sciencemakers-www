@@ -36,9 +36,9 @@ export class AppConfig {
     public load() {
         return new Promise((resolve, reject) => {
             this.http.get('assets/env.json').map( res => res.json() ).catch((error: any):any => {
-                console.log('Configuration file "env.json" could not be read');
+                console.log('Configuration file "assets/env.json" could not be read');
                 resolve(true);
-                return Observable.throw(error.json().error || 'Server error');
+                return ('Server error'); // could be more detailed as needed, e.g.,  Observable.throw(error.json().error || 'Server error' with an up-front check that error has valid JSON
             }).subscribe( (envResponse) => {
 
                 this.env = envResponse;
@@ -72,7 +72,7 @@ export class AppConfig {
                             resolve(true);
                         });
                 } else {
-                    console.error('Env config file "assets/env.json" is not valid');
+                    console.error('Env config file "env.json" is not valid');
                     resolve(true);
                 }
             });

@@ -4,6 +4,19 @@ The ScienceMakers Digital Video Archive website is an AngularJS single page appl
 ## Installation
 Run `npm install` in the root of the project directory to install the necessary build tools and depedencies.
 
+## Configuration
+
+There must be an env.json file in the assets folder with a value identifying which configuration to use.
+The value of the "myEnv" key, e.g., "production", indicates there must be a config.production.json file also in assets.
+This file is NOT part of the repository, as you must specify your own API to the Azure Services feeding this interface, and your own media files URL base string.
+The file config.production.json will have content like the following:
+{
+  "serviceBase" : "https://YourDomainAndPathForAPIServiceHere/",
+  "mediaBase" : "https://YourDomainAndPathForMediaFilesHere/"
+}
+
+You may have a config.development.json with different values, and set env.json differently between development and production builds.
+
 ## Build and Run
 
 ### Development
@@ -16,7 +29,7 @@ Optionally, run `ng serve --hmr -e=hmr` (or simply `npm run hmr`) to run the app
 
 ### Production
 
-Run 'ng build -prod' to build locally.  Deploy outside of the gitHub framework as necessary.
+Set env.json to production as needed.  Run 'ng build -prod' to build locally.  Deploy outside of the gitHub framework as necessary.
 
 ## Browsers
 
