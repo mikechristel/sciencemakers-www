@@ -46,4 +46,4 @@ node.sh
 launch.json
 
 # Configuration files for development and production
-src/assets/*.json
+src/assets/config.*.json
