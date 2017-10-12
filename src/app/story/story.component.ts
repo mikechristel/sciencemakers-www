@@ -173,6 +173,11 @@ export class StoryComponent implements OnInit {
         this.route.params.forEach((params: Params) => {
             this.storyDetailsTitle = "Loading Story Details...";
             this.storyDetailsShortenedTitle = "Loading...";
+
+            // Just in case, clear current interface while next one is loading,
+            // e.g., this corrects the bug of clicking a My Playlist item to load a new video:
+            this.myStory = null;
+
             this.storyIsStarred = false;
             this.transcriptPieces = [];
             this.transcriptPieces.push("");
