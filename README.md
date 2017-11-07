@@ -29,7 +29,7 @@ Optionally, run `ng serve --hmr -e=hmr` (or simply `npm run hmr`) to run the app
 
 ### Production
 
-Set env.json to production as needed.  Run 'ng build -prod' to build locally.  Deploy outside of the gitHub framework as necessary.
+Set env.json to production as needed.  Add in correct Google Analytics key to index.html as needed.  Run 'ng build -prod' to build locally.  Deploy outside of the gitHub framework as necessary.
 
 ## Browsers
 
