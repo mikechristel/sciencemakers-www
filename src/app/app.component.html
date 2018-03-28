@@ -148,10 +148,12 @@
                 </div>
                 <div class="modal-body">
                     <textarea class="form-control textarea-feedback" [(ngModel)]="givenFeedback" maxlength="1024" rows="4" placeholder="Your suggestions and/or complaints will greatly help us..."></textarea>
+                    <textarea class="form-control textarea-feedback-email" [(ngModel)]="optionalFeedbackEmail" maxlength="256" rows="1" placeholder="(Optional) Your email address for a possible response"></textarea>
                     <p>You are welcome to email us as well at <a href="mailto:info@thehistorymakers.org">info@thehistorymakers.org</a>.</p>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" data-dismiss="modal" (click)="postFeedback()">Submit</button>
+                  <button type="button" (click)="clearFeedback()">Clear</button>
+                  <button type="button" data-dismiss="modal" (click)="postFeedback()">Submit</button>
                 </div>
             </div>
         </div>

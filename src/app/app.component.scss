@@ -49,7 +49,11 @@
       border-radius: 0;
       font-size: em(16);
       padding: em(10) em(26);
+      margin-left: em(10);
       text-transform: uppercase;
+      @media screen and (min-width: bp(medium)) {
+              margin-left: em(40);
+      }
     }
   }
 }

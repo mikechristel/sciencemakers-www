@@ -19,6 +19,7 @@ declare let ga: Function; // Declaration used with Google Analytics
 
 export class AppComponent {
     public givenFeedback: string = null;
+    public optionalFeedbackEmail: string = null;
     public menuOpen: boolean = false;
     public mobileSearchOpen: boolean = false;
     private subscription: Subscription;
@@ -107,8 +108,13 @@ export class AppComponent {
         }
     }
 
-    cancelFeedback() {
+    clearFeedback() {
         this.givenFeedback = null;
+        this.optionalFeedbackEmail = null;
+    }
+
+    cancelFeedback() {
+        // NOTE: not clearing out either the feedback nor the email on closing out feedback form at this point in time.
     }
 
     postFeedback() {
@@ -117,11 +123,18 @@ export class AppComponent {
         if (this.givenFeedback) {
             feedbackMessage = this.givenFeedback.trim();
             if (feedbackMessage.length > 0) {
+                if (this.optionalFeedbackEmail && this.optionalFeedbackEmail.trim().length > 0) {
+                    // Tack on "Comment provider email: " addendum
+                    feedbackMessage += "\n  Comment provider email: " + this.optionalFeedbackEmail.trim();
+                }
                 this.feedbackService.postFeedback(feedbackMessage).then(res => {
                     // not bothering with any update on whether feedback accepted or not...
                 });
             }
         }
+        // Clear feedback after it is submitted:
+        this.givenFeedback = null;
+        this.optionalFeedbackEmail = null;
     }
 
     shiftFocus(focusTarget: string) {
