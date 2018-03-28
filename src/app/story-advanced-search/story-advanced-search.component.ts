@@ -8,6 +8,8 @@ import { GlobalState } from '../app.global-state';
 
 import { StorySetType } from '../storyset/storyset-type';
 
+import { AppConfig } from '../config/app-config';
+
 @Component({
     selector: 'thda-story-advs',
     templateUrl: './story-advanced-search.component.html',
@@ -32,10 +34,13 @@ export class StoryAdvancedSearchComponent implements OnInit {
     inputPlaceholder: string;
 
     interviewYears: number[];
+    minYearAllowed: number;
 
-    constructor(private route: ActivatedRoute,
+    constructor(private config: AppConfig,
+        private route: ActivatedRoute,
         private router: Router,
         private titleManagerService: TitleManagerService) {
+          this.minYearAllowed = config.getEarliestInterviewYear();
     }
 
     ngOnInit() {
@@ -48,10 +53,10 @@ export class StoryAdvancedSearchComponent implements OnInit {
 
         var currentYear = new Date().getFullYear();
         this.interviewYears = [];
-        for (var i = GlobalState.EARLIEST_INTERVIEW_YEAR_POSSIBLE; i <= currentYear; i++)
+        for (var i = this.minYearAllowed; i <= currentYear; i++)
             this.interviewYears.push(i);
         if (GlobalState.EarliestInterviewYearToKeep == 0)
-            this.earliestInterviewYear = GlobalState.EARLIEST_INTERVIEW_YEAR_POSSIBLE;
+            this.earliestInterviewYear = this.minYearAllowed;
         else
             this.earliestInterviewYear = GlobalState.EarliestInterviewYearToKeep;
         if (GlobalState.LatestInterviewYearToKeep == 0)

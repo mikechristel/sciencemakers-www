@@ -16,7 +16,7 @@ import { SearchableFacetSpecifier } from './searchable-facet-specifier';
 import { SearchResult } from './search-result';
 import { StorySearchSortField } from './story-search-sort-field';
 
-
+import { AppConfig } from '../config/app-config';
 import { Facet } from '../historymakers/facet';
 import { FacetDetail } from '../historymakers/facet-detail';
 import { GlobalState } from '../app.global-state';
@@ -86,7 +86,9 @@ export class StorySetComponent implements OnInit {
     storySearchSortFields: StorySearchSortField[];
     myCurrentStorySearchSorting: number; // indicator on the sorting in use
 
-    constructor(
+    minYearAllowed: number;
+
+    constructor(private config: AppConfig,
         private route: ActivatedRoute,
         private router: Router,
         private location: Location,
@@ -105,6 +107,7 @@ export class StorySetComponent implements OnInit {
         dragulaService.dropModel.subscribe((value) => {
             playlistManagerService.updatePlaylist();
         });
+        this.minYearAllowed = config.getEarliestInterviewYear();
     }
 
     // Here is the definitive list for routing based on story set type:
@@ -415,7 +418,7 @@ export class StorySetComponent implements OnInit {
                     if (lateYear == earlyYear)
                         retVal = "in " + earlyYear;
                     else {
-                        if (earlyYear > GlobalState.EARLIEST_INTERVIEW_YEAR_POSSIBLE) {
+                        if (earlyYear > this.minYearAllowed) {
                             // NOTE:  We invest one call, new Data().getYear(), to pretty up the display of the interview date range.
                             var currentYear: number = new Date().getFullYear();
                             if (lateYear == currentYear)

@@ -21,6 +21,21 @@ export class AppConfig {
         return this.config[key];
     }
 
+    // Convenience function: get earliest video year; assumes this.config set already via load().
+    public getEarliestInterviewYear() : number {
+        var testObj: Object = this.config["firstInterviewYear"];
+        var MIN_YEAR_ALLOWED: number = 1900; // default to something reasonable in case configuration data is corrupt
+        var candidateYear: number;
+        if (testObj != null) {
+            candidateYear = +testObj.toString();
+            if (candidateYear < MIN_YEAR_ALLOWED)
+                candidateYear = MIN_YEAR_ALLOWED; // NOTE: lots of bad data possibilities still allowed here....
+        }
+        else
+            candidateYear = MIN_YEAR_ALLOWED;
+        return candidateYear;
+    }
+
     /**
      * Use to get the data found in the first file (env file)
      */

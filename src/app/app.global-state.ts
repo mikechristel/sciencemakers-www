@@ -30,7 +30,6 @@ export class GlobalState {
     static BiographySearchOccupations_On: number = 64;
     static BiographySearchFieldMask: number = GlobalState.BiographySearchPreferredName_On | GlobalState.BiographySearchLastName_On | GlobalState.BiographySearchDescriptionShort_On;
 
-    static EARLIEST_INTERVIEW_YEAR_POSSIBLE: number = 1993; // TODO: Move into an external configuration file or a set-up API service call to remove this built-in knowledge of corpus specifics
     static EarliestInterviewYearToKeep: number = 0;
     static LatestInterviewYearToKeep: number = 0;
 
