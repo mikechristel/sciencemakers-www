@@ -428,72 +428,54 @@ input[type="radio"] {
 .biography {
   position: relative;
   display: flex;
-  margin-bottom: em(15);
-  margin-right: em(15);
+  padding: 0;
+
+  margin-bottom: 0.9rem;
+  margin-right: 0.9rem;
   vertical-align: top;
-  width: calc(50% - (1.07143em / 2));
+  width: calc(50% - 0.5rem);
 
-  //IE Fix
-  @media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
-      width: calc(49.9% - (1.07143em / 2));
+  // NOTE: IE Fix not even attempted, as the hard-coded numbers changed for supporting other browsers properly,
+  // e.g., so that for result sets of 11 the bottom row would not be goofily offset for final item.
+  // So, there likely will be unusual IE spacings, i.e., Internet Explorer is not officially supported.
+    // IE Fix
+    //@media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
+    //    width: calc(49.9% - (1.07143em / 2));
+    //}
+
+  // Default:  2 per row, with gaps at sides and between
+  @media screen and (max-width: bp(small) - 1) {
+    &:nth-of-type(2n+0) {
+        margin-right: 0;
+    }
   }
 
-  &:nth-of-type(2n+0) {
-      margin-right: 0;
-  }
-
-  @media screen and (max-width: bp(medium)) and (min-width: bp(small)) {
+  // For widths between small and medium, e.g., let's say 544 to 768 pixels wide, be 3 per row:
+  @media screen and (min-width: bp(small)) and (max-width: bp(medium)) {
       width: calc(33.33333333333333% - (1rem * .6666666666666666));
-      margin-right: auto;
-
-      &:nth-of-type(2n+0) {
-          margin-right: auto;
-      }
 
       &:nth-of-type(3n+0) {
-          margin-right: auto;
-      }
-
-      &:nth-of-type(4n+0) {
-          margin-right: auto;
+          margin-right: 0;
       }
   }
 
-  @media (min-width: bp(medium) + 1) {
-      width: calc(25% - (1.07143em * .75));
+  // For widths between medium, but not exactly medium, and large, e.g., let's say 769 to 1199 pixels wide, be 4 per row:
+  @media screen and (min-width: bp(medium) + 1) and (max-width: bp(large) - 1) {
+      width: calc(25% - (1rem * .75)); // must be small enough so that 4 items fit across at smallest width of bp(medium) + 1
 
-      &:nth-of-type(2n+0) {
-          margin-right: em(15);
+      &:nth-of-type(4n+0) {
+        margin-right: 0;
       }
+  }
+
+  // For widths of large or more, e.g., more than 1200 pixels wide, be 4 per row (a difference from the 8 per row used in historymakers.component.scss for example):
+  @media screen and (min-width: bp(large)) {
+      width: calc(25% - (1rem * .75)); // must be small enough so that 4 items fit across at smallest width of bp(medium) + 1
 
       &:nth-of-type(4n+0) {
           margin-right: 0;
       }
   }
-
-  //IE Fix
-  @media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) and (min-width: bp(medium)) {
-      width: calc(24.9% - (1.07143em * .75));
-  }
-
-  @media (min-width: bp(large)) {
-      width: calc(12.5% - (1.07143em * .875));
-
-      &:nth-of-type(4n+0) {
-          margin-right: em(15);
-      }
-
-
-      &:nth-of-type(8n+0) {
-          margin-right: 0;
-      }
-  }
-
-  //IE Fix
-  @media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) and (min-width: bp(large)) {
-      width: calc(12.49% - (1.07143em * .875));
-  }
-
 }
 
 .biography--list {
