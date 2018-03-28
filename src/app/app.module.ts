@@ -20,6 +20,7 @@ import { StoryAdvancedSearchModule } from './story-advanced-search/story-advance
 import { StoryModule } from './story/story.module';
 import { BiographyStorySetModule } from './biography-storyset/biography-storyset.module';
 import { BiographyAdvancedSearchModule } from './biography-advanced-search/bio-advanced-search.module';
+import { UserSettingsModule } from './user-settings/user-settings.module';
 
 import { TitleManagerService } from './title-manager.service';
 import { HistoryMakerService } from './historymakers/historymaker.service';
@@ -30,6 +31,7 @@ import { FeedbackService } from './feedback/feedback.service';
 import { BiographyStorySetService } from './biography-storyset/biography-storyset.service';
 import { MenuService } from './menu/menu.service';
 import { PlaylistManagerService } from './playlist-manager/playlist-manager.service';
+import { UserSettingsManagerService } from './user-settings/user-settings-manager.service';
 import { GoogleAnalyticsEventsService } from './google-analytics-events.service';
 import { ScrollToModule } from '@nicky-lenaers/ngx-scroll-to';
 
@@ -65,6 +67,7 @@ export function initConfig(config: AppConfig) {
         StoryAdvancedSearchModule,
         BiographyStorySetModule,
         BiographyAdvancedSearchModule,
+        UserSettingsModule,
         StoryModule,
         SharedModule,
         ScrollToModule.forRoot(),
@@ -87,6 +90,7 @@ export function initConfig(config: AppConfig) {
         BiographyStorySetService,
         MenuService,
         PlaylistManagerService,
+        UserSettingsManagerService,
         GoogleAnalyticsEventsService,
         GlobalState
     ],

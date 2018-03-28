@@ -96,8 +96,16 @@
                         </a>
                     </li>
                     <li class="nav__links-item">
-                        <a class="nav__link" routerLink="/all" routerLinkActive="active" (click)="toggleMenu('close')">
-                            Maker Directory
+                        <a class="nav_terse nav__link" routerLink="/all" routerLinkActive="active" (click)="toggleMenu('close')">
+                          Makers
+                        </a>
+                        <a class="nav_verbose nav__link" routerLink="/all" routerLinkActive="active" (click)="toggleMenu('close')">
+                          Maker Directory
+                        </a>
+                    </li>
+                    <li class="nav__links-item">
+                        <a class="nav__link" routerLink="/settings" routerLinkActive="active" (click)="toggleMenu('close')">
+                          Settings
                         </a>
                     </li>
                     <li class="nav__links-item">
@@ -106,7 +114,7 @@
                         </a>
                     </li>
                     <li class="nav__links-item">
-                        <a class="nav__link" href="#myModal" data-toggle="modal" data-target="#myModal" routerLinkActive="active" (click)="toggleMenu('close')">
+                        <a class="nav__link" href="#myModal" data-toggle="modal" data-target="#myModal" (click)="toggleMenu('close')">
                             Contact Us
                         </a>
                     </li>

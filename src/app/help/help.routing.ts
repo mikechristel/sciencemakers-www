@@ -3,6 +3,7 @@ import { Routes, RouterModule } from '@angular/router';
 import { HelpComponent } from './help.component';
 import { HelpSearchComponent } from './help-topics/help-search.component';
 import { HelpSearchInOneComponent } from './help-topics/help-search-in-one.component';
+import { HelpUserSettingsComponent } from './help-topics/help-user-settings.component';
 import { HelpAckComponent } from './help-topics/help-ack.component';
 import { HelpCiteComponent } from './help-topics/help-cite.component';
 import { HelpDataComponent } from './help-topics/help-data.component';
@@ -26,6 +27,7 @@ export const helpRoutes: Routes = [
     { path: 'help', component: HelpComponent },
     { path: 'help/search', component: HelpSearchComponent },
     { path: 'help/search-one', component: HelpSearchInOneComponent },
+    { path: 'help/user-settings', component: HelpUserSettingsComponent },
     { path: 'help/ack', component: HelpAckComponent },
     { path: 'help/cite', component: HelpCiteComponent },
     { path: 'help/data', component: HelpDataComponent },

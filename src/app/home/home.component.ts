@@ -50,7 +50,7 @@ export class HomeComponent implements OnInit {
     ngOnInit() {
         var monthIndicator: number;
         this.menuService.setSearchOption('story');
-        this.titleManagerService.setTitle("The ScienceMakers Digital Archive");
+        this.titleManagerService.setTitle("The ScienceMakers Digital Archive (March 2018)");
         this.searchTitleOnly = GlobalState.SearchTitleOnly;
         this.searchTranscriptOnly = GlobalState.SearchTranscriptOnly;
         this.resultsSize = GlobalState.SearchPageSize;

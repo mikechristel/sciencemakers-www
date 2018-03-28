@@ -1,0 +1,179 @@
+@import '../shared/theme/base';
+
+.page-title {
+    @extend %oswald;
+
+    font-size: rem(20);
+    font-weight: 500;
+    line-height: em(22, 20);
+    margin-bottom: 15px;
+    margin-top: 0;
+    text-transform: uppercase;
+
+    @media screen and (min-width: bp(medium)) {
+        font-size: rem(22);
+         margin-bottom: em(16); // was em(58,22);
+    }
+
+    @media screen and (min-width: bp(large)) {
+        font-size: rem(26);
+        margin-bottom: em(18); // was em(58,26);
+    }
+}
+
+.settingstext {
+  line-height: em(18);
+  font-size: rem(14);
+  color: black;
+  padding-left: 0.2em;
+  padding-right: 0.2em;
+
+  @media screen and (min-width: bp(medium)) {
+      line-height: em(22, 16);
+      font-size: rem(16);
+  }
+}
+
+/* Increase space between checkbox and its text */
+label input {
+  margin-right: 5px;
+}
+
+input {
+  color: #1E1810;
+  font-family: 'Roboto', sans-serif;
+  font-weight: 300;
+  font-size: 1em;
+}
+
+/* Courtesy of http://stackoverflow.com/questions/306252/how-to-align-checkboxes-and-their-labels-consistently-cross-browsers
+*/
+input[type=checkbox] {
+  vertical-align: middle;
+  position: relative;
+  top: -3px;
+}
+
+/* Use noBreak class on outer label enclosing a checkbox to keep label and checkbox on same line.
+*/
+.noBreak {
+  white-space: nowrap;
+  font-size: 0.9em;
+  font-weight: normal;
+  color: #1E1810;
+}
+
+.push-to-left {
+  padding-left: 0em;
+}
+
+.panel-tight-text-vertically {
+  margin-top: 0.2em;
+  margin-bottom: 0em;
+  padding-top: 0.1em;
+  padding-bottom: 0.1em;
+}
+
+ul.list-unstyled.push-to-left {
+  @extend %source-sans-semi-bold;
+  margin-top: em(20);
+
+  @media screen and (max-width: bp(medium)) {
+      margin-top: 0;
+  }
+
+  li {
+      padding-left: em(35);
+
+      @media screen and (max-width: bp(medium)) {
+          border-top: em(1) solid #ccc;
+          line-height: em(50);
+          margin-left: em(15);
+          margin-right: em(15);
+          padding-left: 0;
+          padding-right: 0;
+      }
+
+      &:first-child {
+          @media screen and (max-width: bp(medium)) {
+              border-top: none;
+          }
+      }
+  }
+
+  //Hides default checkbox
+  input[type=checkbox] {
+      display: none;
+  }
+
+  //Custom checkbox
+  label::before {
+      background: #fff;
+      border: em(1) solid #CCC;
+      content: "";
+      cursor: pointer;
+      display: inline-block;
+      height: em(14);
+      left: em(14);
+      margin-top: em(2);
+      position: absolute;
+      transition: box-shadow 0.4s, border 0.4s;
+      width: em(14);
+
+      @media screen and (max-width: bp(medium)) {
+          left: 0;
+          top: 15px;
+      }
+  }
+
+  label {
+      color: color(dark-grey);
+      cursor: pointer;
+      font-size: em(16);
+      line-height: normal;
+      padding-left: em(5);
+      @media screen and (max-width: bp(medium)) {
+          line-height: 110%;
+          margin-bottom: 0;
+          padding-left: em(20);
+      }
+  }
+
+  //Checkbox states
+  label:hover,
+  input[type=checkbox]:checked + label {
+      color: color(primary);
+  }
+
+  label:hover {
+
+      @media screen and (max-width: bp(medium)) {
+          color: color(dark-grey);
+      }
+  }
+
+  label:active,
+  label:focus {
+      color: color(dark-grey);
+  }
+
+  //Custom check mark
+  .filter__check {
+      display: none;
+      left: 18px;
+      position: absolute;
+      top: 6px;
+
+      @media screen and (max-width: bp(medium)) {
+          left: em(2);
+          top: 1.3em;
+      }
+  }
+  input[type=checkbox]:checked + label .filter__check {
+      display: block;
+  }
+
+  input:focus {
+      outline: none;
+  }
+}//ul

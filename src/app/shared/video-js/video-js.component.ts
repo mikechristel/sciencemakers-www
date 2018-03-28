@@ -4,7 +4,10 @@ import { VgControlsModule }     from 'videogular2/controls';
 import { VgOverlayPlayModule }  from 'videogular2/overlay-play';
 import { VgBufferingModule }    from 'videogular2/buffering';
 import { VgAPI }                from 'videogular2/core';
+
+import { UserSettingsManagerService } from '../../user-settings/user-settings-manager.service';
 import { GlobalState }          from '../../app.global-state';
+import { Subscription }         from 'rxjs/Subscription';
 
 @Component({
   selector: 'video-js',
@@ -33,7 +36,13 @@ export class VideoJSComponent implements OnInit {
 
   public api: VgAPI;
 
-  constructor(elementRef: ElementRef, private _renderer: Renderer) {
+  private autoPlaySubscription: Subscription;
+  defaultAutoPlay: boolean;
+
+  constructor(elementRef: ElementRef, private _renderer: Renderer, private userSettingsManagerService: UserSettingsManagerService) {
+    this.autoPlaySubscription = userSettingsManagerService.autoplayVideo$.subscribe((value) => {
+      this.defaultAutoPlay = value;
+    })
     this.url = false;
     this.player = false;
     this.toggleWideScreen = false;
@@ -41,6 +50,7 @@ export class VideoJSComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.defaultAutoPlay = this.userSettingsManagerService.currentAutoplay();
     this.loaded.emit();
   }
 
@@ -56,6 +66,9 @@ export class VideoJSComponent implements OnInit {
   onPlayerReady(api: VgAPI) {
       this.api = api;
       this.isLoaded();
+      // NOTE: There are many cautions against using autoplay, e.g., https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/autoplay --
+      // leave it up to the user to turn it on if he/she so desires.
+      this._renderer.setElementProperty(this.videoPlayerRef.nativeElement, 'autoplay', this.defaultAutoPlay);
   }
 
   toggleWideView() {

@@ -185,6 +185,18 @@
     }
 }
 
+@media screen and (max-width: 900px) {
+  .nav_verbose {
+    display: none !important;
+  }
+}
+
+@media screen and (min-width: 901px) {
+  .nav_terse {
+    display: none !important;
+  }
+}
+
 .header__offset {
   margin-top: em(55);
 

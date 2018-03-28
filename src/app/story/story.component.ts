@@ -20,6 +20,9 @@ import { TimedTextMatch } from './timed-text-match';
 
 import { Playlist } from '../shared/playlist/playlist';
 
+import { UserSettingsManagerService } from '../user-settings/user-settings-manager.service';
+import { Subscription }   from 'rxjs/Subscription';
+
 @Component({
     selector: 'thmda-story',
     templateUrl: './story.component.html',
@@ -66,6 +69,9 @@ export class StoryComponent implements OnInit {
     biographyAccession: string;
     storyCitation: string;
 
+    private autoAdvanceSubscription: Subscription;
+    defaultAutoAdvance: boolean;
+
     // TODO: Depending on storySetType, there are a number of arguments, some optional, needed to allow "goBack" to work cleanly: revisit
     // so that this component's knowledge of what the pass-through values are does not need to be so explicit.  Most (all?) of these arguments
     // as well as goBack() could be deleted if we decide to rely solely on browser navigation and the browser back button rather than give
@@ -104,9 +110,13 @@ export class StoryComponent implements OnInit {
         private titleManagerService: TitleManagerService,
         private historyMakerService: HistoryMakerService,
         private storyDetailService: StoryDetailService,
-        private playlistManagerService: PlaylistManagerService
+        private playlistManagerService: PlaylistManagerService,
+        private userSettingsManagerService: UserSettingsManagerService
     ) {
-        this.myMediaBase = this.config.getConfig('mediaBase')
+        this.myMediaBase = this.config.getConfig('mediaBase');
+        this.autoAdvanceSubscription = userSettingsManagerService.autoadvanceVideo$.subscribe((value) => {
+            this.defaultAutoAdvance = value;
+        })
     }
 
     private computeTranscriptAreaHeight(fullWindowWidth: number, fullWindowHeight: number) {
@@ -170,6 +180,7 @@ export class StoryComponent implements OnInit {
 
     ngOnInit() {
         this.playlist = this.playlistManagerService.initializePlaylist();
+        this.defaultAutoAdvance = this.userSettingsManagerService.currentAutoadvance();
         this.route.params.forEach((params: Params) => {
             this.storyDetailsTitle = "Loading Story Details...";
             this.storyDetailsShortenedTitle = "Loading...";
@@ -541,10 +552,12 @@ export class StoryComponent implements OnInit {
     }
 
     autoAdvanceToNext() {
-        // Commented out until we add a way to toggle this functionality on/off in the UI
-        // if (this.myStory.nextStory != null && this.myStory.nextStory > 0) {
-        //     this.gotoNewStory(this.myStory.nextStory);
-        // }
+        // If the user setting to "autoadvance" is true, and there is a next story, automatically advance to it:
+        if (this.defaultAutoAdvance) {
+            if (this.myStory.nextStory != null && this.myStory.nextStory > 0) {
+                this.gotoNewStory(this.myStory.nextStory);
+            }
+        }
     }
 
     gotoPrevStory() {

@@ -5,6 +5,7 @@ import { FormsModule }    from '@angular/forms';
 import { HelpComponent } from './help.component';
 import { HelpSearchComponent } from './help-topics/help-search.component';
 import { HelpSearchInOneComponent } from './help-topics/help-search-in-one.component';
+import { HelpUserSettingsComponent } from './help-topics/help-user-settings.component';
 import { HelpAckComponent } from './help-topics/help-ack.component';
 import { HelpCiteComponent } from './help-topics/help-cite.component';
 import { HelpDataComponent } from './help-topics/help-data.component';
@@ -25,6 +26,7 @@ import { helpRouting } from './help.routing';
         HelpComponent,
         HelpSearchComponent,
         HelpSearchInOneComponent,
+        HelpUserSettingsComponent,
         HelpAckComponent,
         HelpCiteComponent,
         HelpDataComponent,

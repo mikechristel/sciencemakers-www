@@ -1,0 +1,70 @@
+<div class="container-fluid adjust-height">
+  <h1 class="page-title visible-xs-block">{{settingsPageTitle}}</h1>
+  <h1 class="page-title visible-sm-block visible-md-block visible-lg-block">{{settingsPageTitleLong}}</h1>
+
+  <div class="row">
+      <div class="col-xs-12 visible-xs-block">
+          <ul class="list-unstyled panel-body panel-tight-text-vertically push-to-left">
+              <li class="col-md-12 col-sm-12">
+                  <input id="terseAutoPlay" type="checkbox" [(ngModel)]="defaultAutoPlay" (change)="onAutoPlayChange($event.target.checked)">
+                  <label for="terseAutoPlay" class="tightV">Start video playback immediately.
+                      <svg class="filter__check" height="11px" viewBox="0 0 12 11" width="12px" xmlns="http://www.w3.org/2000/svg">
+                          <title aria-hidden="true">
+                              Checkmark
+                          </title>
+                          <path d="M2.115 3.986l2.052 2.065L9.887 0 12 2.115l-7.823 8.172L0 6.101" fill="#2E2B71" fill-rule="evenodd"></path>
+                      </svg>
+                  </label>
+              </li>
+          </ul>
+      </div>
+      <div class="col-xs-12 visible-sm-block visible-md-block visible-lg-block">
+          <ul class="list-unstyled panel-body panel-tight-text-vertically push-to-left">
+              <li class="col-md-12 col-sm-12">
+                  <input id="verboseAutoPlay" type="checkbox" [(ngModel)]="defaultAutoPlay" (change)="onAutoPlayChange($event.target.checked)">
+                  <label for="verboseAutoPlay" class="tightV">Start video playback immediately (no click/tap needed) when video loads.
+                      <svg class="filter__check" height="11px" viewBox="0 0 12 11" width="12px" xmlns="http://www.w3.org/2000/svg">
+                          <title aria-hidden="true">
+                              Checkmark
+                          </title>
+                          <path d="M2.115 3.986l2.052 2.065L9.887 0 12 2.115l-7.823 8.172L0 6.101" fill="#2E2B71" fill-rule="evenodd"></path>
+                      </svg>
+                  </label>
+              </li>
+          </ul>
+      </div>
+      <p class="settingstext">Note that most mobile browsers do not allow autoplay.  See the
+          <a class="helpanchor" routerLink="/help/user-settings" routerLinkActive="active">help page on settings</a> for more discussion.
+      </p>
+      <div class="col-xs-12 visible-xs-block">
+          <ul class="list-unstyled panel-body panel-tight-text-vertically push-to-left">
+              <li class="col-md-12 col-sm-12">
+                  <input id="terseAutoAdvance" type="checkbox" [(ngModel)]="defaultAutoAdvance" (change)="onAutoAdvanceChange($event.target.checked)">
+                  <label for="terseAutoAdvance" class="tightV">Advance to next video story automatically.
+                      <svg class="filter__check" height="11px" viewBox="0 0 12 11" width="12px" xmlns="http://www.w3.org/2000/svg">
+                          <title aria-hidden="true">
+                              Checkmark
+                          </title>
+                          <path d="M2.115 3.986l2.052 2.065L9.887 0 12 2.115l-7.823 8.172L0 6.101" fill="#2E2B71" fill-rule="evenodd"></path>
+                      </svg>
+                  </label>
+              </li>
+          </ul>
+      </div>
+      <div class="col-xs-12 visible-sm-block visible-md-block visible-lg-block">
+          <ul class="list-unstyled panel-body panel-tight-text-vertically push-to-left">
+              <li class="col-md-12 col-sm-12">
+                  <input id="verboseAutoAdvance" type="checkbox" [(ngModel)]="defaultAutoAdvance" (change)="onAutoAdvanceChange($event.target.checked)">
+                  <label for="verboseAutoAdvance" class="tightV">Advance to the next video story (from same person) automatically when a story playback ends.
+                      <svg class="filter__check" height="11px" viewBox="0 0 12 11" width="12px" xmlns="http://www.w3.org/2000/svg">
+                          <title aria-hidden="true">
+                              Checkmark
+                          </title>
+                          <path d="M2.115 3.986l2.052 2.065L9.887 0 12 2.115l-7.823 8.172L0 6.101" fill="#2E2B71" fill-rule="evenodd"></path>
+                      </svg>
+                  </label>
+              </li>
+          </ul>
+      </div>
+  </div>
+</div>
