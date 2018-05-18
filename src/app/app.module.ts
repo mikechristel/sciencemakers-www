@@ -49,7 +49,6 @@ import { SharedModule } from './shared/shared.module';
         BiographyStampModule,
         StoryStampModule,
         StorySetModule,
-        TagModule,
         HelpModule,
         StoryAdvancedSearchModule,
         BiographyStorySetModule,
