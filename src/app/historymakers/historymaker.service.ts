@@ -198,7 +198,7 @@ export class HistoryMakerService {
       else
         // NOTE: cannot proceed to getting the job family list corresponding to numerals before first having search facets all in place.
         return this.getFacetDetails()
-          .flatMap(fd => {
+          .map(fd => {
             // NOTE: If chosenJobs are empty, or are not in the OccupationTypes table, an empty string is returned.
             var gatheredNames: string = "";
             var gatheredJobs: string[] = [];
@@ -228,7 +228,7 @@ export class HistoryMakerService {
       else
         // NOTE: cannot proceed to getting the maker group corresponding to numerals before first having search facets all in place.
         return this.getFacetDetails()
-          .flatMap(fd => {
+          .map(fd => {
             // NOTE: If chosenMakers are empty, or are not in the MakerCategories table, an empty string is returned.
             var gatheredNames: string = "";
             var gatheredMakers: string[] = [];
