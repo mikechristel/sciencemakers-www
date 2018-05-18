@@ -7,7 +7,7 @@ import { MenuService } from '../menu/menu.service';
 import { StorySetType } from '../storyset/storyset-type';
 
 import { GlobalState } from '../app.global-state';
-import { AppConfig } from '../config/app-config';
+import { environment } from '../../environments/environment';
 
 import { BriefBio } from '../historymakers/brief-bio';
 import { BiographyStampComponent } from '../biography-stamp/biography-stamp.component';
@@ -39,24 +39,24 @@ export class HomeComponent implements OnInit {
 
     public myMediaBase: string;
 
-    constructor(private config: AppConfig,
+    constructor(
         private router: Router,
         private historyMakerService: HistoryMakerService,
         private titleManagerService: TitleManagerService,
         private menuService: MenuService) {
-            this.myMediaBase = this.config.getConfig('mediaBase');
+            this.myMediaBase = environment.mediaBase;
     }
 
     ngOnInit() {
         var monthIndicator: number;
         this.menuService.setSearchOption('story');
-        this.titleManagerService.setTitle("The ScienceMakers Digital Archive (March 2018)");
+        this.titleManagerService.setTitle("The ScienceMakers Digital Archive (May 2018)");
         this.searchTitleOnly = GlobalState.SearchTitleOnly;
         this.searchTranscriptOnly = GlobalState.SearchTranscriptOnly;
         this.resultsSize = GlobalState.SearchPageSize;
         this.setField();
         this.historyMakerService.getCorpusSpecifics()
-            .then(corpusDetails => {
+            .subscribe(corpusDetails => {
               this.storyCount = corpusDetails.storyCount.toLocaleString();
               this.biographyCount = corpusDetails.biographyCount.toLocaleString();
               // NOTE: when testing, we may not have specific ScienceMakers counts, as that is a "special" API that might not be in the testing infrastructure.
@@ -67,7 +67,7 @@ export class HomeComponent implements OnInit {
                   this.scienceMakersStoryCount = corpusDetails.scienceMakersStoryCount.toLocaleString();
         });
         // Do not qualify the people born this month in any way (i.e., no filtering, no paging): just get them all (hence null filtering/paging parameters):
-        this.historyMakerService.getHistoryMakersBornThisMonth(null, null, null, null, null, null, null).then(retSet => {
+        this.historyMakerService.getHistoryMakersBornThisMonth(null, null, null, null, null, null, null).subscribe(retSet => {
           this.biographies = retSet.biographies;
           if (this.biographies == null || this.biographies.length == 0) {
               this.confirmedNoBirthdays = true;

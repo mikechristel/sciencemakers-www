@@ -8,7 +8,7 @@ import { GlobalState } from '../app.global-state';
 
 import { StorySetType } from '../storyset/storyset-type';
 
-import { AppConfig } from '../config/app-config';
+import { environment } from '../../environments/environment';
 
 @Component({
     selector: 'thda-story-advs',
@@ -36,11 +36,10 @@ export class StoryAdvancedSearchComponent implements OnInit {
     interviewYears: number[];
     minYearAllowed: number;
 
-    constructor(private config: AppConfig,
-        private route: ActivatedRoute,
+    constructor(private route: ActivatedRoute,
         private router: Router,
         private titleManagerService: TitleManagerService) {
-          this.minYearAllowed = config.getEarliestInterviewYear();
+          this.minYearAllowed = environment.firstInterviewYear;
     }
 
     ngOnInit() {

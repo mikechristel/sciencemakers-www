@@ -1,6 +1,6 @@
-﻿import { Injectable, Inject } from '@angular/core';
-import { OnInit } from '@angular/core';
-import { Http, Headers, Response } from '@angular/http';
+﻿import { Injectable, Inject, OnInit } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from "rxjs/Rx";
 
 import { TableOfContents } from './table-of-contents';
 import { FacetDetail } from './facet-detail';
@@ -12,7 +12,7 @@ import { CorpusSpecifics } from './corpus-specifics';
 
 import { SearchFacetsDetails } from './search-facets-details';
 
-import { AppConfig } from '../config/app-config';
+import { environment } from '../../environments/environment';
 import { GlobalState } from '../app.global-state';
 
 import { GoogleAnalyticsEventsService } from '../google-analytics-events.service';
@@ -31,58 +31,49 @@ export class HistoryMakerService {
     private cachedMakerCategories: FacetDetail[] = [];
     private cachedOccupationTypes: FacetDetail[] = [];
 
-    constructor(private http: Http, private config: AppConfig,
-        private gaService: GoogleAnalyticsEventsService) {
+    constructor(private http: HttpClient, private gaService: GoogleAnalyticsEventsService) {}
+
+    private storeFacetDetails(givenDetails: SearchFacetsDetails) {
+      if (this.cachedFacetDetails != null)
+        return; // details already in cache
+
+        var oneItem: FacetDetail;
+        var assembledList: FacetDetail[] = [];
+        this.cachedFacetDetails = givenDetails;
+        for (var i: number = 0; i < this.cachedFacetDetails.makerCategories.length; i++) {
+            oneItem = new FacetDetail();
+            oneItem.ID = this.cachedFacetDetails.makerCategories[i].id;
+            oneItem.value = this.cachedFacetDetails.makerCategories[i].description;
+            assembledList.push(oneItem);
+        }
+        this.cachedMakerCategories = assembledList;
+        assembledList = [];
+        for (var j: number = 0; j < this.cachedFacetDetails.occupationTypes.length; j++) {
+            oneItem = new FacetDetail();
+            oneItem.ID = this.cachedFacetDetails.occupationTypes[j].id;
+            oneItem.value = this.cachedFacetDetails.occupationTypes[j].description;
+            assembledList.push(oneItem);
+        }
+        this.cachedOccupationTypes = assembledList;
     }
 
-    getFacetDetails(): Promise<any> {
+    getFacetDetails(): Observable<SearchFacetsDetails> {
         if (this.cachedFacetDetails != null)
-            return Promise.resolve(this.cachedFacetDetails);
+            return Observable.of(this.cachedFacetDetails);
         else {
-            let serviceBase:string = this.config.getConfig('serviceBase');
-            return this.http.get(serviceBase + this.searchFacetsURL)
-                .toPromise()
-                .then(response => {
-                    var oneItem: FacetDetail;
-                    var assembledList: FacetDetail[] = [];
-                    this.cachedFacetDetails = response.json();
-                    for (var i: number = 0; i < this.cachedFacetDetails.makerCategories.length; i++) {
-                        oneItem = new FacetDetail();
-                        oneItem.ID = this.cachedFacetDetails.makerCategories[i].id;
-                        oneItem.value = this.cachedFacetDetails.makerCategories[i].description;
-                        assembledList.push(oneItem);
-                    }
-                    this.cachedMakerCategories = assembledList;
-                    assembledList = [];
-                    for (var j: number = 0; j < this.cachedFacetDetails.occupationTypes.length; j++) {
-                        oneItem = new FacetDetail();
-                        oneItem.ID = this.cachedFacetDetails.occupationTypes[j].id;
-                        oneItem.value = this.cachedFacetDetails.occupationTypes[j].description;
-                        assembledList.push(oneItem);
-                    }
-                    this.cachedOccupationTypes = assembledList;
-                    return this.cachedFacetDetails;
-                })
-                .catch(this.handleError);
+            return this.http.get<SearchFacetsDetails>(environment.serviceBase + this.searchFacetsURL)
+                              .do(fd => this.storeFacetDetails(fd));
         }
     }
 
-    getCorpusSpecifics(): Promise<CorpusSpecifics> {
-        let serviceBase:string = this.config.getConfig('serviceBase');
+    getCorpusSpecifics(): Observable<CorpusSpecifics> {
+      // NOTE: using advice from https://stackoverflow.com/questions/40788163/how-to-make-nested-observable-calls-in-angular2
         return this.getFacetDetails()
-            .then(response => {
-                return this.http.get(serviceBase + this.corpusSpecificsURL)
-                    .toPromise()
-                    .then(response => {
-                        return response.json();
-                    })
-                    .catch(this.handleError);
-            })
-            .catch(this.handleError);
+          .flatMap(fd => this.http.get<CorpusSpecifics>(environment.serviceBase + this.corpusSpecificsURL));
     }
 
     getHistoryMakersBornThisMonth(givenPage: number, givenPageSize: number,
-      genderFacet: string, birthDecadeFacet: string, makerFacets: string, jobFacets: string, lastInitialFacetSpec: string): Promise<TableOfContents> {
+      genderFacet: string, birthDecadeFacet: string, makerFacets: string, jobFacets: string, lastInitialFacetSpec: string): Observable<TableOfContents> {
         var addedArgs: string = "";
         if (givenPage != null && givenPage > 0)
             addedArgs = addedArgs + "&currentPage=" + givenPage;
@@ -109,26 +100,19 @@ export class HistoryMakerService {
         addedArgs = "?" + addedArgs.substring(1);
 
         return this.getFacetDetails()
-            .then(response => {
-                let serviceBase:string = this.config.getConfig('serviceBase');
-                return this.http.get(serviceBase + this.peopleBornThisMonthURL + addedArgs)
-                    .toPromise()
-                    .then(response => {
-                        return response.json();
-                    })
-                    .catch(this.handleError);
-            })
-            .catch(this.handleError);
+          .flatMap(fd => this.http.get<TableOfContents>(environment.serviceBase + this.peopleBornThisMonthURL + addedArgs));
     }
 
     getHistoryMakers(givenQuery: string, searchJustLastNameFieldFlag: boolean, searchJustPreferredFieldFlag: boolean,
-      givenPage: number, givenPageSize: number, genderFacet: string, birthDecadeFacet: string, makerFacets: string, jobFacets: string, lastInitialFacet: string, sortField: string, sortInDescendingOrder: boolean): Promise<TableOfContents> {
+      givenPage: number, givenPageSize: number, genderFacet: string, birthDecadeFacet: string,
+      makerFacets: string, jobFacets: string, lastInitialFacet: string,
+      sortField: string, sortInDescendingOrder: boolean): Observable<TableOfContents> {
         var addedArgs: string = "";
         var queryArg: string;
         var queryIssued: boolean = false;
 
         // NOTE: To accommodate consistent analytics reporting, move the query argument to the front.
-        // Only issue an analytics event if there is a query string.
+        // (Later processing likely will only issue an analytics event if there is a query string.)
         if (givenQuery == null || givenQuery.length == 0)
             queryArg = "query=*";
         else {
@@ -166,25 +150,16 @@ export class HistoryMakerService {
         // NOTE: addedArgs could have stayed empty ("").
 
         return this.getFacetDetails()
-            .then(response => {
-                let serviceBase:string = this.config.getConfig('serviceBase');
-                return this.http.get(serviceBase + this.peopleURL + "?" + queryArg + addedArgs)
-                    .toPromise()
-                    .then(response => {
-                        if (queryIssued) {
-                            // Do extra logging if there was a query involved (instead of a simple look-up of all Makers, for example).
-                            var quickAnswerCheck: TableOfContents = response.json();
-                            if (quickAnswerCheck.count > 0)
-                                this.gaService.emitEvent("Maker Query", queryArg + "&count=" + quickAnswerCheck.count + addedArgs);
-                            else
-                                this.gaService.emitEvent("Maker Query (Empty)", queryArg + addedArgs);
-                        }
-
-                        return response.json();
-                    })
-                    .catch(this.handleError);
-            })
-            .catch(this.handleError);
+          .flatMap(fd => this.http.get<TableOfContents>(environment.serviceBase + this.peopleURL + "?" + queryArg + addedArgs))
+          .do(res => {
+              if (queryIssued) {
+                // Do extra logging if there was a query involved (instead of a simple look-up of all Makers, for example).
+                if (res.count > 0)
+                    this.gaService.emitEvent("Maker Query", queryArg + "&count=" + res.count + addedArgs);
+                else
+                    this.gaService.emitEvent("Maker Query (Empty)", queryArg + addedArgs);
+              }
+        });
     }
 
     private searchFieldsForBiographySearch(justLastName: boolean, justPreferredName: boolean): string {
@@ -217,61 +192,64 @@ export class HistoryMakerService {
         return csvFieldsToSearch;
     }
 
-    getJobFamilyList(chosenJobs: number[]): Promise<any> {
+    getJobFamilyList(chosenJobs: number[]): Observable<string> {
+      if (chosenJobs == null || chosenJobs.length == 0)
+        return Observable.of("");
+      else
         // NOTE: cannot proceed to getting the job family list corresponding to numerals before first having search facets all in place.
         return this.getFacetDetails()
-            .then(response => {
-                // NOTE: If chosenJobs are empty, or are not in the OccupationTypes table, an empty string is returned.
-                var gatheredNames: string = "";
-                var gatheredJobs: string[] = [];
-                var j: number;
-                if (this.cachedOccupationTypes != null) {
-                    for (var i = 0; i < this.cachedOccupationTypes.length; i++) {
-                        for (j = 0; j < chosenJobs.length; j++)
-                            if (this.cachedOccupationTypes[i].ID == chosenJobs[j]) {
-                                gatheredJobs.push(this.cachedOccupationTypes[i].value);
-                                break;
-                            }
-                    }
+          .flatMap(fd => {
+            // NOTE: If chosenJobs are empty, or are not in the OccupationTypes table, an empty string is returned.
+            var gatheredNames: string = "";
+            var gatheredJobs: string[] = [];
+            var j: number;
+            if (this.cachedOccupationTypes != null) {
+                for (var i = 0; i < this.cachedOccupationTypes.length; i++) {
+                    for (j = 0; j < chosenJobs.length; j++)
+                        if (this.cachedOccupationTypes[i].ID == chosenJobs[j]) {
+                            gatheredJobs.push(this.cachedOccupationTypes[i].value);
+                            break;
+                        }
                 }
-                if (gatheredJobs.length > 0) {
-                    gatheredNames = gatheredJobs[0];
-                    for (var i = 1; i < gatheredJobs.length; i++) {
-                        gatheredNames += "; " + gatheredJobs[i]; // separate each entry with '; '
-                    }
+            }
+            if (gatheredJobs.length > 0) {
+                gatheredNames = gatheredJobs[0];
+                for (var i = 1; i < gatheredJobs.length; i++) {
+                    gatheredNames += "; " + gatheredJobs[i]; // separate each entry with '; '
                 }
-                return gatheredNames;
-            })
-            .catch(this.handleError);
+            }
+            return gatheredNames;
+        });
     }
 
-    getMakerGroupList(chosenMakers: number[]) : Promise<any> {
-         // NOTE: cannot proceed to getting the maker group corresponding to numerals before first having search facets all in place.
+    getMakerGroupList(chosenMakers: number[]) : Observable<string> {
+      if (chosenMakers == null || chosenMakers.length == 0)
+        return Observable.of("");
+      else
+        // NOTE: cannot proceed to getting the maker group corresponding to numerals before first having search facets all in place.
         return this.getFacetDetails()
-            .then(response => {
-                // NOTE: If chosenMakers are empty, or are not in the MakerCategories table, an empty string is returned.
-                var gatheredNames: string = "";
-                var gatheredMakers: string[] = [];
-                var j: number;
-                if (this.cachedMakerCategories != null) {
-                    for (var i = 0; i < this.cachedMakerCategories.length; i++) {
-                        for (j = 0; j < chosenMakers.length; j++)
-                            if (this.cachedMakerCategories[i].ID == chosenMakers[j]) {
-                                gatheredMakers.push(this.cachedMakerCategories[i].value);
-                                break;
-                            }
-                    }
+          .flatMap(fd => {
+            // NOTE: If chosenMakers are empty, or are not in the MakerCategories table, an empty string is returned.
+            var gatheredNames: string = "";
+            var gatheredMakers: string[] = [];
+            var j: number;
+            if (this.cachedMakerCategories != null) {
+                for (var i = 0; i < this.cachedMakerCategories.length; i++) {
+                    for (j = 0; j < chosenMakers.length; j++)
+                        if (this.cachedMakerCategories[i].ID == chosenMakers[j]) {
+                            gatheredMakers.push(this.cachedMakerCategories[i].value);
+                            break;
+                        }
                 }
-
-                if (gatheredMakers.length > 0) {
-                    gatheredNames = gatheredMakers[0];
-                    for (var i = 1; i < gatheredMakers.length; i++) {
-                        gatheredNames += ", " + gatheredMakers[i]; // separate each entry with ', '
-                    }
-                }
-                return gatheredNames;
-            })
-            .catch(this.handleError);
+            }
+            if (gatheredMakers.length > 0) {
+                  gatheredNames = gatheredMakers[0];
+                  for (var i = 1; i < gatheredMakers.length; i++) {
+                      gatheredNames += ", " + gatheredMakers[i]; // separate each entry with ', '
+                  }
+              }
+              return gatheredNames;
+          });
     }
 
     getJobType(chosenJobType: number): string {
@@ -294,8 +272,4 @@ export class HistoryMakerService {
         return retVal;
     }
 
-    private handleError(error: any) {
-        console.error('An error occurred', error);
-        return Promise.reject(error.message || error);
-    }
 }

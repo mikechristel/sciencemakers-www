@@ -28,6 +28,7 @@
         "environmentSource": "environments/environment.ts",
         "environments": {
             "dev": "environments/environment.ts",
+            "devauth": "environments/environment.devauth.ts",
             "hmr": "environments/environment.hmr.ts",
             "prod": "environments/environment.prod.ts"
         }

@@ -1,18 +1,18 @@
-﻿import { Injectable, Inject } from '@angular/core';
-import { OnInit } from '@angular/core';
-import { Http, Headers, RequestOptions, Response } from '@angular/http';
+﻿import { Injectable, Inject, OnInit } from '@angular/core';
+import { Observable } from "rxjs/Observable";
+import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 
 import { FeedbackInfo } from './feedback-info';
-import { AppConfig } from '../config/app-config';
+import { environment } from '../../environments/environment';
 
 @Injectable()
 export class FeedbackService {
     private postFeedbackURL = 'feedback';
 
 
-    constructor(private http: Http, private config: AppConfig) {}
+    constructor(private http: HttpClient) {}
 
-    postFeedback(feedbackMessage: string): Promise<any> {
+    postFeedback(feedbackMessage: string) {
         var UNKNOWN_MARKER: string = "*Unknown*";
         var feedbackInfo: FeedbackInfo = new FeedbackInfo();
         var language: string = UNKNOWN_MARKER;
@@ -40,32 +40,18 @@ export class FeedbackService {
         feedbackInfo.Resolution = resolutionInfo;
         feedbackInfo.URL = myURL;
         feedbackInfo.UserAgent = userAgent;
-
-        let headers = new Headers({ 'Content-Type': 'application/json' });
-        let options = new RequestOptions({ headers: headers });
-        let serviceBase:string = this.config.getConfig('serviceBase');
-        return this.http.post(serviceBase + this.postFeedbackURL, feedbackInfo, options)
-            .toPromise()
-            .then(this.extractData)
-            .catch(this.handleError);
-    }
-
-    private extractData(res: Response) {
-        let body = res;
-        // Not planning to do anything of consequence with body, which likely states "Response with status: 200 OK for URL: ..."
-        return body || {};
-    }
-
-    private handleError(error: Response | any) {
-        let errMsg: string;
-        if (error instanceof Response) {
-            const body = error.json() || '';
-            const err = body.error || JSON.stringify(body);
-            errMsg = `${error.status} - ${error.statusText || ''} ${err}`;
-        } else {
-            errMsg = error.message ? error.message : error.toString();
-        }
-        console.error('An error occurred', errMsg);
-        return Promise.reject(errMsg);
+        const headers = new HttpHeaders({'Content-Type':'application/json; charset=utf-8'});
+        this.http.post(environment.serviceBase + this.postFeedbackURL, feedbackInfo, {headers: headers}).subscribe(
+          (data) => {
+            // TODO: not sure if we want to log this to analytics or console, e.g., console.log(data);
+          },
+          (err: HttpErrorResponse) => {
+            if (err.error instanceof Error) {
+              console.log('Client-side error occurred with posting feedback.');
+            } else {
+              console.log('Server-side error occurred with posting feedback.');
+            }
+          }
+        );
     }
 }

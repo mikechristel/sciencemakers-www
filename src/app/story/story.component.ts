@@ -12,7 +12,7 @@ import { DetailedStory } from './detailed-story';
 import { StorySetType } from '../storyset/storyset-type';
 
 import { GlobalState } from '../app.global-state';
-import { AppConfig } from '../config/app-config';
+import { environment } from '../../environments/environment';
 import { TranscriptTiming } from './transcript-timing';
 import { VideoMatchLine } from './video-match-line';
 
@@ -103,8 +103,7 @@ export class StoryComponent implements OnInit {
     private timer: any;
     public myMediaBase: string;
 
-    constructor(private config: AppConfig,
-        private _cdr: ChangeDetectorRef,
+    constructor(private _cdr: ChangeDetectorRef,
         private route: ActivatedRoute,
         private router: Router,
         private titleManagerService: TitleManagerService,
@@ -113,7 +112,7 @@ export class StoryComponent implements OnInit {
         private playlistManagerService: PlaylistManagerService,
         private userSettingsManagerService: UserSettingsManagerService
     ) {
-        this.myMediaBase = this.config.getConfig('mediaBase');
+        this.myMediaBase = environment.mediaBase;
         this.autoAdvanceSubscription = userSettingsManagerService.autoadvanceVideo$.subscribe((value) => {
             this.defaultAutoAdvance = value;
         })
@@ -300,7 +299,7 @@ export class StoryComponent implements OnInit {
             }
             var myStoryID: number = +params['ID']; // + prefix converts string into a number
             this.storyDetailService.getStorySpecifics(myStoryID, this.queryFromCaller)
-                .then(storyDetails => {
+                .subscribe(storyDetails => {
                     this.transcriptHeightInitialized = false;
                     this.storyDetailsTitle = storyDetails.title;
                     this.storyDetailsShortenedTitle = this.truncateAsNeeded(storyDetails.title);
@@ -357,8 +356,9 @@ export class StoryComponent implements OnInit {
                         this.titleManagerService.setTitle("The ScienceMakers - No Story Details Found");
                         this.storyCitation = null;
                     }
-                })
-                .catch(reason => { // TODO: decide how specific to make error recovery, i.e., do one thing for ERR_NAME_NOT_RESOLVED
+                },
+                error => {
+                    // TODO: decide how specific to make error recovery, i.e., do one thing for ERR_NAME_NOT_RESOLVED
                     // which would need to get propagated out of handleError earlier, something different for other errors.
                     // Right now this "network timeout" message could be a lie!!! !!!TBD!!!
                     this.myStory = null;

@@ -16,7 +16,7 @@ import { SearchableFacetSpecifier } from './searchable-facet-specifier';
 import { SearchResult } from './search-result';
 import { StorySearchSortField } from './story-search-sort-field';
 
-import { AppConfig } from '../config/app-config';
+import { environment } from '../../environments/environment';
 import { Facet } from '../historymakers/facet';
 import { FacetDetail } from '../historymakers/facet-detail';
 import { GlobalState } from '../app.global-state';
@@ -88,8 +88,7 @@ export class StorySetComponent implements OnInit {
 
     minYearAllowed: number;
 
-    constructor(private config: AppConfig,
-        private route: ActivatedRoute,
+    constructor(private route: ActivatedRoute,
         private router: Router,
         private location: Location,
         private historyMakerService: HistoryMakerService,
@@ -107,7 +106,7 @@ export class StorySetComponent implements OnInit {
         dragulaService.dropModel.subscribe((value) => {
             playlistManagerService.updatePlaylist();
         });
-        this.minYearAllowed = config.getEarliestInterviewYear();
+        this.minYearAllowed = environment.firstInterviewYear;
     }
 
     // Here is the definitive list for routing based on story set type:
@@ -278,7 +277,7 @@ export class StorySetComponent implements OnInit {
 
             this.idSearchService.getIDSearch(IDListToLoad, givenPage, givenPageSize,
                 searchableFacetSpec.genderFacetSpec, searchableFacetSpec.birthyearFacetSpec, searchableFacetSpec.makerFacetSpec, searchableFacetSpec.jobFacetSpec)
-                .then(retSet => {
+                .subscribe(retSet => {
                     GlobalState.matchSetContext = null; // no match terms for matching on story IDs
                     this.myStoryList = retSet.stories;
                     var totalCount: number;
@@ -297,8 +296,8 @@ export class StorySetComponent implements OnInit {
                         this.selectedStoryID = null; // no stories to select
                         this.setInterfaceForEmptyStorySet(givenPageSize, "No " + titleLabelStoryModifier + " stories yet.");
                     }
-                })
-                .catch(reason => { // give up, perhaps because no starred stories were specified
+                },
+                error => { // give up, perhaps because no starred stories were specified
                     this.setInterfaceForEmptyStorySet(givenPageSize, "No " + titleLabelStoryModifier + " stories yet.");
                 });
         }
@@ -359,7 +358,7 @@ export class StorySetComponent implements OnInit {
             this.myCurrentSearchTitleOnlyFlag, this.myCurrentSearchTranscriptOnlyFlag, givenPage, givenPageSize,
             searchableFacetSpec.genderFacetSpec, searchableFacetSpec.birthyearFacetSpec,
             searchableFacetSpec.makerFacetSpec, searchableFacetSpec.jobFacetSpec, sortField, sortInDescendingOrder)
-          .then(retSet => {
+          .subscribe(retSet => {
             GlobalState.matchSetContext = retSet; // others may check for scoring terms, match character offsets to scoring terms, etc.
             this.myStoryList = retSet.stories;
             var totalCount: number;
@@ -393,12 +392,10 @@ export class StorySetComponent implements OnInit {
             this.calcTitleAndEnablePaging(givenPage, givenPageSize, totalCount, titleLabelStoryModifier, titleLabelSuffix);
 
             this.initiateFacetInterface(searchableFacetSpec, retSet);
-          })
-          .catch(reason => {
-              if (reason && reason.length && reason.length > 0)
-                  this.setInterfaceForEmptyStorySet(givenPageSize, "No stories found due to error: " + reason);
-              else
-                  this.setInterfaceForEmptyStorySet(givenPageSize, "");
+          },
+          error => {
+              // TODO: Decide if further error logging/analytics is desired on fail-to-load cases like this
+              this.setInterfaceForEmptyStorySet(givenPageSize, "");
         });
     }
 

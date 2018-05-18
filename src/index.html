@@ -14,7 +14,22 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
   <!-- Latest compiled JavaScript -->
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-
+  
+  <!-- Authenication -->
+  <script>
+    //
+    // Immediately Invoked Function Expression (IIFE) to
+    // look for JWT in URL.
+    (function(){
+      var reg = new RegExp( '[?&]jwt=([^&#]*)', 'i' );
+      var matches = reg.exec(window.location.href);
+      var token = matches ? matches[1] : null;
+      if (token) {
+        console.log("Auth token cached");
+        localStorage.setItem('token', token);
+      }
+    })();
+  </script>
 </head>
 <body>
   <my-app >Loading...</my-app>

@@ -1,10 +1,10 @@
-﻿import { Injectable, Inject } from '@angular/core';
-import { OnInit } from '@angular/core';
-import { Http, Headers, Response } from '@angular/http';
+﻿import { Injectable, Inject, OnInit } from '@angular/core';
+import { Observable } from 'rxjs/Rx';
+import { HttpClient } from '@angular/common/http';
 
 import { SearchResult } from '../storyset/search-result';
 import { HistoryMakerService } from '../historymakers/historymaker.service';
-import { AppConfig } from '../config/app-config';
+import { environment } from '../../environments/environment';
 import { GlobalState } from '../app.global-state';
 
 import { GoogleAnalyticsEventsService } from '../google-analytics-events.service';
@@ -13,12 +13,12 @@ import { GoogleAnalyticsEventsService } from '../google-analytics-events.service
 export class TextSearchService {
     private txtSearchURL = 'StorySearch?query='; // require query argument, so it is already tacked on
 
-    constructor(private http: Http, private config: AppConfig,
+    constructor(private http: HttpClient,
       private historyMakerService: HistoryMakerService,
       private gaService: GoogleAnalyticsEventsService) { }
 
     getTextSearch(query: string, interviewYearFilter: string, parentBiographyForAllStories: number, matchTitleOnly: boolean, matchTranscriptOnly: boolean,
-        givenPage: number, givenPageSize: number, genderFacet: string, birthyearFacets: string, makerFacets: string, jobFacets: string, sortField: string, sortInDescendingOrder: boolean): Promise<SearchResult> {
+        givenPage: number, givenPageSize: number, genderFacet: string, birthyearFacets: string, makerFacets: string, jobFacets: string, sortField: string, sortInDescendingOrder: boolean): Observable<SearchResult> {
         var addedArgs: string = "";
         if (parentBiographyForAllStories != GlobalState.NOTHING_CHOSEN)
             addedArgs = addedArgs + "&parentBiographyID=" + parentBiographyForAllStories;
@@ -63,21 +63,14 @@ export class TextSearchService {
 
         // NOTE: cannot proceed to a text search before first having search facets all in place.
         return this.historyMakerService.getFacetDetails()
-            .then(response => {
-                let serviceBase:string = this.config.getConfig('serviceBase');
-                return this.http.get(serviceBase + this.txtSearchURL + query + addedArgs)
-                    .toPromise()
-                    .then(response => {
-                        var quickAnswerCheck: SearchResult = response.json();
-                        if (quickAnswerCheck.count > 0)
-                            this.gaService.emitEvent("Text Query", "query=" + query + "&count=" + quickAnswerCheck.count + addedArgs);
-                        else
-                            this.gaService.emitEvent("Text Query (Empty)", "query=" + query + addedArgs);
-                        return response.json();
-                    })
-                    .catch(this.handleError);
-            })
-            .catch(this.handleError);
+          .flatMap(fd => this.http.get<SearchResult>(environment.serviceBase + this.txtSearchURL + query + addedArgs))
+          .do(res => {
+            if (res.count > 0)
+                this.gaService.emitEvent("Text Query", "query=" + query + "&count=" + res.count + addedArgs);
+            else
+                this.gaService.emitEvent("Text Query (Empty)", "query=" + query + addedArgs);
+          }
+        );
     }
 
     private handleError(error: any) {

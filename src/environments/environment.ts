@@ -5,5 +5,10 @@
 
 export const environment = {
   production: false,
-  hmr: false
+  hmr: false,
+  // Runtime configuruation
+  requireAuthentication: false,
+  serviceBase: "api/",
+  mediaBase: "https://thmdaprodmedia.blob.core.windows.net/media/",
+  firstInterviewYear: 2001
 };

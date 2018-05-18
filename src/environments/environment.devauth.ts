@@ -1,10 +1,11 @@
-// Producion Environment (smda-prod-www)
+// For debugging with authentication enabled
 
 export const environment = {
-  production: true,
+  production: false,
   hmr: false,
   // Runtime configuruation
-  requireAuthentication: false,
+  //serviceBase: "http://localhost:65001/api/",
+  requireAuthentication: true,
   serviceBase: "api/",
   mediaBase: "https://thmdaprodmedia.blob.core.windows.net/media/",
   firstInterviewYear: 2001

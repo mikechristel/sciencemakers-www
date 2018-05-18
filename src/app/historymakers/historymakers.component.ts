@@ -211,7 +211,7 @@ export class HistoryMakersComponent implements OnInit {
         var emptyMakerFacetSpec: string = ""; // NOTE: this version of the corpus does not support maker facets
 
         if (this.myBornThisTimeFilterFlag) {
-            this.historyMakerService.getHistoryMakersBornThisMonth(givenPage, givenPageSize, genderFacetSpec, yearFacetSpec, emptyMakerFacetSpec, jobFacetSpec, lastInitialFacetSpec).then(retSet => {
+            this.historyMakerService.getHistoryMakersBornThisMonth(givenPage, givenPageSize, genderFacetSpec, yearFacetSpec, emptyMakerFacetSpec, jobFacetSpec, lastInitialFacetSpec).subscribe(retSet => {
                 this.myCurrentPage = givenPage;
                 this.myCurrentPageSize = givenPageSize;
                 this.biographies = retSet.biographies;
@@ -221,7 +221,7 @@ export class HistoryMakersComponent implements OnInit {
         }
         else {
             this.historyMakerService.getHistoryMakers(this.myCurrentQuery, this.myCurrentSearchLastNameOnlyFlag, this.myCurrentSearchPreferredNameOnlyFlag,
-              givenPage, givenPageSize, genderFacetSpec, yearFacetSpec, emptyMakerFacetSpec, jobFacetSpec, lastInitialFacetSpec, sortField, sortInDescendingOrder).then(retSet => {
+              givenPage, givenPageSize, genderFacetSpec, yearFacetSpec, emptyMakerFacetSpec, jobFacetSpec, lastInitialFacetSpec, sortField, sortInDescendingOrder).subscribe(retSet => {
                 this.myCurrentPage = givenPage;
                 this.myCurrentPageSize = givenPageSize;
                 this.biographies = retSet.biographies;

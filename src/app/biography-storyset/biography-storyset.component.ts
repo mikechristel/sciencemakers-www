@@ -11,7 +11,7 @@ import { PlaylistManagerService } from '../playlist-manager/playlist-manager.ser
 import { StorySetType} from '../storyset/storyset-type';
 import { StoryDocument} from '../storyset/story-document';
 import { GlobalState } from '../app.global-state';
-import { AppConfig } from '../config/app-config';
+import { environment } from '../../environments/environment';
 
 import { DetailedBiographyStorySet } from './detailed-biography-storyset';
 import { BiographyFavorites } from '../story/biography-favorites';
@@ -80,7 +80,7 @@ export class BiographyStorySetComponent implements OnInit {
     biographyIDForLimitingSearch: number;
     myMediaBase: string;
 
-    constructor(private config: AppConfig,
+    constructor(
         private route: ActivatedRoute,
         private router: Router,
         private biographyStorySetService: BiographyStorySetService,
@@ -89,7 +89,7 @@ export class BiographyStorySetComponent implements OnInit {
         private menuService: MenuService,
         private playlistManagerService: PlaylistManagerService) {
 
-        this.myMediaBase = this.config.getConfig('mediaBase');
+        this.myMediaBase = environment.mediaBase;
     }
 
     // NOTE: This component shows all the stories for a given biography.
@@ -296,7 +296,8 @@ export class BiographyStorySetComponent implements OnInit {
 
     private getBiographyResults(proposedSelectedStoryID: number) {
         this.biographyStorySetService.getStoriesInBiography(this.myAccession)
-            .then(bioDetail => {
+            .subscribe(
+              bioDetail => {
                 var pageSizeInEffectiveUse: number;
                 var totalCount: number;
                 var oneSessionInterviewInfo: string;
@@ -330,11 +331,9 @@ export class BiographyStorySetComponent implements OnInit {
 
                     this.tailoredJobFamilyList = null;
                     this.historyMakerService.getJobFamilyList(facetIndicators)
-                      .then(bioDetailJobList => {
-                        this.tailoredJobFamilyList = bioDetailJobList;
-                    })
-                    .catch(reason => {
-                        this.tailoredJobFamilyList = null;
+                      .subscribe(
+                        bioDetailJobList => {
+                          this.tailoredJobFamilyList = bioDetailJobList;
                     });
                     facetIndicators = [];
                     for (i = 0; i < bioDetail.makerCategories.length; i++) {
@@ -344,11 +343,9 @@ export class BiographyStorySetComponent implements OnInit {
                     }
                     this.tailoredMakerGroupList = null;
                     this.historyMakerService.getMakerGroupList(facetIndicators)
-                      .then(bioDetailMakerGroupList => {
-                        this.tailoredMakerGroupList = bioDetailMakerGroupList;
-                    })
-                    .catch(reason => {
-                        this.tailoredMakerGroupList = null;
+                      .subscribe(
+                        bioDetailMakerGroupList => {
+                          this.tailoredMakerGroupList = bioDetailMakerGroupList;
                     });
 
                     var oneStringFacet: string;
@@ -444,13 +441,12 @@ export class BiographyStorySetComponent implements OnInit {
                     this.tapeSummariesShown = false;
                     this.ClearFavoritesBlock();
                 }
-            })
-            .catch(reason => {
-                if (reason && reason.length && reason.length > 0)
-                    this.setInterfaceForEmptyStorySet("No stories found due to error: " + reason);
-                else
-                    this.setInterfaceForEmptyStorySet("");
-            });
+              },
+              error => {
+                // TODO: perhaps add in more careful error processing with logging/analytics as needed
+                this.setInterfaceForEmptyStorySet("");
+              }
+            );
     }
 
     // Set interface for empty results.  If no improvedTitle is given, use "No stories found." as the title.

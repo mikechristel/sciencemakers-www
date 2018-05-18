@@ -1,6 +1,6 @@
 import { Component, OnInit, Input, Inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { AppConfig } from '../../config/app-config';
+import { environment } from '../../../environments/environment';
 
 import { StoryDetailService } from '../../story/story-detail.service';
 import { PlaylistManagerService } from '../../playlist-manager/playlist-manager.service';
@@ -27,9 +27,8 @@ export class PlaylistComponent implements OnInit {
 
   public myMediaBase: string; // NOTE: data repository is not hard-coded here; get via constructor
 
-  constructor(private config: AppConfig,
-    private router: Router, private playlistManagerService: PlaylistManagerService) {
-        this.myMediaBase = this.config.getConfig('mediaBase');
+  constructor(private router: Router, private playlistManagerService: PlaylistManagerService) {
+        this.myMediaBase = environment.mediaBase;
         this.subscription = playlistManagerService.playlist$.subscribe((value) => {
         this.url = this.playlistManagerService.TitledPlaylistAsURL();
         this.playlist = value;

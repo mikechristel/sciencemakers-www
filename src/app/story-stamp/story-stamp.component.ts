@@ -2,7 +2,7 @@
 import { StoryDocument } from '../storyset/story-document';
 import { StoryHighlight } from '../storyset/story-highlight';
 import { GlobalState } from '../app.global-state';
-import { AppConfig } from '../config/app-config';
+import { environment } from '../../environments/environment';
 
 import { Playlist } from '../shared/playlist/playlist';
 import { PlaylistManagerService } from '../playlist-manager/playlist-manager.service';
@@ -40,8 +40,8 @@ export class StoryStampComponent {
     public mobileTooltipMessage: string;
     private timer: any;
 
-    constructor(private config: AppConfig, private playlistManagerService: PlaylistManagerService) {
-      this.myMediaBase = this.config.getConfig('mediaBase');
+    constructor(private playlistManagerService: PlaylistManagerService) {
+      this.myMediaBase = environment.mediaBase;
       this.subscription = playlistManagerService.playlist$.subscribe((value) => {
             this.playlist = value;
             this.isInPlaylist(this.story);

@@ -127,9 +127,7 @@ export class AppComponent {
                     // Tack on "Comment provider email: " addendum
                     feedbackMessage += "\n  Comment provider email: " + this.optionalFeedbackEmail.trim();
                 }
-                this.feedbackService.postFeedback(feedbackMessage).then(res => {
-                    // not bothering with any update on whether feedback accepted or not...
-                });
+                this.feedbackService.postFeedback(feedbackMessage);
             }
         }
         // Clear feedback after it is submitted:

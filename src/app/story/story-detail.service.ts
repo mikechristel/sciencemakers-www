@@ -1,20 +1,20 @@
-﻿import { Injectable, Inject } from '@angular/core';
-import { OnInit } from '@angular/core';
-import { Http, Headers, Response } from '@angular/http';
+﻿import { Injectable, Inject, OnInit } from '@angular/core';
+import { Observable } from "rxjs/Observable";
+import { HttpClient } from '@angular/common/http';
 
 import { DetailedStory } from './detailed-story';
-import { AppConfig } from '../config/app-config';
+import { environment } from '../../environments/environment';
 
 @Injectable()
 export class StoryDetailService {
     private storyDetailsURL = 'StoryDetails?storyID=';
     private storyDetailsQueryTermsArgument = '&queryTerms=';
 
-    constructor(private http: Http, private config: AppConfig) { }
+    constructor(private http: HttpClient) { }
 
-    getStorySpecifics(ID: number, queryTerms: string): Promise<DetailedStory> {
+    getStorySpecifics(ID: number, queryTerms: string): Observable<DetailedStory> {
         // NOTE: If ID not found in the data set, then null is returned to caller
-        var serviceURL: string = this.config.getConfig('serviceBase') + this.storyDetailsURL + ID;
+        var serviceURL: string = environment.serviceBase + this.storyDetailsURL + ID;
 
         // TODO: (!!!TBD!!!): Perhaps add in another argument to optionally limit the length of the timing pairs array returned in this call.
         // (Currently the service decides whether to truncate timing pairs.)
@@ -22,16 +22,6 @@ export class StoryDetailService {
         if (queryTerms != null && queryTerms.length > 0)
             serviceURL += this.storyDetailsQueryTermsArgument + queryTerms;
 
-        return this.http.get(serviceURL)
-            .toPromise()
-            .then(response => {
-                return response.json();
-            })
-            .catch(this.handleError);
-    }
-
-    private handleError(error: any) {
-        console.error('An error occurred', error);
-        return Promise.reject(error.message || error);
+        return this.http.get<DetailedStory>(serviceURL);
     }
 }
