@@ -1,7 +1,7 @@
 // For debugging with authentication enabled
 
 export const environment = {
-  production: false,
+  production: true,
   hmr: false,
   // Runtime configuruation
   //serviceBase: "http://localhost:65001/api/",
