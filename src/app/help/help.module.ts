@@ -9,17 +9,24 @@ import { HelpUserSettingsComponent } from './help-topics/help-user-settings.comp
 import { HelpAckComponent } from './help-topics/help-ack.component';
 import { HelpCiteComponent } from './help-topics/help-cite.component';
 import { HelpDataComponent } from './help-topics/help-data.component';
+import { HelpFacetOriginsComponent } from './help-topics/help-facet-origins.component';
 import { HelpFacetsComponent } from './help-topics/help-facets.component';
+import { HelpReturnAllComponent } from './help-topics/help-return-all.component';
 import { HelpPlaylistComponent } from './help-topics/help-playlist.component';
 import { HelpPrivacyComponent } from './help-topics/help-privacy.component';
 import { HelpPublicationsComponent } from './help-topics/help-publications.component';
 import { HelpTermsComponent } from './help-topics/help-terms.component';
 import { helpRouting } from './help.routing';
+import { SharedModule } from '../shared/shared.module';
+
+import { FlexLayoutModule } from '@angular/flex-layout'; // for flex layout
 
 @NgModule({
     imports: [
+        SharedModule,
         CommonModule,
         FormsModule,
+        FlexLayoutModule,
         helpRouting
     ],
     declarations: [
@@ -30,7 +37,9 @@ import { helpRouting } from './help.routing';
         HelpAckComponent,
         HelpCiteComponent,
         HelpDataComponent,
+        HelpFacetOriginsComponent,
         HelpFacetsComponent,
+        HelpReturnAllComponent,
         HelpPlaylistComponent,
         HelpPrivacyComponent,
         HelpPublicationsComponent,

@@ -4,7 +4,8 @@ import { StringFacet } from './string-facet';
 export class Facets {
     public lastInitial: StringFacet[];
     public gender: StringFacet[];
-    public birthYear: NumberFacet[];
-    public makerCategories: NumberFacet[];
-    public occupationTypes: NumberFacet[];
+    public birthState: StringFacet[];
+    public birthYear: NumberFacet[]; // !!!TBD!!! NOTE: API should name this birthDecade, not birthYear!!! Update when API updates!
+    public makerCategories: StringFacet[];
+    public occupationTypes: StringFacet[];
 }

@@ -1,21 +1,8 @@
-# sciencemakers-www
-The ScienceMakers Digital Video Archive website is a web-based single page application (SPA) built with [Angular](https://angular.io/), [TypeScript](https://www.typescriptlang.org/), and [Bootstrap](https://getbootstrap.com/) for responsive layout.
+# digital-archive-www
+The HistoryMakers Digital Video Archive is a web-based single page application (SPA) built with [Angular](https://angular.io/), [TypeScript](https://www.typescriptlang.org/), and Angular Flex Layout for responsive layout.
 
 ## Installation
 Run `npm install` in the root of the project directory to install the necessary build tools and depedencies.
-
-## Configuration
-
-There must be an env.json file in the assets folder with a value identifying which configuration to use.
-The value of the "myEnv" key, e.g., "production", indicates there must be a config.production.json file also in assets.
-This file is NOT part of the repository, as you must specify your own API to the Azure Services feeding this interface, and your own media files URL base string.
-The file config.production.json will have content like the following:
-{
-  "serviceBase" : "https://YourDomainAndPathForAPIServiceHere/",
-  "mediaBase" : "https://YourDomainAndPathForMediaFilesHere/"
-}
-
-You may have a config.development.json with different values, and set env.json differently between development and production builds.
 
 ## Build and Run
 
@@ -23,20 +10,46 @@ Please note that with the addition of the authentication framework, the number o
 
 ### Development
 
-Build is handled by Angular CLI, for more information see: https://cli.angular.io/
+Build is handled by [Angular CLI](https://cli.angular.io/) for details please refer to the [documentation](https://github.com/angular/angular-cli/wiki).
 
-Run `ng serve` to run the application locally during development.
+To run the application locally during development:
+```
+ng serve
+```
 
-Optionally, run `ng serve --hmr -e=hmr` (or simply `npm run hmr`) to run the application locally with Hot Module Replacement during development.
+To use optional Hot Module Replacement during development:
+```
+ng serve --hmr --configuration=hmr
+```
 
-To debug with authentication enabled: 
-ng serve --env=devauth
+Or more simply:
+```
+npm run hmr
+``` 
+
+To debug with authentication enabled:
+```
+ng serve --configuration=devauth
+```
 
 ### Production
 
-Set env.json to production as needed.  Add in correct Google Analytics key to index.html as needed.  
-Run 'ng build --env=prod --target=production' to build locally.  Deploy outside of the gitHub framework as necessary.
+**NOTE:** Commits to the main branch are automatically deployed to the the [Processing (test) Site](https://thmda-test-www.azurewebsites.net). Please make sure your code will compile for the test site prior to pushing your changes to the GitHub repository.
 
+To build for the [Processing (test) Site](https://thmda-test-www.azurewebsites.net):
+```
+ng build --prod --configuration=test
+```
+
+To build for the Demo Site:
+```
+ng build --prod --configuration=demo
+```
+
+To build for either the [Production](https://thmda-prod-www.azurewebsites.net) or [Demo](https://demo.thehistorymakers.org) Site:
+```
+ng build --prod --configuration=prod
+```
 ## Browsers
 
 ### Tested
@@ -56,25 +69,18 @@ We actively test the latest versions of the following browsers:
 #### Windows 10
 - Chrome
 - Edge
-- IE
 
 ### Recommended
 We primarily develop using Chrome. As a result, we feel it is the browser we best support and is our recommendation for the best user experience.
 
 ## Known Issues
-* There may be minor issues with image scaling in Microsoft Edge and Microsoft Internet Explorer as they do not support the CSS `object-fit` property.
-* The Renderer.invokeElementMethod is deprecated with no current replacement. This method is used to scroll the selected search result into view when returning from the details view.
-* The video player currently has accessibility issues. We are working with the owners of Videogular2 to resolve this issue, and will hopefully have it resolved soon.
+* IE support has been retired in 2020.
 
 ## Resources 
 Font sizing has been implemented using rems and ems. For more information see: https://css-tricks.com/rems-ems/.
 
 ## Dependencies
-* [Angular](https://angular.io/) - Web application framework
+* [Angular](https://angular.io/) - Web application framework (version 9, from 2020)
 * [Angular CLI](https://cli.angular.io/) - A command line interface for Angular
-* [angular-hmr](https://github.com/gdi2290/angular-hmr) - Angular Hot Module Replacement. Used in development when running `ng serve --hmr -e=hmr`.
-* [ngx-bootstrap](https://valor-software.com/ngx-bootstrap/#/) - An Angular 2 version of the popular UI library. Only the Tooltip module is imported into this project.
-* [ngx-clipboard](https://www.npmjs.com/package/ngx-clipboard) - A clipboard copy directive used to copy My Playlist url.
-* [ng2-dragula](https://valor-software.com/ng2-dragula/) - A drag and drop library used to rearrange stories in My Playlist.
-* [ngx-scroll-to](https://github.com/nicky-lenaers/ngx-scroll-to) - A scrolling library that addresses in-page hash linking with Angular routing. Used for the back-to-top and skip-to-main links.
-* [Videogular2](https://videogular.github.io/videogular2/) - An HTML5 video player for Angular 2.
+* [angular-hmr](https://github.com/gdi2290/angular-hmr) - Angular Hot Module Replacement. Used in development when running `ng serve --hmr -configuration=hmr`.
+

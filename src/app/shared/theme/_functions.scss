@@ -16,6 +16,15 @@
   @return null;
 }
 
+@function gutter($key) {
+  @if map-has-key($gutterSpace, $key) {
+    @return map-get($gutterSpace, $key);
+  }
+
+  @warn "Unknown `#{$key}` key in $gutterSpace.";
+  @return null;
+}
+
 $browser-context: 14;
 
 @function em($pixels, $context: $browser-context) {

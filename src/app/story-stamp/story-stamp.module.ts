@@ -1,12 +1,13 @@
 ﻿import { NgModule }       from '@angular/core';
 import { SharedModule } from '../shared/shared.module';
 import { StoryStampComponent } from './story-stamp.component';
-import { TooltipModule } from 'ngx-bootstrap/tooltip';
-
+import { FlexLayoutModule } from '@angular/flex-layout'; // for flex layout
+import { RouterModule } from '@angular/router';
 @NgModule({
     imports: [
+        RouterModule,
         SharedModule,
-        TooltipModule.forRoot()
+        FlexLayoutModule
     ],
     declarations: [
         StoryStampComponent

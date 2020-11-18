@@ -1,25 +1,25 @@
 ﻿import { NgModule }       from '@angular/core';
-import { CommonModule }   from '@angular/common';
-import { FormsModule }    from '@angular/forms';
+
+import { StoryStampModule } from '../story-stamp/story-stamp.module';
+import { USMapModule } from '../US-map/US-map.module';
 
 import { StorySetComponent } from './storyset.component';
 import { storysetRouting } from './storyset.routing';
-
-import { StoryStampModule } from '../story-stamp/story-stamp.module';
+import { SearchFormModule } from '../shared/search-form/search-form.module';
+import { MyPanelModule } from '../shared/my-panel/my-panel.module';
+import { FlexLayoutModule } from '@angular/flex-layout'; // for flex layout
 
 import { SharedModule } from '../shared/shared.module';
-
-import { DragulaService, DragulaModule } from 'ng2-dragula/ng2-dragula';
-
-import { ClipboardModule } from 'ngx-clipboard';
 
 @NgModule({
     imports: [
         SharedModule,
         StoryStampModule,
-        storysetRouting,
-        DragulaModule,
-        ClipboardModule
+        USMapModule,
+        SearchFormModule,
+        MyPanelModule,
+        FlexLayoutModule,
+        storysetRouting
     ],
     declarations: [
         StorySetComponent

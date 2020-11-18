@@ -7,10 +7,12 @@ import { storyRouting } from './story.routing';
 import { StoryStampModule } from '../story-stamp/story-stamp.module';
 
 import { SharedModule } from '../shared/shared.module';
+import { FlexLayoutModule } from '@angular/flex-layout'; // for flex layout
 
 @NgModule({
     imports: [
         SharedModule,
+        FlexLayoutModule,
         storyRouting,
         StoryStampModule
     ],

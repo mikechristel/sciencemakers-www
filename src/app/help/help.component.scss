@@ -1,33 +1,73 @@
 @import '../shared/theme/base';
 
-.page-title {
-    @extend %oswald;
+.help-heading {
+  color: color(dark-grey);
+  font-size: 1.4rem;
+  margin: 0 0 0.3em;
+  padding: 0;
 
-    font-size: rem(20);
-    font-weight: 500;
-    line-height: em(22, 20);
-    margin-bottom: 15px;
-    margin-top: 0;
-    text-transform: uppercase;
+  @media screen and (min-width: bp(afl_medium)) and (max-width: bp(afl_large) - 1) {
+    font-size: 1.6rem;
+  }
 
-    @media screen and (min-width: bp(medium)) {
-        font-size: rem(22);
-         margin-bottom: em(16); // was em(58,22);
-    }
+  @media screen and (min-width: bp(afl_large)) {
+    font-size: 1.8rem;
+  }
 
-    @media screen and (min-width: bp(large)) {
-        font-size: rem(26);
-        margin-bottom: em(18); // was em(58,26);
-    }
 }
 
 .helptext {
-    line-height: em(18);
-    font-size: rem(14);
+    font-size: 1rem;
     color: black;
 
-    @media screen and (min-width: bp(medium)) {
-        line-height: em(22, 16);
-        font-size: rem(16);
+    @media screen and (min-width: bp(afl_medium)) and (max-width: bp(afl_large) - 1) {
+      font-size: 1.2rem;
     }
+    @media screen and (min-width: bp(afl_large)) {
+      font-size: 1.4rem;
+    }
+}
+
+.helptext-before-list { // same as helptext but reduced margin-bottom
+  font-size: 1rem;
+  color: black;
+  margin-bottom: gutter(thmda-extremely_tiny);
+
+  @media screen and (min-width: bp(afl_medium)) and (max-width: bp(afl_large) - 1) {
+    font-size: 1.2rem;
+  }
+  @media screen and (min-width: bp(afl_large)) {
+    font-size: 1.4rem;
+  }
+}
+
+.helptext-no-nargin-top { // same as helptext but zeroed out margin-top
+  font-size: 1rem;
+  color: black;
+  margin-top: 0;
+
+  @media screen and (min-width: bp(afl_medium)) and (max-width: bp(afl_large) - 1) {
+    font-size: 1.2rem;
+  }
+  @media screen and (min-width: bp(afl_large)) {
+    font-size: 1.4rem;
+  }
+}
+
+.helpEmphasis {
+  font-weight: bold;
+}
+
+.help__img {
+  max-width: 100%;
+  height: auto;
+  border: em(2) solid #ccc;
+  border-radius: em(6);
+  padding: gutter(thmda-tight);
+  margin: gutter(thmda-tiny);
+
+  @media screen and (max-width: bp(afl_small) - 1) {
+    padding: gutter(thmda-tiny);
+    margin: gutter(thmda-extremely_tiny);
+  }
 }

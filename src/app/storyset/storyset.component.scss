@@ -1,945 +1,191 @@
 ﻿@import '../shared/theme/base';
-
-.col-sm-4,
-.col-sm-8 {
-    @media screen and (width: 768px) {
-        width: 100%;
-    }
-}
-
-.tight-pack {
-    padding-top: 0em;
-    padding-right: 0em;
-    padding-left: 0em;
-    padding-bottom: 0em;
-    margin-left: 0em;
-    margin-top: 0em;
-    margin-bottom: 0em;
-    margin-right: 0em;
-}
-
-.panel-tight-text-vertically {
-    margin-top: 0.2em;
-    margin-bottom: 0em;
-    padding-top: 0.1em;
-    padding-bottom: 0.1em;
-}
-
-.panel-heading-tight {
-    padding-top: 0.2em;
-    padding-bottom: 0.2em;
-}
-
-.vertically-center-thumbnail {
-    float:none;
-    display:inline-block;
-    vertical-align:middle;
-    margin-right:-4px;
-}
-
-.shadowview {
-    width: 90%;
-    max-width: 320px;
-    box-shadow: 2px 2px 5px rgba(0,0,0,0.75);
-    margin-top: 2px;
-}
-
-.actionAsSpanText {
-    color: #64615D;
-    font-weight: normal;
-}
-
-.actionAsSpanText:hover {
-    color: #5B2325;
-    font-weight: bold;
-    text-decoration: underline;
-    cursor: pointer;
-}
-
-.thinButton {
-    margin-top: 0.1em;
-    margin-bottom: 0.1em;
-}
-
-.thinButtonPgSize {
-    margin-top: 0.1em;
-    margin-bottom: 0.5em;
-}
-
-.addBottomMargin {
-    margin-bottom: 0.3em;
-}
-
-p {
-    color: #1E1810;
-    font-size: 1em;
-    line-height: 1em;
-}
-
-input {
-    color: #1E1810;
-    font-family: 'Roboto', sans-serif;
-    font-weight: 300;
-    font-size: 1em;
-}
-
-.buttonCommandsRow {
-    margin-top: 0.5em;
-    margin-bottom: 0.5em;
-}
-
-.div-inline{
-    display:inline-block;
-}
-
-/* Increase space between checkbox and its text */
-label input {
-    margin-right: 5px;
-}
-
-/* Courtesy of http://stackoverflow.com/questions/306252/how-to-align-checkboxes-and-their-labels-consistently-cross-browsers
-*/
-input[type=checkbox] {
-    vertical-align: middle;
-    position: relative;
-    top: -3px;
-}
-
-/* Use noBreak class on outer label enclosing a checkbox to keep label and checkbox on same line.
-*/
-.noBreak {
-    white-space: nowrap;
-    font-size: 0.9em;
-    font-weight: normal;
-    color: #64615D;
-}
-
-.prefaceLabel {
-  font-weight:bold;
-  color: #1E1810;
-}
-
-.attrib {
-    font-size: 1em;
-    color: #1E1810;
-}
-
-.starredIDListStyle {
-    font-size: 1em;
-    color: #1E1810;
-    font-style: italic;
-}
-
-.row--top {
-
-    @media screen and (min-width: bp(medium) + 1) {
-        margin-bottom: em(18);
-    }
-
-    @media screen and (min-width: bp(large)) {
-        margin-bottom: 0;
-    }
-}
-
-.story-set__title {
-    @extend %oswald;
-
-    color: color(dark-grey);
-    font-size: rem(18);
-    margin: 0 0 em(15) 0;
-    padding-top: 0;
-    text-transform: uppercase;
-
-     @media screen and (min-width: bp(small)) {
-        font-size: rem(20);
-     }
-
-     @media screen and (min-width: bp(medium)) {
-        font-size: rem(22);
-     }
-
-}
-
-.story-set__url-container {
-    align-items: center;
-    display: flex;
-    flex-wrap: wrap;
-    font-size: rem(18);
-    margin-bottom: em(20);
-
-    @media screen and (min-width: bp(small)) {
-      font-size: rem(20);
-    }
-
-    @media screen and (min-width: bp(medium)) {
-      font-size: rem(22);
-      flex-wrap: nowrap;
-    }
-
-    .story-set__title {
-        flex: 0 0 auto;
-        margin: 0 em(5) 0 0;
-    }
-
-    .story-set__copy-link {
-        flex: 0 0 auto;
-        margin-right: em(5);
-
-        &:hover {
-            cursor: pointer;
-        }
-    }
-}
-
-.page-view-options {
-    display: flex;
-    flex-direction: column;
-    height: em(30);
-    justify-content: flex-start;
-    margin: em(15) 0;
-
-    @media screen and (min-width: bp(medium) + 1) {
-        height: em(75);
-        margin: em(15) 0 em(30);
-    }
-
-    @media screen and (min-width: bp(large)) {
-        align-items: center;
-        flex-direction: row;
-        height: em(30);
-    }
-}
-
-.page-view-options__sort-and-display {
-    @extend %desktop-only;
-
-    display: flex;
-    justify-content: flex-start;
-    margin-right: auto;
-    width: 100%;
-
-    @media screen and (min-width: bp(large)) {
-        margin-bottom: 0;
-        // margin-left: 20px;
-    }
-
-}
-
-.pagination {
-    align-self: flex-start;
-    display: flex;
-    flex: 1;
-    font-size: rem(16);
-    margin: 0;
-    max-width: em(360, 16);
-    width: 100%;
-
-    @media screen and (min-width: 992px) {
-        align-self: initial;
-        flex-direction: row;
-    }
-
-}
-
-%pagination__item {
-    background-color: #fff;
-    border-bottom: 1px solid color(light-grey);
-    border-left: 1px solid color(light-grey);
-    border-radius: 0;
-    border-top: 1px solid color(light-grey);
-    color: color(secondary);
-    height: em(30, 16);
-    outline: 0;
-    width: em(38, 16);
-
-    @media screen and (min-width: bp(medium)) {
-        height: em(30, 16);
-        width: em(32, 16);
-    }
-}
-
-.pagination__prev,
-.pagination__next {
-    @extend %pagination__item;
-    @extend %source-sans-semi-bold;
-
-    &:disabled {
-        cursor: not-allowed;
-
-        span {
-            opacity: .5;
-        }
-    }
-}
-
-.pagination__next { border-right: 1px solid color(light-grey);}
-
-.pagination__button {
-    @extend %pagination__item;
-    @extend %source-sans-semi-bold;
-
-    &.active {
-        border: 1px solid color(secondary);
-        background-color: color(secondary);
-        color: #fff;
-    }
-
-    &.pagination__button--mobile-hidden {
-        @media screen and (max-width: bp(small) - 1) {
-            display: none;
-        }
-    }
-}
-
-.search__res-per-pg {
-    // align-self: flex-end;
-    display: inline-block;
-    margin: auto 0;
-}
-
-.search__res-per-pg-button {
-    @extend %source-sans;
-
-    align-items: center;
-    background-color: color(light-grey);
-    border-radius: 0;
-    border: 1px solid #cccccc;
-    color: #333333;
-    display: flex;
-    font-size: 1rem;
-    height: em(30);
-    justify-content: space-between;
-    padding: 0 em(10);
-    transition: background-color .2s ease-in-out, box-shadow .2s ease-in-out;
-
-    &[aria-expanded="true"] {
-        background-color: color(grey);
-        box-shadow: inset 0 0 5px rgba(51,51,51,.5);
-    }
-}
-
-.sort-results {
-    align-items: center;
-    display: flex;
-    justify-content: space-between;
-    margin-right: em(28);
-
-    label {
-        font-weight: normal;
-        margin-bottom: 0;
-        margin-right: 5px;
-    }
-}
-
-.view {
-    display: flex;
-    flex: 1;
-    justify-content: space-between;
-    margin-right: em(28);
-    max-width: 100px;
-}
-
-.view__button-container {
-    display: flex;
-    flex: 1;
-    height: em(30);
-    justify-content: center;
-    margin: auto 0;
-
-    &:first-of-type {
-        border-right: 1px solid color(grey);
-    }
-}
-
-.view__grid-button,
-.view__list-button {
-    background: transparent;
-    color: color(grey);
-    outline: 0;
-    padding: 0;
-    transition: color .2s ease-in-out;
-
-    &.active,
-    &:hover { color: color(secondary); }
-}
-
-.view__grid-button {
-    height: em(30);
-    width: em(30);
-}
-
-.view__list-button {
-    height: em(30);
-    width: em(33);
-}
+@import '../shared/theme/search-helpers';
+@import '../shared/theme/filter-helpers';
+@import '../shared/theme/view-option-helpers';
+@import '../shared/theme/pagination-helpers';
 
 .tapes {
-    align-items: stretch;
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    margin: em(5) 0 em(14);
-    padding: 0;
+  list-style: none;
+  padding: 0;
+  display: grid;
+  // Default of 2 per row
+  grid-template-columns: repeat(2, 1fr); // the "1fr" makes all rows equal height;
+    // e.g., see https://stackoverflow.com/questions/44488357/equal-height-rows-in-css-grid-layout
+  grid-auto-rows: 1fr;
+  gap: gutter(thmda-tight);
 
-    &--list {
-        padding: 0 0 em(14);
-        width: 100%;
-    }
+  // Note: layout set-up assumes that each card plus its gap accounts for roughly 128 pixels.
+  // At these widths, we have these needs:
+  // Breakpoint Name  Pixel-Value Max-Columns (stamps per row)
+  // thmda_narrow     392px       3
+  // BUT NOW at afl_small and up, only 66% of screen is used for stamp area or a max of 336 pixels, so adjust further:
+  // Breakpoint Name  Pixel-Value 2/3-Value or down 336px Max-Columns (stamps per row)
+  // afl_small        600px       400       3
+  // thmda_wideenough 768px       ~512      3 (4 could fit but less readable short text, so leaving wider at 3 per row)
+  // afl_medium       960         640       4
+  // afl_large        1280        944       7
+  // afl_xlarge       1920        1584      12
+  // xlarge           2400        2064      16
+
+
+  // For widths between afl_medium and afl_large, be 4 per row:
+  @media screen and (min-width: bp(afl_medium)) and (max-width: bp(afl_large) - 1) {
+    grid-template-columns: repeat(3, 1fr);
+    gap: gutter(thmda-medium);
+  }
+
+  // New!  With maximum of thmda_maxwidth, afl_large < thmda_maxwidth < afl_xlarge < xlarge, simply max out now at afl_large or greater...
+  // For widths of afl_large or greater, be 7 per row:
+  @media screen and (min-width: bp(afl_large)) {
+    grid-template-columns: repeat(4, 1fr);
+    gap: gutter(thmda-big);
+  }
+
+  // Obsolete wide-screen styling:
+  // For widths between afl_large and afl_xlarge, be 7 per row:
+  //@media screen and (min-width: bp(afl_large)) and (max-width: bp(afl_xlarge) - 1)  {
+  //  grid-template-columns: repeat(7, 1fr);
+  //  gap: gutter(thmda-big);
+  //}
+
+  // For widths between afl_xlarge and xlarge, be 12 per row:
+  //@media screen and (min-width: bp(afl_xlarge)) and (max-width: bp(xlarge) - 1)  {
+  //  grid-template-columns: repeat(12, 1fr);
+  //  gap: gutter(thmda-big);
+  //}
+
+  // For widths of xlarge or more, be 16 per row:
+  //@media screen and (min-width: bp(xlarge)) {
+  //  grid-template-columns: repeat(16, 1fr);
+  //  gap: gutter(thmda-big);
+  //}
 }
 
 .tape {
-    position: relative;
-    display: flex;
-    margin-bottom: 1rem;
-    margin-right: 1rem;
-    vertical-align: top;
-    width: calc(50% - .5rem);
-
-    &:nth-of-type(2n+0) {
-        margin-right: 0;
-    }
-
-    @media (min-width: bp(small)) {
-        width: calc(33.33333333333333% - (1rem * .6666666666666666));
-
-        &:nth-of-type(2n+0) {
-            margin-right: 1rem;
-        }
-
-        &:nth-of-type(3n+0) {
-            margin-right: 0;
-        }
-    }
-
-
-    @media (min-width: bp(large)) {
-        width: calc(25% - (1rem * .75));
-
-        &:nth-of-type(3n+0) {
-            margin-right: 1rem;
-        }
-
-        &:nth-of-type(4n+0) {
-            margin-right: 0;
-        }
-    }
-
-    &.tape--list {
-        margin: 0 !important;
-        width: 100%;
-    }
+  padding: 0;
+  margin: 0;
 }
 
-thda-story {
-    display: flex;
-    width: 100%;
+.tape-as-list {
+  padding: 0;
+  margin: 0 0 gutter(thmda-tiny) 0; // top right bottom left
 }
 
-.page-title {
-    @extend %oswald;
-
-    color: color(dark-grey);
-    font-size: rem(18);
-    letter-spacing: .83px;
-    margin-bottom: 0;
-    margin-top: 0;
-    text-transform: uppercase;
-
-    @media screen and (min-width: bp(medium) + 1) {
-        font-size: rem(26);
-        margin-bottom: em(14,26);
-    }
+.tapes-as-list {
+  list-style: none;
+  padding: 0;
 }
 
-.page-title-section {
-    align-items: center;
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: em(18);
-    margin-top: - em(3);
-
-    @media screen and (min-width: bp(medium) + 1) {
-        display: block;
-    }
-
-}
-
+//My Clips
 .welcome-paragraph {
-    @extend %source-sans-bold;
-    @extend %desktop-only;
+  @extend %source-sans-bold;
 
-    background: color(primary);
-    color: #fff;
-    font-size: rem(20);
-    letter-spacing: .5px;
-    line-height: 1.3;
-    padding: em(14,20) em(14,20) em(12,20);
-    position: relative;
+  background: color(primary);
+  color: #fff;
+  font-size: 2rem;
+  margin: em(12) 0 em(8) 0; // top right bottom left
+  padding: em(8) em(10);;
+  position: relative; // needed to get descending triangle magic to work...
 
-    @media screen and (min-width: bp(large) ) {
-        font-size: rem(33);
-        padding: em(18,33) em(20,33);
-    }
-
-    &:after {
-        border-left: em(30,20) solid transparent;
-        border-right: em(30,20) solid transparent;
-        border-top: em(30,20) solid color(primary);
-        content: '';
-        height: 0;
-        left: calc(50% - 30px);
-        position: absolute;
-        top: 100%;
-        transform: translateY(-50%);
-        width: 0;
-
-        @media screen and (min-width: bp(large) ) {
-            border-left: em(36,33) solid transparent;
-            border-right: em(36,33) solid transparent;
-            border-top: em(36,33) solid color(primary);
-            left: em(120, 33);
-        }
-
-    }
-}
-
-%orange-button {
-    @extend %source-sans;
-
-    background-color: color(secondary);
-    border-radius: 0;
-    height: em(43);
-    width: 100%;
-}
-
-@keyframes hide-maker-dir {
-  0% {
-    height: auto;
-  }
-  90% {
-    height: auto;
-  }
-  100% {
+  &:after { // magic to draw descending triangle
+    border-left: em(10) solid transparent;
+    border-right: em(10) solid transparent;
+    border-top: em(10) solid color(primary);
+    content: '';
     height: 0;
+    left: calc(30% - 10px);
+    position: absolute;
+    top: 100%;
+    transform: translateY(-40%);
+    width: 0;
   }
 }
 
-.hide-under-menu {
-    @media screen and (max-width: bp(medium)) {
-        animation: hide-maker-dir .5s;
-        animation-duration: .5s;
-        animation-fill-mode: forwards;
-        animation-iteration-count: once;
-        overflow: hidden;
-    }
+.distinguishFilterPane {
+  background-color: color(light-grey);
+  border: 1px solid #ccc;
+  padding: gutter(thmda-medium);
 }
 
-.filters:not(.filters--mobile) {
-    @extend %desktop-only;
+.story-set__title {
+  @extend %oswald;
+
+  color: color(black);
+  font-size: 2rem;
+  line-height: 120%;
+  margin-bottom: 0;
+  margin-top: em(4);
+  padding: 0;
+
+  @media screen and (min-width: bp(afl_small)) and (max-width: bp(afl_medium) - 1) {
+      font-size: 1.7rem;
+  }
+
+  @media screen and (min-width: bp(afl_medium)) and (max-width: bp(afl_large) - 1) {
+      font-size: 2rem;
+  }
+
+  @media screen and (min-width: bp(afl_large)) {
+      font-size: 2.3rem;
+  }
+
+  &:focus {
+    outline: 0;
+    text-decoration: underline;
+  }
 }
 
-.filters {
-    background-color: color(light-grey);
-    border: 1px solid #ccc;
-    font-size: 1rem;
-    padding: em(14);
-    margin-bottom: em(20);
-
-    @media screen and (min-width: bp(large)) {
-        margin-bottom: em(24);
-    }
+.attrib {
+    font-size: 1.2rem;
+    color: #1E1810;
 }
 
-.filters__button {
-    @extend %source-sans;
-    @extend %mobile-only;
-
-    align-items: center;
-    background-color: color(primary);
-    border-radius: 0;
-    cursor: pointer;
-    display: flex;
-    justify-content: space-around;
-    padding: em(6) em(15);
-    text-transform: uppercase;
-
-    &:disabled {
-        color: #fff;
-        cursor: not-allowed;
-        opacity: .4;
-    }
+.gap-my-clips-action-container {
+    margin-bottom: em(12);
 }
 
-.filters__button-icon {
-    margin-right: em(9);
+.my-clips-action-button { // note similarity with launch-filter-menu-button
+  @extend %oswald;
+
+  background-color: color(primary);
+  border: 1px solid color(primary); // note: added for accessibility, to provide a button border in high contrast mode
+  border-radius: 0;
+  cursor: pointer;
+  margin: gutter(thmda-tight) 0 gutter(thmda-tiny) 0; // top right bottom left
+  padding: em(4) em(12);
+  font-size: 1.2rem;
+  height: $buttonHeight;
+
+  &:hover,
+  &:focus {
+      box-shadow: inset 0 0 5px rgba(51,51,51,.6);
+      background-color: color(secondary);
+  }
 }
 
-.filter {
-    align-items: center;
-    display: flex;
-    margin-bottom: 0;
+.my-clips-action-button__inverse {
+  @extend %oswald;
+
+  background-color: color(secondary);
+  border: 1px solid color(secondary); // note: added for accessibility, to provide a button border in high contrast mode
+  border-radius: 0;
+  cursor: pointer;
+  margin: gutter(thmda-tight) 0 gutter(thmda-tiny) 0; // top right bottom left
+  padding: em(4) em(12);
+  font-size: 1.2rem;
+  height: $buttonHeight;
+
+  &:hover,
+  &:focus {
+      box-shadow: inset 0 0 5px rgba(51,51,51,.6);
+      background-color: color(primary);
+  }
 }
 
-.filter__name {
-    @extend %source-sans-semi-bold;
-
-    flex: 2;
-    font-size: em(14);
-    line-height: em(18, 14);
-    padding: em(3, 14) 0;
-
-    &.active {
-        color: color(primary);
-    }
-
-    &:hover {
-        @media screen and (min-width: bp(small)) {
-            cursor: pointer;
-        }
-    }
-
-    @media screen and (min-width: bp(large)) {
-        font-size: em(16);
-        line-height: em(18, 16);
-        padding: em(3, 16) 0;
-    }
+.action-button-top-gap {
+  margin-top: em(6);
 }
 
-.filter__check {
-    cursor: pointer;
-    margin-left: auto;
+.page-view-options {
+  margin: em(22) 0 0;
 }
-
-.filters__title {
-    @extend %oswald;
-
-    background-color: transparent;
-    color: color(dark-grey);
-    font-size: em(20);
-    margin-bottom: em(18, 20);
-    text-transform: uppercase;
-
-    @media screen and (min-width: bp(small)) {
-        font-size: em(22);
-        margin-bottom: em(18, 22);
-     }
-}
-
-.filters__applied {
-    margin-bottom: em(18);
-}
-
-.filters__applied-title {
-    @extend %oswald;
-
-    color: color(primary);
-    letter-spacing: -.5px;
-    padding: em(3) 0;
-    text-transform: uppercase;
-}
-
-.filters__search {
-    margin-bottom: em(20);
-}
-
-.filters__input-button {
-    background: color(primary);
-    border-radius: 0;
-    display: flex;
-    height: em(43);
-
-    &:disabled {
-        opacity: 1;
-    }
-}
-
-.filters__input {
-    border: 1px solid color(grey);
-    border-radius: 0;
-    color: color(dark-grey);
-    flex: 2;
-    height: em(43);
-    padding-left: em(13);
-
-    @media screen and (min-width: bp(medium)) {
-        padding-left: em(18);
-    }
-
-    &:focus {
-        border-top: 1px solid color(dark-grey);
-        border-left: 1px solid color(dark-grey);
-        border-bottom: 1px solid color(dark-grey);
-        outline: 0;
-    }
-
-    &:focus + .input-group-btn .filters__input-button {
-       height: em(43);
-    }
-
-}
-
-.apply-filters {
-    @extend %orange-button;
-
-    align-items: center;
-    bottom: - em(53, 16);
-    display: flex;
-    font-size: rem(16);
-    justify-content: center;
-    position: fixed;
-    text-transform: uppercase;
-    transform: translate3d(0,0,0);
-    transition-delay: 0s;
-    transition: transform .2s linear;
-    z-index: 2000;
-}
-
-.apply-filters--show {
-    @media screen and (max-width: bp(medium)) {
-        transform: translate3d(0,- em(53, 16),0);
-        transition-delay: .6s;
-    }
-}
-
-
-// Mobile filter styles
-.filters.filters--mobile {
-    @extend %mobile-only;
-
-    border: 0;
-    font-size: rem(16);
-    padding: 0;
-    position: absolute;
-    top: - em(3000, 16);
-    transition: transform .5s ease-in-out;
-    transition-delay: .3s;
-    width: 100vw;
-    z-index: 1500;
-
-    &.filters--show {
-        transform: translate3d(0, em(3000, 16),0);
-        transition-delay: 0s;
-    }
-
-
-
-    .filters__header {
-        background-color: #fff;
-        display: flex;
-        justify-content: space-between;
-        padding: em(12, 16) em(14, 16) em(8, 16);
-    }
-
-    .filters__header-title {
-        @extend %oswald;
-
-        font-size: em(18, 16);
-        letter-spacing: em(.5, 18);
-        line-height: inherit;
-        margin-bottom: 0;
-        text-transform: uppercase;
-    }
-
-    .filters__header-button {
-        @extend %source-sans-semi-bold;
-
-        background-color: transparent;
-        color: color(secondary);
-        letter-spacing: em(.61);
-        padding: 0;
-    }
-
-    .filters__body {
-        padding: em(9) em(15);
-    }
-
-    .filters__section {
-        margin-bottom: em(25, 16);
-    }
-
-    .filters__section-title {
-        @extend %source-sans-semi-bold;
-
-        color: color(dark-grey);
-        font-size: em(16, 16);
-        margin-bottom: em(6, 16);
-    }
-
-    .filters__button {
-        background-color: #fff;
-        border: 1px solid color(primary);
-        color: color(primary);
-        height: em(43, 16);
-        justify-content: center;
-        padding: em(2) em(6) em(3);
-        text-transform: capitalize;
-        width: 100%;
-        display: block;
-
-        &:focus {
-            outline: 0;
-        }
-
-        // Used as a flex container because Safari doesn't allow buttons to be flex containers
-        // Reference: https://stackoverflow.com/questions/35464067/flexbox-not-working-on-button-element-in-some-browsers
-        .filters__button-content {
-            align-items: center;
-            display: flex;
-            justify-content: center;
-        }
-    }
-
-    .filters__button.selected,
-    .filters__button--inverted  {
-        background-color: color(primary);
-        border: 1px solid color(primary);
-        color: #fff;
-    }
-
-    .filters__2-col {
-        display: flex;
-        margin-bottom: em(8, 16);
-
-        > *:nth-of-type(odd) {
-            margin-right: em(7, 16);
-        }
-
-        > *:nth-of-type(even) {
-            margin-left: em(7, 16);
-        }
-    }
-
-    .filters__button-icon {
-        margin-right: em(5, 16);
-    }
-
-    .search__res-per-pg {
-        display: flex;
-        height: em(43, 16);
-    }
-
-    .search__res-per-pg-button {
-        align-items: center;
-        background-color: color(primary);
-        color: #fff;
-        display: flex;
-        font-size: rem(16);
-        height: em(43, 16);
-        justify-content: space-between;
-        padding: em(5) em(15);
-        width: 100%;
-
-        .search__res-per-pg-container {
-            align-items: center;
-            display: flex;
-            justify-content: space-between;
-            width: 100%;
-        }
-    }
-
-    .filters__input {
-        height: em(43, 16);
-    }
-
-    .panel-heading {
-        align-items: center;
-        display: flex;
-        font-size: rem(16);
-        height: em(43, 16);
-    }
-
-    .panel-title { width: 100%; }
-
-    .panel--first { margin-top: em(14, 16); }
-
-    .filter {
-        border-bottom: 1px solid color(grey);
-        margin-bottom: 0;
-
-        &:last-of-type {
-            border-bottom: 0;
-        }
-    }
-
-    .filter__name {
-        font-size: em(16, 16);
-        line-height: em(20, 16);
-        padding: em(10, 16) 0;
-    }
-}
-// End mobile filter styles
-
-.panel {
-    border-bottom-width: 1px;
-    border-color: color(primary);
-    border-radius: 0;
-    box-shadow: none;
-
-    &:last-of-type {
-        margin-bottom: em(6);
-    }
-}
-
-.panel .caret {
-    transform: rotate(180deg);
-    transition: transform .3s ease-in-out;
-}
-
-.panel .collapsed .caret {
-    transform: rotate(0deg);
-}
-
-.panel-heading {
-    background-color: color(primary);
-    border: 0;
-    border-radius: 0;
-    color: #fff;
-    height: 30px;
-    font-size: em(16);
-    padding: em(5,16) em(15,16);
-
-    .panel-title { @extend %source-sans; }
-
-    a {
-        align-items: center;
-        display: flex;
-        justify-content: space-between;
-
-        &:hover,
-        &:focus,
-        &:visited {
-            color: #fff;
-            text-decoration: none;
-        }
-    }
-}
-
-.filters .panel-body {
-    margin-top: 0;
-    padding-top: 0;
-
-    @media screen and (min-width: bp(medium)) {
-        margin: em(14) 0;
-    }
-}
-
-.dropdown__option {
-    @extend %source-sans;
-
-    background: none;
-    border: none;
-    color: color(dark-grey);
-    cursor: arrow;
-    font-size: em(16);
-    line-height: em(26, 16);
-    padding: 0 em(17, 16);
-    text-align: left;
-    text-transform: capitalize;
-    white-space: nowrap;
-
-    &:hover {
-        background: transparent;
-        color: color(primary);
-    }
-}
-

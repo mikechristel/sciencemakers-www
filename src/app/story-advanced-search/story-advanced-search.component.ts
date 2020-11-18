@@ -1,178 +1,78 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ViewChild, OnInit, AfterViewChecked } from '@angular/core';
 
-import { ActivatedRoute, Router, Params } from '@angular/router';
-
-import { TitleManagerService } from '../title-manager.service';
+import { ActivatedRoute, Params } from '@angular/router';
 
 import { GlobalState } from '../app.global-state';
+import { TitleManagerService } from '../shared/title-manager.service';
 
-import { StorySetType } from '../storyset/storyset-type';
+import { SearchFormService } from '../shared/search-form/search-form.service';
+import { SearchFormComponent } from '../shared/search-form/search-form.component';
 
-import { environment } from '../../environments/environment';
+import { SearchFormOptions } from '../shared/search-form/search-form-options';
+import { BaseComponent } from '../shared/base.component';
+import {LiveAnnouncer} from '@angular/cdk/a11y'; // used to read changes to set title
 
 @Component({
     selector: 'thda-story-advs',
     templateUrl: './story-advanced-search.component.html',
     styleUrls: ['./story-advanced-search.component.scss']
 })
-export class StoryAdvancedSearchComponent implements OnInit {
+export class StoryAdvancedSearchComponent extends BaseComponent implements OnInit, AfterViewChecked {
+    @ViewChild('myStorySearchForm') mySearchFormElement: SearchFormComponent;
+
+    public biographyIDForLimitingSearch: number = null; // used to modify UI in associated html (hence public)
+
     storyAdvSearchPageTitle: string;
     storyAdvSearchPageTitleLong: string;
+    signalFocusToTitle: boolean = false; // is used in html rendering of this component
 
-    txtQuery: string = ""; // this is the query string as edited by the user
-    searchTitleOnly: boolean;
-    searchTranscriptOnly: boolean;
-    resultsSize: number;
-    earliestInterviewYear: number;
-    latestInterviewYear: number;
+    constructor(
+        private route: ActivatedRoute,
+        private globalState: GlobalState,
+        private searchFormService: SearchFormService,
+        private titleManagerService: TitleManagerService, private liveAnnouncer: LiveAnnouncer) {
 
-    filterByInterviewDate: boolean;
+        super(); // for BaseComponent extension (brought in to cleanly unsubscribe from subscriptions)
 
-    fields: string[] = ['all fields','title','transcript'];
-    searchByField: string;
-    biographyIDForLimitingSearch: number;
-    inputPlaceholder: string;
-
-    interviewYears: number[];
-    minYearAllowed: number;
-
-    constructor(private route: ActivatedRoute,
-        private router: Router,
-        private titleManagerService: TitleManagerService) {
-          this.minYearAllowed = environment.firstInterviewYear;
+        this.searchFormService.setSearchOptions(new SearchFormOptions(false, this.globalState.NOTHING_CHOSEN, this.globalState.NO_ACCESSION_CHOSEN, true)); // note: may perhaps be called again with a chosen bio ID
     }
 
     ngOnInit() {
-        this.storyAdvSearchPageTitle = "Story Advanced Search Page";
-        this.storyAdvSearchPageTitleLong = "Story Advanced Search Page, The ScienceMakers Digital Archive";
+        this.storyAdvSearchPageTitle = "Story Advanced Search";
+        this.storyAdvSearchPageTitleLong = "Story Advanced Search, ScienceMakers Digital Archive";
         this.titleManagerService.setTitle(this.storyAdvSearchPageTitleLong);
-        this.searchTitleOnly = GlobalState.SearchTitleOnly;
-        this.searchTranscriptOnly = GlobalState.SearchTranscriptOnly;
-        this.resultsSize = GlobalState.SearchPageSize;
-
-        var currentYear = new Date().getFullYear();
-        this.interviewYears = [];
-        for (var i = this.minYearAllowed; i <= currentYear; i++)
-            this.interviewYears.push(i);
-        if (GlobalState.EarliestInterviewYearToKeep == 0)
-            this.earliestInterviewYear = this.minYearAllowed;
-        else
-            this.earliestInterviewYear = GlobalState.EarliestInterviewYearToKeep;
-        if (GlobalState.LatestInterviewYearToKeep == 0)
-            this.latestInterviewYear = currentYear;
-        else
-            this.latestInterviewYear = GlobalState.LatestInterviewYearToKeep;
-        this.filterByInterviewDate = false;
-
-        this.setField();
+        this.liveAnnouncer.announce(this.storyAdvSearchPageTitle); // NOTE: using LiveAnnouncer to eliminate possible double-speak
 
         this.route.params.forEach((params: Params) => {
-            if (params['ip'] !== undefined && !isNaN(+params['ip'])) {
-                this.biographyIDForLimitingSearch = +params['ip'];
-                if (this.biographyIDForLimitingSearch != GlobalState.NOTHING_CHOSEN)
-                    this.inputPlaceholder = "Search this person's stories...";
-                else {
-                    this.biographyIDForLimitingSearch = null;
+            if (params['ip'] !== undefined && !isNaN(+params['ip']) && params['ia'] !== undefined) {
+                var candidateID: number = +params['ip'];
+                var candidateAccession: string = params['ia'];
+                if (candidateID != this.globalState.NOTHING_CHOSEN) {
+                    this.biographyIDForLimitingSearch = candidateID;
+                    // NOTE: when searching within a non-empty accession, the advanced search options (to filter by interview date) are turned off!
+                    // So, last parameter is false here because we have candidateAccession != this.globalState.NO_ACCESSION_CHOSEN
+                    this.searchFormService.setSearchOptions(new SearchFormOptions(false, candidateID, candidateAccession,
+                        (candidateAccession == this.globalState.NO_ACCESSION_CHOSEN))); // note the "search within this person's stories" option
                 }
             }
         });
-        if (this.biographyIDForLimitingSearch == null)
-            this.inputPlaceholder = "Search stories...";
     }
 
-    doSearch() {
-        // This legal range check should be built into the input controls, but just in case, do possibly redundant check here:
-        GlobalState.SearchTitleOnly = this.searchTitleOnly;
-        GlobalState.SearchTranscriptOnly = this.searchTranscriptOnly;
+    ngAfterViewChecked() {
+        // Attempt focus to the query input element once everything is set up.
+        var focusSetElsewhere: boolean = false;
 
-        // Accumulate routing parameters specifying filter specification, page information, etc.
-        if (this.txtQuery != null && this.txtQuery.length > 0) {
-            // Proceed with route parameter computations and doing the search.
-            var moreOptions = [];
-
-            moreOptions['q'] = GlobalState.cleanedRouterParameter(this.txtQuery);
-            this.titleManagerService.setTitle(GlobalState.PENDING_STORY_SET_TITLE);
-            moreOptions['pg'] = 1; // always show page 1 of new query
-            moreOptions['pgS'] = GlobalState.SearchPageSize; // use global context page size
-
-            if (this.searchTitleOnly) // use explicit "search-title-only" indicator of sT if true
-                moreOptions['sT'] = "1";
-            else if (this.searchTranscriptOnly) // use explicit "search-transcript-only" indicator of sS (search spoken) if true
-                moreOptions['sS'] = "1";
-            // else default to "both" without the use of an explicit flag
-
-            if (this.biographyIDForLimitingSearch != null && this.biographyIDForLimitingSearch != GlobalState.NOTHING_CHOSEN)
-                moreOptions['ip'] = this.biographyIDForLimitingSearch; // flag that an "inside THIS person" search context will be set and used
-
-            if (this.filterByInterviewDate  && this.interviewYears != null && this.interviewYears.length > 0) {
-                // Quick check that a filter is in existence, i.e., the choice is not [min, max] which is the same as no filter at all
-                if (this.earliestInterviewYear > this.interviewYears[0] || this.latestInterviewYear < this.interviewYears[this.interviewYears.length - 1]) {
-                    // A filter not equal to [min, max] is given.  Pass it in the route.
-                    // One last fix: if user put in max, min rather than min, max, do the fix here and in GlobalState tracking variables.
-                    if (this.earliestInterviewYear > this.latestInterviewYear) {
-                        GlobalState.EarliestInterviewYearToKeep = this.latestInterviewYear;
-                        this.latestInterviewYear = this.earliestInterviewYear;
-                        this.earliestInterviewYear = GlobalState.EarliestInterviewYearToKeep;
-                        GlobalState.LatestInterviewYearToKeep = this.latestInterviewYear;
-                    }
-                    moreOptions['iy'] = this.earliestInterviewYear + "-" + this.latestInterviewYear;
-                }
-            }
-            this.router.navigate(['/stories', StorySetType.TextSearch, moreOptions]);
+        if (this.mySearchFormElement) {
+            focusSetElsewhere = true;
+            this.mySearchFormElement.setFocusToQueryInput();
         }
-    }
 
-    noNeedForSearch(): boolean { // Returns true iff there is no need for search action (i.e., no search query).
-        return (this.txtQuery == null || this.txtQuery.length == 0);
-    }
-
-    setPageSize(newSize: number) {
-        GlobalState.SearchPageSize = newSize;
-        this.resultsSize = newSize;
-     }
-
-    setInterviewYearBound(newBound: number, setTheLowerBound: boolean) {
-        if (setTheLowerBound) {
-            this.earliestInterviewYear = newBound;
-            GlobalState.EarliestInterviewYearToKeep = newBound;
+        if (this.globalState.IsInternalRoutingWithinSPA) {
+            this.globalState.IsInternalRoutingWithinSPA = false;
+            if (!focusSetElsewhere)
+                // default to focus on title if input focus not possible
+                // since we did internally route in the SPA (single page application)
+                this.signalFocusToTitle = true;
         }
-        else {
-            this.latestInterviewYear = newBound;
-            GlobalState.LatestInterviewYearToKeep = newBound;
-        }
-     }
-
-     toggleFilterByInterviewDate() {
-        this.filterByInterviewDate = !this.filterByInterviewDate;
-     }
-
-    setField() {
-        if (this.searchTitleOnly === true) {
-            this.searchByField = "title";
-        }
-        else if (this.searchTranscriptOnly === true) {
-            this.searchByField = "transcript";
-        }
-        else { // "both" picked, so do not limit search to just one field or the other
-            this.searchByField = "all fields";
-        }
-    }
-
-    searchFieldChange(currentPick: string) {
-        if (currentPick == "title") {
-            this.searchTitleOnly = true;
-            this.searchTranscriptOnly = false;
-        }
-        else if (currentPick == "transcript") {
-            this.searchTitleOnly = false;
-            this.searchTranscriptOnly = true;
-        }
-        else { // "both" picked, so do not limit search to just one field or the other
-            this.searchTitleOnly = false;
-            this.searchTranscriptOnly = false;
-        }
-        this.searchByField = currentPick;
-        GlobalState.SearchTitleOnly = this.searchTitleOnly;
-        GlobalState.SearchTranscriptOnly = this.searchTranscriptOnly;
     }
 }

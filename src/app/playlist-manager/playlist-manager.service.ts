@@ -1,113 +1,118 @@
 import { Injectable } from '@angular/core';
 import { Subject }    from 'rxjs/Subject';
 
-import { Playlist } from '../shared/playlist/playlist';
-import { GlobalState } from '../app.global-state';
+import { Playlist } from './playlist';
+import { Story } from '../storyset/story';
 
 @Injectable()
 export class PlaylistManagerService {
-  public playlist: Subject<Playlist[]> = new Subject<Playlist[]>();
-  public playlist$ = this.playlist.asObservable();
-  public playlistTitle: Subject<string> = new Subject<string>();
-  public playlistTitle$ = this.playlistTitle.asObservable();
-  public titleURIEncoded: string;
-  public title: string;
-  public localPlaylist: Playlist[] = [];
+  // NOTE: "playlist" renamed to "my clips" in the UI and throughout much of the code, but not in the name of this service.
+  // Also, "Playlist" left as the data type.  Local storage, for historic reasons/backward compatibility, keeps using "playlist"
+  // as well.
+  public myClips: Subject<Playlist[]> = new Subject<Playlist[]>();
+  public myClips$ = this.myClips.asObservable();
+  public presentMyClipsExportForm: Subject<boolean> = new Subject<boolean>();
+  public presentMyClipsExportForm$ = this.presentMyClipsExportForm.asObservable();
+  public presentMyClipsConfirmClearingForm: Subject<boolean> = new Subject<boolean>();
+  public presentMyClipsConfirmClearingForm$ = this.presentMyClipsConfirmClearingForm.asObservable();
+
+  public localMyClips: Playlist[] = [];
 
   constructor() {
-      this.localPlaylist = JSON.parse(localStorage.getItem("sm-playlist") || "[]");
-      this.playlist.next(this.localPlaylist);
-      this.initializePlaylist();
+      this.localMyClips = JSON.parse(localStorage.getItem("playlist") || "[]");
+      this.myClips.next(this.localMyClips);
+      this.initializeMyClips();
   }
 
   ngOnInit() {
-      this.playlist.next(this.localPlaylist);
+      this.myClips.next(this.localMyClips);
   }
 
-  initializePlaylist() {
-    //   this.playlist.next(this.localPlaylist);
-      return this.localPlaylist;
+  initializeMyClips() {
+      return this.localMyClips;
   }
 
-  addPlaylistTitle(playlistTitle) {
-    // NOTE: certain characters in router mess up router parsing, e.g., !
-    // Rather than figure out nuances of router parsing, simplify what can be used as a title to just alphanumeric and space.
-    var cleanedTitle: string = playlistTitle.replace(/\s\s+/g, ' '); // consecutive whitespace turned into single space
-    cleanedTitle = cleanedTitle.replace(/[^a-zA-Z0-9 \-\'\"\_\.]/g, ''); // keep only alphanumeric, dash -, single or double quote ' ", underscore _, period . and space, nothing else
-    this.title = cleanedTitle;
-    this.titleURIEncoded = encodeURIComponent(cleanedTitle);
-    this.playlistTitle.next(cleanedTitle);
-    this.playlist.next(this.localPlaylist);
+  // !!!TODO: NOTE: UI to allow re-ordering of My Clips was retired rather than made fully accessible to keyboard-only users
+  // (it formerly used a drag and drop interface brought in from elsewhere which was mouse-only driven), and so for
+  // now this call is not used anywhere and hence is commented out:
+  //updateMyClips(newMyClipsOrder: Playlist[]) {
+  //    localStorage.setItem("playlist", JSON.stringify(newMyClipsOrder));
+  //    this.localMyClips = newMyClipsOrder;
+  //    this.myClips.next(this.localMyClips);
+  //}
+
+  clearMyClips() { // NOTE: ideally any caller to this first confirms with user before taking this clearing action
+      localStorage.setItem("playlist", "[]");
+      this.localMyClips = [];
+      this.myClips.next(this.localMyClips);
   }
 
-  getTitle() {
-      return this.title;
+  triggerMyClipsExportForm() {
+      // NOTE: Relying on a listener to changes in presentMyClipsExportForm to actually do the (modal) export form display.
+      // Here we just signal it.
+      this.presentMyClipsExportForm.next(true);
   }
 
-  updatePlaylist() {
-    this.playlist.next(this.localPlaylist);
+  triggerMyClipsConfirmClearingForm() {
+      // NOTE: Relying on a listener to changes in presentMyClipsConfirmClearingForm to actually do the (modal) confirm-clear form display.
+      // Here we just signal it.
+      this.presentMyClipsConfirmClearingForm.next(true);
   }
 
-  toggleAddToPlaylist(story) {
-        var idx: number;
-        var item: Playlist;
+  toggleAddToMyClips(story) {
+    var idx: number;
+    var item: Playlist;
 
-        idx = this.localPlaylist.findIndex(x => x.storyID == story.storyID)
-        if (idx >= 0) {
-            this.localPlaylist.splice(idx, 1);
-            localStorage.setItem("sm-playlist", JSON.stringify(this.localPlaylist));
-        }
-        else {
-            // Add story into the list because it's not yet there:
-            item = {
-                storyID: story.storyID,
-                title: story.title
-            }
-            this.localPlaylist.unshift(item);
-            localStorage.setItem("sm-playlist", JSON.stringify(this.localPlaylist));
-        }
-        this.playlist.next(this.localPlaylist);
+    idx = this.localMyClips.findIndex(x => x.storyID == story.storyID)
+    if (idx >= 0) {
+        // Remove story from list because it is already there
+        this.localMyClips.splice(idx, 1);
+        localStorage.setItem("playlist", JSON.stringify(this.localMyClips));
     }
-
-    TitledPlaylistAsURL(): string {
-        var retVal: string = "";
-        var url: string = ""
-        var favCount: number = this.localPlaylist.length;
-        if (favCount > 0) {
-            retVal = this.localPlaylist[0].storyID.toString();
-            for (var i:number = 1; i < this.localPlaylist.length; i++)
-                retVal = retVal + "%2C" + this.localPlaylist[i].storyID;
-            url = window.location.protocol + '//' + window.location.hostname + (window.location.port ? ':' + window.location.port: '') + "/stories/6;IDList=" + retVal;
-            if (this.titleURIEncoded) url = url + ";ListTitle=" + this.titleURIEncoded;
+    else {
+        // Add story into the list because it is not yet there:
+        item = {
+            storyID: story.storyID,
+            title: story.title
         }
-        else url = "";
-        return url;
+        this.localMyClips.push(item); // append the item to the list
+        // NOTE: if desired behavior is to prepend to the list, use this instead: this.localMyClips.unshift(item);
+        localStorage.setItem("playlist", JSON.stringify(this.localMyClips));
     }
+    this.myClips.next(this.localMyClips);
+  }
 
-    PlaylistAsPath(): string {
-        var retVal: string = "";
-        var url: string = ""
-        var favCount: number = this.localPlaylist.length;
-        if (favCount > 0) {
-            retVal = this.localPlaylist[0].storyID.toString();
-            for (var i:number = 1; i < this.localPlaylist.length; i++)
-                retVal = retVal + "%2C" + this.localPlaylist[i].storyID;
-            url = "/stories/7;IDList=" + retVal;
-            // NOTE:  The user's playlist is NOT titled.  They can export it as a titled set of stories, which is the purpose of TitledPlaylistAsURL
-        }
-        else url = "";
-        return url;
-    }
+  appendToMyClips(storyList: Story[]) {
+      var idx: number;
+      var item: Playlist;
+      var atLeastOneAppendMade: boolean = false;
+      if (storyList) {
+          for (var i = 0; i < storyList.length; i++) {
+              idx = this.localMyClips.findIndex(x => x.storyID == storyList[i].document.storyID);
+              if (idx < 0) {
+                  // Item not in My Clips; append it.
+                  item = {
+                      storyID: storyList[i].document.storyID,
+                      title: storyList[i].document.title
+                  }
+                  this.localMyClips.push(item);
+                  atLeastOneAppendMade = true;
+              }
+          }
+          if (atLeastOneAppendMade)
+              localStorage.setItem("playlist", JSON.stringify(this.localMyClips));
+      }
+  }
 
-    PlaylistAsString(): string {
-        var retVal: string = "";
-        var favCount: number = this.localPlaylist.length;
-        if (favCount > 0) {
-            retVal = this.localPlaylist[0].storyID.toString();
-            for (var i:number = 1; i < this.localPlaylist.length; i++)
-                retVal = retVal + "," + this.localPlaylist[i].storyID;
-        }
-        return retVal;
-    }
+  MyClipsAsString(): string {
+      var retVal: string = "";
+      var favCount: number = this.localMyClips.length;
+      if (favCount > 0) {
+          retVal = this.localMyClips[0].storyID.toString();
+          for (var i:number = 1; i < this.localMyClips.length; i++)
+              retVal = retVal + "," + this.localMyClips[i].storyID;
+      }
+      return retVal;
+  }
 
 }

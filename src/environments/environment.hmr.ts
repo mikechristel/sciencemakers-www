@@ -1,11 +1,10 @@
-// Development Environment with Hot Module Replacement (HMR
+// Development Environment with Hot Module Replacement (HMR)
 
 export const environment = {
   production: false,
   hmr: true,
   // Runtime configuruation
-  requireAuthentication: false,
-  serviceBase: "api/",
-  mediaBase: "https://thmdaprodmedia.blob.core.windows.net/media/",
-  firstInterviewYear: 2001
+  serviceBase: "https://da-processing-api.azurewebsites.net/api/", 
+  mediaBase: "https://daprocessingstorage.blob.core.windows.net/media/",
+  firstInterviewYear: 1993
 };

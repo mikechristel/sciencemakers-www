@@ -1,46 +1,35 @@
 ﻿import { NgModule }             from '@angular/core';
 import { CommonModule }         from '@angular/common';
 import { FormsModule }          from '@angular/forms';
+
 import { ScrollToMeDirective }  from './scroll-to-me.directive';
-import { ScrollTranscript }  from './scroll-transcript.directive';
-import { StorySearchComponent } from './story-search/story-search.component';
-import { VideoJSComponent }       from './video-js/video-js.component';
-import { PlaylistComponent } from './playlist/playlist.component';
-import { VgCoreModule } from 'videogular2/core';
-import { VgControlsModule } from 'videogular2/controls';
-import { VgOverlayPlayModule } from 'videogular2/overlay-play';
-import { VgBufferingModule } from 'videogular2/buffering';
-import { ClipboardModule } from 'ngx-clipboard';
-import { TooltipModule } from 'ngx-bootstrap/tooltip';
+import { FocusMeDirective } from './focus-me.directive';
+
+import { FlexLayoutModule } from '@angular/flex-layout'; // for flex layout
+
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { MyVideoModule } from './my-video/my-video.module';
 
 // NOTE:  Template for this module is: https://angular.io/docs/ts/latest/guide/ngmodule.html#!#shared-module
 
 @NgModule({
     imports: [
-        CommonModule, 
+        CommonModule,
         FormsModule,
-        VgCoreModule,
-        VgControlsModule,
-        VgOverlayPlayModule,
-        VgBufferingModule,
-        ClipboardModule,
-        TooltipModule.forRoot()
+        FlexLayoutModule,
+        BrowserAnimationsModule,
+        MyVideoModule
         ],
     declarations: [
         ScrollToMeDirective,
-        ScrollTranscript,
-        StorySearchComponent, 
-        VideoJSComponent, 
-        PlaylistComponent
+        FocusMeDirective
         ],
     exports: [
         ScrollToMeDirective,
-        ScrollTranscript,
-        CommonModule, 
+        FocusMeDirective,
+        CommonModule,
         FormsModule,
-        StorySearchComponent, 
-        VideoJSComponent, 
-        PlaylistComponent
+        MyVideoModule
         ]
 })
 export class SharedModule { }

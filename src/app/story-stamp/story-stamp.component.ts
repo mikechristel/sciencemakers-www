@@ -1,12 +1,10 @@
-﻿import { Component, Input, Output, EventEmitter, Inject } from '@angular/core';
+﻿import { Component, Input } from '@angular/core';
+
 import { StoryDocument } from '../storyset/story-document';
 import { StoryHighlight } from '../storyset/story-highlight';
-import { GlobalState } from '../app.global-state';
 import { environment } from '../../environments/environment';
 
-import { Playlist } from '../shared/playlist/playlist';
-import { PlaylistManagerService } from '../playlist-manager/playlist-manager.service';
-import { Subscription }   from 'rxjs/Subscription';
+import { BaseComponent } from '../shared/base.component';
 
 @Component({
     selector: 'thda-story',
@@ -16,95 +14,54 @@ import { Subscription }   from 'rxjs/Subscription';
 
 // This class is used to present a single story in a presumed grid/list of stories.
 // It takes as input the story details in the form of a StoryDocument object, and the ID of whatever story might be
-// selected to appropriately decorate the selected story in a grid/list.
-// It emits the onSelected event when it fires its onSelect event.
-// See https://angular.io/docs/ts/latest/cookbook/component-communication.html for more on component communication.
-export class StoryStampComponent {
+// selected to appropriately focus the selected story in a grid/list.
+export class StoryStampComponent extends BaseComponent {
     @Input() story: StoryDocument;
     @Input() highlights: StoryHighlight;
+    @Input() hideInterviewDate:boolean = false;
+    @Input() overrideToH4Nesting:boolean = false;
     @Input('selectedID') selectedStoryID: number;
-    @Input() isStarredSetItem: boolean;
     @Input() cardView: boolean;
-    @Output() onSelected = new EventEmitter<number>();
-    @Output() triggerRemoval = new EventEmitter<number>();
-    @Output() storyForPlaylist = new EventEmitter<number>();
-    @Output() hideParent = new EventEmitter<boolean>();
+    @Input() queryForTranscript: string; // used to preserve query-into-transcript context for later match term lookup by a detailed story renderer
 
-
-    private subscription: Subscription;
     public myMediaBase: string;
-    public playlist: Playlist[];
-    public inPlaylist: boolean;
-    public hideCheckmark: boolean;
-    public mobilePopover: boolean = false;
-    public mobileTooltipMessage: string;
-    private timer: any;
 
-    constructor(private playlistManagerService: PlaylistManagerService) {
-      this.myMediaBase = environment.mediaBase;
-      this.subscription = playlistManagerService.playlist$.subscribe((value) => {
-            this.playlist = value;
-            this.isInPlaylist(this.story);
-        })
+    constructor() {
+
+        super(); // for BaseComponent extension (brought in to cleanly unsubscribe from subscriptions)
+
+        this.myMediaBase = environment.mediaBase;
     }
 
-    ngOnInit() {
-        this.playlist = this.playlistManagerService.initializePlaylist();
-        var idx: number;
-
-        idx = this.playlist.findIndex(x => x.storyID == this.story.storyID);
-        if (idx >= 0) {
-            this.inPlaylist = true;
-        }
-        else {
-            this.inPlaylist = false;
-        }
-        this.hideCheckmark = this.inPlaylist;
-    }
-
-    removeCard(isStarredSetItem) {
-        if (isStarredSetItem) this.hideParent.emit();
-    }
-
-    togglePlaylist(story) {
-
-        this.storyForPlaylist.emit(story);
-        this.isInPlaylist(story);
-        this.toggleToolTip();
-    }
-
-    // This custom tooltip implementation is a temporary workaround
-    // until ngx-bootstrap releases a fix for this issue: https://github.com/valor-software/ngx-bootstrap/issues/2257
-    toggleToolTip() {
-        this.inPlaylist ? this.mobileTooltipMessage = "Added to Playlist" : this.mobileTooltipMessage = "Removed from Playlist";
-        this.mobilePopover = true;
-        clearTimeout(this.timer);
-        this.timer = setTimeout(()=>{ this.mobilePopover = false; },2000);
-    }
-
-    isInPlaylist(story) {
-        let idx: any;
-
-        idx = this.playlist.findIndex(x => x.storyID == story.storyID)
-        if (idx >= 0) this.inPlaylist = true;
-        else this.inPlaylist = false;
+    qualifiedRoute() : string {
+        if (this.story && this.story.storyID)
+            return '/story/' + this.story.storyID; // the correct route
+        else
+            return '/story/0'; // default bogus path
     }
 
     isSelected(oneStoryID: number) {
         return oneStoryID == this.selectedStoryID;
     }
 
-    onSelect(oneStoryID: number) {
-        this.onSelected.emit(oneStoryID);
-    }
-
-    removeFromStarredSet(e, storyIDForRemoval: number) {
-        e.stopPropagation(); // do not allow click on "X" remove button to trigger click action to open that story as well
-        this.triggerRemoval.emit(storyIDForRemoval);
-    }
-
+    // Return a mm:ss format equivalent to the specified number of milliseconds, dropping out fractional part
+    // and returning 0:ss for values under a minute.  Return 0:00 for negative values or 0, and
+    // impose a ceiling of 99:59 for huge values.
     convertToMMSS(givenVal: number): string {
-        return GlobalState.convertToMMSS(givenVal);
+        const MAX_MILLISECS_SUPPORTED = 5999; // 99 minutes and 59 seconds, 99:59
+        var workVal = Math.floor(givenVal / 1000); // convert milliseconds to seconds
+        // Protect for goofy values:
+        if (workVal < 0)
+            workVal = 0;
+        else if (workVal > MAX_MILLISECS_SUPPORTED)
+            workVal = MAX_MILLISECS_SUPPORTED;
+        var minutes = Math.floor(workVal / 60);
+        var seconds = workVal - (60 * minutes);
+        var minutesString: string = minutes.toString();
+        var secondsString: string = seconds.toString();
+        if (secondsString.length == 1)
+            secondsString = "0" + secondsString;
+        return minutesString + ":" + secondsString;
     }
 
     // Return the given string, unless it is too long, then return a shortened form ended with ...

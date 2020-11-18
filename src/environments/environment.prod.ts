@@ -1,11 +1,10 @@
-// Producion Environment (smda-prod-www)
+// Producion Environment (thmda-prod-www)
 
 export const environment = {
   production: true,
   hmr: false,
   // Runtime configuruation
-  requireAuthentication: false,
-  serviceBase: "api/",
-  mediaBase: "https://thmdaprodmedia.blob.core.windows.net/media/",
-  firstInterviewYear: 2001
+  serviceBase: "https://da-processing-api.azurewebsites.net/api/", 
+  mediaBase: "https://daprocessingstorage.blob.core.windows.net/media/",
+  firstInterviewYear: 1993
 };

@@ -18,6 +18,7 @@ export class DetailedBiographyStorySet {
     public occupations: string[];
     public birthDate: string;
     public deceasedDate: string;
+    public isScienceMaker: boolean;
     public makerCategories: string[];
     public occupationTypes: string[];
     public favorites: BiographyFavorites;

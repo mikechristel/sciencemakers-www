@@ -11,7 +11,4 @@
     public location: string;
     public gender: string;
     public birthYear: number;
-    public sponsor: string;
-    public sponsorURL: string;
-    public sponsorImage: string; // NOTE: do not use if empty or if it starts "TODO"
 }

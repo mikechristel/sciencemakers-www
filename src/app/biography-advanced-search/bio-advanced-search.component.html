@@ -1,108 +1,54 @@
-<div class="container-fluid adjust-height">
-    <h1 class="page-title visible-xs-block">{{bioAdvSearchPageTitle}}</h1>
-    <h1 class="page-title visible-sm-block visible-md-block visible-lg-block">{{bioAdvSearchPageTitleLong}}</h1>
+<h1 id="mmainHeader" [thdaIsFocused]="signalFocusToTitle" tabindex="-1" class="page-title mobile-only" (mousedown)="noMouseFocus($event)">{{bioAdvSearchPageTitle}}</h1>
+<h1 id="dmainHeader" [thdaIsFocused]="signalFocusToTitle" tabindex="-1" class="page-title desktop-only" (mousedown)="noMouseFocus($event)">{{bioAdvSearchPageTitleLong}}</h1>
 
-    <!-- Search Form (TODO: a candidate to turn into a component with parameter to add link as needed to advanced biography search help, if used in many parent components) -->
-    <section class="search">
-
-        <!-- Search input with dropdown -->
-        <div class="input-dropdown">
-            <input type="text" class="input-dropdown__input" [(ngModel)]="textQuery" placeholder="Search ScienceMakers..." (keyup.enter)="doBiographySearch()" />
-            <div class="dropdown">
-                <button class="dropdown-toggle input-dropdown__button" type="button" id="desktop-fieldFilter" data-toggle="dropdown">
-                    {{searchByField}}
-                    <span class="caret"></span>
-                </button>
-                <ul class="dropdown-menu" role="menu" aria-labelledby="desktop-fieldFilter">
-                    <li role="presentation" *ngFor="let field of fields">
-                        <a class="dropdown__option" role="menuitem" value="field" *ngIf="field !== searchByField" (click)="searchFieldChange(field)">{{field}}</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-
-        <!-- Submit button -->
-        <button class="search__submit" [disabled]="noNeedForBiographySearch()" (click)="doBiographySearch()" value="Search">
-            Search
-            <svg class="search__submit-icon" width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                <title aria-hidden="true">
-                    Search Magnifying Glass Icon
-                </title>
-                <path d="M17.477 2.523C15.797.84 13.59 0 11.387 0 9.183 0 6.98.84 5.297 2.523c-3.037 3.036-3.33 7.775-.885 11.142L.398 17.678c-.53.53-.53 1.392 0 1.924.266.265.614.398.962.398s.696-.133.962-.398l4.013-4.014c1.502 1.09 3.277 1.638 5.052 1.638 2.204 0 4.41-.84 6.09-2.523 3.364-3.363 3.364-8.817 0-12.18zM16.13 13.357c-1.266 1.267-2.95 1.965-4.743 1.965-1.792 0-3.477-.698-4.744-1.965-2.616-2.616-2.616-6.872 0-9.488C7.91 2.6 9.595 1.903 11.387 1.903c1.792 0 3.477.698 4.744 1.965 1.268 1.266 1.966 2.95 1.966 4.743 0 1.792-.698 3.477-1.965 4.744z" fill-rule="nonzero" fill="#FFF"/>
-            </svg>
-            <span class="sr-only">Submit</span>
-        </button>
-
-        <!-- Results per page -->
-        <div class="search__rpp-container">
-            <div class="dropdown search__res-per-pg">
-                <button class="search__res-per-pg-button dropdown-toggle" type="button" id="desktop-pgSizeEntry" data-toggle="dropdown">
-                    Results per Page: {{resultsSize}}
-                    <span class="caret"></span>
-                </button>
-                <ul class="dropdown-menu" role="menu" aria-labelledby="desktop-pgSizeEntry">
-                    <li role="presentation"><a class="dropdown__option" role="menuitem" (click)="setPageSize(10)">10</a></li>
-                    <li role="presentation"><a class="dropdown__option" role="menuitem" (click)="setPageSize(30)">30</a></li>
-                    <li role="presentation"><a class="dropdown__option" role="menuitem" (click)="setPageSize(60)">60</a></li>
-                    <li role="presentation"><a class="dropdown__option" role="menuitem" (click)="setPageSize(100)">100</a></li>
-                    <li role="presentation"><a class="dropdown__option" role="menuitem" (click)="setPageSize(300)">300</a></li>
-                </ul>
-            </div>
-        </div>
-    </section>
-    <!-- End Search Form-->
-    <h4 class="header-4">"Chosen Fields" are All of the Fields you Check Below</h4>
-    <div *ngIf="possibleSearchableBioFields" class="row">
-        <ul class="list-unstyled">
-            <li *ngFor="let oneField of possibleSearchableBioFields" class="col-lg-3 col-md-4 col-sm-6">
-                <label class="noBreak">
-                    <input type="checkbox" value="{{oneField.id}}" [(ngModel)]="oneField.selected"
-                        (change)="onSearchableBioFieldChange(oneField.id, oneField.label, $event.target.checked)">{{oneField.label}}
-                </label>
-            </li>
-        </ul>
-    </div>
-    <p>You have flexibility to search over many or a few fields depending on your needs.  If you uncheck everything, the last name will be searched anyway.
-      If you refresh the page, the default state will be returned to, which is searching last name, preferred name, and the short description.</p>
-    <h4 class="header-4">Search Syntax and Special Characters</h4>
-    <p>There are special characters that add meaning to a query:  *&nbsp;&nbsp;+&nbsp;&nbsp;-&nbsp;&nbsp;(&nbsp;&nbsp;) and quotes to mark a phrase.
-    <p class="bold">Examples of the use of special characters and their meaning:</p>
-    <ul>
-        <li>"coffee cup" &mdash; matches documents with the two word phrase: coffee cup</li>
-        <li>coffee cup &mdash; matches documents with both words, i.e., coffee and cup are in document (by default with no other syntactical markers, all terms must be found in the returned documents)</li>
-        <li>coffee | cup &mdash; matches documents with one or both words, i.e., this is the least precise query</li>
-        <li>drink + (coffee | cup) &mdash; matches documents with drink and at least one of coffee or cup: + is "and", | is "or", and parentheses mark precedence
-        </li>
-    </ul>
-    <p class="bold">Use * as a wildcard</p>
-    <ul>
-        <li>snow* &mdash; matches any word beginning with snow, e.g., snow or snowing or snowstorm</li>
-    </ul>
-    <p class="bold">Use - to start a term to negate (i.e., not search)</p>
-    <ul>
-        <li>coffee -cup &mdash; matches documents with coffee and without cup</li>
-    </ul>
-    <p>As an example tying all of this together, a user looking for people's descriptions or biographies that mention voting and at least one of SNCC or CORE or SCLC
-      could check the appropriate fields above, select "Chosen Fields" to the right of the query box, and issue as a query this text:</p>
-    <p>vot* + (SNCC | CORE | SCLC)</p>
-    <h4 class="header-4">Summary of Searching in the Digital Archive</h4>
-    <p>The default search behavior is to match all terms, so the more terms you add, the more precise your query and the fewer documents will be returned.
-      Search in the Digital Archive makes use of Azure Search with a Lucene-based query parser called simple query.  For details, visit the
-      <a href = "https://lucene.apache.org/core/4_7_0/queryparser/org/apache/lucene/queryparser/simple/SimpleQueryParser.html">Simple Query Parser</a>
-      documentation (note: this page is outside of the Digital Archive).  In Azure Search, the simple query syntax excludes the fuzzy/slop options.</p>
-    <p>Separate fields can be searched within biographies.  As with the biography results per page, i.e., people per page, setting,
-      once you change the search field it remains at your choice until you change it again, so be aware if you are searching into just last names, just
-      preferred names, or the "chosen" fields (i.e., the ones you checked in boxes above) as told to you by the interface.
-    <p>There are two type of searches in the Digital Archive:</p>
-    <ol>
-        <li>"ScienceMakers", i.e., the men and women that were interviewed in the ScienceMakers archive</li>
-        <li>Stories, i.e., what these men and women spoke about</li>
-    </ol>
-    <p>
-        From the <a routerLink="/all" routerLinkActive="active">Maker Directory</a> page, you will see a set of ScienceMakers.
-        You can issue a search to the biographies and see a resulting set of people.  You can also control how the results are sorted along with the page size.
-    </p>
-    <p>From the <a routerLink="/home" routerLinkActive="active">Home</a> page, you can issue a search and see a resulting set of stories.
-    It has its own advanced search capability as well.
-    </p>
+<!-- Search Form (shown in all views, mobile and desktop) -->
+<div fxLayout="row" fxLayoutAlign="start">
+  <div fxFlex="0 1 calc(800px)">
+      <!-- Search Form (capped at 800px width via fxflex line in container div) -->
+      <search-form #myBioSearchForm [showResultsPerPage]="true" [showAdvancedSearchLink]="false" [showFieldOptions]="true"
+         [showAdvancedBioChosenFields]="true"></search-form>
+  </div>
 </div>
+<!-- End Search Form-->
+<h3 class="mysubheading-gap-before">Search Syntax and Special Characters</h3>
+<p class="helptext">There are special characters that add meaning to a query:  *&nbsp;&nbsp;+&nbsp;&nbsp;-&nbsp;&nbsp;(&nbsp;&nbsp;) and quotes to mark a phrase.
+<p class="helptext bold">Examples of the use of special characters and their meaning:</p>
+<ul>
+    <li class="helptext">"coffee cup" &mdash; matches documents with the two word phrase: coffee cup</li>
+    <li class="helptext">coffee cup &mdash; matches documents with both words, i.e., coffee and cup are in document (by default with no other syntactical markers, all terms must be found in the returned documents)</li>
+    <li class="helptext">coffee | cup &mdash; matches documents with one or both words, i.e., this is the least precise query</li>
+    <li class="helptext">drink + (coffee | cup) &mdash; matches documents with drink and at least one of coffee or cup: + is "and", | is "or", and parentheses mark precedence
+    </li>
+</ul>
+<p class="helptext bold">Use * as a wildcard</p>
+<ul>
+    <li class="helptext">snow* &mdash; matches any word beginning with snow, e.g., snow or snowing or snowstorm</li>
+</ul>
+<p class="helptext bold">Use - to start a term to negate (i.e., not search)</p>
+<ul>
+    <li class="helptext">coffee -cup &mdash; matches documents with coffee and without cup</li>
+</ul>
+<p class="helptext">As an example tying all of this together, a user looking for people's descriptions or biographies that mention voting and at least one of SNCC or CORE or SCLC
+  could check the appropriate fields above, select "Chosen Fields" to the right of the query box, and issue as a query this text:</p>
+<p class="helptext">vot* + (SNCC | CORE | SCLC)</p>
+<h3 class="mysubheading">Summary of Searching in the Digital Archive</h3>
+<p class="helptext">The default search behavior is to match all terms, so the more terms you add, the more precise your query and the fewer documents will be returned.
+  Search in the Digital Archive makes use of Azure Search with a Lucene-based query parser called simple query.  For details, visit the
+  <a href = "https://lucene.apache.org/core/4_7_0/queryparser/org/apache/lucene/queryparser/simple/SimpleQueryParser.html">Simple Query Parser</a>
+  documentation (note: this page is outside of the Digital Archive).  In Azure Search, the simple query syntax excludes the fuzzy/slop options.</p>
+<p class="helptext">Separate fields can be searched within biographies.  As with the biography results per page, i.e., people per page, setting,
+  once you change the search field it remains at your choice until you change it again, so be aware if you are searching into just last names, just
+  preferred names, or the "chosen" fields (i.e., the ones you checked in boxes above) as told to you by the interface.
+<p class="helptext">There are two types of searches in the Digital Archive:</p>
+<ol>
+    <li class="helptext">"ScienceMakers", i.e., the people that were interviewed in the archive</li>
+    <li class="helptext">Stories, i.e., what these people spoke about</li>
+</ol>
+<p class="helptext">
+    From the <a routerLink="/all" routerLinkActive="active">Maker Directory</a> page, you will see a set of ScienceMakers.
+    You can issue a search for ScienceMakers, i.e., within the biography details, to see a resulting set of people.
+    You can also control how the results are sorted along with the page size.
+</p>
+<p class="helptext">From the <a routerLink="/home" routerLinkActive="active">Home</a> page, you can issue a search and see a resulting set of stories.
+It has its own advanced search capability as well.
+</p>
