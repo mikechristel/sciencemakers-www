@@ -57,7 +57,7 @@ export class HomeComponent extends BaseComponent implements OnInit {
     }
 
     ngOnInit() {
-        this.titleManagerService.setTitle("ScienceMakers Digital Archive (November 18, 2020)");
+        this.titleManagerService.setTitle("ScienceMakers Digital Archive (November 19, 2020)");
         this.liveAnnouncer.announce("ScienceMakers Digital Archive"); // NOTE: using LiveAnnouncer to eliminate possible double-speak
 
         this.historyMakerService.getCorpusSpecifics().pipe(takeUntil(this.ngUnsubscribe))
@@ -65,18 +65,18 @@ export class HomeComponent extends BaseComponent implements OnInit {
                 this.fullStoryCount = corpusDetails.stories.all.toLocaleString();
               // NOTE: when testing, we may not have specific ScienceMakers counts, as that is a "special" API that might not be in the testing infrastructure.
               // So, do not presume the existence of these counts.
-              // !!!TBD!!! if (corpusDetails.scienceMakersBiographyCount)
-              // this.scienceMakersBiographyCount = corpusDetails.scienceMakersBiographyCount.toLocaleString();
-              // if (corpusDetails.scienceMakersStoryCount)
-              // this.scienceMakersStoryCount = corpusDetails.scienceMakersStoryCount.toLocaleString();
-                var lastUpdateDateString:string = corpusDetails.lastUpdated;
-                if (lastUpdateDateString && lastUpdateDateString.length > 0) {
-                    var lastUpdateDate: Date = new Date(lastUpdateDateString);
-                    this.lastUpdateDatePhrase = "as of " +
-                      this.globalState.cleanedMonthDayYearFromNumbers(lastUpdateDate.getMonth(), lastUpdateDate.getDate(),
-                        lastUpdateDate.getFullYear());
-                }
-                this.fullBiographyCount = corpusDetails.biographies.all.toLocaleString();
+              if (corpusDetails.biographies.scienceMakers)
+                  this.scienceMakersBiographyCount = corpusDetails.biographies.scienceMakers.toLocaleString();
+              if (corpusDetails.stories.scienceMakers)
+                  this.scienceMakersStoryCount = corpusDetails.stories.scienceMakers.toLocaleString();
+              var lastUpdateDateString:string = corpusDetails.lastUpdated;
+              if (lastUpdateDateString && lastUpdateDateString.length > 0) {
+                  var lastUpdateDate: Date = new Date(lastUpdateDateString);
+                  this.lastUpdateDatePhrase = "as of " +
+                    this.globalState.cleanedMonthDayYearFromNumbers(lastUpdateDate.getMonth(), lastUpdateDate.getDate(),
+                      lastUpdateDate.getFullYear());
+              }
+              this.fullBiographyCount = corpusDetails.biographies.all.toLocaleString();
             });
 
         // Do not qualify the people born this week in any way (i.e., no filtering, no paging): just get them all (hence null filtering/paging parameters):

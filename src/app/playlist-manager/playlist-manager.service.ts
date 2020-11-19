@@ -18,8 +18,10 @@ export class PlaylistManagerService {
 
   public localMyClips: Playlist[] = [];
 
+  private SCIENCEMAKERS_PLAYLIST: string = "sm-playlist";
+
   constructor() {
-      this.localMyClips = JSON.parse(localStorage.getItem("playlist") || "[]");
+      this.localMyClips = JSON.parse(localStorage.getItem(this.SCIENCEMAKERS_PLAYLIST) || "[]");
       this.myClips.next(this.localMyClips);
       this.initializeMyClips();
   }
@@ -36,13 +38,13 @@ export class PlaylistManagerService {
   // (it formerly used a drag and drop interface brought in from elsewhere which was mouse-only driven), and so for
   // now this call is not used anywhere and hence is commented out:
   //updateMyClips(newMyClipsOrder: Playlist[]) {
-  //    localStorage.setItem("playlist", JSON.stringify(newMyClipsOrder));
+  //    localStorage.setItem(this.SCIENCEMAKERS_PLAYLIST, JSON.stringify(newMyClipsOrder));
   //    this.localMyClips = newMyClipsOrder;
   //    this.myClips.next(this.localMyClips);
   //}
 
   clearMyClips() { // NOTE: ideally any caller to this first confirms with user before taking this clearing action
-      localStorage.setItem("playlist", "[]");
+      localStorage.setItem(this.SCIENCEMAKERS_PLAYLIST, "[]");
       this.localMyClips = [];
       this.myClips.next(this.localMyClips);
   }
@@ -67,7 +69,7 @@ export class PlaylistManagerService {
     if (idx >= 0) {
         // Remove story from list because it is already there
         this.localMyClips.splice(idx, 1);
-        localStorage.setItem("playlist", JSON.stringify(this.localMyClips));
+        localStorage.setItem(this.SCIENCEMAKERS_PLAYLIST, JSON.stringify(this.localMyClips));
     }
     else {
         // Add story into the list because it is not yet there:
@@ -77,7 +79,7 @@ export class PlaylistManagerService {
         }
         this.localMyClips.push(item); // append the item to the list
         // NOTE: if desired behavior is to prepend to the list, use this instead: this.localMyClips.unshift(item);
-        localStorage.setItem("playlist", JSON.stringify(this.localMyClips));
+        localStorage.setItem(this.SCIENCEMAKERS_PLAYLIST, JSON.stringify(this.localMyClips));
     }
     this.myClips.next(this.localMyClips);
   }
@@ -100,7 +102,7 @@ export class PlaylistManagerService {
               }
           }
           if (atLeastOneAppendMade)
-              localStorage.setItem("playlist", JSON.stringify(this.localMyClips));
+              localStorage.setItem(this.SCIENCEMAKERS_PLAYLIST, JSON.stringify(this.localMyClips));
       }
   }
 

@@ -48,21 +48,21 @@ export class UserSettingsManagerService {
     public storyIDToFocus: Subject<number> = new Subject<number>();
     public storyIDToFocus$ = this.storyIDToFocus.asObservable();
 
-    private AUTOPLAY_SETTING_NAME: string = "autoplay";
-    private AUTOADVANCE_SETTING_NAME: string = "autoadvance";
-    private CCTEXT_SETTING_NAME: string = "cctext";
-    private BIO_SEARCH_FIELDS_MASK_NAME: string = "biosearchfieldsmask";
-    private SHOWBIOGRAPHY_LASTNAME_FACETFILTER: string = "biolastnamefilter";
-    private SHOWBIOGRAPHY_BIRTHDECADE_FACETFILTER: string = "biobirthdecadefilter";
-    private SHOWBIOGRAPHY_BIRTHSTATE_FACETFILTER: string = "biobirthstatefilter";
-    private SHOWSTORY_STATE_FACETFILTER: string = "storystatefilter";
-    private SHOWSTORY_ORG_FACETFILTER: string = "storyorgfilter";
-    private SHOWSTORY_DECADE_FACETFILTER: string = "storydecadefilter";
-    private SHOWSTORY_YEAR_FACETFILTER: string = "storyyearfilter";
-    private SHOWSTORY_BIRTHDECADE_FACETFILTER: string = "storybirthdecadefilter";
+    private AUTOPLAY_SETTING_NAME: string = "sm-autoplay";
+    private AUTOADVANCE_SETTING_NAME: string = "sm-autoadvance";
+    private CCTEXT_SETTING_NAME: string = "sm-cctext";
+    private BIO_SEARCH_FIELDS_MASK_NAME: string = "sm-biosearchfieldsmask";
+    private SHOWBIOGRAPHY_LASTNAME_FACETFILTER: string = "sm-biolastnamefilter";
+    private SHOWBIOGRAPHY_BIRTHDECADE_FACETFILTER: string = "sm-biobirthdecadefilter";
+    private SHOWBIOGRAPHY_BIRTHSTATE_FACETFILTER: string = "sm-biobirthstatefilter";
+    private SHOWSTORY_STATE_FACETFILTER: string = "sm-storystatefilter";
+    private SHOWSTORY_ORG_FACETFILTER: string = "sm-storyorgfilter";
+    private SHOWSTORY_DECADE_FACETFILTER: string = "sm-storydecadefilter";
+    private SHOWSTORY_YEAR_FACETFILTER: string = "sm-storyyearfilter";
+    private SHOWSTORY_BIRTHDECADE_FACETFILTER: string = "sm-storybirthdecadefilter";
 
-    private BIO_ID_TO_FOCUS: string = "bioIDToFocus";
-    private STORY_ID_TO_FOCUS: string = "storyIDToFocus";
+    private BIO_ID_TO_FOCUS: string = "sm-bioIDToFocus";
+    private STORY_ID_TO_FOCUS: string = "sm-storyIDToFocus";
 
     private localAutoplay: boolean = false;
     private localAutoadvance: boolean = false;

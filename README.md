@@ -1,8 +1,21 @@
-# digital-archive-www
-The HistoryMakers Digital Video Archive is a web-based single page application (SPA) built with [Angular](https://angular.io/), [TypeScript](https://www.typescriptlang.org/), and Angular Flex Layout for responsive layout.
+# sciencemakers-www
+The ScienceMakers Digital Video Archive website is a web-based single page application (SPA) built with [Angular](https://angular.io/), [TypeScript](https://www.typescriptlang.org/), and Angular Flex Layout for responsive layout.
 
 ## Installation
 Run `npm install` in the root of the project directory to install the necessary build tools and depedencies.
+
+## Configuration
+
+The environments folder is underspecified.  
+The value of the "myEnv" key, e.g., "prod", indicates there must be a config.prod.json file also in assets.
+This file is NOT part of the repository, as you must specify your own API to the Azure Services feeding this interface, and your own media files URL base string.
+The file config.prod.json will have content like the following:
+{
+  "serviceBase" : "https://YourDomainAndPathForAPIServiceHere/",
+  "mediaBase" : "https://YourDomainAndPathForMediaFilesHere/"
+}
+
+You may have a config.development.json with different values, and set env.json differently between development and production builds.
 
 ## Build and Run
 

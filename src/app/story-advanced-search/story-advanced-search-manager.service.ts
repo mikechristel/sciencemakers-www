@@ -16,9 +16,9 @@ export class StoryAdvancedSearchSettingsManagerService {
   public maxYear: Subject<number> = new Subject<number>();
   public maxYear$ = this.maxYear.asObservable();
 
-  private FILTER_BY_INTERVIEW_DATE_SETTING_NAME: string = "filterbyinterviewyear";
-  private MIN_YEAR_SETTING_NAME: string = "mininterviewyearforfilter";
-  private MAX_YEAR_SETTING_NAME: string = "maxinterviewyearforfilter";
+  private FILTER_BY_INTERVIEW_DATE_SETTING_NAME: string = "sm-filterbyinterviewyear";
+  private MIN_YEAR_SETTING_NAME: string = "sm-mininterviewyearforfilter";
+  private MAX_YEAR_SETTING_NAME: string = "sm-maxinterviewyearforfilter";
   private localFilterByInterviewDate: boolean = false;
   private localMinYear: number = 0; // 0 anticipated to be same as "not set"
   private localMaxYear: number = 0; // 0 anticipated to be same as "not set"
