@@ -63,7 +63,7 @@
         <div fxFlex="100%" fxLayout="row" fxLayoutAlign="space-between center">
             <!-- Toggle button group to toggle item presentation as picture stamp or text or map -->
             <div fxFlex="grow" fxLayout="row wrap" class="mobile-controls-line">
-                <p class="sr-only" id="rg12_label" *ngIf="isNonemptyContent">Story Presentation Options</p>
+                <p class="sr-only" id="rg1_label" *ngIf="isNonemptyContent">Story Presentation Options</p>
 
                 <div fxFlex="100%" fxLayout="row" fxLayoutGap="10px">
                     <!--Summaries button-->
@@ -83,11 +83,11 @@
                     </button>
                 </div>
 
-                <ul *ngIf="isNonemptyContent" class="unstyled-list-nowhitespace" aria-labelledby="rg2_label" fxFlex.lt-md="100%" fxLayout="row" fxLayoutAlign="space-between end" fxLayoutGap="10px">
+                <ul *ngIf="isNonemptyContent" class="unstyled-list-nowhitespace" aria-labelledby="rg1_label" fxFlex.lt-md="100%" fxLayout="row" fxLayoutAlign="space-between end" fxLayoutGap="10px">
 
-                    <li #rg2Pic fxFlex="grow" class="filter-section-rg-item" [class.selected]="cardView"
+                    <li #rg1Pic fxFlex="grow" class="filter-section-rg-item" [class.selected]="cardView"
                         [attr.tabindex]="cardView ? 0 : -1" role="button" [attr.aria-pressed]="cardView"
-                        (click)="cardView = true; textView = false" (keydown)="setViewOptions($event.key, true, false)">
+                        (click)="cardView = true; textView = false" (keydown)="setViewOptionsInNarrowContainer($event.key, true, false)">
                         <span class="sr-only">Picture stamp grid view</span>
                         <span fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="calc(0.6em)">
                             <span fxFlex="0 0 calc(22px)" class="pad-top-a-bit">
@@ -101,9 +101,9 @@
                             <span fxFlex="0 0 auto">Grid</span>
                         </span>
                     </li>
-                    <li #rg2Text fxFlex="grow" class="filter-section-rg-item" [class.selected]="textView"
+                    <li #rg1Text fxFlex="grow" class="filter-section-rg-item" [class.selected]="textView"
                         [attr.tabindex]="textView ? 0 : -1" role="button" [attr.aria-pressed]="textView"
-                        (click)="textView = true; cardView = false" (keydown)="setViewOptions($event.key, false, true)">
+                        (click)="textView = true; cardView = false" (keydown)="setViewOptionsInNarrowContainer($event.key, false, true)">
                         <span class="sr-only">Text-only grid view</span>
                         <span fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="calc(0.6em)">
                             <span fxFlex="0 0 calc(22px)" class="pad-top-a-bit">
@@ -117,9 +117,9 @@
                             <span fxFlex="0 0 auto">List</span>
                         </span>
                     </li>
-                    <li #rg2Map fxFlex="grow" class="filter-section-rg-item" [class.selected]="!cardView && !textView"
+                    <li #rg1Map fxFlex="grow" class="filter-section-rg-item" [class.selected]="!cardView && !textView"
                         [attr.tabindex]="cardView || textView ? -1 : 0" role="button" [attr.aria-pressed]="!cardView && !textView"
-                        (click)="cardView = false; textView = false" (keydown)="setViewOptions($event.key, false, false)">
+                        (click)="cardView = false; textView = false" (keydown)="setViewOptionsInNarrowContainer($event.key, false, false)">
                         <span class="sr-only">U.S. state map view</span>
                         <span fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="calc(0.6em)">
                             <span fxFlex="0 0 calc(22px)" class="pad-top-a-bit">
@@ -131,7 +131,7 @@
                                 </svg>
                             </span>
                             <span fxFlex="0 0 auto">Map</span>
-                        </span>    
+                        </span>
                     </li>
                 </ul>
             </div>
@@ -219,7 +219,7 @@
             <!-- Tapes and filters -->
             <h2 class="sr-only">Stories for this biography</h2>
             <div class="tapes-and-filters" fxFlex="100%" fxLayout="column" fxLayoutAlign="space-between start" fxLayoutGap="0">
-                
+
                 <!-- Story segment count -->
                 <div fxFlex="100%" fxLayout="row" class="page-view-option-piece">
                     <p id="dmainHeader" [thdaIsFocused]="signalFocusToTitle" tabindex="-1" class="total-segments" (mousedown)="noMouseFocus($event)">{{tailoredStoryCountInfo}}</p>
@@ -294,7 +294,7 @@
                                     </svg>
                                 </span>
                                 <span fxFlex="0 0 auto">Map</span>
-                            </span>    
+                            </span>
                         </li>
                     </ul>
                 </div>

@@ -9,7 +9,7 @@
   Clicking/tapping that button will remove the story from "My Clips."  Note that "My Clips" is only a local working area on this browser and device.
   If you want to use it on another device or at a different time, you need to save it.</p>
 <div fxLayout="column" fxLayoutAlign="space-around center">
-  <img fxFlex="0 0 auto" class="help__img" src="assets/help-remove-my-clips.jpg" alt="Add to My Clips button" />
+  <img fxFlex="0 0 auto" class="help__img" src="assets/help-remove-my-clips.jpg" alt="Remove from My Clips button" />
 </div>
 <p class="helptext">
   One way to move a story in "My Clips" to the very last slot is to go to that story's video page,
@@ -28,21 +28,21 @@
 <div class="desktop-only" fxLayout="column" fxLayoutAlign="space-around center">
   <img fxFlex="0 0 auto" class="help__img" src="assets/help-my-clips-1.jpg" alt="screen shot of 2 stories in My Clips set" />
 </div>
-<p class="helptext">For example, you looked through stories on baseball and kerosene and are intrigued by two, from Ted Radcliffe and Dorothy Jackson.
+<p class="helptext">For example, you looked through stories on space satellites and are intrigued by three.
   You select the "Add to My Clips" button on each story's page.
-  You navigate to "My Clips" and see these two stories in their story set. You select the "Share My Clips..." button and enter a title
-  "Baseball and Kerosene."  The result is a link,
-  <a [routerLink]="['/stories/6',  {IDList: '8849,12017', ListTitle: 'Baseball and Kerosene'}]"  routerLinkActive="active">example titled set of two stories</a>,
+  You navigate to "My Clips" and see these three stories in their story set. You select the "Share My Clips..." button and enter a title
+  "Space Satellites" in the interface.  The result is a link,
+  <a [routerLink]="['/stories/6',  {IDList: '30490,31182,27826', ListTitle: 'Space Satellites'}]"  routerLinkActive="active">example titled set of three stories</a>,
   which is presented in a text format on your clipboard that allows you to paste and go with that link in browsers.  NOTE:
   the character set for saved titles is limited to letters, numbers, dashes, quotes, periods, and spaces.</p>
   <p class="helptext">Also on the "My Clips" page is a button to "Clear My Clips" which lets you remove everything from your local workspace, i.e., "My Clips".
   This is useful when you have multiple sets of stories to work on.
-  For example, perhaps you are doing research on 1940s baseball stories and 1960s baseball stories.
-  You set up a number of stories in My Clips from the 1940s.  Importantly, you saved this set using the method described above (e.g.,
+  For example, perhaps you are doing research on 1950s and 1960s satellite and space stories, and 2000s satellite sand space tories.
+  You set up a number of stories in My Clips from the 1950s and 1960s.  Importantly, you saved this set using the method described above (e.g.,
   after "copy to clipboard" you paste that text link into a text file).  You then clear the local workspace, i.e., "My Clips", using "Clear My Clips" and
-  assemble a new list of 1960s stories, and save that set using the copy to clipboard method.
+  assemble a new list of 2000s stories, and save that set using the copy to clipboard method.
   Again, copy that link to your text file.  If you want to load up either of these sets as your "My Clips", you can do so by using "Clear My Clips",
-  then loading the saved route in your text file for the 1940s or 1960s set,
+  then loading the saved route in your text file for the 1950s/60s or the 2000s set,
   seeing that there is a button "Add X stories into My Clips" where X is the number of stories shown.
   In this figure, X is 3, i.e., 3 stories in the set.
 </p>
