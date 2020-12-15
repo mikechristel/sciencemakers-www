@@ -6,7 +6,7 @@ export const environment = {
   production: false,
   hmr: false,
   // Runtime configuruation
-  serviceBase: "https://da-production-api.azurewebsites.net/api/",
+  serviceBase: "https://sm-production-api.azurewebsites.net/api/", // was: "https://da-production-api.azurewebsites.net/api/",
   mediaBase: "https://daproductionstorage.blob.core.windows.net/media/",
   firstInterviewYear: 1993
 };
