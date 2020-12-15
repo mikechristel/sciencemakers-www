@@ -30,16 +30,6 @@ To run the application locally during development:
 ng serve
 ```
 
-To use optional Hot Module Replacement during development:
-```
-ng serve --hmr --configuration=hmr
-```
-
-Or more simply:
-```
-npm run hmr
-``` 
-
 To debug with authentication enabled:
 ```
 ng serve --configuration=devauth
@@ -95,5 +85,5 @@ Font sizing has been implemented using rems and ems. For more information see: h
 ## Dependencies
 * [Angular](https://angular.io/) - Web application framework (version 9, from 2020)
 * [Angular CLI](https://cli.angular.io/) - A command line interface for Angular
-* [angular-hmr](https://github.com/gdi2290/angular-hmr) - Angular Hot Module Replacement. Used in development when running `ng serve --hmr -configuration=hmr`.
+
 

@@ -4,7 +4,6 @@
 // The list of which env maps to which file can be found in `.angular-cli.json`.
 export const environment = {
   production: false,
-  hmr: false,
   // Runtime configuruation
   serviceBase: "https://sm-production-api.azurewebsites.net/api/", // was: "https://da-production-api.azurewebsites.net/api/",
   mediaBase: "https://daproductionstorage.blob.core.windows.net/media/",
