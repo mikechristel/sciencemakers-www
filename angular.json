@@ -12,7 +12,7 @@
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
             "outputPath": "dist",
-            "index": "src/index.html",
+            "index": "src/index-files/development/index.html",
             "main": "src/main.ts",
             "tsConfig": "src/tsconfig.app.json",
             "polyfills": "src/polyfills.ts",
@@ -27,6 +27,7 @@
           },
           "configurations": {
             "production": {
+              "index": "src/index-files/production/index.html",
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
@@ -56,6 +57,7 @@
               ]
             },
             "staging": {
+              "index": "src/index-files/staging/index.html",
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
