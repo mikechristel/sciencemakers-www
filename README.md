@@ -56,22 +56,7 @@ ng build --prod --configuration=prod
 ## Browsers
 
 ### Tested
-We actively test the latest versions of the following browsers:
-
-#### iOS
-- Safari
-
-#### Android
-- Chrome
-
-#### macOS
-- Chrome
-- Firefox
-- Safari
-
-#### Windows 10
-- Chrome
-- Edge
+We actively test the latest versions of the Chrome and Safari browsers, with lesser testing of Edge and Firefox.  
 
 ### Recommended
 We primarily develop using Chrome. As a result, we feel it is the browser we best support and is our recommendation for the best user experience.
