@@ -1,11 +1,11 @@
-// The file contents for the current environment will overwrite these during build.
-// The build system defaults to the dev environment which uses `environment.ts`, but if you do
-// `ng build --env=prod` then `environment.prod.ts` will be used instead.
-// The list of which env maps to which file can be found in `.angular-cli.json`.
+// Default Environment (local development)
+// The build system defaults to the development environment which uses `environment.ts`.
+// Environment can be specified using the `--configuration` flag, ex: `ng build --configuration=production`.
+// The list of which environment maps to which file can be found in `angular.json`.
 export const environment = {
   production: false,
-  // Runtime configuruation
-  serviceBase: "https://sm-production-api.azurewebsites.net/api/", // was: "https://da-production-api.azurewebsites.net/api/",
+  // client configuruationn
+  serviceBase: "https://localhost:44303/api/",  // Locally hosted API
   mediaBase: "https://daproductionstorage.blob.core.windows.net/media/",
   firstInterviewYear: 1993
 };

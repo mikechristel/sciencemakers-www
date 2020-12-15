@@ -11,15 +11,14 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "aot": true,
             "outputPath": "dist",
             "index": "src/index.html",
             "main": "src/main.ts",
             "tsConfig": "src/tsconfig.app.json",
             "polyfills": "src/polyfills.ts",
+            "aot": false,
             "assets": [
-              "src/assets",
-              "src/Web.config"
+              "src/assets"
             ],
             "styles": [
               "src/styles.css"
@@ -28,10 +27,10 @@
           },
           "configurations": {
             "production": {
-              "budgets": [
+              "fileReplacements": [
                 {
-                  "type": "anyComponentStyle",
-                  "maximumWarning": "32kb"
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.production.ts"
                 }
               ],
               "optimization": true,
@@ -43,10 +42,45 @@
               "extractLicenses": true,
               "vendorChunk": false,
               "buildOptimizer": true,
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "2mb",
+                  "maximumError": "5mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "16kb",
+                  "maximumError": "32kb"
+                }
+              ]
+            },
+            "staging": {
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.prod.ts"
+                  "with": "src/environments/environment.staging.ts"
+                }
+              ],
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "aot": true,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": true,
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "2mb",
+                  "maximumError": "5mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "16kb",
+                  "maximumError": "32kb"
                 }
               ]
             }
@@ -61,8 +95,8 @@
             "production": {
               "browserTarget": "digital-archive-www:build:production"
             },
-            "test": {
-              "browserTarget": "digital-archive-www:build:test"
+            "staging": {
+              "browserTarget": "digital-archive-www:build:staging"
             }
           }
         },
@@ -84,8 +118,7 @@
               "src/styles.css"
             ],
             "assets": [
-              "src/assets",
-              "src/Web.config"
+              "src/assets"
             ]
           }
         },

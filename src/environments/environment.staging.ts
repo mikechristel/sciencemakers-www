@@ -1,5 +1,5 @@
-// Production Environment
-// sm-production-www
+// Staging Environment
+// Azure resource TBD
 export const environment = {
   production: true,
   // client configuruation
