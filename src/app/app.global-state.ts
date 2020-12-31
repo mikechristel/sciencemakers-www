@@ -10,7 +10,7 @@ export class GlobalState {
     SearchTitleOnly: boolean = false; // if true, queries to stories will be targeted only to the story title field
     SearchTranscriptOnly: boolean = false; // if true, queries to stories will be targeted only to the transcript field
 
-    BiographyPageSize: number = 100;
+    BiographyPageSize: number = 30;
     StoryPageSize: number = 30;
 
     BiographySearchSortingPreference: number = 0;
