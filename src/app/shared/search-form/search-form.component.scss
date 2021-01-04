@@ -106,7 +106,6 @@
 
 .search__fields-container {
   margin: 0;
-  width: 25%;
   margin-top: em(10);
   margin-bottom: em(10);
 }
@@ -165,7 +164,7 @@
   border: 1px solid color(ok-grey);
   border-radius: 0;
   height: 1.875rem;
-  min-width: 2.5rem;
+  min-width: 10rem;
   width: 100%;
   font-size: 1rem;
 

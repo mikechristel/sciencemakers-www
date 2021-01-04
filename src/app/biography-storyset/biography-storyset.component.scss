@@ -31,7 +31,7 @@
   text-align: center;
 }
 
-.headshot__img__as_is { 
+.headshot__img__as_is {
   height: 332px;
   object-fit: cover;
   transform: scale(1.1);
@@ -186,7 +186,7 @@
 
 .mobile-controls-line {
     margin: auto;
-    padding: em(2) 0 em(4) 0; // top right bottom left
+    padding: em(2) 0 0 0; // top right bottom left
 }
 
 .tapes__title {
@@ -194,17 +194,12 @@
 
     color: color(primary);
     font-size: 1.4rem;
-    margin: em(20) 0 0;
+    margin: em(12) 0 0;
 
     @media screen and (min-width: bp(afl_medium)) {
         font-size: 1.7rem;
         margin-bottom: em(2);
     }
-}
-
-//Specificity for the first H3
-.biography-storyset > div:first-of-type .tapes__title {
-  margin-top: 12px;
 }
 
 .page-view-option-piece {
