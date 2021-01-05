@@ -158,7 +158,7 @@
                                 </svg>
                                 <span fxFlex="0 0 auto">Grid</span>
                             </span>
-                            
+
                         </span>
                     </li>
                     <li #rg1Text fxFlex="grow" class="filter-section-rg-item" [class.selected]="textView"
@@ -210,7 +210,7 @@
             </div>
 
         </div>
-        
+
     </div>
 </section>
 <div *ngIf="!showingFilterMenu" class="mobile-only" fxLayout="column" fxLayoutAlign="space-between stretch" >
@@ -296,7 +296,7 @@
           <!-- Note: hiding welcome-paragraph via aria-hidden because it is included in another heading verbatim, no need for redundancy -->
           <p class="welcome-paragraph" aria-hidden="true" *ngIf="totalBiographiesFoundSuffix">{{totalBiographiesFoundSuffix}}</p>
       </div>
-      <div fxFlex.lt-md="calc(60% - 8px)" fxFlex.md="50%" fxFlex.gt-md="0 0 calc(600px)"> <!-- Ceiling out at breakpoint lg (1280) as 800px -->
+      <div fxFlex.lt-md="calc(60% - 18px)" fxFlex.md="50%" fxFlex.gt-md="0 0 calc(600px)"> <!-- Ceiling out at breakpoint lg (1280) as 800px -->
           <!-- Search Form -->
           <search-form [showResultsPerPage]="false" [showFieldOptions]="false" [showAdvancedSearchLink]="true" ></search-form>
       </div>
@@ -493,10 +493,10 @@
                   [value]="oneSize">{{oneSize}}
                 </option>
             </select>
-        </div>        
+        </div>
 
       </section>
-      <div fxFlex.lt-md="calc(66% - 8px)" fxFlex.gt-sm="calc(100% - 336px)" >
+      <div fxFlex.lt-md="calc(66% - 18px)" fxFlex.gt-sm="calc(100% - 336px)" >
         <div fxLayout="column" fxLayoutAlign="space-between stretch" >
 
           <section fxFlex="100%" id="results-region" aria-label="biography results">

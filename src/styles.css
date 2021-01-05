@@ -20,6 +20,8 @@ body {
 }
 
 .sr-only {
+  /* Old way which had issues for Pagination h2 for historymakers.component and storyset.component,
+  introducing a vertical scrollbar within vertical scrollbar nesting:
   position: absolute;
   width: 1px;
   height: 1px;
@@ -28,6 +30,15 @@ body {
   overflow: hidden;
   clip: rect(0,0,0,0);
   border: 0;
+
+  New way (outside comments, below) follows Sept. 2020 advice from: https://webaim.org/techniques/css/invisiblecontent/
+  */
+  position: absolute;
+  left: -10000px;
+  top: auto;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
 }
 
 h1 {
