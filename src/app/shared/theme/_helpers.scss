@@ -26,7 +26,7 @@
 .desktop-only {
   width: 100%;
 
-  @media screen and (max-width: bp(afl_small) - 1) {
+  @media screen and (max-width: bp(afl_small_just_before)) {
     display: none !important;
   }
 }

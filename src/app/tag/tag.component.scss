@@ -14,7 +14,7 @@
   margin: 0;
   padding: 0;
 
-  @media screen and (max-width: bp(afl_medium)) {
+  @media screen and (max-width: bp(afl_medium_just_before)) {
     grid-template-columns: repeat(1, 1fr);
   }
 }
@@ -30,7 +30,7 @@ h2 {
     padding: 0.1em;
     font-size: 1.2rem;
 
-    @media screen and (min-width: bp(afl_small)) and (max-width: bp(afl_medium) - 1) {
+    @media screen and (min-width: bp(afl_small)) and (max-width: bp(afl_medium_just_before)) {
         font-size: 1.4rem;
         margin-bottom: em(10);
     }
@@ -49,7 +49,7 @@ h2 {
   margin-top: 0;
   padding: 0;
 
-  @media screen and (min-width: bp(afl_small)) and (max-width: bp(afl_medium) - 1) {
+  @media screen and (min-width: bp(afl_small)) and (max-width: bp(afl_medium_just_before)) {
       font-size: 1.2rem;
       margin-bottom: em(10);
   }

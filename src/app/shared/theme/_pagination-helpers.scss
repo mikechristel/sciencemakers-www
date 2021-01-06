@@ -76,7 +76,7 @@
   }
 
   &.pagination__button--narrow-hidden {
-      @media screen and (max-width: bp(thmda_narrow) - 1) {
+      @media screen and (max-width: bp(thmda_narrow_just_before)) {
           display: none;
       }
   }

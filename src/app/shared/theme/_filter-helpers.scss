@@ -10,7 +10,7 @@
   padding: em(4) em(12);
   font-size: 1rem;
 
-  @media screen and (max-width: bp(afl_small)) {
+  @media screen and (max-width: bp(afl_small_just_before)) {
     font-size: 1.2rem;
   }
 
@@ -55,7 +55,7 @@
       letter-spacing: em(.5, 18);
       text-align: center; // center text within its flex container
 
-      @media screen and (max-width: bp(thmda_wideenough)) {
+      @media screen and (max-width: bp(thmda_wideenough_just_before)) {
           font-size: 1.6rem;
           text-align: left;
       }
@@ -140,7 +140,7 @@
 // For typically narrow view
 .panel-for-narrow-filter {
   padding: em(9) 0;
-} 
+}
 
 .filter-section {
     min-height: $buttonHeight;
@@ -174,7 +174,7 @@
   font-size: 1.2rem;
   width: 100%;
 
-  @media screen and (max-width: bp(afl_medium)) {
+  @media screen and (max-width: bp(afl_medium_just_before)) {
     margin-bottom: em(5);
   }
 
@@ -222,7 +222,7 @@
     margin-left: em(8);
   }
 
-  @media screen and (min-width: bp(afl_medium)) and (max-width: bp(afl_large) - 1) {
+  @media screen and (min-width: bp(afl_medium)) and (max-width: bp(afl_large_just_before)) {
     padding-left: em(12,16);
     padding-right: em(12,16);
   }
@@ -260,7 +260,7 @@
   padding: 0;
   transition: color .2s ease-in-out;
 
-  @media screen and (max-width: 1024px) {
+  @media screen and (max-width: thmda_filterui_maxpt) {
     line-height: 100%;
     margin-bottom: em(12);
     text-align: left;
@@ -298,16 +298,16 @@
 
   margin: auto;
 
-  @media screen and (max-width: 1024px) {
+  @media screen and (max-width: thmda_filterui_maxpt) {
     text-align: left; //accordion content on Topic Search page
   }
 
-  @media screen and (max-width: bp(afl_medium)) {
+  @media screen and (max-width: bp(afl_medium_just_before)) {
     font-size: 1rem;
     word-break: break-word;
   }
 
-  @media screen and (max-width: bp(afl_small)) {
+  @media screen and (max-width: bp(afl_small_just_before)) {
     font-size: em(20);
   }
 }
@@ -329,7 +329,7 @@
       color: color(dark-grey);
   }
 
-  @media screen and (max-width: bp(afl_medium)) {
+  @media screen and (max-width: bp(afl_medium_just_before)) {
     margin: em(5);
     height: $buttonHeight;
     width: $buttonHeight;

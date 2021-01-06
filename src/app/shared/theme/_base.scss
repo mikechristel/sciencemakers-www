@@ -11,7 +11,7 @@
   margin-bottom: em(8);
   margin-top: 0;
 
-  @media screen and (min-width: bp(afl_small)) and (max-width: bp(afl_medium) - 1) {
+  @media screen and (min-width: bp(afl_small)) and (max-width: bp(afl_medium_just_before)) {
       font-size: 1.6rem;
       margin-bottom: em(10);
   }
@@ -43,7 +43,7 @@
   margin-bottom: em(6);
   margin-top: 0;
 
-  @media screen and (min-width: bp(afl_small)) and (max-width: bp(afl_medium) - 1) {
+  @media screen and (min-width: bp(afl_small)) and (max-width: bp(afl_medium_just_before)) {
       font-size: 1.4rem;
       margin-bottom: em(8);
   }
@@ -68,7 +68,7 @@
   margin-bottom: em(6);
   margin-top: em(12);
 
-  @media screen and (min-width: bp(afl_small)) and (max-width: bp(afl_medium) - 1) {
+  @media screen and (min-width: bp(afl_small)) and (max-width: bp(afl_medium_just_before)) {
       font-size: 1.4rem;
       margin-bottom: em(8);
       margin-top: em(16);
@@ -138,7 +138,7 @@ fieldset {
   }
 
 
-  //@media screen and (min-width: bp(afl_medium)) and (max-width: bp(afl_xlarge) - 1) {
+  //@media screen and (min-width: bp(afl_medium)) and (max-width: bp(afl_xlarge_just_before)) {
   //  font-size: 1.6rem;
   //}
   //@media screen and (min-width: bp(afl_xlarge)) {

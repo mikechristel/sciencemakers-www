@@ -10,7 +10,7 @@
 
 %video-desktop-view,
 .video-desktop-view {
-  @media screen and (max-width: bp(required_video_in_column) - 1) {
+  @media screen and (max-width: bp(required_video_in_column_just_before)) {
     display: none !important;
   }
 }
@@ -36,7 +36,7 @@
   }
 
   // NOTE: unique look just for this video page for narrow view titles
-  @media screen and (max-width: bp(afl_small) - 1) {
+  @media screen and (max-width: bp(afl_small_just_before)) {
     background-color: black;
     color: #fff;
     font-size: 1.2rem;
@@ -61,7 +61,7 @@
 .titleRow {
   padding: 0;
 
-  @media screen and (min-width: bp(afl_small)) and (max-width: bp(afl_medium) - 1) {
+  @media screen and (min-width: bp(afl_small)) and (max-width: bp(afl_medium_just_before)) {
     padding-bottom: gutter(thmda-tight); // keep buttons separated from content below at wider views
   }
 
@@ -73,7 +73,7 @@
 .title-buttons-area {
   min-width: 340px; // gives enough width for 3 buttons to fit with their labels without wrapping
 
-  @media screen and (max-width: bp(thmda_narrow) - 1) {
+  @media screen and (max-width: bp(thmda_narrow_just_before)) {
     min-width: 320px; // give up cleaner layout to just get stuff into the narrowing view (match min width of videoColumn)
   }
 }
@@ -103,7 +103,7 @@
   width: 100%;
 
   // NOTE: this container for transcript will not be shown for narrow views UNLESS video-narrow-view (see transcriptColumnParent--mobile-active)
-  @media screen and (max-width: bp(required_video_in_column) - 1) {
+  @media screen and (max-width: bp(required_video_in_column_just_before)) {
     display: none;
   }
 }
@@ -134,7 +134,7 @@
 }
 .transcriptColumn--mobile-active {
   // NOTE: when transcript is shown in narrow view ("mobile-active"), use smaller font, etc., layout
-  @media screen and (max-width: bp(required_video_in_column) - 1) {
+  @media screen and (max-width: bp(required_video_in_column_just_before)) {
     min-height: 120px; // NOTE: Insist on a bit of transcript showing
     max-height: 180px; // ...but not too much transcript...
     line-height: 1rem;
@@ -170,20 +170,20 @@
   }
 
   &--mobile-active {
-      @media screen and (max-width: bp(required_video_in_column) - 1) {
+      @media screen and (max-width: bp(required_video_in_column_just_before)) {
           display: inherit;
       }
   }
 
   &--desktop {
-      @media screen and (max-width: bp(required_video_in_column) - 1) , screen and (min-width: bp(thmda_wideenough))  {
+      @media screen and (max-width: bp(required_video_in_column_just_before)) , screen and (min-width: bp(thmda_wideenough))  {
         display: none !important;
       }
       margin-bottom: 0;
   }
 
   &--wide-desktop {
-      @media screen and (max-width: bp(thmda_wideenough) - 1) {
+      @media screen and (max-width: bp(thmda_wideenough_just_before)) {
         display: none !important;
       }
       margin-bottom: 0;
@@ -327,7 +327,7 @@
   font-size: 1.2rem;
   margin: gutter(thmda-medium) 0 0 0; // top right bottom left
 
-  @media screen and (max-width: bp(thmda_narrow) - 1) {
+  @media screen and (max-width: bp(thmda_narrow_just_before)) {
     font-size: 1rem;
   }
 }
@@ -349,17 +349,17 @@
       background-color: color(secondary);
       color: #fff;
   }
-  
+
 }
 
 .spaceForWordyLabel { // hide on narrow views exactly the inverse of range for needTightLabel
-  @media screen and (max-width: bp(thmda_wideenough_for_label) - 1) {
+  @media screen and (max-width: bp(thmda_wideenough_just_before)) {
     display: none !important;
   }
 }
 
 .needTightLabel { // hide on wide views exactly the inverse of range for spaceForWordyLabel
-  @media screen and (min-width: bp(thmda_wideenough_for_label)) {
+  @media screen and (min-width: bp(thmda_wideenough)) {
     display: none !important;
   }
 }

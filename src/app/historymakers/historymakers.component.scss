@@ -29,19 +29,19 @@
   // xlarge           2400        2064      12
 
   // For widths between thmda_narrow and thmda_wideenough, be 3 per row:
-  @media screen and (min-width: bp(thmda_narrow)) and (max-width: bp(thmda_wideenough) - 1) {
+  @media screen and (min-width: bp(thmda_narrow)) and (max-width: bp(thmda_wideenough_just_before)) {
     grid-template-columns: repeat(3, 1fr);
     gap: gutter(thmda-tiny);
   }
 
   // For widths between thmda_wideenough and afl_medium, be 3 per row with a bit more gap:
-  @media screen and (min-width: bp(thmda_wideenough)) and (max-width: bp(afl_medium) - 1) {
+  @media screen and (min-width: bp(thmda_wideenough)) and (max-width: bp(afl_medium_just_before)) {
     grid-template-columns: repeat(3, 1fr);
     gap: gutter(thmda-tight);
   }
 
   // For widths between afl_medium and afl_large, be 4 per row:
-  @media screen and (min-width: bp(afl_medium)) and (max-width: bp(afl_large) - 1)  {
+  @media screen and (min-width: bp(afl_medium)) and (max-width: bp(afl_large_just_before))  {
     grid-template-columns: repeat(4, 1fr);
     gap: gutter(thmda-medium);
   }
@@ -54,13 +54,13 @@
   }
 
   // For widths between afl_large and afl_xlarge, be 6 per row:
-  //@media screen and (min-width: bp(afl_large)) and (max-width: bp(afl_xlarge) - 1)  {
+  //@media screen and (min-width: bp(afl_large)) and (max-width: bp(afl_xlarge_just_before))  {
   //  grid-template-columns: repeat(6, 1fr);
   //  gap: gutter(thmda-medium);
   //}
 
   // For widths between afl_xlarge and xlarge, be 10 per row:
-  //@media screen and (min-width: bp(afl_xlarge)) and (max-width: bp(xlarge) - 1)  {
+  //@media screen and (min-width: bp(afl_xlarge)) and (max-width: bp(xlarge_just_before))  {
   //  grid-template-columns: repeat(10, 1fr);
   //  gap: gutter(thmda-medium);
   //}
@@ -127,11 +127,11 @@
     margin-bottom: em(4);
     padding: 0;
 
-     @media screen and (min-width: bp(afl_small)) and (max-width: bp(afl_medium) - 1) {
+     @media screen and (min-width: bp(afl_small)) and (max-width: bp(afl_medium_just_before)) {
         font-size: 1.7rem;
      }
 
-     @media screen and (min-width: bp(afl_medium)) and (max-width: bp(afl_large) - 1) {
+     @media screen and (min-width: bp(afl_medium)) and (max-width: bp(afl_large_just_before)) {
         font-size: 2rem;
         margin-top: em(4);
     }
@@ -151,7 +151,7 @@
 .page-view-options {
     margin: em(22) 0 0;
 
-    @media screen and (min-width: bp(afl_small)) and (max-width: bp(need_two_video_control_lines) - 1) {
+    @media screen and (min-width: bp(afl_small)) and (max-width: bp(need_two_video_control_lines_just_before)) {
       padding-bottom: em(30);
     }
 }

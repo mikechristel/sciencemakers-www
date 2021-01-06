@@ -41,11 +41,11 @@
 .headshot__img {
   transform: scale(1.1); // needed to get rid of rounded rectangle edges - will be cropped away via styling
   object-fit: cover;
-  @media screen and (min-width: bp(afl_small)) and (max-width: bp(thmda_wideenough) - 1) {
+  @media screen and (min-width: bp(afl_small)) and (max-width: bp(thmda_wideenough_just_before)) {
     width: 100%;
     height: 332px;
   }
-  @media screen and (min-width: bp(thmda_wideenough)) and (max-width: bp(afl_medium) - 1) {
+  @media screen and (min-width: bp(thmda_wideenough)) and (max-width: bp(afl_medium_just_before)) {
     width: 352px;
     height: 352px; // note fxFlex.lt-md in container in html; breakpoints do not fully line up (768px vs. 959 px) so perhaps revisit styling later... !!!TBD!!!
   }
@@ -242,7 +242,7 @@
   // relaxing only the maximum from 7 to 6 (4, 5, 6).
 
   // For widths between afl_medium and afl_large, be 5 per row with gap increase:
-  @media screen and (min-width: bp(afl_medium)) and (max-width: bp(afl_large) - 1) {
+  @media screen and (min-width: bp(afl_medium)) and (max-width: bp(afl_large_just_before)) {
     grid-template-columns: repeat(3, 1fr);
     gap:  gutter(thmda-medium);
   }
@@ -256,13 +256,13 @@
 
   // Obsolete wide-screen styling:
   // For widths between afl_large and afl_xlarge, be 7 per row:
-  //@media screen and (min-width: bp(afl_large)) and (max-width: bp(afl_xlarge) - 1)  {
+  //@media screen and (min-width: bp(afl_large)) and (max-width: bp(afl_xlarge_just_before))  {
   //  grid-template-columns: repeat(7, 1fr);
   //  gap: gutter(thmda-medium);
   //}
 
   // For widths between afl_xlarge and xlarge, be 10 per row:
-  //@media screen and (min-width: bp(afl_xlarge)) and (max-width: bp(xlarge) - 1)  {
+  //@media screen and (min-width: bp(afl_xlarge)) and (max-width: bp(xlarge_just_before))  {
   //  grid-template-columns: repeat(10, 1fr);
   //  gap: gutter(thmda-big);
   //}

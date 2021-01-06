@@ -12,11 +12,11 @@
       outline: 0;
   }
 
-  @media screen and (max-width: bp(thmda_extreme_narrow) - 1) {
+  @media screen and (max-width: bp(thmda_extreme_narrow_just_before)) {
       //padding: gutter(thmda-extremely_tiny) gutter(thmda-extremely_tiny) gutter(thmda-extremely_tiny); // top, left and right, bottom
   }
 
-  @media screen and (min-width: bp(afl_small)) and (max-width: bp(afl_medium) - 1) {
+  @media screen and (min-width: bp(afl_small)) and (max-width: bp(afl_medium_just_before)) {
       //padding: gutter(thmda-medium) gutter(thmda-medium) gutter(thmda-tiny); // top, left and right, bottom
   }
 

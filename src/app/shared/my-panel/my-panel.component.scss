@@ -28,7 +28,7 @@
   padding-left: em(8,16);
   padding-right: em(8,16);
 
-  @media screen and (min-width: bp(afl_medium)) and (max-width: bp(afl_large) - 1) {
+  @media screen and (min-width: bp(afl_medium)) and (max-width: bp(afl_large_just_before)) {
     padding-left: em(12,16);
     padding-right: em(12,16);
   }
@@ -81,7 +81,7 @@
   padding-left: em(8,16);
   padding-right: em(8,16);
 
-  @media screen and (min-width: bp(afl_medium)) and (max-width: bp(afl_large) - 1) {
+  @media screen and (min-width: bp(afl_medium)) and (max-width: bp(afl_large_just_before)) {
     padding-left: em(12,16);
     padding-right: em(12,16);
   }
@@ -147,7 +147,7 @@
   padding-left: em(8,16);
   padding-right: em(8,16);
 
-  @media screen and (min-width: bp(afl_medium)) and (max-width: bp(afl_large) - 1) {
+  @media screen and (min-width: bp(afl_medium)) and (max-width: bp(afl_large_just_before)) {
     padding-left: em(12,16);
     padding-right: em(12,16);
   }

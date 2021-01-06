@@ -39,13 +39,13 @@
 
 .narrow-video-controls-only { // for narrow view, video controls must be on 2 lines
   // Clause 1: Video is in the one and only column.  Don't show this "narrow" view if we are wide enough.
-  @media screen and (min-width: bp(video_controls_one_line)) and (max-width: bp(required_video_in_column)) {
+  @media screen and (min-width: bp(video_controls_one_line)) and (max-width: bp(required_video_in_column_just_before)) {
     display: none !important;
   }
   // Clause 2: Video is in left column.  Don't show this "narrow" view if we are wide enough.
-  // Could actually simplify to just (min-width: bp(need_two_video_control_lines) + 1) since
+  // Could actually simplify to just (min-width: bp(need_two_video_control_lines)) since
   // required_video_in_column is much less than need_two_video_control_lines, but leave as is for clarity:
-  @media screen and (min-width: bp(required_video_in_column) + 1) and (min-width: bp(need_two_video_control_lines) + 1) {
+  @media screen and (min-width: bp(required_video_in_column)) and (min-width: bp(need_two_video_control_lines)) {
     display: none !important;
   }
 }
@@ -57,7 +57,7 @@
     display: none !important;
   }
   // Clause 2: Video is in left column.  Don't show this "wide" view if we are too narrow.
-  @media screen and (min-width: bp(required_video_in_column) + 1) and (max-width: bp(need_two_video_control_lines)) {
+  @media screen and (min-width: bp(required_video_in_column)) and (max-width: bp(need_two_video_control_lines_just_before)) {
     display: none !important;
   }
 }

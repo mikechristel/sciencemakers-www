@@ -28,23 +28,23 @@
 
   padding: em(10) em(14) em(10) em(10); // top right bottom left
 
-  @media screen and (max-width: bp(thmda_narrow) - 1) {
+  @media screen and (max-width: bp(thmda_narrow_just_before)) {
     width: 320px;
   }
-  @media screen and (min-width: bp(thmda_narrow)) and (max-width: bp(afl_small) - 1) {
+  @media screen and (min-width: bp(thmda_narrow)) and (max-width: bp(afl_small_just_before)) {
     width: 380px;
   }
-  @media screen and (min-width: bp(afl_small)) and (max-width: bp(afl_medium) - 1) {
+  @media screen and (min-width: bp(afl_small)) and (max-width: bp(afl_medium_just_before)) {
     width: 500px;
   }
-  @media screen and (min-width: bp(afl_medium)) and (max-width: bp(afl_large) - 1) {
+  @media screen and (min-width: bp(afl_medium)) and (max-width: bp(afl_large_just_before)) {
     width: 800px;
   }
   @media screen and (min-width: bp(afl_large)) {
     width: 1180px;
   }
 
-  @media screen and (max-width: bp(afl_small)) {
+  @media screen and (max-width: bp(afl_small_just_before)) {
     width: 90%;
   }
 
@@ -71,7 +71,7 @@
     padding: 0;
     font-size: 1.4rem;
 
-    @media screen and (min-width: bp(afl_medium)) and (max-width: bp(afl_large) - 1) {
+    @media screen and (min-width: bp(afl_medium)) and (max-width: bp(afl_large_just_before)) {
       font-size: 1.6rem;
     }
 
@@ -125,7 +125,7 @@
       -o-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
       transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
 
-      @media screen and (min-width: bp(afl_medium)) and (max-width: bp(afl_large) - 1) {
+      @media screen and (min-width: bp(afl_medium)) and (max-width: bp(afl_large_just_before)) {
         font-size: 1.2rem;
       }
 
@@ -150,7 +150,7 @@
       width: 95%;
     }
 
-    @media screen  and (max-width: bp(afl_large) - 1)  {
+    @media screen  and (max-width: bp(afl_large_just_before))  {
       font-size: 1.2rem;
     }
 
@@ -187,7 +187,7 @@
           opacity: .4;
       }
 
-      @media screen and (min-width: bp(afl_medium)) and (max-width: bp(afl_large) - 1) {
+      @media screen and (min-width: bp(afl_medium)) and (max-width: bp(afl_large_just_before)) {
         font-size: 1.4rem;
       }
 
@@ -215,7 +215,7 @@
           background-color: color(primary);
       }
 
-      @media screen and (min-width: bp(afl_medium)) and (max-width: bp(afl_large) - 1) {
+      @media screen and (min-width: bp(afl_medium)) and (max-width: bp(afl_large_just_before)) {
         font-size: 1.4rem;
       }
 
@@ -232,7 +232,7 @@
 
     font-size: 1rem;
 
-    @media screen and (min-width: bp(afl_medium)) and (max-width: bp(afl_large) - 1) {
+    @media screen and (min-width: bp(afl_medium)) and (max-width: bp(afl_large_just_before)) {
       font-size: 1.2rem;
     }
 
@@ -246,7 +246,7 @@
 .form-message {
   font-size: 1rem;
 
-  @media screen and (min-width: bp(afl_medium)) and (max-width: bp(afl_large) - 1) {
+  @media screen and (min-width: bp(afl_medium)) and (max-width: bp(afl_large_just_before)) {
     font-size: 1.2rem;
   }
 
@@ -283,17 +283,18 @@
   width: 100%;
   padding-bottom: em(14);
 
-  @media screen and (max-width: bp(afl_large)) {
-    padding-bottom: em(12);
+  @media screen and (max-width: bp(thmda_wideenough_just_before)) {
+    padding-bottom: em(6);
   }
 
-  @media screen and (max-width: bp(afl_medium)) {
+  @media screen and (min-width: bp(thmda_wideenough)) and (max-width: bp(afl_medium_just_before)) {
     padding-bottom: em(10);
   }
 
-  @media screen and (max-width: bp(thmda_wideenough)) {
-    padding-bottom: em(6);
+  @media screen and (min-width: bp(afl_medium)) and (max-width: bp(afl_large_just_before)) {
+    padding-bottom: em(12);
   }
+
 }
 
 .nav__links {
@@ -327,19 +328,15 @@
       border-bottom: em(8) solid color(nav-highlight-shade);
     }
 
-    @media screen and (min-width: bp(afl_small)) and (max-width: bp(thmda_wideenough_for_label) - 1) {
+    @media screen and (min-width: bp(afl_small)) and (max-width: bp(thmda_wideenough_just_before)) {
       font-size: 1.0rem;
     }
 
-    @media screen and (min-width: bp(thmda_wideenough_for_label)) and (max-width: bp(thmda_wideenough) - 1) {
-      font-size: 1.1rem;
-    }
-
-    @media screen and (min-width: bp(thmda_wideenough)) and (max-width: bp(afl_medium) - 1) {
+    @media screen and (min-width: bp(thmda_wideenough)) and (max-width: bp(afl_medium_just_before)) {
       font-size: 1.2rem;
     }
 
-    @media screen and (min-width: bp(afl_medium)) and (max-width: bp(afl_large) - 1) {
+    @media screen and (min-width: bp(afl_medium)) and (max-width: bp(afl_large_just_before)) {
       font-size: 1.3rem;
     }
 
@@ -366,12 +363,12 @@
   position: absolute;
   right: - em(24);
   top: - em(16);
-  @media screen and (max-width: bp(afl_medium) - 1) {
+  @media screen and (max-width: bp(afl_medium_just_before)) {
     display: none !important; // when too narrow, less than medium, don't show the badge
   }
 }
 
-@media screen and (max-width: bp(afl_medium) - 1) {
+@media screen and (max-width: bp(afl_medium_just_before)) {
   .nav_verbose {
     display: none !important;
   }
@@ -396,7 +393,7 @@
 
   padding: em(4) em(8) 0; // top, left and right, bottom
 
-  @media screen and (min-width: bp(afl_small)) and (max-width: bp(afl_medium) - 1) {
+  @media screen and (min-width: bp(afl_small)) and (max-width: bp(afl_medium_just_before)) {
       padding: em(4) em(12) 0; // top, left and right, bottom
   }
 
@@ -414,7 +411,7 @@
 
 .imposeMaxContentsWidth {
   margin: 0;
-  @media screen and (max-width: bp(thmda_maxwidth) - 1) {
+  @media screen and (max-width: bp(thmda_maxwidth_just_before)) {
     margin: 0 auto;
     width: 100%;
   }
@@ -430,14 +427,10 @@
 }
 
 .header__top-flex-row {
-  padding: gutter(thmda-big) 0; // top, left and right, bottom
+  padding: gutter(thmda-big) 0; // top and bottom, right and left
 
-  @media screen and (max-width: bp(thmda_wideenough) ) {
+  @media screen and (max-width: bp(thmda_wideenough_just_before)) {
     padding-top: 0;
-  }
-
-  @media screen and (max-width: bp(afl_small)) {
-    padding-top: gutter(thmda-big);
   }
 }
 
@@ -445,7 +438,7 @@
   cursor: pointer;
   outline: 0;
 
-  @media screen and (max-width: bp(afl_medium) - 1) {
+  @media screen and (max-width: bp(afl_medium_just_before)) {
     max-width: 90%;
   }
   @media screen and (min-width: bp(afl_medium)) {
@@ -545,7 +538,7 @@ a.skip:focus {
   display: none;
 }
 
-@media screen and (max-width: bp(afl_medium) - 1) {
+@media screen and (max-width: bp(afl_medium_just_before)) {
   .copy_URI_verbose {
     display: none !important;
   }

@@ -65,7 +65,7 @@
   margin-top: em(8);
   transition: box-shadow .15s ease-in-out;
 
-  @media screen and (max-width: bp(afl_medium)) {
+  @media screen and (max-width: bp(afl_medium_just_before)) {
     margin-bottom: gutter(thmda-big);
     margin-top: 0;
   }
@@ -90,11 +90,8 @@
   letter-spacing: .5px;
   margin-top: em(8);
 
-  @media screen and (max-width: bp(afl_medium)) {
+  @media screen and (max-width: bp(afl_medium_just_before)) {
     margin-top: 0; // some narrow views will wrap this into a different line, needing a margin for better layout
-  }
-
-  @media screen and (max-width: bp(afl_medium)) {
     margin-bottom: gutter(thmda-big);
   }
 
@@ -115,7 +112,7 @@
   width: auto;
   max-width: em(290);
 
-  @media screen and (max-width: bp(thmda_narrow) - 1) {
+  @media screen and (max-width: bp(thmda_narrow_just_before)) {
     margin-top: em(8); // some narrow views will wrap this into a different line, needing a margin for better layout
   }
 }
@@ -283,7 +280,7 @@ padding: 0;
 width: 100%;
 }
 
-@media screen and (max-width: bp(thmda_narrow) - 1) {
+@media screen and (max-width: bp(thmda_narrow_just_before)) {
 .interview_date_area_wordy {
   display: none !important;
 }

@@ -6,7 +6,7 @@
   margin: 0 0 0.3em;
   padding: 0;
 
-  @media screen and (min-width: bp(afl_medium)) and (max-width: bp(afl_large) - 1) {
+  @media screen and (min-width: bp(afl_medium)) and (max-width: bp(afl_large_just_before)) {
     font-size: 1.6rem;
   }
 
@@ -20,7 +20,7 @@
     font-size: 1rem;
     color: black;
 
-    @media screen and (min-width: bp(afl_medium)) and (max-width: bp(afl_large) - 1) {
+    @media screen and (min-width: bp(afl_medium)) and (max-width: bp(afl_large_just_before)) {
       font-size: 1.2rem;
     }
     @media screen and (min-width: bp(afl_large)) {
@@ -33,7 +33,7 @@
   color: black;
   margin-bottom: gutter(thmda-extremely_tiny);
 
-  @media screen and (min-width: bp(afl_medium)) and (max-width: bp(afl_large) - 1) {
+  @media screen and (min-width: bp(afl_medium)) and (max-width: bp(afl_large_just_before)) {
     font-size: 1.2rem;
   }
   @media screen and (min-width: bp(afl_large)) {
@@ -46,7 +46,7 @@
   color: black;
   margin-top: 0;
 
-  @media screen and (min-width: bp(afl_medium)) and (max-width: bp(afl_large) - 1) {
+  @media screen and (min-width: bp(afl_medium)) and (max-width: bp(afl_large_just_before)) {
     font-size: 1.2rem;
   }
   @media screen and (min-width: bp(afl_large)) {
@@ -66,7 +66,7 @@
   padding: gutter(thmda-tight);
   margin: gutter(thmda-tiny);
 
-  @media screen and (max-width: bp(afl_small) - 1) {
+  @media screen and (max-width: bp(afl_small_just_before)) {
     padding: gutter(thmda-tiny);
     margin: gutter(thmda-extremely_tiny);
   }
