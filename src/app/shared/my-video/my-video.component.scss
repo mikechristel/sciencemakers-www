@@ -53,7 +53,7 @@
 .wider-video-controls-only { // for typical "wider" view, video controls fit on 1 line; same, too, for wider views with video in one column of that view
   // Clause 1: Video is in the one and only column (assuming video_controls_one_line less than required_video_in_column).
   // Don't show this "wide" view if we are too narrow.
-  @media screen and (max-width: bp(video_controls_one_line) - 1) {
+  @media screen and (max-width: bp(video_controls_one_line_just_before)) {
     display: none !important;
   }
   // Clause 2: Video is in left column.  Don't show this "wide" view if we are too narrow.
