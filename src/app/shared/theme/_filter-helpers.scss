@@ -155,11 +155,6 @@
   margin: 0;
 }
 
-.filter-section-rg-item:focus {
-    box-shadow: 0 0 0 3px color(tertiary);
-    outline: 3px solid transparent; // For Windows high contrast mode.
-}
-
 .pad-top-a-bit {
   padding-top: 0.2em;
 }
@@ -189,6 +184,11 @@
     background-color: color(primary);
     border: 1px solid color(primary);
     color: #fff;
+}
+
+.filter-section-rg-item:focus {
+  box-shadow: 0 0 0 3px color(tertiary);
+  outline: 3px solid transparent; // For Windows high contrast mode.
 }
 
 //This style applies to both wide and narrow screens

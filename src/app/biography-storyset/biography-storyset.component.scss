@@ -1,7 +1,52 @@
 ﻿@import '../shared/theme/base';
 @import '../shared/theme/button-helpers';
-@import '../shared/theme/filter-helpers'; // because hide/show of biography implemented with same style as hide/show of filter options
 @import '../shared/theme/view-option-helpers';
+
+// FILTER-PIECE The styles in this portion are the same as styles in shared/theme/filter-helpers, but
+// rather than bring in that relatively large style helper file via an import, only repeat those that are
+// actually used by biography-storyset.
+.pad-top-a-bit {
+  padding-top: 0.2em;
+}
+
+.filter-section-rg-item {
+  @extend %oswald;
+  background-color: #fff;
+  border: 1px solid color(primary);
+  color: color(primary);
+  padding: em(3) em(3);
+  text-transform: capitalize;
+  font-size: 1.2rem;
+  width: 100%;
+
+  @media screen and (max-width: bp(afl_medium_just_before)) {
+    margin-bottom: em(5);
+  }
+
+  &:hover {
+    border: 1px solid color(primary);
+    background-color:  #fff;
+    color: color(secondary);
+  }
+}
+
+.filter-section-rg-item.selected  {
+  background-color: color(primary);
+  border: 1px solid color(primary);
+  color: #fff;
+}
+
+.filter-section-rg-item:focus {
+  box-shadow: 0 0 0 3px color(tertiary);
+  outline: 3px solid transparent; // For Windows high contrast mode.
+}
+
+.filter-section {
+  min-height: $buttonHeight;
+  margin-bottom: em(10, 16);
+}
+
+// FILTER-PIECE End of the filter-helpers section.
 
 .tapes-and-filters {
     margin-top: em(20);
