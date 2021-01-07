@@ -147,11 +147,3 @@
     }
 
 }
-
-.page-view-options {
-    margin: em(22) 0 0;
-
-    @media screen and (min-width: bp(afl_small)) and (max-width: bp(need_two_video_control_lines_just_before)) {
-      padding-bottom: em(30);
-    }
-}
