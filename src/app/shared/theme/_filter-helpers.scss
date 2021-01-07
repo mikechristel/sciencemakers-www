@@ -260,7 +260,7 @@
   padding: 0;
   transition: color .2s ease-in-out;
 
-  @media screen and (max-width: thmda_filterui_maxpt) {
+  @media screen and (max-width: bp(thmda_filterui_maxpt)) {
     line-height: 100%;
     margin-bottom: em(12);
     text-align: left;
@@ -298,7 +298,7 @@
 
   margin: auto;
 
-  @media screen and (max-width: thmda_filterui_maxpt) {
+  @media screen and (max-width: bp(thmda_filterui_maxpt)) {
     text-align: left; //accordion content on Topic Search page
   }
 
