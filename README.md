@@ -4,54 +4,25 @@ The ScienceMakers Digital Video Archive website is a web-based single page appli
 ## Installation
 Run `npm install` in the root of the project directory to install the necessary build tools and depedencies.
 
-## Configuration
+## Build and Deploy
 
-The environments folder is underspecified.  
-The value of the "myEnv" key, e.g., "prod", indicates there must be a config.prod.json file also in assets.
-This file is NOT part of the repository, as you must specify your own API to the Azure Services feeding this interface, and your own media files URL base string.
-The file config.prod.json will have content like the following:
-{
-  "serviceBase" : "https://YourDomainAndPathForAPIServiceHere/",
-  "mediaBase" : "https://YourDomainAndPathForMediaFilesHere/"
-}
+> **NOTE: All of the build and deployment configurations have changed as of December 11, 2020.  Please read carefully.**
 
-You may have a config.development.json with different values, and set env.json differently between development and production builds.
+### Build Environments and Associated Resources
 
-## Build and Run
+The application build is handled by [Angular CLI](https://cli.angular.io/), refer to the [documentation](https://github.com/angular/angular-cli/wiki) for further details.
 
-Please note that with the addition of the authentication framework, the number of possible build options has changed. This number may go down again in the future once authentication goes into production.
+**IMPORTANT: As of December 2020 the development environment requires a locally hosted API**
+ 
+All hosted versions of the Digital Archive API require authentication and are inaccessible to a locally hosted client, therefore the default development configuration requires the API to be locally hosted at https://localhost:44303/api. This is the default debug/development configuration for the .NET API.
 
-### Development
+### Deploying to Azure
 
-Build is handled by [Angular CLI](https://cli.angular.io/) for details please refer to the [documentation](https://github.com/angular/angular-cli/wiki).
-
-To run the application locally during development:
-```
-ng serve
-```
-
-To debug with authentication enabled:
-```
-ng serve --configuration=devauth
-```
-
-### Production
-
-**NOTE:** Commits to the main branch are automatically deployed to the the [Processing (test) Site](https://thmda-test-www.azurewebsites.net). Please make sure your code will compile for the test site prior to pushing your changes to the GitHub repository.
-
-To build for the [Processing (test) Site](https://thmda-test-www.azurewebsites.net):
-```
-ng build --prod --configuration=test
-```
-
-To build for the Demo Site:
-```
-ng build --prod --configuration=demo
-```
-
-To build for either the [Production](https://thmda-prod-www.azurewebsites.net) or [Demo](https://demo.thehistorymakers.org) Site:
-```
-ng build --prod --configuration=prod
+**NOTES**
+1) Continuous Deployment (CD) is not currently available; production archive must be updated manually.
+2) For authentication to work properly, the Angular application must be bundled and deployed together with the .NET API.
+This .NET API should be locked down to "ScienceMakers only" for this ScienceMakers Digital Archive.
+3) Deployment is handled by Visual Studio 2019, refer to the digital-archive-api documentation for publishing specifics.
 ```
 ## Browsers
 
