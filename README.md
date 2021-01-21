@@ -16,6 +16,13 @@ The application build is handled by [Angular CLI](https://cli.angular.io/), refe
  
 All hosted versions of the Digital Archive API require authentication and are inaccessible to a locally hosted client, therefore the default development configuration requires the API to be locally hosted at https://localhost:44303/api. This is the default debug/development configuration for the .NET API.
 
+There are two primary configuration environments as follows:
+
+| Environment | Build Command                         | Build Target       | Client URL                               | Configured serviceBase      | Configured mediaBase                                     |
+|:------------|:--------------------------------------|:-------------------|:-----------------------------------------|:----------------------------|:---------------------------------------------------------|
+| (default)   | `ng serve`                            | (development)      | http://localhost:4200/                   | https://localhost:44303/api | https://daproductionstorage.blob.core.windows.net/media/ |
+| production  | `ng build --configuration=production` | sm-production-www  | https://sm.thehistorymakers.org          | api/                        | https://daproductionstorage.blob.core.windows.net/media/ |
+
 ### Deploying to Azure
 
 **NOTES**
@@ -23,7 +30,7 @@ All hosted versions of the Digital Archive API require authentication and are in
 2) For authentication to work properly, the Angular application must be bundled and deployed together with the .NET API.
 This .NET API should be locked down to "ScienceMakers only" for this ScienceMakers Digital Archive.
 3) Deployment is handled by Visual Studio 2019, refer to the digital-archive-api documentation for publishing specifics.
-```
+
 ## Browsers
 
 ### Tested

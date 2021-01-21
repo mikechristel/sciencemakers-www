@@ -73,7 +73,7 @@
           // (do not show in log for now...) console.log("fyi, aid and aname and publisher_reference: " + token.account_id + ", " + token.account_name + ", " + token.publisher_reference);
           _ll.push(['setDefaults', {
               pid: token.publisher_id,
-              aid: token.account_id,
+              aid: token.publisher_reference,
               aname: token.account_name,
               sid: token.session_id
           }]);
