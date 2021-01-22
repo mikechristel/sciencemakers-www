@@ -28,19 +28,11 @@ export class AnalyticsService {
     }]);
   }
 
-  public logStoryTagSearchForCOUNTER(givenQuery: string) {
-    _ll.push(['trackSearch', {
-      dbs:[
-         {dbid:'2020_05_tag_v1', dbname:'THMDA_StoryTags'}
-      ],
-      queryType:'tagSearch',
-      query:givenQuery
-    }]);
-  }
-
-  public logStoryLookupForCOUNTER(storyID: number, biographyID: string) {
+  public logStoryLookupForCOUNTER(storyID: number, biographyID: string, storyTitle: string) {
     var storyPublicationYear: number = this.parseBioIDForYear(biographyID);
     //console.log("logging story " + storyID + " with yop " + storyPublicationYear);
+    // NOTE:  details are of the form:
+    // ScienceMakers Digital Archive story 378323 A2006.130 Lezli Baskerville talks about her father's musical talent
     _ll.push(['trackItemRequest', {
       dbid:'2020_05_story_v1',
       dbname:'THMDA_Stories',
@@ -50,13 +42,16 @@ export class AnalyticsService {
       // plus additional fields describing the item at title level...
       tm:{ dt: 'database', 'id':'2020_05_story_v1', 'title':'THMDA_Stories' },
       // (details on the actual story item)
-      im:{ dt: 'multimedia', 'id':storyID, 'title':'ScienceMakers Digital Archive story ' + storyID}
+      im:{ dt: 'multimedia', 'id':storyID, 'title':'ScienceMakers Digital Archive story ' + storyID + ' ' + biographyID + ' ' + storyTitle}
     }]);
   }
 
-  public logBiographyLookupForCOUNTER(biographyID: string) {
+  public logBiographyLookupForCOUNTER(biographyID: string, biographyName: string) {
     var yearOfPublication: number = this.parseBioIDForYear(biographyID);
     //console.log("logging bio " + biographyID + " with yop " + yearOfPublication);
+
+    // NOTE:  details are of the form:
+    // ScienceMakers Digital Archive biography A2006.130 Lezli Baskerville
     _ll.push(['trackItemRequest', {
       dbid:'2020_05_bio_v1',
       dbname:'THMDA_Biographies',
@@ -66,7 +61,7 @@ export class AnalyticsService {
       // plus additional fields describing the item at title level...
       tm:{ dt: 'database', 'id':'2020_05_bio_v1', 'title':'THMDA_Biographies' },
       // (details on the actual biography item)
-      im:{ dt: 'multimedia', 'id':biographyID, 'title':'ScienceMakers Digital Archive biography ' + biographyID}
+      im:{ dt: 'multimedia', 'id':biographyID, 'title':'ScienceMakers Digital Archive biography ' + biographyID + ' ' + biographyName}
     }]);
   }
 

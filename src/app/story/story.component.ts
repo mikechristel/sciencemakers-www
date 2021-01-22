@@ -171,7 +171,8 @@ export class StoryComponent extends BaseComponent implements OnInit {
 
                     // NOTE:  Only now, with story details loaded, can we log the item request, since the year of
                     // publication for the item is within the biographyAccession which has just been loaded.
-                    this.analyticsService.logStoryLookupForCOUNTER(myStoryID, this.biographyAccession);
+                    // Also logged is the title.
+                    this.analyticsService.logStoryLookupForCOUNTER(myStoryID, this.biographyAccession, this.storyDetailsTitle);
 
                     this.videoPositionInSeconds = 0;
                     this.videoDurationInSeconds = storyDetails.duration / 1000; // could be a fraction, of course

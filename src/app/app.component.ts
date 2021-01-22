@@ -124,6 +124,7 @@ export class AppComponent extends BaseComponent {
             // Instead of logging "logStoryLookupForCOUNTER" here on the /story/ route, that call is made elsewhere.
             //
             // For biographies, the route begins with /storiesForBio with first argument ID= with the ID following.
+            // Instead of logging "logBiographyLookupForCOUNTER" here on the /storiesForBio/ route, that call is made elsewhere.
             //
             // For biography set queries, an argument after the /all path is the query specifier q=.
             // For biography set queries via a filter specifier, an argument after the /all path is the specifier spec=.
@@ -137,11 +138,7 @@ export class AppComponent extends BaseComponent {
             // we add in a 'ut' argument (use tracking) as a final argument so that if the "&ut=1" fragment is in the cleanedURL
             // then it is a candidate for logging.  This breadcrumb simplifies the logic below and gives us a gate for which
             // URLs to check.
-            if (cleanedURL.startsWith("/storiesForBio?ID")) {
-                var bioID: string = this.parseCleanURLForBioID(cleanedURL);
-                this.analyticsService.logBiographyLookupForCOUNTER(bioID);
-            }
-            else if (cleanedURL.indexOf("&ut=1") > 0) {
+            if (cleanedURL.indexOf("&ut=1") > 0) {
               // NOTE:  the presence of the ut=1 indicates this route as the FIRST time this query set is shown, so "use tracking"
               // and log it.  Similar routes without the "ut=1" will happen on paging and/or going back to the set from an item.
               // NOTE: by not testing for ?ut=1 here, we explicitly assume it is tacked on after at least one other query parameter
@@ -166,18 +163,13 @@ export class AppComponent extends BaseComponent {
                     // console.log("Story search (via filter): " + givenQuerySpec);
                     this.analyticsService.logStorySearchForCOUNTER(givenQuerySpec, "filter");
                 }
-                else if (cleanedURL.startsWith("/stories/3?") && (cleanedURL.indexOf("?q=") > 0 || cleanedURL.indexOf("&q=") > 0)) {
-                    // must have "q=" as query argument
-                    var givenQuerySpec: string = this.parseCleanURLForKey(cleanedURL, "q");
-                    // console.log("Story search (via tags): " + givenQuerySpec);
-                    this.analyticsService.logStoryTagSearchForCOUNTER(givenQuerySpec);
-                }
                 else if (cleanedURL.startsWith("/stories/2?") && (cleanedURL.indexOf("?q=") > 0 || cleanedURL.indexOf("&q=") > 0)) {
                     // must have "q=" as query argument
                     var givenQuerySpec: string = this.parseCleanURLForKey(cleanedURL, "q");
                     // console.log("Story search: " + givenQuerySpec);
                     this.analyticsService.logStorySearchForCOUNTER(givenQuerySpec, "search");
                 }
+                // NOTE: no story search via tags/topics for ScienceMakers, i.e., no handling of stories/3 route.
             }
           }
         });
@@ -192,25 +184,6 @@ export class AppComponent extends BaseComponent {
             this.myClipsWithCountMsg = "My Clips, 1 story";
         else
             this.myClipsWithCountMsg = "My Clips, " + storyCount + " stories";
-    }
-
-    private parseCleanURLForBioID(givenCleanURL: string): string {
-      var retVal: string = "";
-      // Biography ID immediately follows "storiesForBio?ID=" and is ended by either & or end of string
-      var workVal: number = givenCleanURL.indexOf("storiesForBio?ID=");
-      var startOfID: number;
-      var IDCandidate: string = "";
-      if (workVal >= 0) {
-        startOfID = workVal + 17; // move past storiesForBio?ID=
-        workVal = givenCleanURL.indexOf("&");
-        if (workVal > startOfID)
-          // ID runs from character at startOfID up to but not including character at workVal
-          IDCandidate = givenCleanURL.substring(startOfID, workVal);
-        else
-          IDCandidate = givenCleanURL.substring(startOfID);
-        retVal = IDCandidate;
-      }
-      return retVal;
     }
 
     private parseCleanURLForKey(givenCleanURL: string, givenKey: string): string {

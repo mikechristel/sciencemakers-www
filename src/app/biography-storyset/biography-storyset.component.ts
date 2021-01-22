@@ -21,6 +21,7 @@ import { USMapDistribution } from '../US-map/US-map-distribution';
 import { SearchResult } from '../storyset/search-result';
 import { USMapManagerService } from '../US-map/US-map-manager.service';
 import { WindowService } from '../shared/services';
+import { AnalyticsService } from '../ll-analytics.service';
 import { UserSettingsManagerService } from '../user-settings/user-settings-manager.service';
 import {LiveAnnouncer} from '@angular/cdk/a11y'; // used to read changes to set title
 
@@ -90,6 +91,7 @@ export class BiographyStorySetComponent extends BaseComponent implements OnInit 
         private myUSMapManagerService: USMapManagerService,
         private windowService: WindowService,
         private userSettingsManagerService: UserSettingsManagerService,
+        private analyticsService: AnalyticsService,
         private searchFormService: SearchFormService, private liveAnnouncer: LiveAnnouncer) {
 
           super(); // for BaseComponent extension (brought in to cleanly unsubscribe from subscriptions)
@@ -172,6 +174,12 @@ export class BiographyStorySetComponent extends BaseComponent implements OnInit 
                 this.bioDetail = bioDetail;
 
                 if (bioDetail != null) {
+
+                    // NOTE:  Only now, with biography details loaded, can we log the item request, since the name of
+                    // the person is within bioDetail which has just been loaded.
+                    // Also logged is the title.
+                    this.analyticsService.logBiographyLookupForCOUNTER(bioDetail.accession, bioDetail.preferredName);
+
                     this.searchFormService.setSearchOptions(new SearchFormOptions(false, bioDetail.biographyID, bioDetail.accession, false)); // let search form know we will search within this bio for stories
 
                     this.tailoredImage = this.myMediaBase + "biography/image/" + bioDetail.biographyID;
