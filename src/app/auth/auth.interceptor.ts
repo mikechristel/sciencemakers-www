@@ -12,9 +12,14 @@ import {
   HttpEvent
 } from '@angular/common/http';
 import { Observable } from 'rxjs/Observable';
+import { AuthManagerService } from './auth-manager.service';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
+
+  constructor(private authManagerService: AuthManagerService) {
+
+  }
 
   /**
     * Handle all 403 (and 401) errors returned by reverse-proxy authentication server
@@ -33,7 +38,9 @@ export class AuthInterceptor implements HttpInterceptor {
           if (err instanceof HttpErrorResponse) {
             if (err.status === 401 || err.status === 403) {
               // Reload page to force reauthentication
-              window.location.reload(true);
+              // NO!!! infinite looping!!! Instead of... window.location.reload();
+              // ...do a modal dialogue:
+              this.authManagerService.triggerConfirmReloadForm();
             }
           }
         }

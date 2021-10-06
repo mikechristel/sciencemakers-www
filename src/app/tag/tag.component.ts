@@ -31,6 +31,7 @@ export class TagComponent extends BaseComponent implements OnInit, OnDestroy {
     // NOTE: framework for tag tree is very much legacy work dating to 2009 and not changed since then; note that data is
     // expected in certain form via this constant and with comment at the head of the view for this work (i.e., tag.component.html):
     private EXPECTED_TAG_BRANCHES: number = 12;
+    private TWO_DOZEN_UNTAGGED_BIOS_LIMIT: number = 24;
 
     signalFocusToTitle: boolean = false;
 
@@ -133,11 +134,11 @@ export class TagComponent extends BaseComponent implements OnInit, OnDestroy {
           else if (taggedBiographyCount < limitForSmallSubsetExcuse)
               this.tagMatchOpeningExcuse = "A small subset, just " + taggedBiographyCount + " of " + biographyCount +
               " HistoryMakers, have tagged stories.  You can explore this subset using the filters below.";
-          else if (taggedBiographyCount < biographyCount)
+          else if (taggedBiographyCount < biographyCount - this.TWO_DOZEN_UNTAGGED_BIOS_LIMIT)
               this.tagMatchOpeningExcuse = "A subset, " + taggedBiographyCount + " of " + biographyCount +
                 " HistoryMakers, have tagged stories.  You can explore this subset using the filters below.";
-          else
-              this.tagMatchOpeningExcuse = ""; // no need for an excuse when the whole corpus is tagged
+          else // perhaps all bios are tagged, but at least "most" are (there are at most TWO_DOZEN_UNTAGGED_BIOS_LIMIT untagged) so don't bother with a "subset" message
+              this.tagMatchOpeningExcuse = ""; // no need for an excuse when (nearly) the whole corpus is tagged
       }
       else
           this.tagMatchOpeningExcuse = ""; // essentially give up when there is no corpus

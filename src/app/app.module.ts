@@ -36,6 +36,7 @@ import { FeedbackService } from './feedback/feedback.service';
 import { BiographyStorySetService } from './biography-storyset/biography-storyset.service';
 import { SearchFormService } from './shared/search-form/search-form.service';
 import { PlaylistManagerService } from './playlist-manager/playlist-manager.service';
+import { AuthManagerService } from './auth/auth-manager.service';
 import { UserSettingsManagerService } from './user-settings/user-settings-manager.service';
 import { StoryAdvancedSearchSettingsManagerService } from './story-advanced-search/story-advanced-search-manager.service';
 import { USMapManagerService } from './US-map/US-map-manager.service';
@@ -113,6 +114,7 @@ import {AppContentsComponent} from './app-contents/app-contents.component';
     BiographyStorySetService,
     SearchFormService,
     PlaylistManagerService,
+    AuthManagerService,
     UserSettingsManagerService,
     StoryAdvancedSearchSettingsManagerService,
     USMapManagerService,

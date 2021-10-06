@@ -7,7 +7,7 @@ import { TitleManagerService } from '../../shared/title-manager.service';
 import { BaseComponent }  from '../../shared/base.component';
 import {LiveAnnouncer} from '@angular/cdk/a11y'; // used to read changes to set title
 import { GlobalState } from '../../app.global-state';
-import { HistoryMakerService } from '../../historymakers/historymaker.service'; // needed to (re)fetch corpus details as needed
+// (RETIRED tagMatchDetails commented out so this not needed) import { HistoryMakerService } from '../../historymakers/historymaker.service'; // needed to (re)fetch corpus details as needed
 import { UserSettingsManagerService } from '../../user-settings/user-settings-manager.service';
 
 @Component({
@@ -17,15 +17,17 @@ import { UserSettingsManagerService } from '../../user-settings/user-settings-ma
 })
 export class HelpSearchComponent extends BaseComponent implements OnInit {
     signalFocusToTitle: boolean = false; // is used in html rendering of this component
-    tagMatchDetails: string = "";
-    showTopicSearch: boolean = false;
+    // NOTE: turning off (but left in comments) the extra discussion on tagged biographies now that all
+    // biographies will be attempted to be tagged:  tagMatchDetails: string = "";
+    hideTopicSearch: boolean = false;
 
     constructor(private route: ActivatedRoute,
         private router: Router,
-        private historyMakerService: HistoryMakerService,
         private userSettingsManagerService: UserSettingsManagerService,
         private globalState: GlobalState,
         private titleManagerService: TitleManagerService, private liveAnnouncer: LiveAnnouncer) {
+			
+		// as an argument.... private historyMakerService: HistoryMakerService, (commented out as it was only needed for tagMatchDetails)
           super(); // for BaseComponent extension (brought in to cleanly unsubscribe from subscriptions)
     }
 
@@ -42,17 +44,20 @@ export class HelpSearchComponent extends BaseComponent implements OnInit {
             this.signalFocusToTitle = true;
         }
 
-        this.showTopicSearch = this.userSettingsManagerService.currentShowTopicSearch();
-        if (this.showTopicSearch) {
+        this.hideTopicSearch = this.userSettingsManagerService.currentHideTopicSearch();
+
+        // (RETIRED tagMatchDetails commented out)...
+        //if (!this.hideTopicSearch) {
             // Settings related to cached counts (used in giving help about Topic Search)
-            this.historyMakerService.getCorpusSpecifics().pipe(takeUntil(this.ngUnsubscribe))
-            .subscribe(corpusDetails => {
-                this.updateTagMatchDetails(corpusDetails.biographies.tagged, corpusDetails.biographies.all);
-            });
-        }
+
+            // this.historyMakerService.getCorpusSpecifics().pipe(takeUntil(this.ngUnsubscribe))
+            // .subscribe(corpusDetails => {
+            //     this.updateTagMatchDetails(corpusDetails.biographies.tagged, corpusDetails.biographies.all);
+            // });
+        //}
     }
 
-    private updateTagMatchDetails(taggedBiographyCount: number, biographyCount: number) {
+    /*  (RETIRED tagMatchDetails commented out)...    private updateTagMatchDetails(taggedBiographyCount: number, biographyCount: number) {
         if (biographyCount > 0) {
             // Two forms of excuse dependent on how much of corpus has been tagged.
             var limitForSmallSubsetExcuse: number = biographyCount / 4;
@@ -71,5 +76,5 @@ export class HelpSearchComponent extends BaseComponent implements OnInit {
         }
         else
             this.tagMatchDetails = ""; // essentially give up when there is no corpus
-    }
+    }*/
 }

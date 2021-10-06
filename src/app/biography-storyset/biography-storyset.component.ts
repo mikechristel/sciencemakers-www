@@ -4,7 +4,7 @@ import { takeUntil } from "rxjs/operators";
 import { ActivatedRoute, Router, Params } from '@angular/router';
 import { BiographyStorySetService } from './biography-storyset.service';
 import { HistoryMakerService } from '../historymakers/historymaker.service';
-import { IDSearchService } from '../id-search/id-search.service';
+import { TextSearchService } from '../text-search/text-search.service';
 import { TitleManagerService } from '../shared/title-manager.service';
 import { SearchFormService } from '../shared/search-form/search-form.service';
 
@@ -86,12 +86,12 @@ export class BiographyStorySetComponent extends BaseComponent implements OnInit 
         private globalState: GlobalState,
         private biographyStorySetService: BiographyStorySetService,
         private historyMakerService: HistoryMakerService,
-        private idSearchService: IDSearchService,
+        private textSearchService: TextSearchService,
         private titleManagerService: TitleManagerService,
         private myUSMapManagerService: USMapManagerService,
         private windowService: WindowService,
-        private userSettingsManagerService: UserSettingsManagerService,
         private analyticsService: AnalyticsService,
+        private userSettingsManagerService: UserSettingsManagerService,
         private searchFormService: SearchFormService, private liveAnnouncer: LiveAnnouncer) {
 
           super(); // for BaseComponent extension (brought in to cleanly unsubscribe from subscriptions)
@@ -174,10 +174,8 @@ export class BiographyStorySetComponent extends BaseComponent implements OnInit 
                 this.bioDetail = bioDetail;
 
                 if (bioDetail != null) {
-
                     // NOTE:  Only now, with biography details loaded, can we log the item request, since the name of
                     // the person is within bioDetail which has just been loaded.
-                    // Also logged is the title.
                     this.analyticsService.logBiographyLookupForCOUNTER(bioDetail.accession, bioDetail.preferredName);
 
                     this.searchFormService.setSearchOptions(new SearchFormOptions(false, bioDetail.biographyID, bioDetail.accession, false)); // let search form know we will search within this bio for stories
@@ -246,7 +244,6 @@ export class BiographyStorySetComponent extends BaseComponent implements OnInit 
                     var oneTapeStoryList: StoryDocument[] = [];
                     var storyCount: number = 0;
                     var oneStoryDocument: StoryDocument;
-                    var IDListToLoad:string = ""; // see usage below to populate map data for the story set
                     for (i = 0; i < bioDetail.sessions.length; i++) {
                         oneSessionInterviewInfo = "Interviewed on " + this.globalState.cleanedMonthDayYear(bioDetail.sessions[i].interviewDate) + " by " +
                             bioDetail.sessions[i].interviewer + " at " + bioDetail.sessions[i].location + ", videographer " + bioDetail.sessions[i].videographer;
@@ -262,7 +259,6 @@ export class BiographyStorySetComponent extends BaseComponent implements OnInit 
                                     oneStoryDocument = new StoryDocument();
                                     oneStoryDocument.duration = bioDetail.sessions[i].tapes[j].stories[k].duration;
                                     oneStoryDocument.storyID = bioDetail.sessions[i].tapes[j].stories[k].storyID;
-                                    IDListToLoad += oneStoryDocument.storyID + ",";
                                     oneStoryDocument.title = bioDetail.sessions[i].tapes[j].stories[k].title;
                                     oneStoryDocument.storyOrder = bioDetail.sessions[i].tapes[j].stories[k].storyOrder;
                                     oneStoryDocument.accession = this.myAccession;
@@ -276,8 +272,6 @@ export class BiographyStorySetComponent extends BaseComponent implements OnInit 
                             this.myStoryListByTape.push(oneTapeStoryList);
                         }
                     }
-                    if (IDListToLoad.length > 0)
-                        IDListToLoad = IDListToLoad.substring(0, IDListToLoad.length - 1); // drop extraneous "," at end of nonempty list
                     var pendingTitle: string = bioDetail.preferredName;
                     var fragment: string;
                     if (pendingTitle != null && pendingTitle.length > 0)
@@ -296,12 +290,17 @@ export class BiographyStorySetComponent extends BaseComponent implements OnInit 
                     // !!!TBD!!! NOTE: Until the API is updated, US State information is NOT returned from the getStoriesInBiography service call
                     // for stories within a biography.  Make a separate call that will load up this information for the stories.  Also, this implies
                     // that for this view, for biography-storyset, there is no filtering: all the stories for this biography are included.
-                    if (IDListToLoad.length > 0) {
-                        this.idSearchService.getIDSearch(IDListToLoad, 1, this.myStoryList.length + 1)
+                    // Before October 2021: This was done via an IDSearch using all the story IDs for this person.  That could be a long list, and a bug
+                    // was discovered in LibLynx layers that long URLs during authentication were truncated.  So, instead, we can do a story search for * (all)
+                    // within this person, which is the method used here, avoiding the need for a long ID list.
+                    // OLD: this.idSearchService.getIDSearch(IDListToLoad, 1, this.myStoryList.length + 1)
+                    // NEW: this.textSearchService.getTextSearch("*", "", bioDetail.biographyID, .. (no filters)
+                    if (bioDetail.biographyID != this.globalState.NOTHING_CHOSEN) {
+                        this.textSearchService.getTextSearch("*", "", bioDetail.biographyID, false, false, null, null, null, null, null, null, null, null, null, null, null, false)
                           .pipe(takeUntil(this.ngUnsubscribe)).subscribe(retSet => {
                             this.initializeUSStateCounts(bioDetail.preferredName, retSet); // harvest and use the entities/states facet to populate the US state region counts
                         },
-                        error => { // give up on finding additional map information for the story set.
+                        error => { // give up on finding additional map information for the story set
                             this.initializeUSStateCounts(bioDetail.preferredName, null); // effectively empties the map view of any story information
                         });
                     }

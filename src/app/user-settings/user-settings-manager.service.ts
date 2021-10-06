@@ -16,8 +16,8 @@ export class UserSettingsManagerService {
     public showCCText: Subject<boolean> = new Subject<boolean>();
     public showCCText$ = this.showCCText.asObservable();
 
-    public showTopicSearch: Subject<boolean> = new Subject<boolean>();
-    public showTopicSearch$ = this.showTopicSearch.asObservable();
+    public hideTopicSearch: Subject<boolean> = new Subject<boolean>();
+    public hideTopicSearch$ = this.hideTopicSearch.asObservable();
 
     public bioSearchFieldsMask: Subject<number> = new Subject<number>();
     public bioSearchFieldsMask$ = this.bioSearchFieldsMask.asObservable();
@@ -51,6 +51,7 @@ export class UserSettingsManagerService {
     private AUTOPLAY_SETTING_NAME: string = "sm-autoplay";
     private AUTOADVANCE_SETTING_NAME: string = "sm-autoadvance";
     private CCTEXT_SETTING_NAME: string = "sm-cctext";
+    private HIDE_TOPIC_SEARCH_SETTING_NAME: string = "sm-hidetopicsearch";
     private BIO_SEARCH_FIELDS_MASK_NAME: string = "sm-biosearchfieldsmask";
     private SHOWBIOGRAPHY_LASTNAME_FACETFILTER: string = "sm-biolastnamefilter";
     private SHOWBIOGRAPHY_BIRTHDECADE_FACETFILTER: string = "sm-biobirthdecadefilter";
@@ -69,7 +70,7 @@ export class UserSettingsManagerService {
     private localCCText: boolean = false;
     private localBioSearchMask: number = 0;
 
-    private localShowTopicSearch: boolean = false;
+    private localHideTopicSearch: boolean = false;
 
     private localShowBiographyLastNameFacetFilter: boolean = false;
     private localShowBiographyDecadeOfBirthFacetFilter: boolean = false;
@@ -97,8 +98,8 @@ export class UserSettingsManagerService {
         this.localCCText = (temp == "1");
         this.showCCText.next(this.localCCText);
 
-        this.localShowTopicSearch = false; // NOTE: for ScienceMakers, this is always false
-        this.showTopicSearch.next(this.localShowTopicSearch);
+        this.localHideTopicSearch = true; // NOTE: for ScienceMakers, this is always true (revisit if we consider "Great Story" to be reflecting a ScienceMaker's perspective, etc.)
+        this.hideTopicSearch.next(this.localHideTopicSearch);
 
         temp = JSON.parse(localStorage.getItem(this.BIO_SEARCH_FIELDS_MASK_NAME) || "0");
         var tryAsNumber = +temp;
@@ -154,7 +155,7 @@ export class UserSettingsManagerService {
         this.autoadvanceVideo.next(this.localAutoadvance);
         this.showCCText.next(this.localCCText);
         this.bioSearchFieldsMask.next(this.localBioSearchMask);
-        this.showTopicSearch.next(this.localShowTopicSearch);
+        this.hideTopicSearch.next(this.localHideTopicSearch);
 
         this.showBiographyLastNameFacetFilter.next(this.localShowBiographyLastNameFacetFilter);
         this.showBiographyDecadeOfBirthFacetFilter.next(this.localShowBiographyDecadeOfBirthFacetFilter);
@@ -187,8 +188,8 @@ export class UserSettingsManagerService {
         return this.localBioSearchMask;
     }
 
-    public currentShowTopicSearch(): boolean {
-        return this.localShowTopicSearch;
+    public currentHideTopicSearch(): boolean {
+        return this.localHideTopicSearch;
     }
 
     public defaultBioSearchFieldsMask(): number {
@@ -264,7 +265,21 @@ export class UserSettingsManagerService {
         }
     }
 
-    public updateShowBiographyBirthStateFacetFilter(newSetting: boolean) {
+    public updateHideTopicSearch(newSetting: boolean) {
+      var temp: string;
+      if (newSetting)
+        temp = "1";
+      else
+        temp = "0";
+      var newBooleanSetting: boolean = (temp == "1");
+      if (this.localHideTopicSearch != newBooleanSetting) {
+          localStorage.setItem(this.HIDE_TOPIC_SEARCH_SETTING_NAME, temp);
+          this.localHideTopicSearch = newBooleanSetting;
+          this.hideTopicSearch.next(this.localHideTopicSearch);
+      }
+  }
+
+  public updateShowBiographyBirthStateFacetFilter(newSetting: boolean) {
         var temp: string;
         if (newSetting)
           temp = "1";

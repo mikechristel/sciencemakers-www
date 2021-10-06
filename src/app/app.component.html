@@ -79,7 +79,7 @@
                         Maker Directory
                     </a>
                 </li>
-                <li *ngIf="showTopicSearch" fxFlex="auto">
+                <li *ngIf="!hideTopicSearch" fxFlex="auto">
                     <a class="nav_terse nav__link" routerLink="/tag" routerLinkActive="active">
                         Topics
                     </a>
@@ -263,5 +263,38 @@ as not to disturb the scroll-bar mechanics used in the rest of this page layout.
   </div>
 </div>
 
+<!-- Modal form for Confirm Reload action -->
+<div #myConfirmReloadModalForm *ngIf="showMyConfirmReloadModalForm" fxLayout="column" fxLayoutAlign="space-between stretch"
+  aria-labelledby="confirmReloadHeading"
+  class="mymodal" role="dialog" (keydown.esc)="closeMyConfirmReloadModalForm()" cdkTrapFocus cdkTrapFocusAutoCapture>
+  <div class="mymodal-header" fxFlex="grow" fxLayout="row" fxLayoutAlign="space-between start">
+      <div fxFlex="grow" class="noSpacing">
+          <!-- Hide this intro text because title text is to be given AFTER the close button (via the sr-only h1 element). -->
+          <p class="mymodal-title" aria-hidden="true">Reload Window</p>
+      </div>
+      <div fxFlex="1 0 calc(28px)">
+          <button class="close" (click)="closeMyConfirmReloadModalForm()" cdkFocusRegionStart>
+              <span class="sr-only">Cancel and close dialog</span>
+              <svg aria-hidden="true" width="17px" height="24px" viewBox="0 -2 17 17" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                  <title>Cancel and close dialog</title>
+                  <g id="close-myclips-modal" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                      <path d="M7.29241999,-1.85786438 C6.78933126,-1.85786438 6.38432326,-1.45285565 6.38432326,-0.949767649 L6.38432326,6.38432326 L-0.949767649,6.38432326 C-1.45285492,6.38432326 -1.85786438,6.78933126 -1.85786438,7.29241999 L-1.85786438,8.99185126 C-1.85786438,9.49493999 -1.45285492,9.89994799 -0.949767649,9.89994799 L6.38432326,9.89994799 L6.38432326,17.2340389 C6.38432326,17.7371269 6.78933126,18.1421356 7.29241999,18.1421356 L8.99185126,18.1421356 C9.49493999,18.1421356 9.89994799,17.7371269 9.89994799,17.2340389 L9.89994799,9.89994799 L17.2340389,9.89994799 C17.7371269,9.89994799 18.1421356,9.49493999 18.1421356,8.99185126 L18.1421356,7.29241999 C18.1421356,6.78933126 17.7371269,6.38432326 17.2340389,6.38432326 L9.89994799,6.38432326 L9.89994799,-0.949767649 C9.89994799,-1.45285565 9.49493999,-1.85786438 8.99185126,-1.85786438 L7.29241999,-1.85786438 Z" fill="#FFFFFF" fill-rule="nonzero" transform="translate(8.142136, 8.142136) rotate(-315.000000) translate(-8.142136, -8.142136) "></path>
+                  </g>
+              </svg>
+          </button>
+          <h1 id="confirmReloadHeading" class="sr-only">Confirm the reloading of window?</h1>
+      </div>
+  </div>
+  <div class="mymodal-body" fxFlexFill fxLayout="column" fxLayoutAlign="space-between stretch">
+      <div fxFlex="grow" class="noSpacing">
+        <p>Your session may have expired. Reload to get a new session.</p>
+      </div>
+  </div>
+  <div class="mymodal-footer" fxFlex="grow" fxLayout="row" fxLayoutAlign="space-evenly center" fxLayoutGap="calc(2em)">
+      <button fxFlex="grow" (click)="executeWindowReload()">Yes</button>
+      <button fxFlex="grow" (click)="closeMyConfirmReloadModalForm()" cdkFocusRegionEnd>No</button>
+  </div>
+</div>
+
 <!-- Modal underlay (obscuring rest of application from sight and eliminating mouse clicks into that other content) -->
-<div *ngIf="showMyContactUsModalForm || showMyExportMyClipsModalForm || showMyConfirmClearingMyClipsModalForm" class="mymodal-overlay"></div>
+<div *ngIf="showMyContactUsModalForm || showMyExportMyClipsModalForm || showMyConfirmClearingMyClipsModalForm || showMyConfirmReloadModalForm" class="mymodal-overlay"></div>

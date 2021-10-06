@@ -31,7 +31,7 @@ export class ContentLinksComponent extends BaseComponent implements OnInit, Afte
     priorRoute: string; // used to compute extraDetailsOnPriorRoute
     extraDetailsOnPriorRoute: string; // used to decorate further the "Back" button label
 
-    public showTopicSearch: boolean = false; // value will be read and set from userSettingsManagerService
+    public hideTopicSearch: boolean = false; // value will be read and set from userSettingsManagerService
 
     constructor(private route: ActivatedRoute,
       private router: Router,
@@ -56,8 +56,8 @@ export class ContentLinksComponent extends BaseComponent implements OnInit, Afte
             this.setMyClipsCountMessage();
         });
 
-        userSettingsManagerService.showTopicSearch$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((value) => {
-            this.showTopicSearch = value;
+        userSettingsManagerService.hideTopicSearch$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((value) => {
+            this.hideTopicSearch = value;
         });
 
         routerHistoryService.previousUrl$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((value) => {
@@ -96,7 +96,7 @@ export class ContentLinksComponent extends BaseComponent implements OnInit, Afte
     }
 
     ngOnInit() {
-        this.showTopicSearch = this.userSettingsManagerService.currentShowTopicSearch();
+        this.hideTopicSearch = this.userSettingsManagerService.currentHideTopicSearch();
         this.myClips = this.playlistManagerService.initializeMyClips();
         this.setMyClipsCountMessage();
     }

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>ScienceMakers Digital Archive (DEVELOPMENT)</title>
+  <title>ScienceMakers Digital Archive quick check</title>
   <base href="/">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -13,7 +13,16 @@
 
   <!-- LibLynx and COUNTER compliance -->
   <script type="text/javascript">
+    function inIframe () {
+      try {
+          return window.self !== window.top;
+      } catch (e) {
+          return true;
+      }
+    }
+
     var _ll = _ll || [];
+    var _aname = ""; // account name, used if feedback is volunteered
 
     // load tracker asynchronously
     (function() {
@@ -22,7 +31,7 @@
     })();
 
     function getCookie(cname) {
-        // NOTE: to debug locally, return a valid cookie contents, but in deployed code, return "" and give up....
+        // STORED COOKIE FOR DEVELOPMENT PURPOSES ONLY
         return "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzZXNzaW9uX2lkIjoiY2xpZW50ZGV2ZWxvcG1lbnQiLCJwdWJsaXNoZXJfaWQiOiI0Njk3YzU4OWMxNjBhNDg5IiwiYWNjb3VudF9pZCI6MjQ5MTg5NDIsImFjY291bnRfbmFtZSI6IlRlc3QgQW5kIERldmVsb3BtZW50IiwicHVibGlzaGVyX3JlZmVyZW5jZSI6InRlc3RkZXYiLCJpYXQiOjE2MDM4OTM2MDAsImV4cCI6MTY3MjUzMTE5OX0.DHxxaw_Na9Gdb_UrmH6-I8jP4yAQHEXBxeMCamTYcEA";
     }
 
@@ -46,29 +55,42 @@
             }
         }
 
-        return JSON.parse(result);
+        if (result == "")
+          return "";
+        else
+          return JSON.parse(result);
     }
 
-    // Immediately Invoked Function Expression (IIFE) to
-    // look for what we need in the cookie.
+    var hasCookie=false;
+
+    // Immediately Invoked Function Expression (IIFE) to look for what we need in the cookie.
     (function() {
         var token = decodeAuthCookie(getCookie('da_auth'));
-
         if (token == "")
           console.log("Cookie not as expected: logging will not work.");
-        else { // assuming all pieces are there
-          // set provider id and defaults for all tracking calls
-          // (do not show in log for now...) console.log("fyi, aid and aname and publisher_reference: " + token.account_id + ", " + token.account_name + ", " + token.publisher_reference);
+        else {
+          hasCookie = true;
+          // assuming all pieces are there set provider id and defaults for all tracking calls
+          // (suppress reporting to console on success for now) console.log("fyi, aid and aname and publisher_reference: " + token.account_id + ", " + token.account_name + ", " + token.publisher_reference);
           _ll.push(['setDefaults', {
               pid: token.publisher_id,
               aid: token.publisher_reference,
               aname: token.account_name,
               sid: token.session_id
           }]);
+          _aname = token.account_name;
         }
     })();
-
+2
+    var _heldInIFrame = inIframe();
+    if (_heldInIFrame && !hasCookie) {
+      var formerDest = encodeURIComponent(window.location.href);
+      // this won't work unless popups allowed; VERY DEPENDENT on browser and user settings --> window.open(window.location.href, "_blank"); // open in another tab
+      // so, instead, on held in an iFrame without cookies, give up...
+      window.location.replace("https://test-stuff.etc.cmu.edu/dummyPage.html?url=" + formerDest);
+    }
   </script>
+
 </head>
 <body>
   <my-app >Loading...</my-app>

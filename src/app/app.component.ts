@@ -2,6 +2,7 @@
 import { Router, NavigationEnd } from '@angular/router'; // Router added to provide analytics on route changes
 
 import { FeedbackService } from './feedback/feedback.service';
+import { AuthManagerService } from './auth/auth-manager.service';
 import { PlaylistManagerService } from './playlist-manager/playlist-manager.service';
 import { Playlist } from './playlist-manager/playlist';
 import { takeUntil } from "rxjs/operators";
@@ -36,6 +37,7 @@ export class AppComponent extends BaseComponent {
     public showMyContactUsModalForm: boolean = false;
     public showMyExportMyClipsModalForm: boolean = false;
     public showMyConfirmClearingMyClipsModalForm: boolean = false;
+    public showMyConfirmReloadModalForm: boolean = false;
     public inSearchFormRoute: boolean = false;
     public inHelpFormRoute: boolean = false;
     public inContentLinksRoute: boolean = false;
@@ -49,7 +51,7 @@ export class AppComponent extends BaseComponent {
     public myClipsTitleLengthHelper: string = "lengthLimitInfoForMyClipsTitle"; // ID for which char count in title is given
     public myClipsURLCopyActionFresh: boolean = false;
 
-    public showTopicSearch: boolean = false; // value will be read and set from userSettingsManagerService
+    public hideTopicSearch: boolean = false; // value will be read and set from userSettingsManagerService
 
     // Via RouterHistoryService
     previousUrlViaRouterHistoryService$ = this.routerHistoryService.previousUrl$;
@@ -62,7 +64,8 @@ export class AppComponent extends BaseComponent {
         private analyticsService: AnalyticsService,
         private titleManagerService: TitleManagerService,
         private userSettingsManagerService: UserSettingsManagerService,
-        private playlistManagerService: PlaylistManagerService) {
+        private playlistManagerService: PlaylistManagerService,
+        private authManagerService: AuthManagerService) {
 
         super(); // since this is a derived class from BaseComponent
 
@@ -83,13 +86,18 @@ export class AppComponent extends BaseComponent {
                 this.openMyConfirmClearMyClipsModalForm();
         });
 
+        authManagerService.presentConfirmReloadForm$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((value) => {
+            if (value)
+                this.openMyConfirmReloadModalForm();
+        });
+
         feedbackService.presentFeedbackInputForm$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((value) => {
             if (value)
                 this.openMyContactUsModalForm();
         });
 
-        userSettingsManagerService.showTopicSearch$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((value) => {
-            this.showTopicSearch = value;
+        userSettingsManagerService.hideTopicSearch$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((value) => {
+            this.hideTopicSearch = value;
         });
 
         // The event tracking tying in navigation ending of routing with Google Analytics is following
@@ -163,13 +171,18 @@ export class AppComponent extends BaseComponent {
                     // console.log("Story search (via filter): " + givenQuerySpec);
                     this.analyticsService.logStorySearchForCOUNTER(givenQuerySpec, "filter");
                 }
+                else if (cleanedURL.startsWith("/stories/3?") && (cleanedURL.indexOf("?q=") > 0 || cleanedURL.indexOf("&q=") > 0)) {
+                    // must have "q=" as query argument
+                    var givenQuerySpec: string = this.parseCleanURLForKey(cleanedURL, "q");
+                    // console.log("Story search (via tags): " + givenQuerySpec);
+                    this.analyticsService.logStoryTagSearchForCOUNTER(givenQuerySpec);
+                }
                 else if (cleanedURL.startsWith("/stories/2?") && (cleanedURL.indexOf("?q=") > 0 || cleanedURL.indexOf("&q=") > 0)) {
                     // must have "q=" as query argument
                     var givenQuerySpec: string = this.parseCleanURLForKey(cleanedURL, "q");
                     // console.log("Story search: " + givenQuerySpec);
                     this.analyticsService.logStorySearchForCOUNTER(givenQuerySpec, "search");
                 }
-                // NOTE: no story search via tags/topics for ScienceMakers, i.e., no handling of stories/3 route.
             }
           }
         });
@@ -208,7 +221,7 @@ export class AppComponent extends BaseComponent {
     }
 
     ngOnInit() {
-        this.showTopicSearch = this.userSettingsManagerService.currentShowTopicSearch();
+        this.hideTopicSearch = this.userSettingsManagerService.currentHideTopicSearch();
         this.myClips = this.playlistManagerService.initializeMyClips();
         this.setMyClipsCountMessage();
     }
@@ -331,6 +344,22 @@ export class AppComponent extends BaseComponent {
         this.optionalFeedbackEmail = null;
 
         this.closeMyContactUsModalForm();
+    }
+
+    openMyConfirmReloadModalForm() {
+        this.cachedTitle = this.titleManagerService.getTitle(); // browser window page title
+        this.titleManagerService.setTitle("Confirm reload action, ScienceMakers Digital Archive");
+        this.showMyConfirmReloadModalForm = true;
+    }
+
+    closeMyConfirmReloadModalForm() {
+        this.titleManagerService.setTitle(this.cachedTitle);
+        this.showMyConfirmReloadModalForm = false;
+    }
+
+    executeWindowReload() {
+        // Do the window reload action.
+        window.location.reload(); // reload the current page
     }
 
     // The functions below deal with the "My Clips Title/URL" exporting.

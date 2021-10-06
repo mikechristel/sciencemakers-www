@@ -31,7 +31,7 @@ export class UserSettingsComponent extends BaseComponent implements OnInit {
     showStoryYearFacetFilter: boolean;
     showStoryJobTypeFacetFilter: boolean;
     showStoryDecadeOfBirthFacetFilter: boolean;
-    defaultShowTopicSearch: boolean;
+    defaultHideTopicSearch: boolean;
 
     constructor(private route: ActivatedRoute,
       private router: Router,
@@ -47,9 +47,9 @@ export class UserSettingsComponent extends BaseComponent implements OnInit {
           this.defaultAutoAdvance = value;
         });
 
-        // Settings related to optional experimental features: defaultShowTopicSearch
-        userSettingsManagerService.showTopicSearch$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((value) => {
-          this.defaultShowTopicSearch = value;
+        // Settings related to optional experimental features: defaultHideTopicSearch
+        userSettingsManagerService.hideTopicSearch$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((value) => {
+          this.defaultHideTopicSearch = value;
         });
 
         // Settings related to visibility of certain filters for biography sets:
@@ -91,7 +91,7 @@ export class UserSettingsComponent extends BaseComponent implements OnInit {
 
         this.defaultAutoPlay = this.userSettingsManagerService.currentAutoplay();
         this.defaultAutoAdvance = this.userSettingsManagerService.currentAutoadvance();
-        this.defaultShowTopicSearch = this.userSettingsManagerService.currentShowTopicSearch();
+        this.defaultHideTopicSearch = this.userSettingsManagerService.currentHideTopicSearch();
 
         this.showBiographyBirthStateFacetFilter = this.userSettingsManagerService.currentShowBiographyBirthStateFacetFilter();
         this.showBiographyDecadeOfBirthFacetFilter = this.userSettingsManagerService.currentShowBiographyDecadeOfBirthFacetFilter();
@@ -123,6 +123,10 @@ export class UserSettingsComponent extends BaseComponent implements OnInit {
 
     onAutoAdvanceChange(isChecked: boolean) {
       this.userSettingsManagerService.updateAutoAdvance(isChecked);
+    }
+
+    onHideTopicSearchChange(isChecked: boolean) {
+      this.userSettingsManagerService.updateHideTopicSearch(isChecked);
     }
 
     onShowBiographyBirthStateFacetFilterChange(isChecked: boolean) {

@@ -28,6 +28,16 @@ export class AnalyticsService {
     }]);
   }
 
+  public logStoryTagSearchForCOUNTER(givenQuery: string) {
+    _ll.push(['trackSearch', {
+      dbs:[
+         {dbid:'2020_05_tag_v1', dbname:'THMDA_StoryTags'}
+      ],
+      queryType:'tagSearch',
+      query:givenQuery
+    }]);
+  }
+
   public logStoryLookupForCOUNTER(storyID: number, biographyID: string, storyTitle: string) {
     var storyPublicationYear: number = this.parseBioIDForYear(biographyID);
     //console.log("logging story " + storyID + " with yop " + storyPublicationYear);

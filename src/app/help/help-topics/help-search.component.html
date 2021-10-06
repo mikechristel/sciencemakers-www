@@ -13,9 +13,8 @@
       Typical searches work against the story transcript (spoken words plus any transcription notes) and story title (created by people to represent the story).
     </li>
 </ul>
-<p class="helptext" *ngIf="showTopicSearch && tagMatchDetails && tagMatchDetails.length > 0">
-  In addition, there is a <a routerLink="/tag" routerLinkActive="active">Topic Search</a> page where stories that have been manually tagged into topics can be retrieved.
-  Currently, {{tagMatchDetails}} <a routerLink="/tag" routerLinkActive="active">Topic Search</a> page.
+<p class="helptext" *ngIf="!hideTopicSearch">
+  In addition, there is a <a routerLink="/tag" routerLinkActive="active">Topic Search</a> page where stories that have been automatically tagged into topics can be retrieved.
 </p>
 <p class="helptext"><a routerLink="/help" routerLinkActive="active">Back to FAQ/Help</a></p>
 
