@@ -17,7 +17,6 @@ import { TimedTextMatch } from './timed-text-match';
 import { Playlist } from '../playlist-manager/playlist';
 
 import { UserSettingsManagerService } from '../user-settings/user-settings-manager.service';
-import { AnalyticsService } from '../ll-analytics.service';
 import { WindowService } from '../shared/services';
 
 import { BaseComponent } from '../shared/base.component';
@@ -95,7 +94,6 @@ export class StoryComponent extends BaseComponent implements OnInit {
         private userSettingsManagerService: UserSettingsManagerService,
         private liveAnnouncer: LiveAnnouncer,
         private windowService: WindowService,
-        private analyticsService: AnalyticsService,
         private breakpointObserver: BreakpointObserver
     ) {
         super(); // for BaseComponent extension (brought in to cleanly unsubscribe from subscriptions)
@@ -168,11 +166,6 @@ export class StoryComponent extends BaseComponent implements OnInit {
                     this.biographyAccession = storyDetails.citation.accession;
                     this.biographyPreferredName = storyDetails.citation.preferredName;
                     this.biographyDetailsReady = true;
-
-                    // NOTE:  Only now, with story details loaded, can we log the item request, since the year of
-                    // publication for the item is within the biographyAccession which has just been loaded.
-                    // Also logged is the title.
-                    this.analyticsService.logStoryLookupForCOUNTER(myStoryID, this.biographyAccession, this.storyDetailsTitle);
 
                     this.videoPositionInSeconds = 0;
                     this.videoDurationInSeconds = storyDetails.duration / 1000; // could be a fraction, of course

@@ -57,7 +57,7 @@ export class HomeComponent extends BaseComponent implements OnInit {
     }
 
     ngOnInit() {
-        this.titleManagerService.setTitle("ScienceMakers Digital Archive (October 6, 2021)");
+        this.titleManagerService.setTitle("ScienceMakers Digital Archive (December 8, 2021)");
         this.liveAnnouncer.announce("ScienceMakers Digital Archive"); // NOTE: using LiveAnnouncer to eliminate possible double-speak
 
         this.historyMakerService.getCorpusSpecifics().pipe(takeUntil(this.ngUnsubscribe))

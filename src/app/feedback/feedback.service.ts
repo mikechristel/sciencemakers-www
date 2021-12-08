@@ -28,38 +28,25 @@ export class FeedbackService extends BaseComponent {
         this.presentFeedbackInputForm.next(true);
     }
 
-    postFeedback(feedbackMessage: string) {
-        var UNKNOWN_MARKER: string = "*Unknown*";
+    postFeedback(feedbackMessage: string, feedbackEmail: string) {
         var feedbackInfo: FeedbackInfo = new FeedbackInfo();
-        var language: string = UNKNOWN_MARKER;
-        var userAgent: string = UNKNOWN_MARKER;
-        var myURL: string = UNKNOWN_MARKER;
-        var accountName: string = UNKNOWN_MARKER;
 
-        var resolutionInfo: string = UNKNOWN_MARKER;
+        var resolutionInfo: string = null;
         if (window != null && window.navigator != null) {
-            if (window.navigator.language != null)
-                language = window.navigator.language;
-            if (window.navigator.userAgent != null)
-                userAgent = window.navigator.userAgent;
             if (window.innerWidth != null && window.innerHeight != null)
                 resolutionInfo = window.innerWidth + "x" + window.innerHeight;
         }
+        var myURL: string = null;
         if (window != null && window.location != null && window.location.href != null) {
           var currentURL = window.location.href;
           if (currentURL.length > 0)
             myURL = currentURL; // trust if not empty and not null
         }
-        if (_aname != null && _aname != "")
-            accountName = _aname;
 
         feedbackInfo.Comments = feedbackMessage;
-        feedbackInfo.Date = new Date().toISOString();
-        feedbackInfo.Language = language;
-        feedbackInfo.Resolution = resolutionInfo;
-        feedbackInfo.URL = myURL;
-        feedbackInfo.UserAgent = userAgent;
-        feedbackInfo.AccountName = accountName;
+        feedbackInfo.Email = feedbackEmail ?? "**not given**";
+        feedbackInfo.Resolution = resolutionInfo ?? "**unknown**";
+        feedbackInfo.URL = myURL ?? "**unknown**";
 
         const headers = new HttpHeaders({'Content-Type':'application/json; charset=utf-8'});
         this.http.post(environment.serviceBase + this.postFeedbackURL, feedbackInfo, {headers: headers}).pipe(takeUntil(this.ngUnsubscribe)).subscribe(

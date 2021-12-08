@@ -57,7 +57,6 @@ import { CdkStepperModule } from '@angular/cdk/stepper';
 import {ClipboardModule} from '@angular/cdk/clipboard';
 
 import { FlexLayoutModule } from '@angular/flex-layout'; // for flex layout
-import { AnalyticsService } from './ll-analytics.service';
 
 import {AppContentsComponent} from './app-contents/app-contents.component';
 
@@ -118,7 +117,6 @@ import {AppContentsComponent} from './app-contents/app-contents.component';
     UserSettingsManagerService,
     StoryAdvancedSearchSettingsManagerService,
     USMapManagerService,
-    AnalyticsService,
     GlobalState
   ],
   bootstrap: [ AppComponent ]
