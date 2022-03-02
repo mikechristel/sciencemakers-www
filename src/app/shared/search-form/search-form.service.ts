@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Subject }    from 'rxjs/Subject';
+import { Subject }    from 'rxjs';
 import { SearchFormOptions } from './search-form-options';
 import { GlobalState } from '../../app.global-state';
 

@@ -1,6 +1,7 @@
 ﻿import { Injectable, Inject, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from "rxjs/Rx";
+import { Observable, of, throwError } from "rxjs";
+import { catchError, tap, mergeMap, map } from "rxjs/operators";
 
 import { TableOfContents } from './table-of-contents';
 import { FacetDetail } from './facet-detail';
@@ -92,31 +93,47 @@ export class HistoryMakerService {
 
     getBiographyFacetDetails(): Observable<BiographySearchFacetsDetails> {
         if (this.cachedBiographyFacetDetails != null)
-            return Observable.of(this.cachedBiographyFacetDetails);
+            return of(this.cachedBiographyFacetDetails);
         else {
-            return this.http.get<BiographySearchFacetsDetails>(environment.serviceBase + this.biographySearchFacetsURL)
-                    .do(fd => this.storeBiographyFacetDetails(fd));
+          return this.http.get<BiographySearchFacetsDetails>(environment.serviceBase + this.biographySearchFacetsURL).pipe(
+            tap(fd => this.storeBiographyFacetDetails(fd)),
+            catchError( err => {
+              // TODO: (!!!TBD!!!) Decide if we wish to log errors in any way or use console, e.g., console.log('error caught: ', err);
+              return throwError( err ); }
+            )
+          );
         }
     }
 
     getStoryFacetDetails(): Observable<StorySearchFacetsDetails> {
         if (this.cachedStoryFacetDetails != null)
-            return Observable.of(this.cachedStoryFacetDetails);
+            return of(this.cachedStoryFacetDetails);
         else {
-            return this.http.get<StorySearchFacetsDetails>(environment.serviceBase + this.storySearchFacetsURL)
-                    .do(fd => this.storeStoryFacetDetails(fd));
+          return this.http.get<StorySearchFacetsDetails>(environment.serviceBase + this.storySearchFacetsURL).pipe(
+            tap(fd => this.storeStoryFacetDetails(fd)),
+            catchError( err => {
+              // TODO: (!!!TBD!!!) Decide if we wish to log errors in any way or use console, e.g., console.log('error caught: ', err);
+              return throwError( err ); }
+            )
+          );
         }
     }
 
     getCorpusSpecifics(): Observable<CorpusSpecifics> {
         if (this.cachedCorpusSpecifics != null)
-            return Observable.of(this.cachedCorpusSpecifics);
+            return of(this.cachedCorpusSpecifics);
         else {
-            // NOTE: using advice from
+            // NOTE: updating to RxJS v. 6 from very old v. 5.x advice from
             // https://stackoverflow.com/questions/40788163/how-to-make-nested-observable-calls-in-angular2
-            return this.getBiographyFacetDetails()
-              .flatMap(fd => this.http.get<CorpusSpecifics>(environment.serviceBase + this.corpusSpecificsURL)
-                .do(cs => this.storeCorpusSpecifics(cs)));
+            return this.getBiographyFacetDetails().pipe(
+              mergeMap(fd => this.http.get<CorpusSpecifics>(environment.serviceBase + this.corpusSpecificsURL).pipe(
+                catchError( err => {
+                  // TODO: (!!!TBD!!!) Decide if we wish to log errors in any way or use console, e.g., console.log('error caught: ', err);
+                  return throwError( err ); }
+                )
+              )),
+              tap(cs => this.storeCorpusSpecifics(cs))
+            );
         }
     }
 
@@ -150,8 +167,14 @@ export class HistoryMakerService {
         // Replace opening & with ? character instead (since there always are contents in addedArgs, at least the dateTodayFacet argument).
         addedArgs = "?" + addedArgs.substring(1);
 
-        return this.getBiographyFacetDetails()
-          .flatMap(fd => this.http.get<TableOfContents>(environment.serviceBase + this.peopleBornThisWeekURL + addedArgs));
+        return this.getBiographyFacetDetails().pipe(
+          mergeMap(fd => this.http.get<TableOfContents>(environment.serviceBase + this.peopleBornThisWeekURL + addedArgs).pipe(
+            catchError( err => {
+              // TODO: (!!!TBD!!!) Decide if we wish to log errors in any way or use console, e.g., console.log('error caught: ', err);
+              return throwError( err ); }
+            )
+          ))
+        );
     }
 
     getHistoryMakers(givenQuery: string, givenSearchFieldsMask: number,
@@ -199,8 +222,15 @@ export class HistoryMakerService {
         }
         // NOTE: addedArgs could have stayed empty ("").
 
-        return this.getBiographyFacetDetails()
-          .flatMap(fd => this.http.get<TableOfContents>(environment.serviceBase + this.peopleURL + "?" + queryArg + addedArgs));
+        return this.getBiographyFacetDetails().pipe(
+          mergeMap(fd => this.http.get<TableOfContents>(environment.serviceBase + this.peopleURL + "?" + queryArg + addedArgs).pipe(
+            catchError( err => {
+              // TODO: (!!!TBD!!!) Decide if we wish to log errors in any way or use console, e.g., console.log('error caught: ', err);
+              return throwError( err ); }
+            )
+          ))
+        );
+
     }
 
     private searchFieldsForBiographySearch(givenSearchFieldsMask: number, justLastName: boolean, justPreferredName: boolean): string {
@@ -233,11 +263,11 @@ export class HistoryMakerService {
 
     getJobFamilyList(chosenJobs: string[]): Observable<string> {
       if (chosenJobs == null || chosenJobs.length == 0)
-        return Observable.of("");
+        return of("");
       else
         // NOTE: cannot proceed to getting the job family list corresponding to numerals before first having search facets all in place.
-        return this.getBiographyFacetDetails()
-          .map(fd => {
+        return this.getBiographyFacetDetails().pipe(
+          map(fd => {
               // NOTE: If chosenJobs are empty, or are not in the OccupationTypes table, an empty string is returned.
               var gatheredNames: string = "";
               if (this.cachedOccupationTypes != null) {
@@ -249,16 +279,17 @@ export class HistoryMakerService {
               if (gatheredNames.length > 0)
                   gatheredNames = gatheredNames.substring(0, gatheredNames.length - 2); // truncate extra "; " at end
               return gatheredNames;
-          });
+          })
+        );
     }
 
     getMakerGroupList(chosenMakers: string[]) : Observable<string> {
       if (chosenMakers == null || chosenMakers.length == 0)
-        return Observable.of("");
+        return of("");
       else
          // NOTE: cannot proceed to getting the maker group corresponding to numerals before first having search facets all in place.
-         return this.getBiographyFacetDetails()
-          .map(fd => {
+         return this.getBiographyFacetDetails().pipe(
+          map(fd => {
               // NOTE: If chosenMakers are empty, or are not in the MakerCategories table, an empty string is returned.
               var gatheredNames: string = "";
               if (this.cachedMakerCategories != null) {
@@ -270,7 +301,8 @@ export class HistoryMakerService {
               if (gatheredNames.length > 0)
                   gatheredNames = gatheredNames.substring(0, gatheredNames.length - 2); // truncate extra ", " at end
               return gatheredNames;
-          });
+          })
+        );
     }
 
     getJobType(chosenJobType: string): string {

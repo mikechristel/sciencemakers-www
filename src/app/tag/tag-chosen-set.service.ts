@@ -1,7 +1,8 @@
 ﻿import { Injectable } from '@angular/core';
 import { TagService } from './tag.service';
-import { Observable } from "rxjs/Observable";
+import { Observable } from "rxjs";
 import { ChosenTagInfo } from './chosen-tag-info';
+import { TagSearchResult } from '../tag/tag-search-result';
 
 @Injectable()
 export class TagChosenSetService {
@@ -59,9 +60,9 @@ export class TagChosenSetService {
         this.refreshNeededForTags = false;
     }
 
-    public tagMatchCount(): Observable<number> {
-        // Returns the number of stories meeting the current tag choice setting.
-        return this.tagService.getTagSearchCount(this.myTagSpec);
+    public tagMatchInfo(): Observable<TagSearchResult> {
+        // Get tag search info (especially the number of stories meeting the current tag choice setting).
+        return this.tagService.getTagSearchInfo(this.myTagSpec);
     }
 
     // Read-only property that is the string specification of the tag filter.

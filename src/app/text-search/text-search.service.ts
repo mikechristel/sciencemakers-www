@@ -1,5 +1,6 @@
 ﻿import { Injectable, Inject, OnInit } from '@angular/core';
-import { Observable } from 'rxjs/Rx';
+import { Observable, throwError } from "rxjs";
+import { catchError, mergeMap } from "rxjs/operators";
 import { HttpClient } from '@angular/common/http';
 
 import { SearchResult } from '../storyset/search-result';
@@ -71,7 +72,8 @@ export class TextSearchService {
         }
 
         // NOTE: cannot proceed to a text search before first having story search facets all in place.
-        return this.historyMakerService.getStoryFacetDetails()
-          .flatMap(fd => this.http.get<SearchResult>(environment.serviceBase + this.txtSearchURL + query + addedArgs));
+        return this.historyMakerService.getStoryFacetDetails().pipe(
+          mergeMap(fd => this.http.get<SearchResult>(environment.serviceBase + this.txtSearchURL + query + addedArgs))
+        );
     }
 }

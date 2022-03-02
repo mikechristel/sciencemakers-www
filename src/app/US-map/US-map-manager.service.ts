@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Subject }    from 'rxjs/Subject';
+import { Subject }    from 'rxjs';
 
 // The purpose of this service is to store as an observable information from the U.S. map,
 // such as which U.S. region has been clicked.

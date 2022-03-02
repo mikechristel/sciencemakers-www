@@ -1,5 +1,6 @@
 ﻿import { Injectable, Inject, OnInit } from '@angular/core';
-import { Observable } from 'rxjs/Rx';
+import { Observable, of, throwError } from "rxjs";
+import { catchError, tap, mergeMap, map } from "rxjs/operators";
 import { HttpClient } from '@angular/common/http';
 
 import { TagTree } from './tag-tree';
@@ -27,10 +28,10 @@ export class TagService {
 
     getTags(): Observable<TagTree> {
         if (this.cachedTagTree != null)
-            return Observable.of(this.cachedTagTree);
+            return of(this.cachedTagTree);
         else {
-            return this.http.get<TagTree>(environment.serviceBase + this.tagListURL)
-            .do(givenTagTree => {
+          return this.http.get<TagTree>(environment.serviceBase + this.tagListURL).pipe(
+            tap(givenTagTree => {
               this.cachedTagTree = givenTagTree;
               var j: number;
               for (var i = 0; i < this.cachedTagTree.branches.length; i++) {
@@ -38,7 +39,12 @@ export class TagService {
                       this.tagMap[this.cachedTagTree.branches[i].branchValues[j].id] = this.cachedTagTree.branches[i].branchValues[j].label;
                   }
               }
-            });
+            }),
+            catchError( err => {
+              // TODO: (!!!TBD!!!) Decide if we wish to log errors in any way or use console, e.g., console.log('error caught: ', err);
+              return throwError( err ); }
+            )
+          );
         }
     }
 
@@ -76,21 +82,29 @@ export class TagService {
         }
 
         // NOTE: cannot proceed to a tag search (story-focused) before first having story search facets all in place.
-        return this.historyMakerService.getStoryFacetDetails()
-          .flatMap(fd => this.http.get<SearchResult>(environment.serviceBase + this.tagSearchURL + csvTagList + addedArgs));
+        return this.historyMakerService.getStoryFacetDetails().pipe(
+          mergeMap(fd => this.http.get<SearchResult>(environment.serviceBase + this.tagSearchURL + csvTagList + addedArgs).pipe(
+            catchError( err => {
+              // TODO: (!!!TBD!!!) Decide if we wish to log errors in any way or use console, e.g., console.log('error caught: ', err);
+              return throwError( err ); }
+            )
+          ))
+        );
     }
 
-    getTagSearchCount(csvTagList: string): Observable<number> {
-        if (csvTagList == null || csvTagList.length == 0)
-            return Observable.of(0);
+    getTagSearchInfo(csvTagList: string): Observable<TagSearchResult> {
+        if (csvTagList == null || csvTagList.length == 0) {
+          var emptyOne: TagSearchResult = new TagSearchResult();
+          emptyOne.count = 0;
+          return of(emptyOne);
+        }
         else {
-            return this.http.get<TagSearchResult>(environment.serviceBase + this.tagSearchCountURL + csvTagList)
-              .map(tagResult => {
-                var storyResultCount: number = 0; // use 0 for ill-defined results
-                if (tagResult != null)
-                    storyResultCount = tagResult.count;
-                return storyResultCount;
-              });
+          return this.http.get<TagSearchResult>(environment.serviceBase + this.tagSearchCountURL + csvTagList).pipe(
+              catchError( err => {
+                // TODO: (!!!TBD!!!) Decide if we wish to log errors in any way or use console, e.g., console.log('error caught: ', err);
+                return throwError( err ); }
+              )
+          );
         }
     }
 

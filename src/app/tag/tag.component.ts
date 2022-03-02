@@ -250,28 +250,32 @@ export class TagComponent extends BaseComponent implements OnInit, OnDestroy {
         else {
             this.clearIsPending = false; // have 1 or more tags to check
             this.tagMatchSummary = "";
-            this.tagChosenSetService.tagMatchCount().pipe(takeUntil(this.ngUnsubscribe))
+            this.tagChosenSetService.tagMatchInfo().pipe(takeUntil(this.ngUnsubscribe))
                 .subscribe(ans => {
-                    var connector: string;
-                    if (!this.clearIsPending) {
-                        this.hasNoTagSpec = false;
-                        this.tagMatchCountForSummary = ans;
-                        if (ans != 1)
-                            connector = " stories have ";
-                        else
-                            connector = " story has ";
-                        if (this.tagChosenSetService.chosenTags.length == 1)
-                            this.tagMatchSummary = ans + connector + "this tag:";
-                        else
-                            this.tagMatchSummary = ans + connector + "all these tags:";
-                    }
-                    // else // this.clearIsPending: nothing really to do:
-                        // During the delay, user may have cleared out tag choices via "Clear" button or
-                        // unchecked all tags - in any case there is nothing left to show so do not update
-                        // either this.tagMatchCountForSummary or this.tagMatchSummary - keep them as "cleared."
-                },
-                error => { this.tagMatchSummary = ""; this.hasNoTagSpec = true; }
-              );
+                  // NOTE: ans assumed to be full TagSearchResult
+                  var storyResultCount: number = 0; // use 0 for ill-defined results
+                  if (ans != null)
+                      storyResultCount = ans.count;
+                  var connector: string;
+                  if (!this.clearIsPending) {
+                      this.hasNoTagSpec = false;
+                      this.tagMatchCountForSummary = storyResultCount;
+                      if (storyResultCount != 1)
+                          connector = " stories have ";
+                      else
+                          connector = " story has ";
+                      if (this.tagChosenSetService.chosenTags.length == 1)
+                          this.tagMatchSummary = storyResultCount + connector + "this tag:";
+                      else
+                          this.tagMatchSummary = storyResultCount + connector + "all these tags:";
+                  }
+                  // else // this.clearIsPending: nothing really to do:
+                      // During the delay, user may have cleared out tag choices via "Clear" button or
+                      // unchecked all tags - in any case there is nothing left to show so do not update
+                      // either this.tagMatchCountForSummary or this.tagMatchSummary - keep them as "cleared."
+              },
+              error => { this.tagMatchSummary = ""; this.hasNoTagSpec = true; }
+            );
             this.descForSubset = newTitle;
             this.liveAnnouncer.announce(this.tagMatchSummary + " " + this.descForSubset); // done here rather than via aria-live tag on h2 element in the rendering
         }

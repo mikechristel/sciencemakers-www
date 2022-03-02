@@ -1,5 +1,6 @@
 ﻿import { Injectable, Inject, OnInit } from '@angular/core';
-import { Observable } from "rxjs/Observable";
+import { Observable, throwError } from "rxjs";
+import { catchError } from "rxjs/operators";
 import { HttpClient } from '@angular/common/http';
 
 import { DetailedStory } from './detailed-story';
@@ -24,6 +25,11 @@ export class StoryDetailService {
         if (queryTerms != null && queryTerms.length > 0 && queryTerms.trim() != this.WILDCARD_TO_MATCH_ALL)
             serviceURL += this.storyDetailsQueryTermsArgument + queryTerms;
 
-        return this.http.get<DetailedStory>(serviceURL);
+        return this.http.get<DetailedStory>(serviceURL).pipe(
+          catchError( err => {
+            // TODO: (!!!TBD!!!) Decide if we wish to log errors in any way or use console, e.g., console.log('error caught: ', err);
+            return throwError( err ); }
+          )
+        );
     }
 }

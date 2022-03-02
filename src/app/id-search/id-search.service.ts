@@ -1,5 +1,6 @@
 ﻿import { Injectable, Inject, OnInit } from '@angular/core';
-import { Observable } from "rxjs/Observable";
+import { Observable, throwError } from "rxjs";
+import { catchError, mergeMap } from "rxjs/operators";
 import { HttpClient } from '@angular/common/http';
 
 import { SearchResult } from '../storyset/search-result';
@@ -39,7 +40,13 @@ export class IDSearchService {
             addedArgs = addedArgs + "&entityYearFacet=" + namedYearFacets;
 
         // NOTE: cannot proceed to an story ID search before first having story search facets all in place.
-        return this.historyMakerService.getStoryFacetDetails()
-          .flatMap(fd => this.http.get<SearchResult>(environment.serviceBase + this.idSearchURL + csvIDList + addedArgs));
+        return this.historyMakerService.getStoryFacetDetails().pipe(
+          mergeMap(fd => this.http.get<SearchResult>(environment.serviceBase + this.idSearchURL + csvIDList + addedArgs).pipe(
+            catchError( err => {
+              // TODO: (!!!TBD!!!) Decide if we wish to log errors in any way or use console, e.g., console.log('error caught: ', err);
+              return throwError( err ); }
+            )
+          ))
+        );
     }
 }

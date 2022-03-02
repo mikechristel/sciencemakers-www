@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Subject }    from 'rxjs/Subject';
-import { isNumber } from 'util';
+import { Subject }    from 'rxjs';
 
 // The purpose of this service is to retrieve and store in localStorage the advanced story search settings,
 // such as filter by interview date range, the minimum acceptable interview year and maximum acceptable interview year.
@@ -29,12 +28,12 @@ export class StoryAdvancedSearchSettingsManagerService {
       this.localFilterByInterviewDate = (temp == "1");
       this.filterByInterviewDate.next(this.localFilterByInterviewDate);
       temp = JSON.parse(localStorage.getItem(this.MIN_YEAR_SETTING_NAME) || "0");
-      if (isNumber(temp)) {
+      if (typeof temp === 'number') {
           this.localMinYear = +temp;
           this.minYear.next(this.localMinYear);
       }
       temp = JSON.parse(localStorage.getItem(this.MAX_YEAR_SETTING_NAME) || "0");
-      if (isNumber(temp)) {
+      if (typeof temp === 'number') {
           this.localMaxYear = +temp;
           this.maxYear.next(this.localMaxYear);
       }

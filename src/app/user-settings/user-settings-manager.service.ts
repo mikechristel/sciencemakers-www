@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Subject }    from 'rxjs/Subject';
+import { Subject }    from 'rxjs';
 import { GlobalState } from '../app.global-state';
 
 // The purpose of this service is to retrieve and store in localStorage the autoplay and autoadvance user settings.

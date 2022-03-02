@@ -215,8 +215,7 @@ export class StoryComponent extends BaseComponent implements OnInit {
                     }
                   },
                   error => {
-                    // TODO: decide how specific to make error recovery, i.e., do one thing for ERR_NAME_NOT_RESOLVED
-                    // which would need to get propagated out of handleError earlier, something different for other errors.
+                    // TODO: decide how specific to make error recovery.
                     // Right now this "network timeout" message could be a lie, so soften the message to "may have."
                     this.myStory = null;
                     this.interviewDateSuffix = null;
