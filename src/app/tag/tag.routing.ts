@@ -6,4 +6,4 @@ export const tagRoutes: Routes = [
     { path: 'tag', component: TagComponent }
 ];
 
-export const tagRouting: ModuleWithProviders = RouterModule.forChild(tagRoutes);
+export const tagRouting: ModuleWithProviders<any> = RouterModule.forChild(tagRoutes);

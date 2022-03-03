@@ -6,4 +6,4 @@ export const contentLinksRoutes: Routes = [
     { path: 'contentlinks', component: ContentLinksComponent }
 ];
 
-export const contentLinksRouting: ModuleWithProviders = RouterModule.forChild(contentLinksRoutes);
+export const contentLinksRouting: ModuleWithProviders<any> = RouterModule.forChild(contentLinksRoutes);

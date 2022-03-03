@@ -6,4 +6,4 @@ export const settingsRoutes: Routes = [
     { path: 'settings', component: UserSettingsComponent }
 ];
 
-export const settingsRouting: ModuleWithProviders = RouterModule.forChild(settingsRoutes);
+export const settingsRouting: ModuleWithProviders<any> = RouterModule.forChild(settingsRoutes);

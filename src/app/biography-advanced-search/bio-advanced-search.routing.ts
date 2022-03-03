@@ -6,4 +6,4 @@ export const biographyAdvancedSearchRoutes: Routes = [
     { path: 'bioadvs', component: BiographyAdvancedSearchComponent }
 ];
 
-export const biographyAdvancedSearchRouting: ModuleWithProviders = RouterModule.forChild(biographyAdvancedSearchRoutes);
+export const biographyAdvancedSearchRouting: ModuleWithProviders<any> = RouterModule.forChild(biographyAdvancedSearchRoutes);

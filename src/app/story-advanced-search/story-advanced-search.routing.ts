@@ -6,4 +6,4 @@ export const storyAdvancedSearchRoutes: Routes = [
     { path: 'storyadvs', component: StoryAdvancedSearchComponent }
 ];
 
-export const storyAdvancedSearchRouting: ModuleWithProviders = RouterModule.forChild(storyAdvancedSearchRoutes);
+export const storyAdvancedSearchRouting: ModuleWithProviders<any> = RouterModule.forChild(storyAdvancedSearchRoutes);

@@ -14,4 +14,4 @@ export const homeRoutes: Routes = [
     { path: '**', component: RouteNotFoundComponent } // NOTE: wildcard must be last, and homeRouting must always be last in sets of routes
 ];
 
-export const homeRouting: ModuleWithProviders = RouterModule.forChild(homeRoutes);
+export const homeRouting: ModuleWithProviders<any> = RouterModule.forChild(homeRoutes);

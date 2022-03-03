@@ -6,4 +6,4 @@ export const searchSimpleRoutes: Routes = [
     { path: 'search', component: SearchSimpleComponent }
 ];
 
-export const searchSimpleRouting: ModuleWithProviders = RouterModule.forChild(searchSimpleRoutes);
+export const searchSimpleRouting: ModuleWithProviders<any> = RouterModule.forChild(searchSimpleRoutes);

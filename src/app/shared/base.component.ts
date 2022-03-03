@@ -1,4 +1,4 @@
-import { OnDestroy } from '@angular/core';
+import { Directive, OnDestroy } from '@angular/core';
 import { Subject } from 'rxjs';
 
 // Created to support best practices for unsubscribe:
@@ -14,6 +14,7 @@ import { Subject } from 'rxjs';
 // where the class with ngOnInit starts as export class MyComponent extends BaseComponent
 //
 // Overloaded a bit by adding in a common event handler, noMouseFocus, for use across its subclasses, too.
+@Directive()
 export class BaseComponent implements OnDestroy {
   ngUnsubscribe = new Subject<void>();
 

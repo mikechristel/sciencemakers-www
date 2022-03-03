@@ -42,4 +42,4 @@ export const helpRoutes: Routes = [
     { path: 'help/terms', component: HelpTermsComponent }
 ];
 
-export const helpRouting: ModuleWithProviders = RouterModule.forChild(helpRoutes);
+export const helpRouting: ModuleWithProviders<any> = RouterModule.forChild(helpRoutes);

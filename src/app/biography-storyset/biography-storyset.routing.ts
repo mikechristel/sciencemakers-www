@@ -6,4 +6,4 @@ export const biographyStorySetRoutes: Routes = [
     { path: 'storiesForBio', component: BiographyStorySetComponent }
 ];
 
-export const biographyStorySetRouting: ModuleWithProviders = RouterModule.forChild(biographyStorySetRoutes);
+export const biographyStorySetRouting: ModuleWithProviders<any> = RouterModule.forChild(biographyStorySetRoutes);
