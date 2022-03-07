@@ -61,11 +61,11 @@ h2 {
 }
 
 .smallGapAfter {
-  margin: 0 0 em(18) 0; // top right bottom left
+  margin: 0 0 em(18) 0; /* top right bottom left */
 }
 
 .smallGapBefore {
-  margin: em(18) 0 0 0; // top right bottom left
+  margin: em(18) 0 0 0; /* top right bottom left */
 }
 
 .topic_button {
@@ -84,7 +84,7 @@ h2 {
   transition: box-shadow .15s ease-in-out;
 
   @media screen and (min-width: bp(thmda_narrow)) {
-    //padding: em(6) em(6) em(6) em(6); // top right bottom left
+    //padding: em(6) em(6) em(6) em(6); /* top right bottom left */
   }
 
   &:hover,
@@ -109,7 +109,7 @@ h2 {
   height: $buttonHeight;
 
   @media screen and (min-width: bp(thmda_narrow)) {
-    //padding: em(6) em(6) em(6) em(6); // top right bottom left
+    //padding: em(6) em(6) em(6) em(6); /* top right bottom left */
   }
 
   // adjust look for "disabled"

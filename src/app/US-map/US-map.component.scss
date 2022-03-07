@@ -52,8 +52,8 @@ text {
 }
 
 .mapTextDetail {
-  margin: 0 0 em(8) 0; // top right bottom left
-  padding: gutter(thmda-tiny) gutter(thmda-tiny) gutter(thmda-tiny) gutter(thmda-tiny); // top right bottom left
+  margin: 0 0 em(8) 0; /* top right bottom left */
+  padding: gutter(thmda-tiny) gutter(thmda-tiny) gutter(thmda-tiny) gutter(thmda-tiny); /* top right bottom left */
   border: 1px solid color(dark-grey);
   background-color: color(light-grey);
   color: black;

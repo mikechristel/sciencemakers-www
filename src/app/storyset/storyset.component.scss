@@ -68,7 +68,7 @@
 
 .tape-as-list {
   padding: 0;
-  margin: 0 0 gutter(thmda-tiny) 0; // top right bottom left
+  margin: 0 0 gutter(thmda-tiny) 0; /* top right bottom left */
 }
 
 .tapes-as-list {
@@ -83,7 +83,7 @@
   background: color(primary);
   color: #fff;
   font-size: 2rem;
-  margin: em(12) 0 em(8) 0; // top right bottom left
+  margin: em(12) 0 em(8) 0; /* top right bottom left */
   padding: em(8) em(10);;
   position: relative; // needed to get descending triangle magic to work...
 
@@ -151,7 +151,7 @@
   border: 1px solid color(primary); // note: added for accessibility, to provide a button border in high contrast mode
   border-radius: 0;
   cursor: pointer;
-  margin: gutter(thmda-tight) 0 gutter(thmda-tiny) 0; // top right bottom left
+  margin: gutter(thmda-tight) 0 gutter(thmda-tiny) 0; /* top right bottom left */
   padding: em(4) em(12);
   font-size: 1.2rem;
   height: $buttonHeight;
@@ -170,7 +170,7 @@
   border: 1px solid color(secondary); // note: added for accessibility, to provide a button border in high contrast mode
   border-radius: 0;
   cursor: pointer;
-  margin: gutter(thmda-tight) 0 gutter(thmda-tiny) 0; // top right bottom left
+  margin: gutter(thmda-tight) 0 gutter(thmda-tiny) 0; /* top right bottom left */
   padding: em(4) em(12);
   font-size: 1.2rem;
   height: $buttonHeight;

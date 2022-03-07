@@ -14,7 +14,7 @@
     padding: em(15);
 
     @media screen and (min-width: bp(afl_medium) ) {
-        margin: em(0) em(0) em(10) em(0); // top right bottom left
+        margin: em(0) em(0) em(10) em(0); /* top right bottom left */
     }
 
 }

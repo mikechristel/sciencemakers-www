@@ -37,7 +37,7 @@
   height: 3rem;
   letter-spacing: .5px;
   transition: box-shadow .15s ease-in-out;
-  margin: em(8) em(8) em(16); // top, left and right, bottom
+  margin: em(8) em(8) em(16); /* top, left and right, bottom */
 
   @media screen and (min-width: bp(afl_medium)) {
     font-size: 1.2rem;
@@ -210,7 +210,7 @@
 }
 
 .markOffLegend {
-  margin: em(8) 0; // top, left and right, bottom
+  margin: em(8) 0; /* top, left and right, bottom */
 }
 
 
@@ -249,7 +249,7 @@ color: #1E1810;
   border: 1px solid color(ok-grey);
   box-shadow: none;
   // leave height out of style; figured out based on need for space for the min/max date when checked "on"
-  margin: em(8) 0 em(12); // top, left and right, bottom
+  margin: em(8) 0 em(12); /* top, left and right, bottom */
   padding: 0.2em 0.2em 0.2em 0.2em;
   width: 90%;
 

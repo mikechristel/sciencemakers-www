@@ -41,7 +41,7 @@
     color: #fff;
     font-size: 1.2rem;
     margin-bottom: 0;
-    padding: gutter(thmda-tight) gutter(thmda-tiny) gutter(thmda-tight) gutter(thmda-tiny); // top right bottom left
+    padding: gutter(thmda-tight) gutter(thmda-tiny) gutter(thmda-tight) gutter(thmda-tiny); /* top right bottom left */
   }
 
   &:focus {
@@ -117,8 +117,8 @@
   max-height: 400px; // ...but not too much transcript...
   overflow-x: hidden;
   overflow-y: auto;
-  margin: 0 0 em(8) 0; // top right bottom left
-  padding: gutter(thmda-tiny) gutter(thmda-tiny) gutter(thmda-tiny) gutter(thmda-tiny); // top right bottom left
+  margin: 0 0 em(8) 0; /* top right bottom left */
+  padding: gutter(thmda-tiny) gutter(thmda-tiny) gutter(thmda-tiny) gutter(thmda-tiny); /* top right bottom left */
   border: 1px solid color(dark-grey);
   background-color: color(light-grey);
   color: black;
@@ -160,7 +160,7 @@
   background-repeat: repeat;
   ...but wait for the tri-color scheme to be improved first.
   */
-  padding: gutter(thmda-tight) 0 0 0; // top right bottom left
+  padding: gutter(thmda-tight) 0 0 0; /* top right bottom left */
   margin-bottom: 0.5em;
 
   &--narrow-view {
@@ -325,7 +325,7 @@
 .tabs {
   border-bottom: 1px solid color(ok-grey);
   font-size: 1.2rem;
-  margin: gutter(thmda-medium) 0 0 0; // top right bottom left
+  margin: gutter(thmda-medium) 0 0 0; /* top right bottom left */
 
   @media screen and (max-width: bp(thmda_narrow_just_before)) {
     font-size: 1rem;

@@ -79,7 +79,7 @@
 
 .biography-as-list {
   padding: 0;
-  margin: 0 0 em(20) 0; // top right bottom left
+  margin: 0 0 em(20) 0; /* top right bottom left */
 }
 
 .biographies-as-list {
@@ -94,7 +94,7 @@
     background: color(primary);
     color: #fff;
     font-size: 2rem;
-    margin: em(12) 0 em(8) 0; // top right bottom left
+    margin: em(12) 0 em(8) 0; /* top right bottom left */
     padding: em(8) em(10);
     position: relative; // needed to get descending triangle magic to work...
 

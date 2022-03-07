@@ -65,6 +65,6 @@
 .card__contents {
   @extend %oswald;
   font-size: 1rem;
-  padding: em(8) em(11) em(8) em(11); // top right bottom left
+  padding: em(8) em(11) em(8) em(11); /* top right bottom left */
   margin: 0;
 }

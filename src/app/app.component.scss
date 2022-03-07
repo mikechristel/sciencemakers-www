@@ -1,9 +1,11 @@
 ﻿@import './shared/theme/base';
 
-// NOTE: with Spring 2019 push for greater accessibility, making use of angular/CDK (e.g., for
-// drop-down menu box overlay that traps focus such as to choose which fields to search)
-// Useful walkthrough: https://blog.angularindepth.com/creating-a-toast-service-with-angular-cdk-a0d35fd8cc12
-@import "~@angular/cdk/overlay";
+/* NOTE: with Spring 2019 push for greater accessibility, making use of angular/CDK (e.g., for
+   drop-down menu box overlay that traps focus such as to choose which fields to search)
+   Useful walkthrough: blog.angularindepth.com/creating-a-toast-service-with-angular-cdk-a0d35fd8cc12
+   NOTE: in updating to Angular 10..11..12..13  the @import became @use at 12 to 13 update.
+*/
+@use "~@angular/cdk/overlay";
 @include cdk-overlay();
 
 .mymodal {
@@ -26,7 +28,7 @@
   background-color: color(light-grey);
   border: 5px solid color(primary);
 
-  padding: em(10) em(14) em(10) em(10); // top right bottom left
+  padding: em(10) em(14) em(10) em(10); /* top right bottom left */
 
   @media screen and (max-width: bp(thmda_narrow_just_before)) {
     width: 320px;
@@ -67,7 +69,7 @@
     @extend %oswald;
     color: color(dark-grey);
     line-height: 120%;
-    margin: 0 0 em(4) em(4); // top right bottom left
+    margin: 0 0 em(4) em(4); /* top right bottom left */
     padding: 0;
     font-size: 1.4rem;
 
@@ -94,7 +96,7 @@
   }
 
   .mymodal-body {
-    padding: em(2) em(4) em(2); // top, right and left, bottom
+    padding: em(2) em(4) em(2); /* top, right and left, bottom */
 
     textarea,
     textarea:focus {
@@ -112,9 +114,9 @@
       resize: none;
       overflow: auto;
 
-      // Safari will "zoom in" on the textarea with font-size like this, so it needs more space.
-      // Rather than "fight it" and try to control Safari html-select element styling, give it the space
-      // to do what it is doing (at least for Safari 13 on mobile, works as of May 2020).
+      /* Safari will "zoom in" on the textarea with font-size like this, so it needs more space.
+         Rather than "fight it" and try to control Safari html-select element styling, give it the space
+         to do what it is doing (at least for Safari 13 on mobile, works as of May 2020). */
       &:not(:root:root) {
         width: 95%;
       }
@@ -143,9 +145,9 @@
     background-color: #fff;
     font-size: 1rem;
 
-    // Safari will "zoom in" on the textarea with font-size like this, so it needs more space.
-    // Rather than "fight it" and try to control Safari html-select element styling, give it the space
-    // to do what it is doing (at least for Safari 13 on mobile, works as of May 2020).
+    /* Safari will "zoom in" on the textarea with font-size like this, so it needs more space.
+       Rather than "fight it" and try to control Safari html-select element styling, give it the space
+       to do what it is doing (at least for Safari 13 on mobile, works as of May 2020). */
     &:not(:root:root) {
       width: 95%;
     }
@@ -159,14 +161,14 @@
     }
   }
 
-  .mymodal-footer { // note similarity with search__submit style for search button
+  .mymodal-footer { /* note similarity with search__submit style for search button */
     border-top: 0;
     padding-bottom: 6px;
 
     button {
       @extend %oswald;
       background: color(primary);
-      border: 1px solid color(primary); // note: added for accessibility, to provide a button border in high contrast mode
+      border: 1px solid color(primary); /* note: added for accessibility, to provide a button border in high contrast mode */
       border-radius: 0;
       color: #fff;
       font-size: 1.2rem;
@@ -199,7 +201,7 @@
     .button-secondary {
       @extend %oswald;
       background: color(secondary);
-      border: 1px solid color(secondary); // note: added for accessibility, to provide a button border in high contrast mode
+      border: 1px solid color(secondary); /* note: added for accessibility, to provide a button border in high contrast mode */
       border-radius: 0;
       color: #fff;
       font-size: 1.2rem;
@@ -256,8 +258,8 @@
 }
 
 .mymodal-overlay {
-    // See comment in https://stackoverflow.com/questions/43533463/how-to-create-a-modal-popup-that-is-compatible-with-angular-4
-    // for origins of this approach to modal dialog presentation.
+    /* See comment in https:stackoverflow.com/questions/43533463/how-to-create-a-modal-popup-that-is-compatible-with-angular-4
+       for origins of this approach to modal dialog presentation. */
 
     /* detach from document */
     position: fixed;
@@ -277,7 +279,7 @@
 }
 
 .nav-across-width { /* only use for desktop, not mobile; mobile shows hamburger menu via header__menu-icon instead */
-  @extend %desktop-only; // counters the extend %mobile-only for header__menu-icon
+  @extend %desktop-only; /* counters the extend %mobile-only for header__menu-icon */
   color: color(dark-grey);
   font-size: 1rem;
   width: 100%;
@@ -313,8 +315,7 @@
     letter-spacing: em(.5, 16);
     transition: all .2s ease-in-out;
     text-decoration: none;
-    padding: 0 0 em(1,16) 0; // top right bottom left
-    //padding: em(8,16) 0;
+    padding: 0 0 em(1,16) 0; /* top right bottom left */
 
     &.active {
       color: color(nav-highlight-shade);
@@ -345,7 +346,7 @@
     }
 }
 
-.nav__link--myclips { position: relative; } // needed to add nav__badge as decoration to the "my clips" nav link
+.nav__link--myclips { position: relative; } /* needed to add nav__badge as decoration to the "my clips" nav link */
 
 .nav__badge {
   display: inline-block;
@@ -364,7 +365,7 @@
   right: - em(24);
   top: - em(16);
   @media screen and (max-width: bp(afl_medium_just_before)) {
-    display: none !important; // when too narrow, less than medium, don't show the badge
+    display: none !important; /* when too narrow, less than medium, don't show the badge */
   }
 }
 
@@ -391,14 +392,14 @@
   border-bottom: 1px solid #ccc;
   box-shadow: 0 0 10px rgba(0,0,0,.15);
 
-  padding: em(4) em(8) 0; // top, left and right, bottom
+  padding: em(4) em(8) 0; /* top, left and right, bottom */
 
   @media screen and (min-width: bp(afl_small)) and (max-width: bp(afl_medium_just_before)) {
-      padding: em(4) em(12) 0; // top, left and right, bottom
+      padding: em(4) em(12) 0; /* top, left and right, bottom */
   }
 
   @media screen and (min-width: bp(afl_medium)) {
-      padding: em(2) em(16) 0; // top, left and right, bottom
+      padding: em(2) em(16) 0; /* top, left and right, bottom */
   }
 }
 
@@ -427,7 +428,7 @@
 }
 
 .header__top-flex-row {
-  padding: gutter(thmda-big) 0; // top and bottom, right and left
+  padding: gutter(thmda-big) 0; /* top and bottom, right and left */
 
   @media screen and (max-width: bp(thmda_wideenough_just_before)) {
     padding-top: 0;
@@ -468,7 +469,7 @@
     text-align: right;
 }
 
-// a11y skip to main content
+/* a11y skip to main content */
 .skip {
 	padding:6px;
 	position: absolute;
