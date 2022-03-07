@@ -4,8 +4,8 @@
  note: took out fxLayoutAlign="start stretch"  from parent div... -->
 <div fxFlexFill fxLayout="column" class="appHeaderPlusContents">
   <header fxFlex.xs="1 1 5rem" fxFlex.lt-xs="1 1 8.8rem" fxFlex.gt-sm="1 1 9.15rem" fxFlex.gt-md="1 1 9.2rem" id="header" class="header">
-    <a *ngIf="!inContentLinksRoute" [routerLink]="" fragment="'mmainHeader'" routerLinkActive="active" class="skip mobile-only" (click)="scrollHeaderIntoView('mmainHeader')">Skip to content</a>
-    <a *ngIf="!inContentLinksRoute" [routerLink]="" fragment="'dmainHeader'" routerLinkActive="active" class="skip desktop-only" (click)="scrollHeaderIntoView('dmainHeader')">Skip to content</a>
+    <a *ngIf="!inContentLinksRoute" [routerLink]="[]" fragment="'mmainHeader'" routerLinkActive="active" class="skip mobile-only" (click)="scrollHeaderIntoView('mmainHeader')">Skip to content</a>
+    <a *ngIf="!inContentLinksRoute" [routerLink]="[]" fragment="'dmainHeader'" routerLinkActive="active" class="skip desktop-only" (click)="scrollHeaderIntoView('dmainHeader')">Skip to content</a>
     <div class="header__content-container" fxLayout="column">
         <div class="header__top-flex-row" fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="calc(4px)">
             <div fxFlex.gt-xs="3 3 calc(17em)" fxFlex.lt-sm="60%" fxLayout="row" fxLayoutAlign="start">
@@ -123,8 +123,8 @@ cause additional vertical scroll bars - bars within bars - if tacked on to the e
 as not to disturb the scroll-bar mechanics used in the rest of this page layout.) -->
 <footer class="imposeMaxWidth" *ngIf="inShowingManyItemsRoute">
   <h2 class="sr-only">Footer</h2>
-  <a [routerLink]="" fragment="'mmainHeader'" routerLinkActive="active" class="skip mobile-only" (click)="scrollHeaderIntoView('mmainHeader')">Back to Top</a>
-  <a [routerLink]="" fragment="'dmainHeader'" routerLinkActive="active" class="skip desktop-only" (click)="scrollHeaderIntoView('dmainHeader')">Back to Top</a>
+  <a [routerLink]="[]" fragment="'mmainHeader'" routerLinkActive="active" class="skip mobile-only" (click)="scrollHeaderIntoView('mmainHeader')">Back to Top</a>
+  <a [routerLink]="[]" fragment="'dmainHeader'" routerLinkActive="active" class="skip desktop-only" (click)="scrollHeaderIntoView('dmainHeader')">Back to Top</a>
 </footer>
 
 <!-- Modal form for Contact Us -->
