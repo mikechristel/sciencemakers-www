@@ -36,7 +36,7 @@ $browser-context: 14;
     $context: $context * 1px;
   }
 
-  @return $pixels / $context * 1em;
+  @return math.div($pixels, $context) * 1em;
 }
 
 @function rem($pixels, $context: $browser-context) {
@@ -48,5 +48,5 @@ $browser-context: 14;
     $context: $context * 1px;
   }
 
-  @return $pixels / $context * 1rem;
+  @return math.div($pixels, $context) * 1rem;
 }
