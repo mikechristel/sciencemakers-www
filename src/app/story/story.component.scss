@@ -339,7 +339,7 @@
   border-radius: 0;
   color: color(ok-grey);
   font-size: 1.2rem;
-  height: $buttonHeight;
+  height: #{$buttonHeight};
 
   &:hover {
       cursor: pointer;

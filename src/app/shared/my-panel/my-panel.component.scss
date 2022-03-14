@@ -21,7 +21,7 @@
   border: 0;
   border-radius: 0;
   color: #fff;
-  height: $buttonHeight; /* corresponds to 30px(42px) where 16px is default but allows users to resize text up to 200% and container grows, too */
+  height: #{$buttonHeight}; /* corresponds to 30px(42px) where 16px is default but allows users to resize text up to 200% and container grows, too */
   text-align: left;
   width: 100%;
 
@@ -75,7 +75,7 @@
   border: 0;
   border-radius: 0;
   color: #fff;
-  height: $buttonHeight;
+  height: #{$buttonHeight};
   width: 100%;
 
   padding-left: em(8,16);
@@ -140,7 +140,7 @@
   border: 0;
   border-radius: 0;
   color: #fff;
-  height: $buttonHeight;
+  height: #{$buttonHeight};
   margin-bottom: em(8);
   width: 100%;
 

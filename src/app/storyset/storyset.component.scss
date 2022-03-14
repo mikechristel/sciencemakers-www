@@ -133,7 +133,7 @@
   margin: gutter(thmda-tight) 0 gutter(thmda-tiny) 0; /* top right bottom left */
   padding: em(4) em(12);
   font-size: 1.2rem;
-  height: $buttonHeight;
+  height: #{$buttonHeight};
 
   &:hover,
   &:focus {
@@ -152,7 +152,7 @@
   margin: gutter(thmda-tight) 0 gutter(thmda-tiny) 0; /* top right bottom left */
   padding: em(4) em(12);
   font-size: 1.2rem;
-  height: $buttonHeight;
+  height: #{$buttonHeight};
 
   &:hover,
   &:focus {

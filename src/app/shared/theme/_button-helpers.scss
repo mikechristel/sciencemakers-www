@@ -7,7 +7,7 @@
   color: #fff;
   cursor: pointer;
   font-size: 1.2rem;
-  height: $buttonHeight;
+  height: #{$buttonHeight};
   transition: box-shadow .15s ease-in-out;
   width: auto; /* note: subtle difference with search__submit style for search button */
 
@@ -36,7 +36,7 @@
   color: #fff;
   cursor: pointer;
   font-size: 1.2rem;
-  height: $buttonHeight;
+  height: #{$buttonHeight};
   transition: box-shadow .15s ease-in-out;
   width: auto; /* note: subtle difference with search__submit style for search button */
 
@@ -65,7 +65,7 @@
   color: #fff;
   cursor: pointer;
   font-size: 1.2rem;
-  height: $buttonHeight;
+  height: #{$buttonHeight};
   margin: 0;
   padding: 0 10px;
   text-align: center;
@@ -94,7 +94,7 @@
   color: #fff;
   cursor: pointer;
   font-size: 1.2rem;
-  height: $buttonHeight;
+  height: #{$buttonHeight};
   padding: 0 12px;
   white-space: nowrap;
   transition: box-shadow .15s ease-in-out;
@@ -121,7 +121,7 @@
   color: #fff;
   cursor: pointer;
   font-size: 1.2rem;
-  height: $buttonHeight;
+  height: #{$buttonHeight};
   padding: 0 10px;
   white-space: nowrap;
   transition: box-shadow .15s ease-in-out;
@@ -149,8 +149,8 @@
   color: #fff;
   cursor: pointer;
   font-size: 1.2rem;
-  height: $buttonHeight;
-  min-height: $buttonHeight;
+  height: #{$buttonHeight};
+  min-height: #{$buttonHeight};
   max-width: 12.5rem; /* note: difference from back-button-low-key */
   padding: 0 12px;
   white-space: nowrap;
@@ -177,7 +177,7 @@
   border-radius: 0;
   color: #fff;
   cursor: pointer;
-  height: $buttonHeight;
+  height: #{$buttonHeight};
   max-width: 8.125rem;
   white-space: nowrap;
   transition: box-shadow .15s ease-in-out;
@@ -204,7 +204,7 @@
   color: #fff;
   cursor: pointer;
   font-size: 1.2rem;
-  height: $buttonHeight;
+  height: #{$buttonHeight};
   padding: 0 10px;
   white-space: nowrap;
   transition: box-shadow .15s ease-in-out;
@@ -232,7 +232,7 @@
   color: #fff;
   cursor: pointer;
   font-size: 1.2rem;
-  height: $buttonHeight;
+  height: #{$buttonHeight};
   padding: 0 12px;
   white-space: nowrap;
   transition: box-shadow .15s ease-in-out;

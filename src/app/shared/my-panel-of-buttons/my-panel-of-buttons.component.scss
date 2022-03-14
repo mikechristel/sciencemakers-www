@@ -24,7 +24,7 @@
   border: 0;
   border-radius: 0;
   color: #fff;
-  height: $buttonHeight;
+  height: #{$buttonHeight};
   width: 100%;
 
   padding-left: em(8,16);
@@ -77,7 +77,7 @@
   border: 0;
   border-radius: 0;
   color: #fff;
-  height: $buttonHeight;
+  height: #{$buttonHeight};
   width: 100%;
 
   padding-left: em(8,16);

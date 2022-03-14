@@ -60,7 +60,7 @@
   color: #fff;
   cursor: pointer;
   font-size: 1.2rem;
-  height: $buttonHeight;
+  height: #{$buttonHeight};
   letter-spacing: .5px;
   margin-top: em(8);
   transition: box-shadow .15s ease-in-out;
@@ -86,7 +86,7 @@
   border-radius: 0;
   color: #fff;
   font-size: 1.2rem;
-  height: $buttonHeight;
+  height: #{$buttonHeight};
   letter-spacing: .5px;
   margin-top: em(8);
 

@@ -16,14 +16,14 @@
   border-top: 1px solid color(light-grey);
   color: color(secondary);
   font-size: 1rem;
-  height: $buttonHeight;
+  height: #{$buttonHeight};
   outline: 0;
   width: 2.375rem;
   margin: 0;
   padding: 0;
 
   @media screen and (min-width: bp(afl_medium)) {
-      height: $buttonHeight;
+      height: #{$buttonHeight};
       width: 2rem;
   }
 

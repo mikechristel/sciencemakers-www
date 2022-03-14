@@ -42,7 +42,7 @@
 }
 
 .filter-section {
-  min-height: $buttonHeight;
+  min-height: #{$buttonHeight};
   margin-bottom: em(10, 16);
 }
 

@@ -172,7 +172,7 @@
       border-radius: 0;
       color: #fff;
       font-size: 1.2rem;
-      height: $buttonHeight;
+      height: #{$buttonHeight};
       min-width: 3.125rem;
       max-width: 6.25rem;
       letter-spacing: .5px;
@@ -205,7 +205,7 @@
       border-radius: 0;
       color: #fff;
       font-size: 1.2rem;
-      height: $buttonHeight;
+      height: #{$buttonHeight};
       min-width: 3.125rem;
       max-width: 6.25rem;
       letter-spacing: .5px;

@@ -5,7 +5,7 @@
   border: 1px solid color(primary); /* note: added for accessibility, to provide a button border in high contrast mode */
   border-radius: 0;
   cursor: pointer;
-  height: $buttonHeight;
+  height: #{$buttonHeight};
   margin-bottom: em(10);
   padding: em(4) em(12);
   font-size: 1rem;
@@ -78,7 +78,7 @@
     cursor: pointer;
     font-size: 1.2rem;
     max-width: 6.25rem;
-    height: $buttonHeight;
+    height: #{$buttonHeight};
     letter-spacing: em(.61);
     transition: box-shadow .15s ease-in-out;
 
@@ -100,7 +100,7 @@
     @media screen and (min-width: bp(thmda_narrow)) {
         font-size: 1.2rem;
         max-width: 9.75rem;
-        height: $buttonHeight;
+        height: #{$buttonHeight};
     }
   }
 
@@ -116,7 +116,7 @@
 }
 
 .filter-section {
-  min-height: $buttonHeight;
+  min-height: #{$buttonHeight};
   margin-bottom: em(10, 16);
 
   .filter-select-parent {
@@ -143,7 +143,7 @@
 }
 
 .filter-section {
-    min-height: $buttonHeight;
+    min-height: #{$buttonHeight};
 }
 
 .filter-select-label {
@@ -208,7 +208,7 @@
   border: 1px solid color(primary); /* note: added for accessibility, to provide a border in high contrast mode */
   border-radius: 0;
   color: #fff;
-  height: $buttonHeight; /* corresponds to 30px(42px) with 16px default */
+  height: #{$buttonHeight}; /* corresponds to 30px(42px) with 16px default */
   width: 100%;
   font-size: 1.2rem;
 
@@ -331,7 +331,7 @@
 
   @media screen and (max-width: bp(afl_medium_just_before)) {
     margin: em(5);
-    height: $buttonHeight;
+    height: #{$buttonHeight};
     width: $buttonHeight;
     padding-bottom: em(10);
     padding-top: em(10);
