@@ -1,4 +1,4 @@
-﻿@import '../shared/theme/base';
+﻿@use '../shared/theme/base';
 
 /* NOTE: Formerly, story date showed only on narrow views with the stamp, but Higher Education Advisory Board (HEAB) complaints on UI/UX
    included too much information in panes of multiple stories (e.g., story sets).  So, hide story date in "card" view.  For users wanting

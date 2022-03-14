@@ -4,10 +4,10 @@
    NOTE: with Spring 2019 push for greater accessibility, making use of angular/CDK (e.g., for
          drop-down menu box overlay that traps focus such as to choose which fields to search)
 */
-@import '~@angular/cdk/overlay-prebuilt.css';
-@import '~@angular/cdk/a11y-prebuilt.css';
-@import 'my-thmda-material-theme.css'; /* instead of:
-@import '@angular/material/prebuilt-themes/purple-green.css'; */ /* brought in with material styling (slider) of video player */
+@use '~@angular/cdk/overlay-prebuilt.css';
+@use '~@angular/cdk/a11y-prebuilt.css';
+@use 'my-thmda-material-theme.css'; /* instead of:
+@use '@angular/material/prebuilt-themes/purple-green.css'; */ /* brought in with material styling (slider) of video player */
 
 body {
   height:100vh;

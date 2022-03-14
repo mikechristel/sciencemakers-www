@@ -1,6 +1,6 @@
-﻿@import '../shared/theme/base';
-@import '../shared/theme/button-helpers';
-@import '../shared/theme/view-option-helpers';
+﻿@use '../shared/theme/base';
+@use '../shared/theme/button-helpers';
+@use '../shared/theme/view-option-helpers';
 
 /* FILTER-PIECE The styles in this portion are the same as styles in shared/theme/filter-helpers, but
    rather than bring in that relatively large style helper file via an import, only repeat those that are

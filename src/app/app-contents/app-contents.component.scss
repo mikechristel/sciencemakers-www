@@ -1,4 +1,4 @@
-@import '../shared/theme/base';
+@use '../shared/theme/base';
 
 /* Importantly, this ":host" magic (along with flex markup in the parent container) lets the contents fill
    the remaining browser viewport with a vertical scrollbar on any overflow.  Coupled with other

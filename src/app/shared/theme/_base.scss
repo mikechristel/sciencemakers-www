@@ -1,6 +1,6 @@
-@import 'functions';
-@import 'variables';
-@import 'helpers';
+@use 'functions';
+@use 'variables';
+@use 'helpers';
 
 /* common styling, e.g., for title/main heading of the page/route */
 .page-title {

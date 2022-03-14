@@ -1,5 +1,5 @@
-﻿@import '../shared/theme/base';
-@import '../shared/theme/filter-helpers'; /* panel UI used here the same as used for filter panels */
+﻿@use '../shared/theme/base';
+@use '../shared/theme/filter-helpers'; /* panel UI used here the same as used for filter panels */
 
 .limitMaxWidth {
   text-align: center;

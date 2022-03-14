@@ -1,5 +1,5 @@
-@import '../theme/base';
-@import '../theme/search-helpers';
+@use '../theme/base';
+@use '../theme/search-helpers';
 
 .search-form-container {
     @extend %source-sans;

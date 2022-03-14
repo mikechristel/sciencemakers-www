@@ -1,4 +1,4 @@
-@import '../../shared/theme/base';
+@use '../../shared/theme/base';
 
 /* !!!TBD!!! NOTE: it is difficult to construct a control line that will resize in rem units while remaining on one line.
    Yet, it is both aesthetically desirable and offers expected video control behavior to keep the controls aligned closely
@@ -103,7 +103,7 @@ video::cue(v[voice="S2"]) {
   here at this level, which didn't work....
 .mat-accent .mat-slider-track-fill, .mat-accent .mat-slider-thumb, .mat-accent .mat-slider-thumb-label {
     background-color: #69f0ae; -- currently a shade of green, if in the main style.css there is this theme:
-    --this line commented out... @import '@angular/material/prebuilt-themes/purple-green.css';
+    --this line commented out... @use '@angular/material/prebuilt-themes/purple-green.css';
 }
 !!!BUT!!! Unfortunately, the below attempts did not work
 .mat-accent .mat-slider-track-fill, .mat-accent .mat-slider-thumb, .mat-accent .mat-slider-thumb-label {

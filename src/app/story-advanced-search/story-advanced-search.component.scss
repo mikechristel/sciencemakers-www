@@ -1,5 +1,5 @@
-@import '../shared/theme/base';
-@import '../shared/theme/search-helpers';
+@use '../shared/theme/base';
+@use '../shared/theme/search-helpers';
 
 .helptext {
     font-size: 1rem;
