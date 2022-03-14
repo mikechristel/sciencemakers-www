@@ -1,6 +1,6 @@
-@import 'variables'; // e.g., for thmda_narrow
+@import 'variables'; /* e.g., for thmda_narrow */
 
-// Typical use: pagination button set to allow paging for a list of items
+/* Typical use: pagination button set to allow paging for a list of items */
 .pagination {
   font-size: 1rem;
   margin-bottom: em(8);

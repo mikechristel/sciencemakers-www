@@ -1,4 +1,4 @@
-// Typical use: show options to change view to a visual stamp, a text grid, or a SVG map.
+/* Typical use: show options to change view to a visual stamp, a text grid, or a SVG map. */
 .view {
   margin: 0;
   max-width: 130px;
@@ -8,7 +8,7 @@
 
 .view-rg-item:focus {
   box-shadow: 0 0 0 3px color(tertiary);
-  outline: 3px solid transparent; // For Windows high contrast mode.
+  outline: 3px solid transparent; /* For Windows high contrast mode. */
 }
 
 .view-rg-item {

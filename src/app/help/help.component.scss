@@ -28,7 +28,7 @@
     }
 }
 
-.helptext-before-list { // same as helptext but reduced margin-bottom
+.helptext-before-list { /* same as helptext but reduced margin-bottom */
   font-size: 1rem;
   color: black;
   margin-bottom: gutter(thmda-extremely_tiny);
@@ -41,7 +41,7 @@
   }
 }
 
-.helptext-no-nargin-top { // same as helptext but zeroed out margin-top
+.helptext-no-nargin-top { /* same as helptext but zeroed out margin-top */
   font-size: 1rem;
   color: black;
   margin-top: 0;

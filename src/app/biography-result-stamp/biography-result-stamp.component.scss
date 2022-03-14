@@ -1,22 +1,22 @@
 @import '../shared/theme/base';
 
-// For biography result stamps, the mockup for results at 768 width with a column of about 512 for results
-// showed a card image height of about 150, which is 5/8 of the 240 height used with the close BiographyStamp class
-// and its biography-stamp.component.html rendering.
+/* For biography result stamps, the mockup for results at 768 width with a column of about 512 for results
+   showed a card image height of about 150, which is 5/8 of the 240 height used with the close BiographyStamp class
+   and its biography-stamp.component.html rendering. */
 
 .card {
   border: 1px solid color(ok-grey);
   color: color(dark-grey);
   background-color: color(light-grey);
   text-decoration: none;
-  overflow: hidden; // necessary to hide any overflow of image for narrow card widths
-  height: 100%; // needed to fill all of the allocated flex layout or grid space
+  overflow: hidden; /* necessary to hide any overflow of image for narrow card widths */
+  height: 100%; /* needed to fill all of the allocated flex layout or grid space */
 
   &:focus {
-      // Accessibility review noted:
-      //   Focus outline is missing in Firefox.
-      //   For the :focus psuedo selector, define an outline style which will be visible, such as "outline: 2px dashed black;".
-      // So, here that is:
+      /* Accessibility review noted:
+           Focus outline is missing in Firefox.
+           For the :focus psuedo selector, define an outline style which will be visible, such as "outline: 2px dashed black;".
+         So, here that is: */
       outline: 2px dashed black;
       border: 1px solid color(secondary);
       background: color(primary);
@@ -45,14 +45,13 @@
   }
 }
 
-//Maker Directory
-.card__img { // note: source images come in as either 320x240 or 320x180 resolution
+/* Maker Directory */
+.card__img { /* note: source images come in as either 320x240 or 320x180 resolution */
   object-fit: cover;
-  transform: scale(1.05); // scaling to remove rounded corners on the majority of corpus (since others are squared corners) and fill top block always
+  transform: scale(1.05); /* scaling to remove rounded corners on the majority of corpus (since others are squared corners) and fill top block always */
   transition: filter .2s ease-in-out;
   width: 100%;
-  //max-width: 180px;
-  height: 150px; // (fills the 150px allocated for image area in fxFlex in html rendering well)
+  height: 150px; /* (fills the 150px allocated for image area in fxFlex in html rendering well) */
   .card:hover & {
     filter: grayscale(100%);
   }
@@ -101,7 +100,7 @@
         font-size: 1.4rem;
     }
     @media screen and (min-width: bp(afl_large)) {
-        font-size: 1.2rem; // at 2 per row, back to smaller font...
+        font-size: 1.2rem; /* at 2 per row, back to smaller font... */
     }
 }
 
@@ -123,7 +122,7 @@
         padding-bottom: em(2);
     }
     @media screen and (min-width: bp(afl_large)) {
-        font-size: 1.2rem; // at 2 per row, back to smaller font...
+        font-size: 1.2rem; /* at 2 per row, back to smaller font... */
         padding-bottom: em(2);
     }
 }

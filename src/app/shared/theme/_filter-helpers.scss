@@ -2,7 +2,7 @@
   @extend %source-sans;
 
   background-color: color(primary);
-  border: 1px solid color(primary); // note: added for accessibility, to provide a button border in high contrast mode
+  border: 1px solid color(primary); /* note: added for accessibility, to provide a button border in high contrast mode */
   border-radius: 0;
   cursor: pointer;
   height: $buttonHeight;
@@ -36,7 +36,7 @@
   margin-bottom: em(10, 20);
 }
 
-// Filter menu styles
+/* Filter menu styles */
 .filter-menu {
   border: 0;
   font-size: 1.2rem;
@@ -53,7 +53,7 @@
 
       font-size: 1.4rem;
       letter-spacing: em(.5, 18);
-      text-align: center; // center text within its flex container
+      text-align: center; /* center text within its flex container */
 
       @media screen and (max-width: bp(thmda_wideenough_just_before)) {
           font-size: 1.6rem;
@@ -72,7 +72,7 @@
     @extend %oswald;
 
     background-color: color(primary);
-    border: 1px solid color(primary); // note: added for accessibility, to provide a button border in high contrast mode
+    border: 1px solid color(primary); /* note: added for accessibility, to provide a button border in high contrast mode */
     border-radius: 0;
     color: #fff;
     cursor: pointer;
@@ -110,7 +110,7 @@
 
   .button-secondary {
     background: color(secondary);
-    border: 1px solid color(secondary); // note: added for accessibility, to provide a button border in high contrast mode
+    border: 1px solid color(secondary); /* note: added for accessibility, to provide a button border in high contrast mode */
   }
 
 }
@@ -128,7 +128,7 @@
   margin-bottom: 0;
 }
 
-// Last name active filter styles
+/* Last name active filter styles */
 .last-name-filter .last-name-letter {
     border-radius: 0;
     height: em(36);
@@ -137,7 +137,7 @@
     width: em(36);
   }
 
-// For typically narrow view
+/* For typically narrow view */
 .panel-for-narrow-filter {
   padding: em(9) 0;
 }
@@ -188,10 +188,10 @@
 
 .filter-section-rg-item:focus {
   box-shadow: 0 0 0 3px color(tertiary);
-  outline: 3px solid transparent; // For Windows high contrast mode.
+  outline: 3px solid transparent; /* For Windows high contrast mode. */
 }
 
-//This style applies to both wide and narrow screens
+/* This style applies to both wide and narrow screens */
 .filter-section-title {
   @extend %oswald;
 
@@ -205,19 +205,19 @@
   margin: auto;
 
   background-color: color(primary);
-  border: 1px solid color(primary); // note: added for accessibility, to provide a border in high contrast mode
+  border: 1px solid color(primary); /* note: added for accessibility, to provide a border in high contrast mode */
   border-radius: 0;
   color: #fff;
-  height: $buttonHeight; // corresponds to 30px(42px) with 16px default
+  height: $buttonHeight; /* corresponds to 30px(42px) with 16px default */
   width: 100%;
   font-size: 1.2rem;
 
   padding-left: em(8,16);
   padding-right: em(8,16);
 
-  // Safari will "zoom in" on the select with font-size like this, so it needs more space.
-  // Rather than "fight it" and try to control Safari html-select element styling, give it the space
-  // to do what it is doing (at least for Safari 13 on mobile, works as of May 2020).
+  /* Safari will "zoom in" on the select with font-size like this, so it needs more space.
+     Rather than "fight it" and try to control Safari html-select element styling, give it the space
+     to do what it is doing (at least for Safari 13 on mobile, works as of May 2020). */
   &:not(:root:root) {
     margin-left: em(8);
   }
@@ -274,7 +274,7 @@
 .filter-one-choice {
   @extend %source-sans-semi-bold;
 
-  font-size: 1rem; // must stay small because filters often squeezed into narrow filter panes
+  font-size: 1rem; /* must stay small because filters often squeezed into narrow filter panes */
   margin: 0;
   padding: 0;
   border: 0;
@@ -293,13 +293,13 @@
 
 .field-list-parent {
   @extend %source-sans;
-  font-size: 1rem; // must stay small because filters often squeezed into narrow filter panes
+  font-size: 1rem; /* must stay small because filters often squeezed into narrow filter panes */
   text-align: center;
 
   margin: auto;
 
   @media screen and (max-width: bp(thmda_filterui_maxpt)) {
-    text-align: left; //accordion content on Topic Search page
+    text-align: left; /* accordion content on Topic Search page */
   }
 
   @media screen and (max-width: bp(afl_medium_just_before)) {
@@ -364,7 +364,7 @@
   }
 
   .filter-remove-button {
-      font-size: 1rem; // must stay small because filters often squeezed into narrow filter panes
+      font-size: 1rem; /* must stay small because filters often squeezed into narrow filter panes */
       margin: 0;
       border: 0;
       background: transparent;
@@ -386,12 +386,12 @@
   .filter-remove-button:focus {
       color: color(secondary);
       box-shadow: 0 0 0 3px color(tertiary);
-      // NOTE: accessibility experts asked for this to be removed... outline: 3px solid transparent; // For Windows high contrast mode.
+      /* NOTE: accessibility experts asked for this to be removed... outline: 3px solid transparent; -- For Windows high contrast mode */.
   }
 
   .applied-field-list-parent {
     @extend %source-sans-semi-bold;
-    font-size: 1rem; // must stay small because filters often squeezed into narrow filter panes
+    font-size: 1rem; /* must stay small because filters often squeezed into narrow filter panes */
 
     margin: auto;
     vertical-align: middle;
@@ -406,4 +406,4 @@
     }
   }
 }
-// End of filters-applied
+/* End of filters-applied */

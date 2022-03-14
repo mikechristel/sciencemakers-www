@@ -6,7 +6,7 @@
   box-shadow: none;
   border: 1px solid color(primary);
   box-sizing: border-box;
-} // End of .panel-parent
+}
 
 .panel-title-item {
   @extend %oswald;
@@ -21,7 +21,7 @@
   border: 0;
   border-radius: 0;
   color: #fff;
-  height: $buttonHeight; // corresponds to 30px(42px) where 16px is default but allows users to resize text up to 200% and container grows, too
+  height: $buttonHeight; /* corresponds to 30px(42px) where 16px is default but allows users to resize text up to 200% and container grows, too */
   text-align: left;
   width: 100%;
 
@@ -56,7 +56,7 @@
   box-shadow: none;
   border: 1px solid color(secondary);
   box-sizing: border-box;
-} // End of .panel-reverse-parent
+}
 
 .panel-reverse-title-item {
   @extend %oswald;
@@ -103,7 +103,7 @@
   }
 }
 
-//Topic Search
+/* Topic Search */
 .panel-GRANDparent {
   background-color: color(light-grey);
   margin-bottom: em(18);
@@ -111,7 +111,7 @@
   box-shadow: none;
   border: 1px solid color(black);
   box-sizing: border-box;
-} // End of .panel-GRANDparent
+}
 
 .panel-GRANDparent > div.panel-body {
   background-color: color(light-grey);

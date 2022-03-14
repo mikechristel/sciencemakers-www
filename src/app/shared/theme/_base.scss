@@ -2,7 +2,7 @@
 @import 'variables';
 @import 'helpers';
 
-// common styling, e.g., for title/main heading of the page/route
+/* common styling, e.g., for title/main heading of the page/route */
 .page-title {
   @extend %oswald;
 
@@ -22,18 +22,18 @@
   }
 
   &:focus {
-    // !!!TBD!!! This likely will be tweaked in the future: must show a visual focus indicator,
-    // but do it well as EVERY route change ends up focusing the title element by request of accessibility experts.
-    // So, this style is seen frequently on first posting of a route for the title/main heading.
-    // Inspect not just this style class, but others for non-interactive elements who received a
-    // tabindex="-1" and (mousedown) to stop mouse focus activation that are currently using:
-    // outline: 0; and text-decoration: underline;
+    /* !!!TBD!!! This likely will be tweaked in the future: must show a visual focus indicator,
+       but do it well as EVERY route change ends up focusing the title element by request of accessibility experts.
+       So, this style is seen frequently on first posting of a route for the title/main heading.
+       Inspect not just this style class, but others for non-interactive elements who received a
+       tabindex="-1" and (mousedown) to stop mouse focus activation that are currently using:
+       outline: 0; and text-decoration: underline; */
     outline: 0;
     text-decoration: underline;
   }
 }
 
-// common style for subheadings (just a bit smaller than main title)
+/* common style for subheadings (just a bit smaller than main title) */
 .mysubheading {
   @extend %oswald;
 
@@ -109,7 +109,7 @@ p, li {
   padding: 0;
 }
 
-// Fieldset, legend, checkbox input
+/* Fieldset, legend, checkbox input */
 fieldset {
   display: block;
   margin-inline-start: 2px;
@@ -132,21 +132,12 @@ fieldset {
   font-size: 1.4rem;
   margin: 0;
   border: 0;
-  // Obsolete wide-screen improvements with maximum of thmda_maxwidth, afl_large < thmda_maxwidth < afl_xlarge < xlarge, simplify to afl_medium or larger
   @media screen and (min-width: bp(afl_medium)) {
       font-size: 1.6rem;
   }
-
-
-  //@media screen and (min-width: bp(afl_medium)) and (max-width: bp(afl_xlarge_just_before)) {
-  //  font-size: 1.6rem;
-  //}
-  //@media screen and (min-width: bp(afl_xlarge)) {
-  //    font-size: 1.8rem;
-  //}
 }
 
-/* Courtesy of http://stackoverflow.com/questions/306252/how-to-align-checkboxes-and-their-labels-consistently-cross-browsers
+/* Courtesy of stackoverflow.com/questions/306252/how-to-align-checkboxes-and-their-labels-consistently-cross-browsers
 */
 input[type=checkbox] {
 vertical-align: middle;
@@ -188,7 +179,7 @@ ul.list-unstyled {
             font-size: 1.1rem;
         }
     }
-}//ul
+}
 
 .nothing-for-ul {
   list-style-type: none;

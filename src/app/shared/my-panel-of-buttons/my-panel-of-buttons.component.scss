@@ -6,7 +6,7 @@
   box-shadow: none;
   border: 1px solid color(primary);
   box-sizing: border-box;
-} // End of .panel-parent
+}
 
 .panel-title-item {
   @extend %source-sans;
@@ -58,7 +58,7 @@
   box-shadow: none;
   border: 1px solid color(secondary);
   box-sizing: border-box;
-} // End of .panel-reverse-parent
+}
 
 .panel-reverse-title-item {
   @extend %oswald;
@@ -111,7 +111,7 @@
   border: 1px solid color(black);
   box-sizing: border-box;
   margin-bottom: em(8, 14);
-} // End of .panel-GRANDparent
+}
 
 .panel-GRANDparent-title-item {
   @extend %source-sans;

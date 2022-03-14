@@ -10,7 +10,7 @@
   }
 
   &:focus {
-    color: color(primary-on-mid-grey); // trust color cueing is enough
-    // NOTE: accessibility experts asked for this to be removed... outline: 3px solid transparent; // For Windows high contrast mode
+    color: color(primary-on-mid-grey); /* trust color cueing is enough */
+    /* NOTE: accessibility experts asked for this to be removed... outline: 3px solid transparent; -- For Windows high contrast mode */
   }
 }

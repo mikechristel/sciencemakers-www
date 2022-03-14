@@ -2,19 +2,17 @@
   @extend %source-sans-semi-bold;
 
   background-color: color(primary);
-  border: 1px solid color(primary); // note: added for accessibility, to provide a button border in high contrast mode
+  border: 1px solid color(primary); /* note: added for accessibility, to provide a button border in high contrast mode */
   border-radius: 0;
   color: #fff;
   cursor: pointer;
   font-size: 1.2rem;
   height: $buttonHeight;
-  // retired this when we moved from em units to rem units to better support accessibility rules: letter-spacing: .5px;
-  // retired this when we moved from em units to rem units to better support accessibility rules: line-height: 0.95em;
   transition: box-shadow .15s ease-in-out;
-  width: auto; // note: subtle difference with search__submit style for search button
+  width: auto; /* note: subtle difference with search__submit style for search button */
 
   @media screen and (min-width: bp(afl_small)) {
-      font-size: 1.2rem; // note: subtle difference with search__submit style for search button
+      font-size: 1.2rem; /* note: subtle difference with search__submit style for search button */
   }
 
   &:hover,
@@ -33,17 +31,17 @@
   @extend %source-sans-semi-bold;
 
   background-color: color(primary);
-  border: 1px solid color(primary); // note: added for accessibility, to provide a button border in high contrast mode
+  border: 1px solid color(primary); /* note: added for accessibility, to provide a button border in high contrast mode */
   border-radius: 0;
   color: #fff;
   cursor: pointer;
   font-size: 1.2rem;
   height: $buttonHeight;
   transition: box-shadow .15s ease-in-out;
-  width: auto; // note: subtle difference with search__submit style for search button
+  width: auto; /* note: subtle difference with search__submit style for search button */
 
   @media screen and (min-width: bp(afl_small)) {
-      font-size: 1.2rem; // note: subtle difference with search__submit style for search button
+      font-size: 1.2rem; /* note: subtle difference with search__submit style for search button */
   }
 
   &:hover,
@@ -58,11 +56,11 @@
   }
 }
 
-.myclips-add-delete-low-key-video-line { // height of 2rem, no margin nor narrow width media query
+.myclips-add-delete-low-key-video-line { /* height of 2rem, no margin nor narrow width media query */
   @extend %oswald;
 
   background-color: color(primary);
-  border: 1px solid color(primary); // note: added for accessibility, to provide a button border in high contrast mode
+  border: 1px solid color(primary); /* note: added for accessibility, to provide a button border in high contrast mode */
   border-radius: 0;
   color: #fff;
   cursor: pointer;
@@ -73,7 +71,7 @@
   text-align: center;
 
   transition: box-shadow .15s ease-in-out;
-  width: 100%; // note: subtle difference with search__submit style for search button
+  width: 100%; /* note: subtle difference with search__submit style for search button */
 
   &:hover,
   &:focus {
@@ -87,21 +85,20 @@
   }
 }
 
-.back-button-low-key { // similar to my-app-button but shorter, with smaller font too
+.back-button-low-key { /* similar to my-app-button but shorter, with smaller font too */
   @extend %oswald;
 
   background-color: color(primary);
-  border: 1px solid color(primary); // note: added for accessibility, to provide a button border in high contrast mode
+  border: 1px solid color(primary); /* note: added for accessibility, to provide a button border in high contrast mode */
   border-radius: 0;
   color: #fff;
   cursor: pointer;
   font-size: 1.2rem;
   height: $buttonHeight;
-  //max-width: 4rem;
   padding: 0 12px;
   white-space: nowrap;
   transition: box-shadow .15s ease-in-out;
-  width: auto; // note: subtle difference with search__submit style for search button
+  width: auto; /* note: subtle difference with search__submit style for search button */
 
   &:hover,
   &:focus {
@@ -115,11 +112,11 @@
   }
 }
 
-.back-button-low-key-video-line { // just like back-button-low-key but no margin and height change
+.back-button-low-key-video-line { /* just like back-button-low-key but no margin and height change */
   @extend %oswald;
 
   background-color: color(secondary);
-  border: 1px solid color(secondary); // note: added for accessibility, to provide a button border in high contrast mode
+  border: 1px solid color(secondary); /* note: added for accessibility, to provide a button border in high contrast mode */
   border-radius: 0;
   color: #fff;
   cursor: pointer;
@@ -128,7 +125,7 @@
   padding: 0 10px;
   white-space: nowrap;
   transition: box-shadow .15s ease-in-out;
-  width: auto; // note: subtle difference with search__submit style for search button
+  width: auto; /* note: subtle difference with search__submit style for search button */
   margin: 0;
 
   &:hover,
@@ -147,18 +144,18 @@
   @extend %oswald;
 
   background-color: color(primary);
-  border: 1px solid color(primary); // note: added for accessibility, to provide a button border in high contrast mode
+  border: 1px solid color(primary); /* note: added for accessibility, to provide a button border in high contrast mode */
   border-radius: 0;
   color: #fff;
   cursor: pointer;
   font-size: 1.2rem;
   height: $buttonHeight;
   min-height: $buttonHeight;
-  max-width: 12.5rem; // note: difference from back-button-low-key
+  max-width: 12.5rem; /* note: difference from back-button-low-key */
   padding: 0 12px;
   white-space: nowrap;
   transition: box-shadow .15s ease-in-out;
-  width: auto; // note: subtle difference with search__submit style for search button
+  width: auto; /* note: subtle difference with search__submit style for search button */
 
   &:hover,
   &:focus {
@@ -172,11 +169,11 @@
   }
 }
 
-.button-low-key { // similar to back-button-low-key but with larger width
+.button-low-key { /* similar to back-button-low-key but with larger width */
   @extend %source-sans;
 
   background-color: color(primary);
-  border: 1px solid color(primary); // note: added for accessibility, to provide a button border in high contrast mode
+  border: 1px solid color(primary); /* note: added for accessibility, to provide a button border in high contrast mode */
   border-radius: 0;
   color: #fff;
   cursor: pointer;
@@ -184,7 +181,7 @@
   max-width: 8.125rem;
   white-space: nowrap;
   transition: box-shadow .15s ease-in-out;
-  width: auto; // note: subtle difference with search__submit style for search button
+  width: auto; /* note: subtle difference with search__submit style for search button */
 
   &:hover,
   &:focus {
@@ -198,11 +195,11 @@
   }
 }
 
-.button-low-key-toggle { // very similar to button-low-key but height of em(32); on redo of styles could be organized better with that
+.button-low-key-toggle { /* very similar to button-low-key but height of em(32); on redo of styles could be organized better with that */
   @extend %oswald;
 
   background-color: color(secondary);
-  border: 1px solid color(secondary); // note: added for accessibility, to provide a button border in high contrast mode
+  border: 1px solid color(secondary); /* note: added for accessibility, to provide a button border in high contrast mode */
   border-radius: 0;
   color: #fff;
   cursor: pointer;
@@ -211,8 +208,8 @@
   padding: 0 10px;
   white-space: nowrap;
   transition: box-shadow .15s ease-in-out;
-  width: auto; // note: subtle difference with search__submit style for search button
-  margin: 0; // note: difference with button-low-key
+  width: auto; /* note: subtle difference with search__submit style for search button */
+  margin: 0; /* note: difference with button-low-key */
 
   &:hover,
   &:focus {
@@ -226,21 +223,20 @@
   }
 }
 
-.summaries-button-low-key { // similar to back-button-low-key but with different value for max-width
+.summaries-button-low-key { /* similar to back-button-low-key but with different value for max-width */
   @extend %oswald;
 
   background-color: color(secondary);
-  border: 1px solid color(secondary); // note: added for accessibility, to provide a button border in high contrast mode
+  border: 1px solid color(secondary); /* note: added for accessibility, to provide a button border in high contrast mode */
   border-radius: 0;
   color: #fff;
   cursor: pointer;
   font-size: 1.2rem;
   height: $buttonHeight;
-  //max-width: 7.875rem;
   padding: 0 12px;
   white-space: nowrap;
   transition: box-shadow .15s ease-in-out;
-  width: auto; // note: subtle difference with search__submit style for search button
+  width: auto; /* note: subtle difference with search__submit style for search button */
 
   &:hover,
   &:focus {

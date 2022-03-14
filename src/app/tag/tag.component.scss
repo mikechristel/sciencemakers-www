@@ -1,5 +1,5 @@
 ﻿@import '../shared/theme/base';
-@import '../shared/theme/filter-helpers'; // panel UI used here the same as used for filter panels
+@import '../shared/theme/filter-helpers'; /* panel UI used here the same as used for filter panels */
 
 .limitMaxWidth {
   text-align: center;
@@ -72,7 +72,7 @@ h2 {
   @extend %oswald;
 
   background-color: color(primary);
-  border: 1px solid color(primary); // note: added for accessibility, to provide a button border in high contrast mode
+  border: 1px solid color(primary); /* note: added for accessibility, to provide a button border in high contrast mode */
   border-radius: 0;
   color: #fff;
   cursor: pointer;
@@ -82,10 +82,6 @@ h2 {
   padding-left: 10px;
   padding-right: 10px;
   transition: box-shadow .15s ease-in-out;
-
-  @media screen and (min-width: bp(thmda_narrow)) {
-    //padding: em(6) em(6) em(6) em(6); /* top right bottom left */
-  }
 
   &:hover,
   &:focus {
@@ -108,11 +104,7 @@ h2 {
   letter-spacing: .5px;
   height: $buttonHeight;
 
-  @media screen and (min-width: bp(thmda_narrow)) {
-    //padding: em(6) em(6) em(6) em(6); /* top right bottom left */
-  }
-
-  // adjust look for "disabled"
+  /* adjust look for "disabled" */
   cursor: not-allowed;
   opacity: .4;
 
@@ -128,7 +120,7 @@ h2 {
 .button-secondary {
   @extend %oswald;
   background: color(secondary);
-  border: 1px solid color(secondary); // note: added for accessibility, to provide a button border in high contrast mode
+  border: 1px solid color(secondary); /* note: added for accessibility, to provide a button border in high contrast mode */
   border-radius: 0;
   color: #fff;
   height: $buttonHeight;
