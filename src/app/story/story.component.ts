@@ -510,6 +510,7 @@ export class StoryComponent extends BaseComponent implements OnInit {
         var maxTimingPairIndex: number;
         var givenMatchesCount: number;
         var newEntry: TimedTextMatch;
+        var redundantEntry: boolean = false;
 
         if (this.myStory.timingPairs == null)
             maxTimingPairIndex = -1;
@@ -518,7 +519,7 @@ export class StoryComponent extends BaseComponent implements OnInit {
         if (this.myStory.matchTerms == null)
             givenMatchesCount = 0;
         else
-            givenMatchesCount = this.myStory.matchTerms.length;
+            givenMatchesCount = this.myStory.matchTerms.length; // NOTE: this may include some extraneous redundant entries
 
         if (givenMatchesCount == 0 || maxTimingPairIndex <= 0) {
             this.storyHasMatches = false;
@@ -529,23 +530,44 @@ export class StoryComponent extends BaseComponent implements OnInit {
         this.storyHasMatches = true;
         // As we move through this.myStory.timingPairs in ascending offset order, we don't go back,
         // i.e., i starts at 0 but moves forward within this outer while loop rather than being
-        // reset to 0 each time:
+        // reset to 0 each time.
+        // Also, we do a check that if the next match overlaps with the prior match, we extend the prior match.
+        // If the next match is fully included in the prior match, it is just left out.
+        // This corrects for issues with the service where a double match may be reported, e.g., to
+        // "topsy-turvy" and "turvy" on a query term of topsy-turvy.  Filter out such redundancies here.
         while (matchIndex < givenMatchesCount) {
             while (this.myStory.timingPairs[i].offset <= this.myStory.matchTerms[matchIndex].startOffset &&
                 i <= maxTimingPairIndex)
                 i++;
-            // Offset at matchIndex lines up in time slot at i-1 (using 0 if i-1 == -1);
-            // set the time attribute for matchInfo[] based on the stored offset value already there,
-            // adjusting the time based on this.myStory.timingPairs.
-            newEntry = new TimedTextMatch();
-            newEntry.startOffset = this.myStory.matchTerms[matchIndex].startOffset;
-            newEntry.endOffset = this.myStory.matchTerms[matchIndex].endOffset;
+            // Redundancy check: if this match overlaps with prior one - extend prior one.
+            // If it is completely in prior one, do nothing.
+            // Of course, if there is no prior one - we keep this match, as we do if it does not overlap with prior one.
+            redundantEntry = false;
+            if (this.myMatchContext.length > 0) { // have a prior entry to check (no need to compare startOffsets as they are ordered and increasing in value)
+                if (this.myMatchContext[this.myMatchContext.length - 1].endOffset > this.myStory.matchTerms[matchIndex].startOffset) {
+                  redundantEntry = true;
+                  if (this.myMatchContext[this.myMatchContext.length - 1].endOffset < this.myStory.matchTerms[matchIndex].endOffset) {
+                    // Extend prior entry to overlap both of these match entries as they overlap.
+                    this.myMatchContext[this.myMatchContext.length - 1].endOffset = this.myStory.matchTerms[matchIndex].endOffset;
+                  }
+                  // else this prior entry completely encloses the matchIndex entry -- nothing else to do
+                }
+            }
+            if (!redundantEntry)
+            {
+              // Offset at matchIndex lines up in time slot at i-1 (using 0 if i-1 == -1);
+              // set the time attribute for matchInfo[] based on the stored offset value already there,
+              // adjusting the time based on this.myStory.timingPairs.
+              newEntry = new TimedTextMatch();
+              newEntry.startOffset = this.myStory.matchTerms[matchIndex].startOffset;
+              newEntry.endOffset = this.myStory.matchTerms[matchIndex].endOffset;
 
-            if (i == 0)
-                newEntry.time = this.myStory.timingPairs[0].time;
-            else
-                newEntry.time = this.myStory.timingPairs[i - 1].time;
-            this.myMatchContext.push(newEntry);
+              if (i == 0)
+                  newEntry.time = this.myStory.timingPairs[0].time;
+              else
+                  newEntry.time = this.myStory.timingPairs[i - 1].time;
+              this.myMatchContext.push(newEntry);
+            }
             matchIndex++; // Note: service puts matches in order, so this.myStory.timingPairs[N+1].startOffset >= this.myStory.timingPairs[N].startOffset
         }
     }
