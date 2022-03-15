@@ -1,16 +1,19 @@
+@use '../theme/myF';
+@use '../theme/myGlobals';
+@use '../theme/helpers';
 @use '../theme/base';
 
 .panel-parent {
-  margin-bottom: em(8, 14);
+  margin-bottom: myF.em(8, 14);
   border-radius: 0;
   box-shadow: none;
-  border: 1px solid color(primary);
+  border: 1px solid myF.color(primary);
   box-sizing: border-box;
 }
 
 .panel-title-item {
-  @extend %source-sans;
-  @extend %oswald;
+ @include myGlobals.source-sans;
+  @include myGlobals.oswald;
 
   font-size: 1.2rem;
   margin: auto;
@@ -20,52 +23,52 @@
 .panel-open-close {
   padding: 0;
 
-  background-color: color(primary);
+  background-color: myF.color(primary);
   border: 0;
   border-radius: 0;
   color: #fff;
-  height: #{$buttonHeight};
+  height: myGlobals.$buttonHeight;
   width: 100%;
 
-  padding-left: em(8,16);
-  padding-right: em(8,16);
+  padding-left: myF.em(8,16);
+  padding-right: myF.em(8,16);
 
-  @media screen and (min-width: bp(afl_medium)) and (max-width: bp(afl_large_just_before)) {
-    padding-left: em(12,16);
-    padding-right: em(12,16);
+  @media screen and (min-width: myF.bp(afl_medium)) and (max-width: myF.bp(afl_large_just_before)) {
+    padding-left: myF.em(12,16);
+    padding-right: myF.em(12,16);
   }
 
-  @media screen and (min-width: bp(afl_large)) {
-    padding-left: em(16,16);
-    padding-right: em(16,16);
+  @media screen and (min-width: myF.bp(afl_large)) {
+    padding-left: myF.em(16,16);
+    padding-right: myF.em(16,16);
   }
 
   &:hover,
   &:focus {
-    background-color: color(secondary);
+    background-color: myF.color(secondary);
     color: #fff;
   }
 
   &.active {
-    background-color: color(primary);
+    background-color: myF.color(primary);
     color: #fff;
   }
 }
 
 .panel-reverse-parent {
-  margin-bottom: em(8, 14);
+  margin-bottom: myF.em(8, 14);
   border-radius: 0;
   box-shadow: none;
-  border: 1px solid color(secondary);
+  border: 1px solid myF.color(secondary);
   box-sizing: border-box;
 }
 
 .panel-reverse-title-item {
-  @extend %oswald;
+  @include myGlobals.oswald;
   font-size: 1.2rem;
   margin: auto;
 
-  @media screen and (min-width: bp(afl_small)) {
+  @media screen and (min-width: myF.bp(afl_small)) {
       font-size: 1.4rem;
   }
 }
@@ -73,34 +76,34 @@
 .panel-reverse-open-close {
   padding: 0;
 
-  background-color: color(secondary);
+  background-color: myF.color(secondary);
   border: 0;
   border-radius: 0;
   color: #fff;
-  height: #{$buttonHeight};
+  height: myGlobals.$buttonHeight;
   width: 100%;
 
-  padding-left: em(8,16);
-  padding-right: em(8,16);
+  padding-left: myF.em(8,16);
+  padding-right: myF.em(8,16);
 
-  @media screen and (min-width: bp(afl_medium)) and (max-width: bp(afl_large_just_before)) {
-    padding-left: em(12,16);
-    padding-right: em(12,16);
+  @media screen and (min-width: myF.bp(afl_medium)) and (max-width: myF.bp(afl_large_just_before)) {
+    padding-left: myF.em(12,16);
+    padding-right: myF.em(12,16);
   }
 
-  @media screen and (min-width: bp(afl_large)) {
-    padding-left: em(16,16);
-    padding-right: em(16,16);
+  @media screen and (min-width: myF.bp(afl_large)) {
+    padding-left: myF.em(16,16);
+    padding-right: myF.em(16,16);
   }
 
   &:hover,
   &:focus {
-    background-color: color(primary);
+    background-color: myF.color(primary);
     color: #fff;
   }
 
   &.active {
-    background-color: color(secondary);
+    background-color: myF.color(secondary);
     color: #fff;
   }
 }
@@ -108,18 +111,18 @@
 .panel-GRANDparent {
   border-radius: 0;
   box-shadow: none;
-  border: 1px solid color(black);
+  border: 1px solid myF.color(black);
   box-sizing: border-box;
-  margin-bottom: em(8, 14);
+  margin-bottom: myF.em(8, 14);
 }
 
 .panel-GRANDparent-title-item {
-  @extend %source-sans;
+ @include myGlobals.source-sans;
   font-size: 1rem;
   font-style: italic;
   margin: auto;
 
-  @media screen and (min-width: bp(afl_small)) {
+  @media screen and (min-width: myF.bp(afl_small)) {
       font-size: 1.2rem;
   }
 }
@@ -127,34 +130,34 @@
 .panel-GRANDparent-open-close {
   padding: 0;
 
-  background-color: color(black);
+  background-color: myF.color(black);
   border: 0;
   border-radius: 0;
   color: #fff;
   height: 1.875rem;
   width: 100%;
 
-  padding-left: em(8,16);
-  padding-right: em(8,16);
+  padding-left: myF.em(8,16);
+  padding-right: myF.em(8,16);
 
-  @media screen and (min-width: bp(afl_medium)) and (max-width: bp(afl_large_just_before)) {
-    padding-left: em(12,16);
-    padding-right: em(12,16);
+  @media screen and (min-width: myF.bp(afl_medium)) and (max-width: myF.bp(afl_large_just_before)) {
+    padding-left: myF.em(12,16);
+    padding-right: myF.em(12,16);
   }
 
-  @media screen and (min-width: bp(afl_large)) {
-    padding-left: em(16,16);
-    padding-right: em(16,16);
+  @media screen and (min-width: myF.bp(afl_large)) {
+    padding-left: myF.em(16,16);
+    padding-right: myF.em(16,16);
   }
 
   &:hover,
   &:focus {
-    background-color: color(secondary);
+    background-color: myF.color(secondary);
     color: #fff;
   }
 
   &.active {
-    background-color: color(black);
+    background-color: myF.color(black);
     color: #fff;
   }
 }
@@ -196,6 +199,6 @@
 }
 
 .panel-body {
-  padding: em(4,14) em(6,14);
+  padding: myF.em(4,14) myF.em(6,14);
   background-color: white;
 }

@@ -1,9 +1,12 @@
-﻿@use '../shared/theme/base';
+﻿@use '../shared/theme/myF';
+@use '../shared/theme/myGlobals';
+@use '../shared/theme/helpers';
+@use '../shared/theme/base';
 @use '../shared/theme/filter-helpers'; /* panel UI used here the same as used for filter panels */
 
 .limitMaxWidth {
   text-align: center;
-  max-width: bp(afl_large);
+  max-width: myF.bp(afl_large);
 }
 
 .top-ul {
@@ -14,7 +17,7 @@
   margin: 0;
   padding: 0;
 
-  @media screen and (max-width: bp(afl_medium_just_before)) {
+  @media screen and (max-width: myF.bp(afl_medium_just_before)) {
     grid-template-columns: repeat(1, 1fr);
   }
 }
@@ -26,58 +29,58 @@
 
 h2 {
     margin-top: 0.5em;
-    margin-bottom: em(6);
+    margin-bottom: myF.em(6);
     padding: 0.1em;
     font-size: 1.2rem;
 
-    @media screen and (min-width: bp(afl_small)) and (max-width: bp(afl_medium_just_before)) {
+    @media screen and (min-width: myF.bp(afl_small)) and (max-width: myF.bp(afl_medium_just_before)) {
         font-size: 1.4rem;
-        margin-bottom: em(10);
+        margin-bottom: myF.em(10);
     }
 
-    @media screen and (min-width: bp(afl_medium)) {
+    @media screen and (min-width: myF.bp(afl_medium)) {
         font-size: 1.6rem;
-        margin-bottom: em(12);
+        margin-bottom: myF.em(12);
     }
 }
 
 .tagSummary {
-  @extend %oswald;
-  color: color(dark-grey);
+  @include myGlobals.oswald;
+  color: myF.color(dark-grey);
   font-size: 1rem;
-  margin-bottom: em(10);
+  margin-bottom: myF.em(10);
   margin-top: 0;
   padding: 0;
 
-  @media screen and (min-width: bp(afl_small)) and (max-width: bp(afl_medium_just_before)) {
+  @media screen and (min-width: myF.bp(afl_small)) and (max-width: myF.bp(afl_medium_just_before)) {
       font-size: 1.2rem;
-      margin-bottom: em(10);
+      margin-bottom: myF.em(10);
   }
 
-  @media screen and (min-width: bp(afl_medium)) {
+  @media screen and (min-width: myF.bp(afl_medium)) {
       font-size: 1.4rem;
-      margin-bottom: em(12);
+      margin-bottom: myF.em(12);
   }
 }
 
 .smallGapAfter {
-  margin: 0 0 em(18) 0; /* top right bottom left */
+  margin: 0 0 myF.em(18) 0; /* top right bottom left */
 }
 
 .smallGapBefore {
-  margin: em(18) 0 0 0; /* top right bottom left */
+  margin: myF.em(18) 0 0 0; /* top right bottom left */
 }
 
 .topic_button {
-  @extend %oswald;
+  @include myGlobals.oswald;
 
-  background-color: color(primary);
-  border: 1px solid color(primary); /* note: added for accessibility, to provide a button border in high contrast mode */
+  background-color: myF.color(primary);
+  border: 1px solid myF.color(primary); /* note: added for accessibility, to provide a button border in high contrast mode */
   border-radius: 0;
   color: #fff;
   cursor: pointer;
   font-size: 1.2rem;
-  height: #{$buttonHeight};
+  height: myGlobals.$buttonHeight;
   letter-spacing: .5px;
   padding-left: 10px;
   padding-right: 10px;
@@ -86,7 +89,7 @@ h2 {
   &:hover,
   &:focus {
       box-shadow: inset 0 0 5px rgba(51,51,51,.6);
-      background-color: color(secondary);
+      background-color: myF.color(secondary);
   }
 
   span {
@@ -95,14 +98,14 @@ h2 {
 }
 
 .topic_button_disabled {
-  @extend %oswald;
+  @include myGlobals.oswald;
 
-  background-color: color(primary);
+  background-color: myF.color(primary);
   border-radius: 0;
   color: #fff;
   font-size: 1.2rem;
   letter-spacing: .5px;
-  height: #{$buttonHeight};
+  height: myGlobals.$buttonHeight;
 
   /* adjust look for "disabled" */
   cursor: not-allowed;
@@ -114,16 +117,16 @@ h2 {
 }
 
 .button-secondary--disabled {
-  background-color: color(secondary);
+  background-color: myF.color(secondary);
 }
 
 .button-secondary {
-  @extend %oswald;
-  background: color(secondary);
-  border: 1px solid color(secondary); /* note: added for accessibility, to provide a button border in high contrast mode */
+  @include myGlobals.oswald;
+  background: myF.color(secondary);
+  border: 1px solid myF.color(secondary); /* note: added for accessibility, to provide a button border in high contrast mode */
   border-radius: 0;
   color: #fff;
-  height: #{$buttonHeight};
+  height: myGlobals.$buttonHeight;
   min-width: 3.125rem;
   max-width: 6.25rem;
   letter-spacing: .5px;
@@ -132,6 +135,6 @@ h2 {
   &:hover,
   &:focus {
       box-shadow: inset 0 0 5px rgba(51,51,51,.6);
-      background-color: color(primary);
+      background-color: myF.color(primary);
   }
 }

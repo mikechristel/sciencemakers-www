@@ -1,24 +1,27 @@
+@use 'myGlobals';
+@use 'myF';
+
 .my-app-button {
   @extend %source-sans-semi-bold;
 
-  background-color: color(primary);
-  border: 1px solid color(primary); /* note: added for accessibility, to provide a button border in high contrast mode */
+  background-color: myF.color(primary);
+  border: 1px solid myF.color(primary); /* note: added for accessibility, to provide a button border in high contrast mode */
   border-radius: 0;
   color: #fff;
   cursor: pointer;
   font-size: 1.2rem;
-  height: #{$buttonHeight};
+  height: myGlobals.$buttonHeight;
   transition: box-shadow .15s ease-in-out;
   width: auto; /* note: subtle difference with search__submit style for search button */
 
-  @media screen and (min-width: bp(afl_small)) {
+  @media screen and (min-width: myF.bp(afl_small)) {
       font-size: 1.2rem; /* note: subtle difference with search__submit style for search button */
   }
 
   &:hover,
   &:focus {
       box-shadow: inset 0 0 5px rgba(51,51,51,.6);
-      background-color: color(secondary);
+      background-color: myF.color(secondary);
   }
 
   &:disabled {
@@ -30,24 +33,24 @@
 .my-app-button-shorter {
   @extend %source-sans-semi-bold;
 
-  background-color: color(primary);
-  border: 1px solid color(primary); /* note: added for accessibility, to provide a button border in high contrast mode */
+  background-color: myF.color(primary);
+  border: 1px solid myF.color(primary); /* note: added for accessibility, to provide a button border in high contrast mode */
   border-radius: 0;
   color: #fff;
   cursor: pointer;
   font-size: 1.2rem;
-  height: #{$buttonHeight};
+  height: myGlobals.$buttonHeight;
   transition: box-shadow .15s ease-in-out;
   width: auto; /* note: subtle difference with search__submit style for search button */
 
-  @media screen and (min-width: bp(afl_small)) {
+  @media screen and (min-width: myF.bp(afl_small)) {
       font-size: 1.2rem; /* note: subtle difference with search__submit style for search button */
   }
 
   &:hover,
   &:focus {
       box-shadow: inset 0 0 5px rgba(51,51,51,.6);
-      background-color: color(secondary);
+      background-color: myF.color(secondary);
   }
 
   &:disabled {
@@ -57,15 +60,15 @@
 }
 
 .myclips-add-delete-low-key-video-line { /* height of 2rem, no margin nor narrow width media query */
-  @extend %oswald;
+  @include myGlobals.oswald;
 
-  background-color: color(primary);
-  border: 1px solid color(primary); /* note: added for accessibility, to provide a button border in high contrast mode */
+  background-color: myF.color(primary);
+  border: 1px solid myF.color(primary); /* note: added for accessibility, to provide a button border in high contrast mode */
   border-radius: 0;
   color: #fff;
   cursor: pointer;
   font-size: 1.2rem;
-  height: #{$buttonHeight};
+  height: myGlobals.$buttonHeight;
   margin: 0;
   padding: 0 10px;
   text-align: center;
@@ -76,7 +79,7 @@
   &:hover,
   &:focus {
     box-shadow: inset 0 0 5px rgba(51,51,51,.6);
-    background-color: color(secondary);
+    background-color: myF.color(secondary);
   }
 
   &:disabled {
@@ -86,15 +89,15 @@
 }
 
 .back-button-low-key { /* similar to my-app-button but shorter, with smaller font too */
-  @extend %oswald;
+  @include myGlobals.oswald;
 
-  background-color: color(primary);
-  border: 1px solid color(primary); /* note: added for accessibility, to provide a button border in high contrast mode */
+  background-color: myF.color(primary);
+  border: 1px solid myF.color(primary); /* note: added for accessibility, to provide a button border in high contrast mode */
   border-radius: 0;
   color: #fff;
   cursor: pointer;
   font-size: 1.2rem;
-  height: #{$buttonHeight};
+  height: myGlobals.$buttonHeight;
   padding: 0 12px;
   white-space: nowrap;
   transition: box-shadow .15s ease-in-out;
@@ -103,7 +106,7 @@
   &:hover,
   &:focus {
       box-shadow: inset 0 0 5px rgba(51,51,51,.6);
-      background-color: color(secondary);
+      background-color: myF.color(secondary);
   }
 
   &:disabled {
@@ -113,15 +116,15 @@
 }
 
 .back-button-low-key-video-line { /* just like back-button-low-key but no margin and height change */
-  @extend %oswald;
+  @include myGlobals.oswald;
 
-  background-color: color(secondary);
-  border: 1px solid color(secondary); /* note: added for accessibility, to provide a button border in high contrast mode */
+  background-color: myF.color(secondary);
+  border: 1px solid myF.color(secondary); /* note: added for accessibility, to provide a button border in high contrast mode */
   border-radius: 0;
   color: #fff;
   cursor: pointer;
   font-size: 1.2rem;
-  height: #{$buttonHeight};
+  height: myGlobals.$buttonHeight;
   padding: 0 10px;
   white-space: nowrap;
   transition: box-shadow .15s ease-in-out;
@@ -131,7 +134,7 @@
   &:hover,
   &:focus {
       box-shadow: inset 0 0 5px rgba(51,51,51,.6);
-      background-color: color(primary);
+      background-color: myF.color(primary);
   }
 
   &:disabled {
@@ -141,16 +144,16 @@
 }
 
 .back-button-for-story {
-  @extend %oswald;
+  @include myGlobals.oswald;
 
-  background-color: color(primary);
-  border: 1px solid color(primary); /* note: added for accessibility, to provide a button border in high contrast mode */
+  background-color: myF.color(primary);
+  border: 1px solid myF.color(primary); /* note: added for accessibility, to provide a button border in high contrast mode */
   border-radius: 0;
   color: #fff;
   cursor: pointer;
   font-size: 1.2rem;
-  height: #{$buttonHeight};
-  min-height: #{$buttonHeight};
+  height: myGlobals.$buttonHeight;
+  min-height: myGlobals.$buttonHeight;
   max-width: 12.5rem; /* note: difference from back-button-low-key */
   padding: 0 12px;
   white-space: nowrap;
@@ -160,7 +163,7 @@
   &:hover,
   &:focus {
       box-shadow: inset 0 0 5px rgba(51,51,51,.6);
-      background-color: color(secondary);
+      background-color: myF.color(secondary);
   }
 
   &:disabled {
@@ -170,14 +173,14 @@
 }
 
 .button-low-key { /* similar to back-button-low-key but with larger width */
-  @extend %source-sans;
+ @include myGlobals.source-sans;
 
-  background-color: color(primary);
-  border: 1px solid color(primary); /* note: added for accessibility, to provide a button border in high contrast mode */
+  background-color: myF.color(primary);
+  border: 1px solid myF.color(primary); /* note: added for accessibility, to provide a button border in high contrast mode */
   border-radius: 0;
   color: #fff;
   cursor: pointer;
-  height: #{$buttonHeight};
+  height: myGlobals.$buttonHeight;
   max-width: 8.125rem;
   white-space: nowrap;
   transition: box-shadow .15s ease-in-out;
@@ -186,7 +189,7 @@
   &:hover,
   &:focus {
       box-shadow: inset 0 0 5px rgba(51,51,51,.6);
-      background-color: color(secondary);
+      background-color: myF.color(secondary);
   }
 
   &:disabled {
@@ -195,16 +198,16 @@
   }
 }
 
-.button-low-key-toggle { /* very similar to button-low-key but height of em(32); on redo of styles could be organized better with that */
-  @extend %oswald;
+.button-low-key-toggle { /* very similar to button-low-key but height of myF.em(32); on redo of styles could be organized better with that */
+  @include myGlobals.oswald;
 
-  background-color: color(secondary);
-  border: 1px solid color(secondary); /* note: added for accessibility, to provide a button border in high contrast mode */
+  background-color: myF.color(secondary);
+  border: 1px solid myF.color(secondary); /* note: added for accessibility, to provide a button border in high contrast mode */
   border-radius: 0;
   color: #fff;
   cursor: pointer;
   font-size: 1.2rem;
-  height: #{$buttonHeight};
+  height: myGlobals.$buttonHeight;
   padding: 0 10px;
   white-space: nowrap;
   transition: box-shadow .15s ease-in-out;
@@ -214,7 +217,7 @@
   &:hover,
   &:focus {
       box-shadow: inset 0 0 5px rgba(51,51,51,.6);
-      background-color: color(primary);
+      background-color: myF.color(primary);
   }
 
   &:disabled {
@@ -224,15 +227,15 @@
 }
 
 .summaries-button-low-key { /* similar to back-button-low-key but with different value for max-width */
-  @extend %oswald;
+  @include myGlobals.oswald;
 
-  background-color: color(secondary);
-  border: 1px solid color(secondary); /* note: added for accessibility, to provide a button border in high contrast mode */
+  background-color: myF.color(secondary);
+  border: 1px solid myF.color(secondary); /* note: added for accessibility, to provide a button border in high contrast mode */
   border-radius: 0;
   color: #fff;
   cursor: pointer;
   font-size: 1.2rem;
-  height: #{$buttonHeight};
+  height: myGlobals.$buttonHeight;
   padding: 0 12px;
   white-space: nowrap;
   transition: box-shadow .15s ease-in-out;
@@ -241,7 +244,7 @@
   &:hover,
   &:focus {
       box-shadow: inset 0 0 5px rgba(51,51,51,.6);
-      background-color: color(primary);
+      background-color: myF.color(primary);
   }
 
   &:disabled {
@@ -249,8 +252,8 @@
       opacity: .4;
   }
 
-  @media screen and (max-width: bp(afl_medium_just_before)) {
-    margin-bottom: em(12);
+  @media screen and (max-width: myF.bp(afl_medium_just_before)) {
+    margin-bottom: myF.em(12);
   }
 }
 

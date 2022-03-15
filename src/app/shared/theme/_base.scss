@@ -1,24 +1,23 @@
-@use 'functions';
-@use 'variables';
-@use 'helpers';
+@use 'myGlobals';
+@use 'myF';
 
 /* common styling, e.g., for title/main heading of the page/route */
 .page-title {
-  @extend %oswald;
+  @include myGlobals.oswald;
 
   font-size: 1.4rem;
   font-weight: 500;
-  margin-bottom: em(8);
+  margin-bottom: myF.em(8);
   margin-top: 0;
 
-  @media screen and (min-width: bp(afl_small)) and (max-width: bp(afl_medium_just_before)) {
+  @media screen and (min-width: myF.bp(afl_small)) and (max-width: myF.bp(afl_medium_just_before)) {
       font-size: 1.6rem;
-      margin-bottom: em(10);
+      margin-bottom: myF.em(10);
   }
 
-  @media screen and (min-width: bp(afl_medium)) {
+  @media screen and (min-width: myF.bp(afl_medium)) {
       font-size: 1.8rem;
-      margin-bottom: em(12);
+      margin-bottom: myF.em(12);
   }
 
   &:focus {
@@ -35,22 +34,22 @@
 
 /* common style for subheadings (just a bit smaller than main title) */
 .mysubheading {
-  @extend %oswald;
+  @include myGlobals.oswald;
 
   font-size: 1.2rem;
   font-weight: 500;
   color: black;
-  margin-bottom: em(6);
+  margin-bottom: myF.em(6);
   margin-top: 0;
 
-  @media screen and (min-width: bp(afl_small)) and (max-width: bp(afl_medium_just_before)) {
+  @media screen and (min-width: myF.bp(afl_small)) and (max-width: myF.bp(afl_medium_just_before)) {
       font-size: 1.4rem;
-      margin-bottom: em(8);
+      margin-bottom: myF.em(8);
   }
 
-  @media screen and (min-width: bp(afl_medium)) {
+  @media screen and (min-width: myF.bp(afl_medium)) {
       font-size: 1.6rem;
-      margin-bottom: em(10);
+      margin-bottom: myF.em(10);
   }
 
   &:focus {
@@ -60,24 +59,24 @@
 }
 
 .mysubheading-gap-before {
-  @extend %oswald;
+  @include myGlobals.oswald;
 
   font-size: 1.2rem;
   font-weight: 500;
   color: black;
-  margin-bottom: em(6);
-  margin-top: em(12);
+  margin-bottom: myF.em(6);
+  margin-top: myF.em(12);
 
-  @media screen and (min-width: bp(afl_small)) and (max-width: bp(afl_medium_just_before)) {
+  @media screen and (min-width: myF.bp(afl_small)) and (max-width: myF.bp(afl_medium_just_before)) {
       font-size: 1.4rem;
-      margin-bottom: em(8);
-      margin-top: em(16);
+      margin-bottom: myF.em(8);
+      margin-top: myF.em(16);
   }
 
-  @media screen and (min-width: bp(afl_medium)) {
+  @media screen and (min-width: myF.bp(afl_medium)) {
       font-size: 1.6rem;
-      margin-bottom: em(10);
-      margin-top: em(20);
+      margin-bottom: myF.em(10);
+      margin-top: myF.em(20);
   }
 
   &:focus {
@@ -90,7 +89,7 @@ p, li {
   font-size: 1rem;
   padding: 0 0.2em 0;
 
-  @media screen and (min-width: bp(afl_medium)) {
+  @media screen and (min-width: myF.bp(afl_medium)) {
       font-size: 1rem;
   }
 }
@@ -132,7 +131,7 @@ fieldset {
   font-size: 1.4rem;
   margin: 0;
   border: 0;
-  @media screen and (min-width: bp(afl_medium)) {
+  @media screen and (min-width: myF.bp(afl_medium)) {
       font-size: 1.6rem;
   }
 }
@@ -165,17 +164,17 @@ ul.list-unstyled {
     }
 
     label {
-        @extend %source-sans;
+       @include myGlobals.source-sans;
         font-size: 1rem;
         cursor: pointer;
         color: black;
 
         &:hover,
         &:focus {
-            color: color(secondary);
+            color: myF.color(secondary);
         }
 
-        @media screen and (min-width: bp(afl_small)) {
+        @media screen and (min-width: myF.bp(afl_small)) {
             font-size: 1.1rem;
         }
     }

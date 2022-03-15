@@ -1,3 +1,6 @@
+@use '../shared/theme/myF';
+@use '../shared/theme/myGlobals';
+@use '../shared/theme/helpers';
 @use '../shared/theme/base';
 
 /* Importantly, this ":host" magic (along with flex markup in the parent container) lets the contents fill
@@ -6,22 +9,22 @@
    while the contents and only the contents have a vertical scrollbar. */
 .appContents {
   margin: 0;
-  padding: em(30) gutter(thmda-big) gutter(thmda-big); /* top, left and right, bottom */
+  padding: myF.em(30) myF.gutter(thmda-big) myF.gutter(thmda-big); /* top, left and right, bottom */
 
   &:focus {
       outline: 0;
   }
 
-  @media screen and (max-width: bp(thmda_extreme_narrow_just_before)) {
-      padding: gutter(thmda-extremely_tiny) gutter(thmda-extremely_tiny) gutter(thmda-extremely_tiny); /* top, left and right, bottom */
+  @media screen and (max-width: myF.bp(thmda_extreme_narrow_just_before)) {
+      padding: myF.gutter(thmda-extremely_tiny) myF.gutter(thmda-extremely_tiny) myF.gutter(thmda-extremely_tiny); /* top, left and right, bottom */
   }
 
-  @media screen and (min-width: bp(afl_small)) and (max-width: bp(afl_medium_just_before)) {
-      padding: gutter(thmda-medium) gutter(thmda-medium) gutter(thmda-tiny); /* top, left and right, bottom */
+  @media screen and (min-width: myF.bp(afl_small)) and (max-width: myF.bp(afl_medium_just_before)) {
+      padding: myF.gutter(thmda-medium) myF.gutter(thmda-medium) myF.gutter(thmda-tiny); /* top, left and right, bottom */
   }
 
-  @media screen and (min-width: bp(afl_medium)) {
-      padding: gutter(thmda-big) gutter(thmda-big) gutter(thmda-tight); /* top, left and right, bottom */
+  @media screen and (min-width: myF.bp(afl_medium)) {
+      padding: myF.gutter(thmda-big) myF.gutter(thmda-big) myF.gutter(thmda-tight); /* top, left and right, bottom */
   }
 }
 :host {
@@ -31,7 +34,7 @@
      make use of overflow-y: scroll almost always now, except for widths at thmda_maxwidt or larger. */
   overflow-y: auto;
 
-  @media screen and (max-width: bp(thmda_narrow)) {
+  @media screen and (max-width: myF.bp(thmda_narrow)) {
     overflow-y: scroll; /* avoid jitters of scrollbar hide/show/hide on narrow widths by always having it there */
   }
 }

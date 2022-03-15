@@ -1,22 +1,25 @@
+@use '../theme/myF';
+@use '../theme/myGlobals';
+@use '../theme/helpers';
 @use '../theme/base';
 @use '../theme/search-helpers';
 
 .search-form-container {
-    @extend %source-sans;
+   @include myGlobals.source-sans;
 
     font-size: 1rem;
-    @media screen and (min-width: bp(afl_medium)) {
+    @media screen and (min-width: myF.bp(afl_medium)) {
         font-size: 1.2rem;
     }
 }
 
 .search__advanced {
-    color: color(primary);
+    color: myF.color(primary);
 
-    padding-top: em(4);
+    padding-top: myF.em(4);
 
-    @media screen and (min-width: bp(afl_medium)) {
-      padding-top: em(6);
+    @media screen and (min-width: myF.bp(afl_medium)) {
+      padding-top: myF.em(6);
     }
 }
 
@@ -29,7 +32,7 @@
 .resetFieldsToDefault { /* very similar to search__submit */
   @extend %source-sans-semi-bold;
 
-  background-color: color(primary);
+  background-color: myF.color(primary);
   border-radius: 0;
   color: #fff;
   cursor: pointer;
@@ -37,16 +40,16 @@
   height: 3rem;
   letter-spacing: .5px;
   transition: box-shadow .15s ease-in-out;
-  margin: em(8) em(8) em(16); /* top, left and right, bottom */
+  margin: myF.em(8) myF.em(8) myF.em(16); /* top, left and right, bottom */
 
-  @media screen and (min-width: bp(afl_medium)) {
+  @media screen and (min-width: myF.bp(afl_medium)) {
     font-size: 1.2rem;
   }
 
   &:hover,
   &:focus {
       box-shadow: inset 0 0 5px rgba(51,51,51,.6);
-      background-color: color(secondary);
+      background-color: myF.color(secondary);
   }
 
 }
@@ -54,26 +57,26 @@
 .search__submit {
   @extend %source-sans-semi-bold;
 
-  background-color: color(primary);
-  border:1px color(primary); /* defined for accessibility, so that a border is rendered in the Windows High Contrast mode */
+  background-color: myF.color(primary);
+  border:1px myF.color(primary); /* defined for accessibility, so that a border is rendered in the Windows High Contrast mode */
   border-radius: 0;
   color: #fff;
   cursor: pointer;
   font-size: 1.2rem;
-  height: #{$buttonHeight};
+  height: myGlobals.$buttonHeight;
   letter-spacing: .5px;
-  margin-top: em(8);
+  margin-top: myF.em(8);
   transition: box-shadow .15s ease-in-out;
 
-  @media screen and (max-width: bp(afl_medium_just_before)) {
-    margin-bottom: gutter(thmda-big);
+  @media screen and (max-width: myF.bp(afl_medium_just_before)) {
+    margin-bottom: myF.gutter(thmda-big);
     margin-top: 0;
   }
 
   &:hover,
   &:focus {
       box-shadow: inset 0 0 5px rgba(51,51,51,.6);
-      background-color: color(secondary);
+      background-color: myF.color(secondary);
   }
 
 }
@@ -81,18 +84,18 @@
 .search__submit__disabled {
   @extend %source-sans-semi-bold;
 
-  background-color: color(primary);
-  border:1px color(primary); /* defined for accessibility, so that a border is rendered in the Windows High Contrast mode */
+  background-color: myF.color(primary);
+  border:1px myF.color(primary); /* defined for accessibility, so that a border is rendered in the Windows High Contrast mode */
   border-radius: 0;
   color: #fff;
   font-size: 1.2rem;
-  height: #{$buttonHeight};
+  height: myGlobals.$buttonHeight;
   letter-spacing: .5px;
-  margin-top: em(8);
+  margin-top: myF.em(8);
 
-  @media screen and (max-width: bp(afl_medium_just_before)) {
+  @media screen and (max-width: myF.bp(afl_medium_just_before)) {
     margin-top: 0; /* some narrow views will wrap this into a different line, needing a margin for better layout */
-    margin-bottom: gutter(thmda-big);
+    margin-bottom: myF.gutter(thmda-big);
   }
 
   /* adjust look for "disabled" */
@@ -103,17 +106,17 @@
 
 .search__fields-container {
   margin: 0;
-  margin-top: em(10);
-  margin-bottom: em(10);
+  margin-top: myF.em(10);
+  margin-bottom: myF.em(10);
 }
 
 .search__rpp-container {
   margin: auto;
   width: auto;
-  max-width: em(290);
+  max-width: myF.em(290);
 
-  @media screen and (max-width: bp(thmda_narrow_just_before)) {
-    margin-top: em(8); /* some narrow views will wrap this into a different line, needing a margin for better layout */
+  @media screen and (max-width: myF.bp(thmda_narrow_just_before)) {
+    margin-top: myF.em(8); /* some narrow views will wrap this into a different line, needing a margin for better layout */
   }
 }
 
@@ -123,17 +126,17 @@
 }
 
 .search__input {
-  @extend %source-sans;
+ @include myGlobals.source-sans;
 
-  border: 1px solid color(dark-grey);
+  border: 1px solid myF.color(dark-grey);
   border-radius: 0;
   font-size: 1rem;
   height: 3rem;
-  margin-bottom: em(10);
+  margin-bottom: myF.em(10);
   padding-left: 0.5em;
   width: 100%;
 
-  @media screen and (min-width: bp(afl_medium)) {
+  @media screen and (min-width: myF.bp(afl_medium)) {
       font-size: 1.2rem;
       height: 3rem;
   }
@@ -147,17 +150,17 @@
 }
 
 .search-field-select {
-  @extend %source-sans;
+ @include myGlobals.source-sans;
 
   background-color: #fff;
-  border: 1px solid color(ok-grey);
+  border: 1px solid myF.color(ok-grey);
   border-radius: 0;
   height: 1.875rem;
   min-width: 10rem;
   width: 100%;
   font-size: 1rem;
 
-  @media screen and (min-width: bp(afl_medium)) {
+  @media screen and (min-width: myF.bp(afl_medium)) {
       font-size: 1.2rem;
       height: 2rem;
   }
@@ -166,7 +169,7 @@
      Rather than "fight it" and try to control Safari html-select element styling, give it the space
      to do what it is doing (at least for Safari 13 on mobile, works as of May 2020). */
   &:not(:root:root) {
-    margin-left: em(8);
+    margin-left: myF.em(8);
   }
 
 }
@@ -176,7 +179,7 @@
 }
 
 .search__links-container {
-  margin-bottom: em(5);
+  margin-bottom: myF.em(5);
   width: 100%;
 
   &--no-rpp {
@@ -202,7 +205,7 @@
 }
 
 .markOffLegend {
-  margin: em(8) 0; /* top, left and right, bottom */
+  margin: myF.em(8) 0; /* top, left and right, bottom */
 }
 
 
@@ -236,12 +239,12 @@ color: #1E1810;
 }
 
 .interview_date_panel {
-  background-color: color(secondary);
+  background-color: myF.color(secondary);
   border-radius: 0;
-  border: 1px solid color(ok-grey);
+  border: 1px solid myF.color(ok-grey);
   box-shadow: none;
   /* leave height out of style; figured out based on need for space for the min/max date when checked "on" */
-  margin: em(8) 0 em(12); /* top, left and right, bottom */
+  margin: myF.em(8) 0 myF.em(12); /* top, left and right, bottom */
   padding: 0.2em 0.2em 0.2em 0.2em;
   width: 90%;
 
@@ -272,13 +275,13 @@ padding: 0;
 width: 100%;
 }
 
-@media screen and (max-width: bp(thmda_narrow_just_before)) {
+@media screen and (max-width: myF.bp(thmda_narrow_just_before)) {
 .interview_date_area_wordy {
   display: none !important;
 }
 }
 
-@media screen and (min-width: bp(thmda_narrow)) {
+@media screen and (min-width: myF.bp(thmda_narrow)) {
 .interview_date_area_terse {
   display: none !important;
 }
@@ -288,6 +291,6 @@ width: 100%;
 @extend %oswald;
 color: white;
 font-size: 1rem;
-padding-top: em(2);
-padding-right: em(5);
+padding-top: myF.em(2);
+padding-right: myF.em(5);
 }

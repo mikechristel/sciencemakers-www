@@ -1,3 +1,6 @@
+@use '../shared/theme/myF';
+@use '../shared/theme/myGlobals';
+@use '../shared/theme/helpers';
 @use '../shared/theme/base';
 @use '../shared/theme/button-helpers';
 
@@ -9,12 +12,12 @@
     text-decoration: none;
 
     &.active {
-      color: color(nav-highlight-shade);
+      color: myF.color(nav-highlight-shade);
       text-decoration: underline;
     }
 
     &:hover {
-      color: color(nav-highlight-shade);
+      color: myF.color(nav-highlight-shade);
       text-decoration: underline;
     }
 }
@@ -30,7 +33,7 @@
   text-align: center;
   white-space: nowrap;
   vertical-align: middle;
-  background-color: color(nav-highlight-shade);
+  background-color: myF.color(nav-highlight-shade);
   border-radius: 10px;
 }
 

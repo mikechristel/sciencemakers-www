@@ -1,17 +1,19 @@
-﻿@use './shared/theme/base';
+﻿@use './shared/theme/myF';
+@use './shared/theme/myGlobals';
+@use './shared/theme/helpers';
+@use './shared/theme/base';
 
 /* NOTE: with Spring 2019 push for greater accessibility, making use of angular/CDK (e.g., for
    drop-down menu box overlay that traps focus such as to choose which fields to search)
    Useful walkthrough: blog.angularindepth.com/creating-a-toast-service-with-angular-cdk-a0d35fd8cc12
    NOTE: in updating to Angular 10..11..12..13  the @import became @use at 12 to 13 update.
 */
-@use "~@angular/cdk/overlay";
-@include cdk-overlay();
+@use "../../node_modules/@angular/cdk/overlay";
 
 .mymodal {
   /* detach from rest of the document */
   position: fixed;
-  max-width: bp(thmda_maxwidth);
+  max-width: myF.bp(thmda_maxwidth);
 
   /* center */
   left: 50%;
@@ -25,28 +27,28 @@
   box-shadow: rgba(0,0,0,0.4) 10px 10px 4px;
 
   /* visual illusion of being a solid object -- alter to taste */
-  background-color: color(light-grey);
-  border: 5px solid color(primary);
+  background-color: myF.color(light-grey);
+  border: 5px solid myF.color(primary);
 
-  padding: em(10) em(14) em(10) em(10); /* top right bottom left */
+  padding: myF.em(10) myF.em(14) myF.em(10) myF.em(10); /* top right bottom left */
 
-  @media screen and (max-width: bp(thmda_narrow_just_before)) {
+  @media screen and (max-width: myF.bp(thmda_narrow_just_before)) {
     width: 320px;
   }
-  @media screen and (min-width: bp(thmda_narrow)) and (max-width: bp(afl_small_just_before)) {
+  @media screen and (min-width: myF.bp(thmda_narrow)) and (max-width: myF.bp(afl_small_just_before)) {
     width: 380px;
   }
-  @media screen and (min-width: bp(afl_small)) and (max-width: bp(afl_medium_just_before)) {
+  @media screen and (min-width: myF.bp(afl_small)) and (max-width: myF.bp(afl_medium_just_before)) {
     width: 500px;
   }
-  @media screen and (min-width: bp(afl_medium)) and (max-width: bp(afl_large_just_before)) {
+  @media screen and (min-width: myF.bp(afl_medium)) and (max-width: myF.bp(afl_large_just_before)) {
     width: 800px;
   }
-  @media screen and (min-width: bp(afl_large)) {
+  @media screen and (min-width: myF.bp(afl_large)) {
     width: 1180px;
   }
 
-  @media screen and (max-width: bp(afl_small_just_before)) {
+  @media screen and (max-width: myF.bp(afl_small_just_before)) {
     width: 90%;
   }
 
@@ -62,45 +64,45 @@
 
   .mymodal-header {
     border-bottom: 0;
-    padding: 0 0 em(22);
+    padding: 0 0 myF.em(22);
   }
 
   .mymodal-title {
-    @extend %oswald;
-    color: color(dark-grey);
+    @include myGlobals.oswald;
+    color: myF.color(dark-grey);
     line-height: 120%;
-    margin: 0 0 em(4) em(4); /* top right bottom left */
+    margin: 0 0 myF.em(4) myF.em(4); /* top right bottom left */
     padding: 0;
     font-size: 1.4rem;
 
-    @media screen and (min-width: bp(afl_medium)) and (max-width: bp(afl_large_just_before)) {
+    @media screen and (min-width: myF.bp(afl_medium)) and (max-width: myF.bp(afl_large_just_before)) {
       font-size: 1.6rem;
     }
 
-    @media screen and (min-width: bp(afl_large)) {
+    @media screen and (min-width: myF.bp(afl_large)) {
       font-size: 1.8rem;
     }
   }
 
   button.close {
     color: #fff;
-    background-color: color(primary);
+    background-color: myF.color(primary);
     text-shadow: none;
     opacity: 1;
 
     &:hover,
     &:focus {
         box-shadow: inset 0 0 5px rgba(51,51,51,.6);
-        background-color: color(secondary);
+        background-color: myF.color(secondary);
     }
   }
 
   .mymodal-body {
-    padding: em(2) em(4) em(2); /* top, right and left, bottom */
+    padding: myF.em(2) myF.em(4) myF.em(2); /* top, right and left, bottom */
 
     textarea,
     textarea:focus {
-      @extend %source-sans;
+     @include myGlobals.source-sans;
       width: 100%;
       height: auto;
       background-color: #fff;
@@ -108,9 +110,9 @@
       border: 1px solid #ccc;
       border-radius: 0;
       box-shadow: none;
-      color: color(dark-grey);
+      color: myF.color(dark-grey);
       font-size: 1rem;
-      margin-bottom: em(16);
+      margin-bottom: myF.em(16);
       resize: none;
       overflow: auto;
 
@@ -127,21 +129,21 @@
       -o-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
       transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
 
-      @media screen and (min-width: bp(afl_medium)) and (max-width: bp(afl_large_just_before)) {
+      @media screen and (min-width: myF.bp(afl_medium)) and (max-width: myF.bp(afl_large_just_before)) {
         font-size: 1.2rem;
       }
 
-      @media screen and (min-width: bp(afl_large)) {
+      @media screen and (min-width: myF.bp(afl_large)) {
         font-size: 1.4rem;
       }
     }
   }
 
   .email_input {
-    @extend %source-sans;
+   @include myGlobals.source-sans;
     width: 100%;
     height: auto;
-    color: color(dark-grey);
+    color: myF.color(dark-grey);
     background-color: #fff;
     font-size: 1rem;
 
@@ -152,11 +154,11 @@
       width: 95%;
     }
 
-    @media screen  and (max-width: bp(afl_large_just_before))  {
+    @media screen  and (max-width: myF.bp(afl_large_just_before))  {
       font-size: 1.2rem;
     }
 
-    @media screen and (min-width: bp(afl_large)) {
+    @media screen and (min-width: myF.bp(afl_large)) {
       font-size: 1.4rem;
     }
   }
@@ -166,13 +168,13 @@
     padding-bottom: 6px;
 
     button {
-      @extend %oswald;
-      background: color(primary);
-      border: 1px solid color(primary); /* note: added for accessibility, to provide a button border in high contrast mode */
+      @include myGlobals.oswald;
+      background: myF.color(primary);
+      border: 1px solid myF.color(primary); /* note: added for accessibility, to provide a button border in high contrast mode */
       border-radius: 0;
       color: #fff;
       font-size: 1.2rem;
-      height: #{$buttonHeight};
+      height: myGlobals.$buttonHeight;
       min-width: 3.125rem;
       max-width: 6.25rem;
       letter-spacing: .5px;
@@ -181,7 +183,7 @@
       &:hover,
       &:focus {
           box-shadow: inset 0 0 5px rgba(51,51,51,.6);
-          background-color: color(secondary);
+          background-color: myF.color(secondary);
       }
 
       &:disabled {
@@ -189,23 +191,23 @@
           opacity: .4;
       }
 
-      @media screen and (min-width: bp(afl_medium)) and (max-width: bp(afl_large_just_before)) {
+      @media screen and (min-width: myF.bp(afl_medium)) and (max-width: myF.bp(afl_large_just_before)) {
         font-size: 1.4rem;
       }
 
-      @media screen and (min-width: bp(afl_large)) {
+      @media screen and (min-width: myF.bp(afl_large)) {
         font-size: 1.6rem;
       }
     }
 
     .button-secondary {
-      @extend %oswald;
-      background: color(secondary);
-      border: 1px solid color(secondary); /* note: added for accessibility, to provide a button border in high contrast mode */
+      @include myGlobals.oswald;
+      background: myF.color(secondary);
+      border: 1px solid myF.color(secondary); /* note: added for accessibility, to provide a button border in high contrast mode */
       border-radius: 0;
       color: #fff;
       font-size: 1.2rem;
-      height: #{$buttonHeight};
+      height: myGlobals.$buttonHeight;
       min-width: 3.125rem;
       max-width: 6.25rem;
       letter-spacing: .5px;
@@ -214,31 +216,31 @@
       &:hover,
       &:focus {
           box-shadow: inset 0 0 5px rgba(51,51,51,.6);
-          background-color: color(primary);
+          background-color: myF.color(primary);
       }
 
-      @media screen and (min-width: bp(afl_medium)) and (max-width: bp(afl_large_just_before)) {
+      @media screen and (min-width: myF.bp(afl_medium)) and (max-width: myF.bp(afl_large_just_before)) {
         font-size: 1.4rem;
       }
 
-      @media screen and (min-width: bp(afl_large)) {
+      @media screen and (min-width: myF.bp(afl_large)) {
         font-size: 1.6rem;
       }
     }
   }
 
   .modal-warning {
-    @extend %source-sans-bold;
+   @include myGlobals.source-sans-bold;
 
-    color: color(tertiary);
+    color: myF.color(tertiary);
 
     font-size: 1rem;
 
-    @media screen and (min-width: bp(afl_medium)) and (max-width: bp(afl_large_just_before)) {
+    @media screen and (min-width: myF.bp(afl_medium)) and (max-width: myF.bp(afl_large_just_before)) {
       font-size: 1.2rem;
     }
 
-    @media screen and (min-width: bp(afl_large)) {
+    @media screen and (min-width: myF.bp(afl_large)) {
       font-size: 1.4rem;
     }
   }
@@ -248,11 +250,11 @@
 .form-message {
   font-size: 1rem;
 
-  @media screen and (min-width: bp(afl_medium)) and (max-width: bp(afl_large_just_before)) {
+  @media screen and (min-width: myF.bp(afl_medium)) and (max-width: myF.bp(afl_large_just_before)) {
     font-size: 1.2rem;
   }
 
-  @media screen and (min-width: bp(afl_large)) {
+  @media screen and (min-width: myF.bp(afl_large)) {
     font-size: 1.4rem;
   }
 }
@@ -280,28 +282,28 @@
 
 .nav-across-width { /* only use for desktop, not mobile; mobile shows hamburger menu via header__menu-icon instead */
   @extend %desktop-only; /* counters the extend %mobile-only for header__menu-icon */
-  color: color(dark-grey);
+  color: myF.color(dark-grey);
   font-size: 1rem;
   width: 100%;
-  padding-bottom: em(14);
+  padding-bottom: myF.em(14);
 
-  @media screen and (max-width: bp(thmda_wideenough_just_before)) {
-    padding-bottom: em(6);
+  @media screen and (max-width: myF.bp(thmda_wideenough_just_before)) {
+    padding-bottom: myF.em(6);
   }
 
-  @media screen and (min-width: bp(thmda_wideenough)) and (max-width: bp(afl_medium_just_before)) {
-    padding-bottom: em(10);
+  @media screen and (min-width: myF.bp(thmda_wideenough)) and (max-width: myF.bp(afl_medium_just_before)) {
+    padding-bottom: myF.em(10);
   }
 
-  @media screen and (min-width: bp(afl_medium)) and (max-width: bp(afl_large_just_before)) {
-    padding-bottom: em(12);
+  @media screen and (min-width: myF.bp(afl_medium)) and (max-width: myF.bp(afl_large_just_before)) {
+    padding-bottom: myF.em(12);
   }
 
 }
 
 .nav__links {
   @extend %list-without-styles;
-  @extend %oswald;
+  @include myGlobals.oswald;
 
   margin: 0;
   width: 100%;
@@ -309,39 +311,39 @@
 }
 
 .nav__link {
-    color: color(dark-grey);
+    color: myF.color(dark-grey);
     font-weight: 400;
     font-size: 1rem;
-    letter-spacing: em(.5, 16);
+    letter-spacing: myF.em(.5, 16);
     transition: all .2s ease-in-out;
     text-decoration: none;
-    padding: 0 0 em(1,16) 0; /* top right bottom left */
+    padding: 0 0 myF.em(1,16) 0; /* top right bottom left */
 
     &.active {
-      color: color(nav-highlight-shade);
-      border-bottom: em(8) solid color(nav-highlight-shade);
+      color: myF.color(nav-highlight-shade);
+      border-bottom: myF.em(8) solid myF.color(nav-highlight-shade);
       text-decoration: none;
     }
 
     &:hover {
-      color: color(nav-highlight-shade);
+      color: myF.color(nav-highlight-shade);
       text-decoration: none;
-      border-bottom: em(8) solid color(nav-highlight-shade);
+      border-bottom: myF.em(8) solid myF.color(nav-highlight-shade);
     }
 
-    @media screen and (min-width: bp(afl_small)) and (max-width: bp(thmda_wideenough_just_before)) {
+    @media screen and (min-width: myF.bp(afl_small)) and (max-width: myF.bp(thmda_wideenough_just_before)) {
       font-size: 1.0rem;
     }
 
-    @media screen and (min-width: bp(thmda_wideenough)) and (max-width: bp(afl_medium_just_before)) {
+    @media screen and (min-width: myF.bp(thmda_wideenough)) and (max-width: myF.bp(afl_medium_just_before)) {
       font-size: 1.2rem;
     }
 
-    @media screen and (min-width: bp(afl_medium)) and (max-width: bp(afl_large_just_before)) {
+    @media screen and (min-width: myF.bp(afl_medium)) and (max-width: myF.bp(afl_large_just_before)) {
       font-size: 1.3rem;
     }
 
-    @media screen and (min-width: bp(afl_large)) {
+    @media screen and (min-width: myF.bp(afl_large)) {
       font-size: 1.4rem;
     }
 }
@@ -356,26 +358,26 @@
   font-weight: 700;
   line-height: 1;
   color: #fff;
-  background-color: color(nav-highlight-shade);
+  background-color: myF.color(nav-highlight-shade);
   text-align: center;
   white-space: nowrap;
   vertical-align: middle;
   border-radius: 10px;
   position: absolute;
-  right: - em(24);
-  top: - em(16);
-  @media screen and (max-width: bp(afl_medium_just_before)) {
+  right: - myF.em(24);
+  top: - myF.em(16);
+  @media screen and (max-width: myF.bp(afl_medium_just_before)) {
     display: none !important; /* when too narrow, less than medium, don't show the badge */
   }
 }
 
-@media screen and (max-width: bp(afl_medium_just_before)) {
+@media screen and (max-width: myF.bp(afl_medium_just_before)) {
   .nav_verbose {
     display: none !important;
   }
 }
 
-@media screen and (min-width: bp(afl_medium)) {
+@media screen and (min-width: myF.bp(afl_medium)) {
   .nav_terse {
     display: none !important;
   }
@@ -384,53 +386,53 @@
 .appHeaderPlusContents {
     margin: 0;
     padding: 0;
-    max-width: bp(thmda_maxwidth);
+    max-width: myF.bp(thmda_maxwidth);
 }
 
 .header {
-  background-color: color(light-grey);
+  background-color: myF.color(light-grey);
   border-bottom: 1px solid #ccc;
   box-shadow: 0 0 10px rgba(0,0,0,.15);
 
-  padding: em(4) em(8) 0; /* top, left and right, bottom */
+  padding: myF.em(4) myF.em(8) 0; /* top, left and right, bottom */
 
-  @media screen and (min-width: bp(afl_small)) and (max-width: bp(afl_medium_just_before)) {
-      padding: em(4) em(12) 0; /* top, left and right, bottom */
+  @media screen and (min-width: myF.bp(afl_small)) and (max-width: myF.bp(afl_medium_just_before)) {
+      padding: myF.em(4) myF.em(12) 0; /* top, left and right, bottom */
   }
 
-  @media screen and (min-width: bp(afl_medium)) {
-      padding: em(2) em(16) 0; /* top, left and right, bottom */
+  @media screen and (min-width: myF.bp(afl_medium)) {
+      padding: myF.em(2) myF.em(16) 0; /* top, left and right, bottom */
   }
 }
 
 .header__content-container {
   margin: 0 auto;
-  @media screen and (min-width: bp(thmda_maxwidth)) {
-      max-width: bp(thmda_maxwidth);
+  @media screen and (min-width: myF.bp(thmda_maxwidth)) {
+      max-width: myF.bp(thmda_maxwidth);
   }
 }
 
 .imposeMaxContentsWidth {
   margin: 0;
-  @media screen and (max-width: bp(thmda_maxwidth_just_before)) {
+  @media screen and (max-width: myF.bp(thmda_maxwidth_just_before)) {
     margin: 0 auto;
     width: 100%;
   }
-  @media screen and (min-width: bp(thmda_maxwidth)) {
+  @media screen and (min-width: myF.bp(thmda_maxwidth)) {
       margin: 0 auto;
-      width: bp(thmda_maxwidth);
+      width: myF.bp(thmda_maxwidth);
   }
 }
 
 .imposeMaxWidth {
   margin: 0 auto;
-  max-width: bp(thmda_maxwidth);
+  max-width: myF.bp(thmda_maxwidth);
 }
 
 .header__top-flex-row {
-  padding: gutter(thmda-big) 0; /* top and bottom, right and left */
+  padding: myF.gutter(thmda-big) 0; /* top and bottom, right and left */
 
-  @media screen and (max-width: bp(thmda_wideenough_just_before)) {
+  @media screen and (max-width: myF.bp(thmda_wideenough_just_before)) {
     padding-top: 0;
   }
 }
@@ -439,10 +441,10 @@
   cursor: pointer;
   outline: 0;
 
-  @media screen and (max-width: bp(afl_medium_just_before)) {
+  @media screen and (max-width: myF.bp(afl_medium_just_before)) {
     max-width: 90%;
   }
-  @media screen and (min-width: bp(afl_medium)) {
+  @media screen and (min-width: myF.bp(afl_medium)) {
     height: 100%;
   }
 }
@@ -456,14 +458,14 @@
 }
 
 .header__icon {
-    color: color(dark-grey);
-    margin-right: em(18);
+    color: myF.color(dark-grey);
+    margin-right: myF.em(18);
     transition: color .3s ease-in-out;
 }
 
 .header__tagline {
-    @extend %source-sans-bold-italic;
-    color: color(dark-grey);
+   @include myGlobals.source-sans-bold-italic;
+    color: myF.color(dark-grey);
     font-size: 0.85rem;
     line-height: 1.125rem;
     text-align: right;
@@ -539,13 +541,13 @@ a.skip:focus {
   display: none;
 }
 
-@media screen and (max-width: bp(afl_medium_just_before)) {
+@media screen and (max-width: myF.bp(afl_medium_just_before)) {
   .copy_URI_verbose {
     display: none !important;
   }
 }
 
-@media screen and (min-width: bp(afl_medium)) {
+@media screen and (min-width: myF.bp(afl_medium)) {
   .copy_URI_terse {
     display: none !important;
   }

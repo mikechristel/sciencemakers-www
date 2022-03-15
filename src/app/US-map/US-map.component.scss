@@ -1,7 +1,9 @@
+@use '../shared/theme/myF';
+@use '../shared/theme/myGlobals';
+@use '../shared/theme/helpers';
 @use '../shared/theme/base';
 @use '../shared/theme/search-helpers';
 @use '../shared/theme/filter-helpers';
-@use '../shared/theme/button-helpers';
 
 .myMapStyling {
   fill:#aaaaaa;
@@ -52,9 +54,9 @@ text {
 }
 
 .mapTextDetail {
-  margin: 0 0 em(8) 0; /* top right bottom left */
-  padding: gutter(thmda-tiny) gutter(thmda-tiny) gutter(thmda-tiny) gutter(thmda-tiny); /* top right bottom left */
-  border: 1px solid color(dark-grey);
-  background-color: color(light-grey);
+  margin: 0 0 myF.em(8) 0; /* top right bottom left */
+  padding: myF.gutter(thmda-tiny) myF.gutter(thmda-tiny) myF.gutter(thmda-tiny) myF.gutter(thmda-tiny); /* top right bottom left */
+  border: 1px solid myF.color(dark-grey);
+  background-color: myF.color(light-grey);
   color: black;
 }

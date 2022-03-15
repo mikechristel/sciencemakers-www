@@ -1,13 +1,16 @@
-﻿@use '../shared/theme/base';
+﻿@use '../shared/theme/myF';
+@use '../shared/theme/myGlobals';
+@use '../shared/theme/helpers';
+@use '../shared/theme/base';
 
 /* NOTE: Formerly, story date showed only on narrow views with the stamp, but Higher Education Advisory Board (HEAB) complaints on UI/UX
    included too much information in panes of multiple stories (e.g., story sets).  So, hide story date in "card" view.  For users wanting
    more detail, including highlights on why a text match occurs, they can show the list view instead, which does include the story date. */
 
 .card {
-  border: 1px solid color(ok-grey);
-  color: color(dark-grey);
-  background-color: color(light-grey);
+  border: 1px solid myF.color(ok-grey);
+  color: myF.color(dark-grey);
+  background-color: myF.color(light-grey);
   text-decoration: none;
   overflow: hidden; /* necessary to hide any overflow of image for narrow card widths */
   height: 100%; /* needed to fill all of the allocated flex layout or grid space */
@@ -18,29 +21,29 @@
           For the :focus psuedo selector, define an outline style which will be visible, such as "outline: 2px dashed black;".
          So, here that is: */
       outline: 2px dashed black;
-      border: 1px solid color(secondary);
-      background: color(primary);
+      border: 1px solid myF.color(secondary);
+      background: myF.color(primary);
       text-decoration: none;
   }
 
   &:hover {
-      border: 1px solid color(secondary);
-      background: color(primary);
+      border: 1px solid myF.color(secondary);
+      background: myF.color(primary);
       text-decoration: none;
   }
 
   &.active {
-    background-color: color(light-grey);
+    background-color: myF.color(light-grey);
   }
 }
 
 .card_img-backdrop {
-  background-color: color(light-grey);
+  background-color: myF.color(light-grey);
   padding: 0;
   margin: 0;
   text-align: center;
   .card:hover & {
-      background: color(primary);
+      background: myF.color(primary);
       color: #fff;
   }
 }
@@ -56,16 +59,16 @@
 }
 
 .card__info-overlay {
-  @extend %source-sans;
-  background: color(light-grey);
-  color: color(dark-grey);
+ @include myGlobals.source-sans;
+  background: myF.color(light-grey);
+  color: myF.color(dark-grey);
   padding: 0;
   margin: 0;
   text-align: center;
   min-width: 112px; /* matches card__img width */
 
   .card:hover & {
-      background: color(primary);
+      background: myF.color(primary);
       color: #fff;
   }
 }
@@ -75,7 +78,7 @@
   font-size: 1rem;
   max-height: 2.7rem; /* shows 3 lines cleanly, including descenders like "g" */
   margin: 0;
-  padding: em(8);
+  padding: myF.em(8);
   text-align: left;
 }
 
@@ -83,82 +86,82 @@
   font-size: 1rem;
   text-align: right;
   padding: 0;
-  margin: 0 em(4) 0 0; /* top right bottom left */
+  margin: 0 myF.em(4) 0 0; /* top right bottom left */
 }
 
 .list {
-  border: 1px solid color(ok-grey);
+  border: 1px solid myF.color(ok-grey);
   border-radius: 0;
   background-color: #fff;
   text-decoration: none;
-  color: color(dark-grey);
+  color: myF.color(dark-grey);
 
   font-size: 1rem;
-  padding: 0 em(2) em(6) em(2); /* top right bottom left */
+  padding: 0 myF.em(2) myF.em(6) myF.em(2); /* top right bottom left */
   width: 100%;
 
   &:hover,
   &:focus {
     text-decoration: underline;
   }
-  @media screen and (min-width: bp(afl_small)) and (max-width: bp(afl_medium_just_before)) {
+  @media screen and (min-width: myF.bp(afl_small)) and (max-width: myF.bp(afl_medium_just_before)) {
       font-size: 1.2rem;
   }
-  @media screen and (min-width: bp(afl_medium)) and (max-width: bp(afl_large_just_before)) {
+  @media screen and (min-width: myF.bp(afl_medium)) and (max-width: myF.bp(afl_large_just_before)) {
       font-size: 1.4rem;
   }
-  @media screen and (min-width: bp(afl_large)) {
+  @media screen and (min-width: myF.bp(afl_large)) {
       font-size: 1.2rem; /* at 2 per row, back to smaller font... */
   }
 }
 
 .list__name {
-  @extend %oswald;
+  @include myGlobals.oswald;
 
-  color: color(dark-grey);
+  color: myF.color(dark-grey);
   line-height: 120%;
-  margin: 0 0 em(5);
-  padding: 0 em(2) 0 em(2); /* top right bottom left */
+  margin: 0 0 myF.em(5);
+  padding: 0 myF.em(2) 0 myF.em(2); /* top right bottom left */
   border: none;
 
-  @media screen and (min-width: bp(afl_small)) and (max-width: bp(afl_medium_just_before)) {
+  @media screen and (min-width: myF.bp(afl_small)) and (max-width: myF.bp(afl_medium_just_before)) {
       font-size: 1.2rem;
   }
-  @media screen and (min-width: bp(afl_medium)) and (max-width: bp(afl_large_just_before)) {
+  @media screen and (min-width: myF.bp(afl_medium)) and (max-width: myF.bp(afl_large_just_before)) {
       font-size: 1.4rem;
   }
-  @media screen and (min-width: bp(afl_large)) {
+  @media screen and (min-width: myF.bp(afl_large)) {
       font-size: 1.2rem; /* at 2 per row, back to smaller font... */
   }
 }
 
 .list__contents {
-  color: color(dark-grey);
+  color: myF.color(dark-grey);
   font-size: 1em;
   margin: 0;
-  padding: 0 em(2) 0 em(2); /* top right bottom left */
+  padding: 0 myF.em(2) 0 myF.em(2); /* top right bottom left */
   border: none;
 
-  @media screen and (min-width: bp(afl_small)) and (max-width: bp(afl_medium_just_before)) {
+  @media screen and (min-width: myF.bp(afl_small)) and (max-width: myF.bp(afl_medium_just_before)) {
       font-size: 1rem;
   }
-  @media screen and (min-width: bp(afl_medium)) {
+  @media screen and (min-width: myF.bp(afl_medium)) {
       font-size: 1.1rem;
   }
 }
 
 .list__storydate {
-  color: color(dark-grey);
+  color: myF.color(dark-grey);
   font-style: italic;
   font-size: 1rem;
   margin: 0;
-  padding: 0 em(2) 0 em(2); /* top right bottom left */
+  padding: 0 myF.em(2) 0 myF.em(2); /* top right bottom left */
   border: none;
 
-  @media screen and (min-width: bp(afl_small)) and (max-width: bp(afl_medium_just_before)) {
+  @media screen and (min-width: myF.bp(afl_small)) and (max-width: myF.bp(afl_medium_just_before)) {
       font-size: 1rem;
   }
-  @media screen and (min-width: bp(afl_medium)) {
+  @media screen and (min-width: myF.bp(afl_medium)) {
       font-size: 1.1rem;
   }
 }

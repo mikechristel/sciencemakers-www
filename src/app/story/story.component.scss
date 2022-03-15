@@ -1,16 +1,19 @@
-﻿@use '../shared/theme/base';
+﻿@use '../shared/theme/myF';
+@use '../shared/theme/myGlobals';
+@use '../shared/theme/helpers';
+@use '../shared/theme/base';
 @use '../shared/theme/button-helpers';
 
 %video-narrow-view,
 .video-narrow-view {
-  @media screen and (min-width: bp(required_video_in_column)) {
+  @media screen and (min-width: myF.bp(required_video_in_column)) {
     display: none !important;
   }
 }
 
 %video-desktop-view,
 .video-desktop-view {
-  @media screen and (max-width: bp(required_video_in_column_just_before)) {
+  @media screen and (max-width: myF.bp(required_video_in_column_just_before)) {
     display: none !important;
   }
 }
@@ -22,26 +25,26 @@
 /* NOTE: see _base.scss, biography set title in historymakers.component.scss, etc. for similar page-title styling,
    from which the following is derived but made "special" in its narrow view. */
 .page-title-video-page {
-  @extend %oswald;
+  @include myGlobals.oswald;
 
-  color: color(black);
+  color: myF.color(black);
   font-size: 1.4rem;
   width: 100%;
   margin-top: 0;
-  margin-bottom: em(4);
+  margin-bottom: myF.em(4);
   padding: 0;
 
-   @media screen and (min-width: bp(afl_medium)) {
+   @media screen and (min-width: myF.bp(afl_medium)) {
       font-size: 1.7rem;
   }
 
   /* NOTE: unique look just for this video page for narrow view titles */
-  @media screen and (max-width: bp(afl_small_just_before)) {
+  @media screen and (max-width: myF.bp(afl_small_just_before)) {
     background-color: black;
     color: #fff;
     font-size: 1.2rem;
     margin-bottom: 0;
-    padding: gutter(thmda-tight) gutter(thmda-tiny) gutter(thmda-tight) gutter(thmda-tiny); /* top right bottom left */
+    padding: myF.gutter(thmda-tight) myF.gutter(thmda-tiny) myF.gutter(thmda-tight) myF.gutter(thmda-tiny); /* top right bottom left */
   }
 
   &:focus {
@@ -61,19 +64,19 @@
 .titleRow {
   padding: 0;
 
-  @media screen and (min-width: bp(afl_small)) and (max-width: bp(afl_medium_just_before)) {
-    padding-bottom: gutter(thmda-tight); /* keep buttons separated from content below at wider views */
+  @media screen and (min-width: myF.bp(afl_small)) and (max-width: myF.bp(afl_medium_just_before)) {
+    padding-bottom: myF.gutter(thmda-tight); /* keep buttons separated from content below at wider views */
   }
 
-  @media screen and (min-width: bp(afl_medium)) {
-    padding-bottom: gutter(thmda-medium); /* keep buttons separated from content below at wider views */
+  @media screen and (min-width: myF.bp(afl_medium)) {
+    padding-bottom: myF.gutter(thmda-medium); /* keep buttons separated from content below at wider views */
   }
 }
 
 .title-buttons-area {
   min-width: 340px; /* gives enough width for 3 buttons to fit with their labels without wrapping */
 
-  @media screen and (max-width: bp(thmda_narrow_just_before)) {
+  @media screen and (max-width: myF.bp(thmda_narrow_just_before)) {
     min-width: 320px; /* give up cleaner layout to just get stuff into the narrowing view (match min width of videoColumn) */
   }
 }
@@ -103,7 +106,7 @@
   width: 100%;
 
   /* NOTE: this container for transcript will not be shown for narrow views UNLESS video-narrow-view (see transcriptColumnParent--mobile-active) */
-  @media screen and (max-width: bp(required_video_in_column_just_before)) {
+  @media screen and (max-width: myF.bp(required_video_in_column_just_before)) {
     display: none;
   }
 }
@@ -117,10 +120,10 @@
   max-height: 400px; /* ...but not too much transcript... */
   overflow-x: hidden;
   overflow-y: auto;
-  margin: 0 0 em(8) 0; /* top right bottom left */
-  padding: gutter(thmda-tiny) gutter(thmda-tiny) gutter(thmda-tiny) gutter(thmda-tiny); /* top right bottom left */
-  border: 1px solid color(dark-grey);
-  background-color: color(light-grey);
+  margin: 0 0 myF.em(8) 0; /* top right bottom left */
+  padding: myF.gutter(thmda-tiny) myF.gutter(thmda-tiny) myF.gutter(thmda-tiny) myF.gutter(thmda-tiny); /* top right bottom left */
+  border: 1px solid myF.color(dark-grey);
+  background-color: myF.color(light-grey);
   color: black;
   line-height: 1.125rem;
   font-size: 1.2rem;
@@ -128,13 +131,13 @@
   /* !!!TBD!!! !!!TODO: !!! NOTE: REVISIT later (or replace with ngStyle) to fill all available height in its flex container on wide views;
      this is a COMPROMISE as for 320x240 videos, a max-height of 400px works fine, but for 320x180 videos, the max-height should be no more than 300px.
      A compromise of 328px is used here; !!!TBD!!! !!!TODO: later tune based on 240 video height or 180 video height, plus if there are matches or not. */
-  @media screen and (min-width: bp(thmda_wideenough)) {
+  @media screen and (min-width: myF.bp(thmda_wideenough)) {
       max-height: 328px;
   }
 }
 .transcriptColumn--mobile-active {
   /* NOTE: when transcript is shown in narrow view ("mobile-active"), use smaller font, etc., layout */
-  @media screen and (max-width: bp(required_video_in_column_just_before)) {
+  @media screen and (max-width: myF.bp(required_video_in_column_just_before)) {
     min-height: 120px; /* NOTE: Insist on a bit of transcript showing */
     max-height: 180px; /* ...but not too much transcript... */
     line-height: 1rem;
@@ -160,7 +163,7 @@
   background-repeat: repeat;
   ...but wait for the tri-color scheme to be improved first.
   */
-  padding: gutter(thmda-tight) 0 0 0; /* top right bottom left */
+  padding: myF.gutter(thmda-tight) 0 0 0; /* top right bottom left */
   margin-bottom: 0.5em;
 
   &--narrow-view {
@@ -170,20 +173,20 @@
   }
 
   &--mobile-active {
-      @media screen and (max-width: bp(required_video_in_column_just_before)) {
+      @media screen and (max-width: myF.bp(required_video_in_column_just_before)) {
           display: inherit;
       }
   }
 
   &--desktop {
-      @media screen and (max-width: bp(required_video_in_column_just_before)) , screen and (min-width: bp(thmda_wideenough))  {
+      @media screen and (max-width: myF.bp(required_video_in_column_just_before)) , screen and (min-width: myF.bp(thmda_wideenough))  {
         display: none !important;
       }
       margin-bottom: 0;
   }
 
   &--wide-desktop {
-      @media screen and (max-width: bp(thmda_wideenough_just_before)) {
+      @media screen and (max-width: myF.bp(thmda_wideenough_just_before)) {
         display: none !important;
       }
       margin-bottom: 0;
@@ -191,19 +194,19 @@
 
   p:last-of-type {
       font-size: 1.25rem;
-      margin-bottom: em(32);
+      margin-bottom: myF.em(32);
   }
 }
 
 .about__section {
-  border-bottom: 1px solid color(ok-grey);
-  margin-bottom: gutter(thmda-big);
-  padding-bottom: gutter(thmda-tight);
+  border-bottom: 1px solid myF.color(ok-grey);
+  margin-bottom: myF.gutter(thmda-big);
+  padding-bottom: myF.gutter(thmda-tight);
 
   &:first-of-type {
-      margin-top: gutter(thmda-big);
+      margin-top: myF.gutter(thmda-big);
 
-      @media screen and (min-width: bp(afl_small)) {
+      @media screen and (min-width: myF.bp(afl_small)) {
           margin-top: 0;
       }
   }
@@ -221,9 +224,9 @@
 }
 
 .about__heading {
-  @extend %oswald;
+  @include myGlobals.oswald;
 
-  color: color(dark-grey);
+  color: myF.color(dark-grey);
   font-size: 1.4rem;
   letter-spacing: -.4px;
   line-height: 1.25rem;
@@ -244,14 +247,14 @@
 .about__link,
 .about__link:visited {
   @extend %source-sans-semi-bold;
-  color: color(primary);
+  color: myF.color(primary);
 }
 
 /* Prev and Next Match Section */
 .match {
-    background-color: color(primary);
+    background-color: myF.color(primary);
     width: 100%;
-    max-width: bp(max_video_width); /* NOTE: do not extend wider than video player */
+    max-width: myF.bp(max_video_width); /* NOTE: do not extend wider than video player */
     height: 1.875rem;
 }
 
@@ -263,7 +266,7 @@
 
 .match__prev-button,
 .match__next-button {
-    @extend %source-sans;
+   @include myGlobals.source-sans;
 
     background-color: transparent;
     color: #fff;
@@ -278,7 +281,7 @@
 }
 
 .match__tick-line {
-    background-color: color(ok-grey);
+    background-color: myF.color(ok-grey);
     height: 0.125rem;
     margin: auto 0;
     position: relative; /* needed to position match__tick properly on the line */
@@ -298,17 +301,17 @@
     background-color: black;
     height: 1.875rem;
     width: 100%;
-    max-width: bp(max_video_width); /* NOTE: do not extend wider than video player */
+    max-width: myF.bp(max_video_width); /* NOTE: do not extend wider than video player */
 }
 
 .story-nav__prev-button {
-  @extend %source-sans;
+ @include myGlobals.source-sans;
 
   background-color: transparent;
   color: #fff;
 }
 .story-nav__next-button {
-    @extend %source-sans;
+   @include myGlobals.source-sans;
 
     background-color: transparent;
     color: #fff;
@@ -323,43 +326,43 @@
 }
 
 .tabs {
-  border-bottom: 1px solid color(ok-grey);
+  border-bottom: 1px solid myF.color(ok-grey);
   font-size: 1.2rem;
-  margin: gutter(thmda-medium) 0 0 0; /* top right bottom left */
+  margin: myF.gutter(thmda-medium) 0 0 0; /* top right bottom left */
 
-  @media screen and (max-width: bp(thmda_narrow_just_before)) {
+  @media screen and (max-width: myF.bp(thmda_narrow_just_before)) {
     font-size: 1rem;
   }
 }
 
 .tabs__tab {
-  @extend %source-sans-bold;
+ @include myGlobals.source-sans-bold;
 
-  background-color: color(light-grey);
+  background-color: myF.color(light-grey);
   border-radius: 0;
-  color: color(ok-grey);
+  color: myF.color(ok-grey);
   font-size: 1.2rem;
-  height: #{$buttonHeight};
+  height: myGlobals.$buttonHeight;
 
   &:hover {
       cursor: pointer;
   }
 
   &--active {
-      background-color: color(secondary);
+      background-color: myF.color(secondary);
       color: #fff;
   }
 
 }
 
 .spaceForWordyLabel { /* hide on narrow views exactly the inverse of range for needTightLabel */
-  @media screen and (max-width: bp(thmda_wideenough_just_before)) {
+  @media screen and (max-width: myF.bp(thmda_wideenough_just_before)) {
     display: none !important;
   }
 }
 
 .needTightLabel { /* hide on wide views exactly the inverse of range for spaceForWordyLabel */
-  @media screen and (min-width: bp(thmda_wideenough)) {
+  @media screen and (min-width: myF.bp(thmda_wideenough)) {
     display: none !important;
   }
 }

@@ -1,5 +1,16 @@
 // CREDIT: greatly inspired by mat-video (https://github.com/nkoehler/mat-video) with subset of that functionality here;
 // see https://github.com/nkoehler/mat-video/blob/master/projects/mat-video/src/lib/video.component.ts
+// Feb. 2022 NOTE: The repo was abandoned in July 2020 and will not work in Angular 13.  Sadly, as browsers update, it may fail since recent 2022 Firefox versions (e.g., 97) also showed video player issues (no CC text).
+// So, this component may need to either be replaced (but will accessibility and CC support still be there as expected?!?!), or overhauled with a re-inspection of the latest
+// documentation on HTML5 video player support.
+//
+// Update based on https://developer.mozilla.org/en-US/docs/Web/API/URL/createObjectURL (it does NOT support MediaStream), and advice noted in
+// https://stackoverflow.com/questions/49886248/how-to-replace-url-createobjecturl that:
+//   Note: The use of a MediaStream object (not to be confused with MediaSource) as an input to this method is in the process of being deprecated.
+//   Discussions are ongoing about whether or not it should be removed outright. As such, you should try to avoid using this method with MediaStreams,
+//   and should use HTMLMediaElement.srcObject instead.
+// As a result, MediaStream is removed as a Interface option on the Input src variable, and argument Interface option for setVideoSrc function.  MediaSource remains viable.
+
 import {AfterViewInit, Component, ElementRef, EventEmitter, Input, OnChanges, OnDestroy, Output, Renderer2, SimpleChanges, ViewChild, OnInit} from "@angular/core";
 import { ThemePalette } from "@angular/material/core";
 
@@ -24,7 +35,7 @@ export class MyVideoComponent implements OnInit, AfterViewInit, OnChanges, OnDes
   @Output() timeChange: EventEmitter<number> = new EventEmitter();
   @Output() ended: EventEmitter<any> = new EventEmitter();
 
-  @Input() src: string | MediaStream | MediaSource | Blob = null;
+  @Input() src: string | MediaSource | Blob = null;
   @Input() urlToCCIndicator: string = null;
   @Input() poster: string = null;
 
@@ -206,7 +217,7 @@ export class MyVideoComponent implements OnInit, AfterViewInit, OnChanges, OnDes
       return !this.playing || this.isMouseMoving ? activeClass : inactiveClass;
   }
 
-  private setVideoSrc(src: string | MediaStream | MediaSource | Blob): void {
+  private setVideoSrc(src: string | MediaSource | Blob): void {
     if (this.srcObjectURL) {
       URL.revokeObjectURL(this.srcObjectURL);
       this.srcObjectURL = null;
@@ -216,16 +227,23 @@ export class MyVideoComponent implements OnInit, AfterViewInit, OnChanges, OnDes
       return;
     }
 
+    // NOTE: In Feb. 2022, developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/srcObject noted the following:
+    // Older versions of the Media Source specification required using createObjectURL() to create an object URL then setting src to that URL.
+    // Now you can just set srcObject to the MediaStream directly.
+
     if (!src) {
       this.video.nativeElement.src = null;
       if ("srcObject" in HTMLVideoElement.prototype) {
         this.video.nativeElement.srcObject = new MediaStream();
       }
-    } else if (typeof src === "string") {
+    }
+    else if (typeof src === "string") {
       this.video.nativeElement.src = src;
-    } else if ("srcObject" in HTMLVideoElement.prototype) {
+    }
+    else if ("srcObject" in HTMLVideoElement.prototype) {
       this.video.nativeElement.srcObject = src;
-    } else {
+    }
+    else {
       this.srcObjectURL = URL.createObjectURL(src);
       this.video.nativeElement.src = this.srcObjectURL;
     }

@@ -1,3 +1,6 @@
+@use '../../../theme/myF';
+@use '../../../theme/myGlobals';
+@use '../../../theme/helpers';
 @use '../../../theme/base';
 
 .myVideoButton {
@@ -6,11 +9,11 @@
   color: #fff;
 
   &:hover {
-      color: color(primary-on-mid-grey);
+      color: myF.color(primary-on-mid-grey);
   }
 
   &:focus {
-    color: color(primary-on-mid-grey); /* trust color cueing is enough */
+    color: myF.color(primary-on-mid-grey); /* trust color cueing is enough */
     /* NOTE: accessibility experts asked for this to be removed... outline: 3px solid transparent; -- For Windows high contrast mode */
   }
 }

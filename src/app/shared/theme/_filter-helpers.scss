@@ -1,23 +1,26 @@
-.launch-filter-menu-button {
-  @extend %source-sans;
+@use 'myGlobals';
+@use 'myF';
 
-  background-color: color(primary);
-  border: 1px solid color(primary); /* note: added for accessibility, to provide a button border in high contrast mode */
+.launch-filter-menu-button {
+ @include myGlobals.source-sans;
+
+  background-color: myF.color(primary);
+  border: 1px solid myF.color(primary); /* note: added for accessibility, to provide a button border in high contrast mode */
   border-radius: 0;
   cursor: pointer;
-  height: #{$buttonHeight};
-  margin-bottom: em(10);
-  padding: em(4) em(12);
+  height: myGlobals.$buttonHeight;
+  margin-bottom: myF.em(10);
+  padding: myF.em(4) myF.em(12);
   font-size: 1rem;
 
-  @media screen and (max-width: bp(afl_small_just_before)) {
+  @media screen and (max-width: myF.bp(afl_small_just_before)) {
     font-size: 1.2rem;
   }
 
   &:hover,
   &:focus {
       box-shadow: inset 0 0 5px rgba(51,51,51,.6);
-      background-color: color(secondary);
+      background-color: myF.color(secondary);
   }
 
   &:disabled {
@@ -28,12 +31,12 @@
 }
 
 .filters__title {
-  @extend %oswald;
+  @include myGlobals.oswald;
 
   background-color: transparent;
-  color: color(dark-grey);
+  color: myF.color(dark-grey);
   font-size: 1.7rem;
-  margin-bottom: em(10, 20);
+  margin-bottom: myF.em(10, 20);
 }
 
 /* Filter menu styles */
@@ -45,17 +48,17 @@
 
   .panel-for-narrow-filter-header {
       background-color: #fff;
-      padding: em(12, 16) em(14, 16) em(8, 16);
+      padding: myF.em(12, 16) myF.em(14, 16) myF.em(8, 16);
   }
 
   .filter-menu-header-title {
-      @extend %oswald;
+      @include myGlobals.oswald;
 
       font-size: 1.4rem;
-      letter-spacing: em(.5, 18);
+      letter-spacing: myF.em(.5, 18);
       text-align: center; /* center text within its flex container */
 
-      @media screen and (max-width: bp(thmda_wideenough_just_before)) {
+      @media screen and (max-width: myF.bp(thmda_wideenough_just_before)) {
           font-size: 1.6rem;
           text-align: left;
       }
@@ -66,26 +69,26 @@
       }
   }
 
-  .panel--first { margin-top: em(14, 16); }
+  .panel--first { margin-top: myF.em(14, 16); }
 
   .filter-menu-top-level-button {
-    @extend %oswald;
+    @include myGlobals.oswald;
 
-    background-color: color(primary);
-    border: 1px solid color(primary); /* note: added for accessibility, to provide a button border in high contrast mode */
+    background-color: myF.color(primary);
+    border: 1px solid myF.color(primary); /* note: added for accessibility, to provide a button border in high contrast mode */
     border-radius: 0;
     color: #fff;
     cursor: pointer;
     font-size: 1.2rem;
     max-width: 6.25rem;
-    height: #{$buttonHeight};
-    letter-spacing: em(.61);
+    height: myGlobals.$buttonHeight;
+    letter-spacing: myF.em(.61);
     transition: box-shadow .15s ease-in-out;
 
     &:hover,
     &:focus {
         box-shadow: inset 0 0 5px rgba(51,51,51,.6);
-        background-color: color(secondary);
+        background-color: myF.color(secondary);
     }
 
     &:disabled {
@@ -97,27 +100,27 @@
         width: 100%;
     }
 
-    @media screen and (min-width: bp(thmda_narrow)) {
+    @media screen and (min-width: myF.bp(thmda_narrow)) {
         font-size: 1.2rem;
         max-width: 9.75rem;
-        height: #{$buttonHeight};
+        height: myGlobals.$buttonHeight;
     }
   }
 
   .filter-menu-top-level-button.button-secondary {
-    margin-right: em(32);
+    margin-right: myF.em(32);
   }
 
   .button-secondary {
-    background: color(secondary);
-    border: 1px solid color(secondary); /* note: added for accessibility, to provide a button border in high contrast mode */
+    background: myF.color(secondary);
+    border: 1px solid myF.color(secondary); /* note: added for accessibility, to provide a button border in high contrast mode */
   }
 
 }
 
 .filter-section {
-  min-height: #{$buttonHeight};
-  margin-bottom: em(10, 16);
+  min-height: myGlobals.$buttonHeight;
+  margin-bottom: myF.em(10, 16);
 
   .filter-select-parent {
     padding-left: 0.25em;
@@ -131,25 +134,25 @@
 /* Last name active filter styles */
 .last-name-filter .last-name-letter {
     border-radius: 0;
-    height: em(36);
-    padding-bottom: em(4);
-    padding-top: em(4);
-    width: em(36);
+    height: myF.em(36);
+    padding-bottom: myF.em(4);
+    padding-top: myF.em(4);
+    width: myF.em(36);
   }
 
 /* For typically narrow view */
 .panel-for-narrow-filter {
-  padding: em(9) 0;
+  padding: myF.em(9) 0;
 }
 
 .filter-section {
-    min-height: #{$buttonHeight};
+    min-height: myGlobals.$buttonHeight;
 }
 
 .filter-select-label {
   @extend %source-sans-semi-bold;
 
-  color: color(dark-grey);
+  color: myF.color(dark-grey);
   font-size: 1rem;
   line-height: 2rem;
   margin: 0;
@@ -160,86 +163,86 @@
 }
 
 .filter-section-rg-item {
-  @extend %oswald;
+  @include myGlobals.oswald;
   background-color: #fff;
-  border: 1px solid color(primary);
-  color: color(primary);
-  padding: em(3) em(3);
+  border: 1px solid myF.color(primary);
+  color: myF.color(primary);
+  padding: myF.em(3) myF.em(3);
   text-transform: capitalize;
   font-size: 1.2rem;
   width: 100%;
 
-  @media screen and (max-width: bp(afl_medium_just_before)) {
-    margin-bottom: em(5);
+  @media screen and (max-width: myF.bp(afl_medium_just_before)) {
+    margin-bottom: myF.em(5);
   }
 
   &:hover {
-    border: 1px solid color(primary);
+    border: 1px solid myF.color(primary);
     background-color:  #fff;
-    color: color(secondary);
+    color: myF.color(secondary);
   }
 }
 
 .filter-section-rg-item.selected  {
-    background-color: color(primary);
-    border: 1px solid color(primary);
+    background-color: myF.color(primary);
+    border: 1px solid myF.color(primary);
     color: #fff;
 }
 
 .filter-section-rg-item:focus {
-  box-shadow: 0 0 0 3px color(tertiary);
+  box-shadow: 0 0 0 3px myF.color(tertiary);
   outline: 3px solid transparent; /* For Windows high contrast mode. */
 }
 
 /* This style applies to both wide and narrow screens */
 .filter-section-title {
-  @extend %oswald;
+  @include myGlobals.oswald;
 
-  color: color(dark-grey);
+  color: myF.color(dark-grey);
   font-size: 1.4rem;
-  margin-bottom: em(6, 16);
+  margin-bottom: myF.em(6, 16);
 }
 
 .filter-select-parent {
-  @extend %oswald;
+  @include myGlobals.oswald;
   margin: auto;
 
-  background-color: color(primary);
-  border: 1px solid color(primary); /* note: added for accessibility, to provide a border in high contrast mode */
+  background-color: myF.color(primary);
+  border: 1px solid myF.color(primary); /* note: added for accessibility, to provide a border in high contrast mode */
   border-radius: 0;
   color: #fff;
-  height: #{$buttonHeight}; /* corresponds to 30px(42px) with 16px default */
+  height: myGlobals.$buttonHeight; /* corresponds to 30px(42px) with 16px default */
   width: 100%;
   font-size: 1.2rem;
 
-  padding-left: em(8,16);
-  padding-right: em(8,16);
+  padding-left: myF.em(8,16);
+  padding-right: myF.em(8,16);
 
   /* Safari will "zoom in" on the select with font-size like this, so it needs more space.
      Rather than "fight it" and try to control Safari html-select element styling, give it the space
      to do what it is doing (at least for Safari 13 on mobile, works as of May 2020). */
   &:not(:root:root) {
-    margin-left: em(8);
+    margin-left: myF.em(8);
   }
 
-  @media screen and (min-width: bp(afl_medium)) and (max-width: bp(afl_large_just_before)) {
-    padding-left: em(12,16);
-    padding-right: em(12,16);
+  @media screen and (min-width: myF.bp(afl_medium)) and (max-width: myF.bp(afl_large_just_before)) {
+    padding-left: myF.em(12,16);
+    padding-right: myF.em(12,16);
   }
 
-  @media screen and (min-width: bp(afl_large)) {
-    padding-left: em(16,16);
-    padding-right: em(16,16);
+  @media screen and (min-width: myF.bp(afl_large)) {
+    padding-left: myF.em(16,16);
+    padding-right: myF.em(16,16);
   }
 
   &:hover,
   &:focus {
-    background-color: color(secondary);
+    background-color: myF.color(secondary);
     color: #fff;
   }
 
   &.active {
-    background-color: color(primary);
+    background-color: myF.color(primary);
     color: #fff;
   }
 }
@@ -256,18 +259,18 @@
 }
 
 .filter-choices {
-  margin: em(5);
+  margin: myF.em(5);
   padding: 0;
   transition: color .2s ease-in-out;
 
-  @media screen and (max-width: bp(thmda_filterui_maxpt)) {
+  @media screen and (max-width: myF.bp(thmda_filterui_maxpt)) {
     line-height: 100%;
-    margin-bottom: em(12);
+    margin-bottom: myF.em(12);
     text-align: left;
   }
 
   &:hover {
-      color: color(secondary);
+      color: myF.color(secondary);
   }
 }
 
@@ -279,74 +282,74 @@
   padding: 0;
   border: 0;
   background: none;
-  color: color(unchosen-shade);
+  color: myF.color(unchosen-shade);
   font-weight: normal;
 
   &.active {
-      color: color(primary);
+      color: myF.color(primary);
   }
 
   &:hover {
-      color: color(secondary);
+      color: myF.color(secondary);
   }
 }
 
 .field-list-parent {
-  @extend %source-sans;
+ @include myGlobals.source-sans;
   font-size: 1rem; /* must stay small because filters often squeezed into narrow filter panes */
   text-align: center;
 
   margin: auto;
 
-  @media screen and (max-width: bp(thmda_filterui_maxpt)) {
+  @media screen and (max-width: myF.bp(thmda_filterui_maxpt)) {
     text-align: left; /* accordion content on Topic Search page */
   }
 
-  @media screen and (max-width: bp(afl_medium_just_before)) {
+  @media screen and (max-width: myF.bp(afl_medium_just_before)) {
     font-size: 1rem;
     word-break: break-word;
   }
 
-  @media screen and (max-width: bp(afl_small_just_before)) {
-    font-size: em(20);
+  @media screen and (max-width: myF.bp(afl_small_just_before)) {
+    font-size: myF.em(20);
   }
 }
 
 .filter--alphabet {
-  border: 1px solid color(ok-grey);
-  color: color(dark-grey);
-  margin: em(3);
-  height: em(30);
-  width: em(30);
-  padding-bottom: em(4);
-  padding-top: em(4);
+  border: 1px solid myF.color(ok-grey);
+  color: myF.color(dark-grey);
+  margin: myF.em(3);
+  height: myF.em(30);
+  width: myF.em(30);
+  padding-bottom: myF.em(4);
+  padding-top: myF.em(4);
   text-align: center;
   text-transform: uppercase;
   transition: border .2s ease-in-out;
 
   &:hover {
-      border: 1px solid color(dark-grey);
-      color: color(dark-grey);
+      border: 1px solid myF.color(dark-grey);
+      color: myF.color(dark-grey);
   }
 
-  @media screen and (max-width: bp(afl_medium_just_before)) {
-    margin: em(5);
-    height: #{$buttonHeight};
+  @media screen and (max-width: myF.bp(afl_medium_just_before)) {
+    margin: myF.em(5);
+    height: myGlobals.$buttonHeight;
     width: $buttonHeight;
-    padding-bottom: em(10);
-    padding-top: em(10);
+    padding-bottom: myF.em(10);
+    padding-top: myF.em(10);
   }
 }
 
 .filters-applied {
-  margin-bottom: em(18);
+  margin-bottom: myF.em(18);
 
   .filters-applied-title {
-    @extend %oswald;
+    @include myGlobals.oswald;
 
-    color: color(primary);
+    color: myF.color(primary);
     letter-spacing: -.5px;
-    padding: em(3) 0;
+    padding: myF.em(3) 0;
   }
 
   .filters-applied-set {
@@ -356,10 +359,10 @@
   }
 
   .filter-applied-container {
-      margin-bottom: em(10);
+      margin-bottom: myF.em(10);
 
       &:hover {
-          color: color(secondary);
+          color: myF.color(secondary);
       }
   }
 
@@ -368,24 +371,24 @@
       margin: 0;
       border: 0;
       background: transparent;
-      color: color(unchosen-shade);
+      color: myF.color(unchosen-shade);
       font-weight: normal;
       cursor: pointer;
       padding: 0;
       transition: color .2s ease-in-out;
 
       &.active {
-          color: color(primary);
+          color: myF.color(primary);
       }
 
       &:hover {
-          color: color(secondary);
+          color: myF.color(secondary);
       }
   }
 
   .filter-remove-button:focus {
-      color: color(secondary);
-      box-shadow: 0 0 0 3px color(tertiary);
+      color: myF.color(secondary);
+      box-shadow: 0 0 0 3px myF.color(tertiary);
       /* NOTE: accessibility experts asked for this to be removed... outline: 3px solid transparent; -- For Windows high contrast mode */.
   }
 
@@ -400,7 +403,7 @@
   .remove-icon {
     height: 1.5rem;
     width: 1.5rem;
-    @media screen and (min-width: bp(afl_large)) {
+    @media screen and (min-width: myF.bp(afl_large)) {
       height: 1.5rem;
       width: 1.5rem;
     }

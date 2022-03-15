@@ -1,4 +1,7 @@
-﻿@use '../shared/theme/base';
+﻿@use '../shared/theme/myF';
+@use '../shared/theme/myGlobals';
+@use '../shared/theme/helpers';
+@use '../shared/theme/base';
 @use '../shared/theme/search-helpers';
 @use '../shared/theme/filter-helpers';
 @use '../shared/theme/view-option-helpers';
@@ -12,7 +15,7 @@
   grid-template-columns: repeat(2, 1fr); /* the "1fr" makes all rows equal height;
        e.g., see  stackoverflow.com/questions/44488357/equal-height-rows-in-css-grid-layout */
   grid-auto-rows: 1fr;
-  gap: gutter(thmda-tight);
+  gap: myF.gutter(thmda-tight);
 
   /* Note: layout set-up assumes that each card plus its gap accounts for roughly 128 pixels.
      At these widths, we have these needs:
@@ -27,16 +30,16 @@
   */
 
   /* For widths between afl_medium and afl_large, be 4 per row: */
-  @media screen and (min-width: bp(afl_medium)) and (max-width: bp(afl_large_just_before)) {
+  @media screen and (min-width: myF.bp(afl_medium)) and (max-width: myF.bp(afl_large_just_before)) {
     grid-template-columns: repeat(3, 1fr);
-    gap: gutter(thmda-medium);
+    gap: myF.gutter(thmda-medium);
   }
 
   /* New!  With maximum of thmda_maxwidth, afl_large < thmda_maxwidth < afl_xlarge < xlarge, simply max out now at afl_large or greater...
      For widths of afl_large or greater, be 7 per row: */
-  @media screen and (min-width: bp(afl_large)) {
+  @media screen and (min-width: myF.bp(afl_large)) {
     grid-template-columns: repeat(4, 1fr);
-    gap: gutter(thmda-big);
+    gap: myF.gutter(thmda-big);
   }
 }
 
@@ -47,7 +50,7 @@
 
 .tape-as-list {
   padding: 0;
-  margin: 0 0 gutter(thmda-tiny) 0; /* top right bottom left */
+  margin: 0 0 myF.gutter(thmda-tiny) 0; /* top right bottom left */
 }
 
 .tapes-as-list {
@@ -57,19 +60,19 @@
 
 /* My Clips */
 .welcome-paragraph {
-  @extend %source-sans-bold;
+ @include myGlobals.source-sans-bold;
 
-  background: color(primary);
+  background: myF.color(primary);
   color: #fff;
   font-size: 2rem;
-  margin: em(12) 0 em(8) 0; /* top right bottom left */
-  padding: em(8) em(10);;
+  margin: myF.em(12) 0 myF.em(8) 0; /* top right bottom left */
+  padding: myF.em(8) myF.em(10);;
   position: relative; /* needed to get descending triangle magic to work... */
 
   &:after { /* magic to draw descending triangle */
-    border-left: em(10) solid transparent;
-    border-right: em(10) solid transparent;
-    border-top: em(10) solid color(primary);
+    border-left: myF.em(10) solid transparent;
+    border-right: myF.em(10) solid transparent;
+    border-top: myF.em(10) solid myF.color(primary);
     content: '';
     height: 0;
     left: calc(30% - 10px);
@@ -81,30 +84,30 @@
 }
 
 .distinguishFilterPane {
-  background-color: color(light-grey);
+  background-color: myF.color(light-grey);
   border: 1px solid #ccc;
-  padding: gutter(thmda-medium);
+  padding: myF.gutter(thmda-medium);
 }
 
 .story-set__title {
-  @extend %oswald;
+  @include myGlobals.oswald;
 
-  color: color(black);
+  color: myF.color(black);
   font-size: 2rem;
   line-height: 120%;
   margin-bottom: 0;
-  margin-top: em(4);
+  margin-top: myF.em(4);
   padding: 0;
 
-  @media screen and (min-width: bp(afl_small)) and (max-width: bp(afl_medium_just_before)) {
+  @media screen and (min-width: myF.bp(afl_small)) and (max-width: myF.bp(afl_medium_just_before)) {
       font-size: 1.7rem;
   }
 
-  @media screen and (min-width: bp(afl_medium)) and (max-width: bp(afl_large_just_before)) {
+  @media screen and (min-width: myF.bp(afl_medium)) and (max-width: myF.bp(afl_large_just_before)) {
       font-size: 2rem;
   }
 
-  @media screen and (min-width: bp(afl_large)) {
+  @media screen and (min-width: myF.bp(afl_large)) {
       font-size: 2.3rem;
   }
 
@@ -120,47 +123,47 @@
 }
 
 .gap-my-clips-action-container {
-    margin-bottom: em(12);
+    margin-bottom: myF.em(12);
 }
 
 .my-clips-action-button { /* note similarity with launch-filter-menu-button */
-  @extend %oswald;
+  @include myGlobals.oswald;
 
-  background-color: color(primary);
-  border: 1px solid color(primary); /* note: added for accessibility, to provide a button border in high contrast mode */
+  background-color: myF.color(primary);
+  border: 1px solid myF.color(primary); /* note: added for accessibility, to provide a button border in high contrast mode */
   border-radius: 0;
   cursor: pointer;
-  margin: gutter(thmda-tight) 0 gutter(thmda-tiny) 0; /* top right bottom left */
-  padding: em(4) em(12);
+  margin: myF.gutter(thmda-tight) 0 myF.gutter(thmda-tiny) 0; /* top right bottom left */
+  padding: myF.em(4) myF.em(12);
   font-size: 1.2rem;
-  height: #{$buttonHeight};
+  height: myGlobals.$buttonHeight;
 
   &:hover,
   &:focus {
       box-shadow: inset 0 0 5px rgba(51,51,51,.6);
-      background-color: color(secondary);
+      background-color: myF.color(secondary);
   }
 }
 
 .my-clips-action-button__inverse {
-  @extend %oswald;
+  @include myGlobals.oswald;
 
-  background-color: color(secondary);
-  border: 1px solid color(secondary); /* note: added for accessibility, to provide a button border in high contrast mode */
+  background-color: myF.color(secondary);
+  border: 1px solid myF.color(secondary); /* note: added for accessibility, to provide a button border in high contrast mode */
   border-radius: 0;
   cursor: pointer;
-  margin: gutter(thmda-tight) 0 gutter(thmda-tiny) 0; /* top right bottom left */
-  padding: em(4) em(12);
+  margin: myF.gutter(thmda-tight) 0 myF.gutter(thmda-tiny) 0; /* top right bottom left */
+  padding: myF.em(4) myF.em(12);
   font-size: 1.2rem;
-  height: #{$buttonHeight};
+  height: myGlobals.$buttonHeight;
 
   &:hover,
   &:focus {
       box-shadow: inset 0 0 5px rgba(51,51,51,.6);
-      background-color: color(primary);
+      background-color: myF.color(primary);
   }
 }
 
 .action-button-top-gap {
-  margin-top: em(6);
+  margin-top: myF.em(6);
 }

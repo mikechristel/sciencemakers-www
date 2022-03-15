@@ -1,13 +1,16 @@
-﻿@use '../shared/theme/base';
+﻿@use '../shared/theme/myF';
+@use '../shared/theme/myGlobals';
+@use '../shared/theme/helpers';
+@use '../shared/theme/base';
 
 /* For biographies, the mockup for home page born this time (week or day) showed a card width of up to 284 (height 272 for the image part).
    For HistoryMakers biography searches, we don't want to go that tall of image height (or wide), so that we can show more
    results in limited space; hence a different class of biography-result-stamp was born (which also has a list view option). */
 
 .card {
-  border: 1px solid color(ok-grey);
-  color: color(dark-grey);
-  background-color: color(light-grey);
+  border: 1px solid myF.color(ok-grey);
+  color: myF.color(dark-grey);
+  background-color: myF.color(light-grey);
   text-decoration: none;
   overflow: hidden; /* necessary to hide any overflow of image for narrow card widths */
   height: 100%; /* needed to fill all of the allocated flex layout or grid space */
@@ -18,19 +21,19 @@
            For the :focus psuedo selector, define an outline style which will be visible, such as "outline: 2px dashed black;".
          So, here that is: */
       outline: 2px dashed black;
-      border: 1px solid color(secondary);
-      background: color(primary);
+      border: 1px solid myF.color(secondary);
+      background: myF.color(primary);
       color: #fff;
   }
 
   &:hover {
-      border: 1px solid color(secondary);
-      background: color(primary);
+      border: 1px solid myF.color(secondary);
+      background: myF.color(primary);
       color: #fff;
   }
 
   &.active {
-      background-color: color(light-grey);
+      background-color: myF.color(light-grey);
   }
 }
 
@@ -63,8 +66,8 @@
 }
 
 .card__contents {
-  @extend %oswald;
+  @include myGlobals.oswald;
   font-size: 1rem;
-  padding: em(8) em(11) em(8) em(11); /* top right bottom left */
+  padding: myF.em(8) myF.em(11) myF.em(8) myF.em(11); /* top right bottom left */
   margin: 0;
 }

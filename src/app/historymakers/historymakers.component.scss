@@ -1,4 +1,7 @@
-﻿@use '../shared/theme/base';
+﻿@use '../shared/theme/myF';
+@use '../shared/theme/myGlobals';
+@use '../shared/theme/helpers';
+@use '../shared/theme/base';
 @use '../shared/theme/search-helpers';
 @use '../shared/theme/filter-helpers';
 @use '../shared/theme/view-option-helpers';
@@ -12,7 +15,7 @@
   grid-template-columns: repeat(2, 1fr); /* the "1fr" makes all rows equal height;
        e.g., see  stackoverflow.com/questions/44488357/equal-height-rows-in-css-grid-layout */
   grid-auto-rows: 1fr;
-  gap: gutter(thmda-tiny);
+  gap: myF.gutter(thmda-tiny);
 
   /* Note: layout set-up assumes that each card plus its gap accounts for roughly ~160 pixels.
      At these widths, we have these needs:
@@ -27,28 +30,28 @@
      afl_large        1280        934       6
   */
   /* For widths between thmda_narrow and thmda_wideenough, be 3 per row: */
-  @media screen and (min-width: bp(thmda_narrow)) and (max-width: bp(thmda_wideenough_just_before)) {
+  @media screen and (min-width: myF.bp(thmda_narrow)) and (max-width: myF.bp(thmda_wideenough_just_before)) {
     grid-template-columns: repeat(3, 1fr);
-    gap: gutter(thmda-tiny);
+    gap: myF.gutter(thmda-tiny);
   }
 
   /* For widths between thmda_wideenough and afl_medium, be 3 per row with a bit more gap: */
-  @media screen and (min-width: bp(thmda_wideenough)) and (max-width: bp(afl_medium_just_before)) {
+  @media screen and (min-width: myF.bp(thmda_wideenough)) and (max-width: myF.bp(afl_medium_just_before)) {
     grid-template-columns: repeat(3, 1fr);
-    gap: gutter(thmda-tight);
+    gap: myF.gutter(thmda-tight);
   }
 
   /* For widths between afl_medium and afl_large, be 4 per row: */
-  @media screen and (min-width: bp(afl_medium)) and (max-width: bp(afl_large_just_before))  {
+  @media screen and (min-width: myF.bp(afl_medium)) and (max-width: myF.bp(afl_large_just_before))  {
     grid-template-columns: repeat(4, 1fr);
-    gap: gutter(thmda-medium);
+    gap: myF.gutter(thmda-medium);
   }
 
   /* New!  With maximum of thmda_maxwidth, afl_large < thmda_maxwidth < afl_xlarge < xlarge, simply max out now at afl_large or greater...
      For widths of afl_large or more, be 6 per row: */
-  @media screen and (min-width: bp(afl_large)) {
+  @media screen and (min-width: myF.bp(afl_large)) {
     grid-template-columns: repeat(6, 1fr);
-    gap: gutter(thmda-medium);
+    gap: myF.gutter(thmda-medium);
   }
 }
 
@@ -59,7 +62,7 @@
 
 .biography-as-list {
   padding: 0;
-  margin: 0 0 em(20) 0; /* top right bottom left */
+  margin: 0 0 myF.em(20) 0; /* top right bottom left */
 }
 
 .biographies-as-list {
@@ -69,19 +72,19 @@
 
 /* HistoryMakers Total */
 .welcome-paragraph {
-    @extend %source-sans-bold;
+   @include myGlobals.source-sans-bold;
 
-    background: color(primary);
+    background: myF.color(primary);
     color: #fff;
     font-size: 2rem;
-    margin: em(12) 0 em(8) 0; /* top right bottom left */
-    padding: em(8) em(10);
+    margin: myF.em(12) 0 myF.em(8) 0; /* top right bottom left */
+    padding: myF.em(8) myF.em(10);
     position: relative; /* needed to get descending triangle magic to work... */
 
     &:after { /* magic to draw descending triangle */
-        border-left: em(10) solid transparent;
-        border-right: em(10) solid transparent;
-        border-top: em(10) solid color(primary);
+        border-left: myF.em(10) solid transparent;
+        border-right: myF.em(10) solid transparent;
+        border-top: myF.em(10) solid myF.color(primary);
         content: '';
         height: 0;
         left: calc(30% - 10px);
@@ -93,32 +96,32 @@
 }
 
 .distinguishFilterPane {
-  background-color: color(light-grey);
+  background-color: myF.color(light-grey);
   border: 1px solid #ccc;
-  padding: gutter(thmda-medium);
+  padding: myF.gutter(thmda-medium);
 }
 
 .biography-set__title {
-    @extend %oswald;
+    @include myGlobals.oswald;
 
-    color: color(black);
+    color: myF.color(black);
     font-size: 1.4rem;
     margin-top: 0;
-    margin-bottom: em(4);
+    margin-bottom: myF.em(4);
     padding: 0;
 
-     @media screen and (min-width: bp(afl_small)) and (max-width: bp(afl_medium_just_before)) {
+     @media screen and (min-width: myF.bp(afl_small)) and (max-width: myF.bp(afl_medium_just_before)) {
         font-size: 1.7rem;
      }
 
-     @media screen and (min-width: bp(afl_medium)) and (max-width: bp(afl_large_just_before)) {
+     @media screen and (min-width: myF.bp(afl_medium)) and (max-width: myF.bp(afl_large_just_before)) {
         font-size: 2rem;
-        margin-top: em(4);
+        margin-top: myF.em(4);
     }
 
-    @media screen and (min-width: bp(afl_large)) {
+    @media screen and (min-width: myF.bp(afl_large)) {
         font-size: 2.3rem;
-        margin-top: em(4);
+        margin-top: myF.em(4);
     }
 
     &:focus {

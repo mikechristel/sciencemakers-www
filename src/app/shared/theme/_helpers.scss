@@ -2,6 +2,8 @@
    --------------------------------------------------
    Classes to use for small, common tasks. If used in conjunction
    with other styles, please create a class and extend the placeholder. */
+@use 'myGlobals';
+@use 'myF';
 
 .bold,
 %bold { font-weight: 700; }
@@ -17,7 +19,7 @@
 
 %mobile-only,
 .mobile-only {
-  @media screen and (min-width: bp(afl_small)) {
+  @media screen and (min-width: myF.bp(afl_small)) {
     display: none !important;
   }
 }
@@ -26,7 +28,7 @@
 .desktop-only {
   width: 100%;
 
-  @media screen and (max-width: bp(afl_small_just_before)) {
+  @media screen and (max-width: myF.bp(afl_small_just_before)) {
     display: none !important;
   }
 }
