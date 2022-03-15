@@ -47,7 +47,7 @@
     gap: myF.gutter(thmda-medium);
   }
 
-  /* New!  With maximum of thmda_maxwidth, afl_large < thmda_maxwidth < afl_xlarge < xlarge, simply max out now at afl_large or greater...
+  /* With maximum of thmda_maxwidth, afl_large < thmda_maxwidth < afl_xlarge < xlarge, simply max out now at afl_large or greater...
      For widths of afl_large or more, be 6 per row: */
   @media screen and (min-width: myF.bp(afl_large)) {
     grid-template-columns: repeat(6, 1fr);
