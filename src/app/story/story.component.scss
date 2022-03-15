@@ -246,7 +246,7 @@
 
 .about__link,
 .about__link:visited {
-  @extend %source-sans-semi-bold;
+  @include myGlobals.source-sans-semi-bold;
   color: myF.color(primary);
 }
 

@@ -150,7 +150,7 @@
 }
 
 .filter-select-label {
-  @extend %source-sans-semi-bold;
+  @include myGlobals.source-sans-semi-bold;
 
   color: myF.color(dark-grey);
   font-size: 1rem;
@@ -275,7 +275,7 @@
 }
 
 .filter-one-choice {
-  @extend %source-sans-semi-bold;
+  @include myGlobals.source-sans-semi-bold;
 
   font-size: 1rem; /* must stay small because filters often squeezed into narrow filter panes */
   margin: 0;
@@ -393,7 +393,7 @@
   }
 
   .applied-field-list-parent {
-    @extend %source-sans-semi-bold;
+    @include myGlobals.source-sans-semi-bold;
     font-size: 1rem; /* must stay small because filters often squeezed into narrow filter panes */
 
     margin: auto;

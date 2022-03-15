@@ -74,7 +74,13 @@
 }
 
 .card__story-title {
-  @extend %limited-text; /* shows ... for text that overflows its display area */
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  display: -webkit-box;
+  line-height: 1.1em;
+  overflow: hidden;
+  text-overflow: ellipsis; /* shows ... for text that overflows its display area */
+
   font-size: 1rem;
   max-height: 2.7rem; /* shows 3 lines cleanly, including descenders like "g" */
   margin: 0;

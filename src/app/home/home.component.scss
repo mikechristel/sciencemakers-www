@@ -9,7 +9,7 @@
 
 /* Homepage */
 .welcome-paragraph {
-    @extend %source-sans-semi-bold;
+    @include myGlobals.source-sans-semi-bold;
 
     background: myF.color(secondary);
     color: #fff;
@@ -100,7 +100,7 @@
 }
 
 .birthdays__empty-message {
-  @extend %source-sans-semi-bold;
+  @include myGlobals.source-sans-semi-bold;
 
   color: myF.color(dark-grey);
   font-size: 1.2rem;

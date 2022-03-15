@@ -2,7 +2,7 @@
 @use 'myF';
 
 .my-app-button {
-  @extend %source-sans-semi-bold;
+  @include myGlobals.source-sans-semi-bold;
 
   background-color: myF.color(primary);
   border: 1px solid myF.color(primary); /* note: added for accessibility, to provide a button border in high contrast mode */
@@ -31,7 +31,7 @@
 }
 
 .my-app-button-shorter {
-  @extend %source-sans-semi-bold;
+  @include myGlobals.source-sans-semi-bold;
 
   background-color: myF.color(primary);
   border: 1px solid myF.color(primary); /* note: added for accessibility, to provide a button border in high contrast mode */

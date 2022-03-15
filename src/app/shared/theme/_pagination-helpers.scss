@@ -41,7 +41,7 @@
 .pagination__prev,
 .pagination__next {
   @extend %pagination__item;
-  @extend %source-sans-semi-bold;
+  @include myGlobals.source-sans-semi-bold;
 
   &:disabled {
       cursor: not-allowed;
@@ -64,7 +64,7 @@
 
 .pagination__button {
   @extend %pagination__item;
-  @extend %source-sans-semi-bold;
+  @include myGlobals.source-sans-semi-bold;
 
   &.active {
       border: 1px solid myF.color(secondary);

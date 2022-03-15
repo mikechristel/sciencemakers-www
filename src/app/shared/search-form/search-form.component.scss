@@ -24,13 +24,13 @@
 }
 
 .search__routerLink {
-@extend %source-sans;
+  @include myGlobals.source-sans;
     cursor: pointer;
     font-size: 1rem;
 }
 
 .resetFieldsToDefault { /* very similar to search__submit */
-  @extend %source-sans-semi-bold;
+  @include myGlobals.source-sans-semi-bold;
 
   background-color: myF.color(primary);
   border-radius: 0;
@@ -55,7 +55,7 @@
 }
 
 .search__submit {
-  @extend %source-sans-semi-bold;
+  @include myGlobals.source-sans-semi-bold;
 
   background-color: myF.color(primary);
   border:1px myF.color(primary); /* defined for accessibility, so that a border is rendered in the Windows High Contrast mode */
@@ -82,7 +82,7 @@
 }
 
 .search__submit__disabled {
-  @extend %source-sans-semi-bold;
+  @include myGlobals.source-sans-semi-bold;
 
   background-color: myF.color(primary);
   border:1px myF.color(primary); /* defined for accessibility, so that a border is rendered in the Windows High Contrast mode */
@@ -256,7 +256,7 @@ color: #1E1810;
 }
 
 .interview_date_area_terse {
-@extend %oswald;
+@include myGlobals.oswald;
 color: white;
 font-size: 1rem;
 margin: 0;
@@ -267,7 +267,7 @@ align-content: center;
 }
 
 .interview_date_area_wordy {
-@extend %oswald;
+@include myGlobals.oswald;
 color: white;
 font-size: 1.1rem;
 margin: 0;
@@ -288,7 +288,7 @@ width: 100%;
 }
 
 .interview-date-preface-label {
-@extend %oswald;
+@include myGlobals.oswald;
 color: white;
 font-size: 1rem;
 padding-top: myF.em(2);
