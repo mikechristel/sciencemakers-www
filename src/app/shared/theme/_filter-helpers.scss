@@ -335,7 +335,7 @@
   @media screen and (max-width: myF.bp(afl_medium_just_before)) {
     margin: myF.em(5);
     height: myGlobals.$buttonHeight;
-    width: $buttonHeight;
+    width: myGlobals.$buttonHeight;
     padding-bottom: myF.em(10);
     padding-top: myF.em(10);
   }
@@ -389,7 +389,7 @@
   .filter-remove-button:focus {
       color: myF.color(secondary);
       box-shadow: 0 0 0 3px myF.color(tertiary);
-      /* NOTE: accessibility experts asked for this to be removed... outline: 3px solid transparent; -- For Windows high contrast mode */.
+      /* NOTE: accessibility experts asked for this to be removed... outline: 3px solid transparent; -- For Windows high contrast mode */
   }
 
   .applied-field-list-parent {

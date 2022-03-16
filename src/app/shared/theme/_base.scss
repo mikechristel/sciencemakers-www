@@ -164,7 +164,7 @@ ul.list-unstyled {
     }
 
     label {
-       @include myGlobals.source-sans;
+        @include myGlobals.source-sans;
         font-size: 1rem;
         cursor: pointer;
         color: black;

@@ -32,12 +32,3 @@
     display: none !important;
   }
 }
-
-%limited-text {
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 3;
-    display: -webkit-box;
-    line-height: 1.1em;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
