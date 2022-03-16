@@ -12,8 +12,7 @@
   padding: 0;
   display: grid;
   /* Default of 2 per row */
-  grid-template-columns: repeat(2, 1fr); /* the "1fr" makes all rows equal height;
-       e.g., see  stackoverflow.com/questions/44488357/equal-height-rows-in-css-grid-layout */
+  grid-template-columns: repeat(2, 1fr); /* the "1fr" makes all rows equal height; e.g., see stackoverflow.com/questions/44488357/equal-height-rows-in-css-grid-layout */
   grid-auto-rows: 1fr;
   gap: myF.gutter(thmda-tiny);
 
@@ -28,7 +27,9 @@
      thmda_wideenough 768px       ~512      3
      afl_medium       960         640       4
      afl_large        1280        934       6
-  */
+     afl_xlarge (retired, not used)      1920        1584      10
+     xlarge (retired, not used)           2400        2064      12 */
+
   /* For widths between thmda_narrow and thmda_wideenough, be 3 per row: */
   @media screen and (min-width: myF.bp(thmda_narrow)) and (max-width: myF.bp(thmda_wideenough_just_before)) {
     grid-template-columns: repeat(3, 1fr);
@@ -42,7 +43,7 @@
   }
 
   /* For widths between afl_medium and afl_large, be 4 per row: */
-  @media screen and (min-width: myF.bp(afl_medium)) and (max-width: myF.bp(afl_large_just_before))  {
+  @media screen and (min-width: myF.bp(afl_medium)) and (max-width: myF.bp(afl_large_just_before)) {
     grid-template-columns: repeat(4, 1fr);
     gap: myF.gutter(thmda-medium);
   }
@@ -72,7 +73,7 @@
 
 /* HistoryMakers Total */
 .welcome-paragraph {
-   @include myGlobals.source-sans-bold;
+    @include myGlobals.source-sans-bold;
 
     background: myF.color(primary);
     color: #fff;
