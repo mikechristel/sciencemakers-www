@@ -5,7 +5,7 @@
     <!-- Search input: text query with label  -->
     <label fxFlex="auto" id="queryInputLabel" class="input-preface-label">{{inputPlaceholder}}</label>
     <input fxFlex="auto" #queryInput class="search__input" type="text"
-      aria-labeledby="queryInputLabel" [(ngModel)]="txtQuery" (keyup.enter)="doSearch()" />
+      aria-labelledby="queryInputLabel" [(ngModel)]="txtQuery" (keyup.enter)="doSearch()" />
     <!-- Optional dropdown list of fields to search -->
     <div fxFlex="auto" *ngIf="showFieldOptions && (activeSearchFieldItem >= 0)" class="search__fields-container">
         <label for="search-fld-select" class="select-preface-label">Fields to search:</label>
