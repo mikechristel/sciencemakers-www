@@ -1,884 +1,320 @@
-﻿@import '../shared/theme/base';
+﻿@use '../shared/theme/myF';
+@use '../shared/theme/myGlobals';
+@use '../shared/theme/helpers';
+@use '../shared/theme/base';
+@use '../shared/theme/button-helpers';
+@use '../shared/theme/view-option-helpers';
 
-.col-sm-3,
-.col-sm-4,
-.col-sm-8 {
-    @media screen and (width: 768px) {
-        width: 100%;
-    }
+/* FILTER-PIECE The styles in this portion are the same as styles in shared/theme/filter-helpers, but
+   rather than bring in that relatively large style helper file via an import, only repeat those that are
+   actually used by biography-storyset. */
+.pad-top-a-bit {
+  padding-top: 0.2em;
 }
 
-.story-search {
-    display: block;
+.filter-section-rg-item {
+  @include myGlobals.oswald;
+  background-color: #fff;
+  border: 1px solid myF.color(primary);
+  color: myF.color(primary);
+  padding: myF.em(3) myF.em(3);
+  text-transform: capitalize;
+  font-size: 1.2rem;
+  width: 100%;
+
+  @media screen and (max-width: myF.bp(afl_medium_just_before)) {
+    margin-bottom: myF.em(5);
+  }
+
+  &:hover {
+    border: 1px solid myF.color(primary);
+    background-color:  #fff;
+    color: myF.color(secondary);
+  }
 }
 
-.search--desktop {
-    margin-left: 0;
-    margin-right: 0;
+.filter-section-rg-item.selected  {
+  background-color: myF.color(primary);
+  border: 1px solid myF.color(primary);
+  color: #fff;
 }
 
-.biography--desktop {
-    display: none;
+.filter-section-rg-item:focus {
+  box-shadow: 0 0 0 3px myF.color(tertiary);
+  outline: 3px solid transparent; /* For Windows high contrast mode. */
 }
 
-.biography--tablet {
-    display: initial;
-
-    @media (max-width: bp(medium)) {
-        display: none;
-    }
+.filter-section {
+  min-height: myGlobals.$buttonHeight;
+  margin-bottom: myF.em(10, 16);
 }
+
+/* FILTER-PIECE End of the filter-helpers section. */
 
 .tapes-and-filters {
-    margin-top: em(20);
+    margin-top: myF.em(20);
 }
 
 .row--top {
-    @media (min-width: bp(medium)) {
-        margin-bottom: em(28);
+  @media screen and (min-width: myF.bp(afl_medium)) {
+        margin-bottom: myF.em(28);
     }
 }
 
-.headshot {
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
+.headshot__container_narrow {
+    margin-bottom: myF.em(2);
+    min-height: 332px;
     overflow: hidden;
 }
 
 .headshot__container {
+    padding: 0;
+    margin: 0;
     overflow: hidden;
-
-    @media (max-width: bp(medium)) {
-        display: flex;
-        justify-content: center;
-        margin-bottom: em(20);
-        overflow: hidden;
-    }
-
-    @media (max-width: bp(large) - 1) and (min-width: bp(medium)) {
-        overflow: hidden;
-    }
 }
 
-.headshot__image-box {
-    align-self: center;
+.headshot_img-backdrop {
+  padding: 0;
+  margin: 0;
+  text-align: center;
+}
+
+.headshot__img__as_is {
+  height: 332px;
+  object-fit: cover;
+  transform: scale(1.1);
+  width: 100%;
+}
+
+.headshot__img {
+  transform: scale(1.1); /* needed to get rid of rounded rectangle edges - will be cropped away via styling */
+  object-fit: cover;
+  @media screen and (min-width: myF.bp(afl_small)) and (max-width: myF.bp(thmda_wideenough_just_before)) {
     width: 100%;
-
-    @media (max-width: bp(medium)) {
-        max-width: em(300);
-    }
-
-    @media (max-width: bp(small)) {
-        max-width: em(232);
-    }
+    height: 332px;
+  }
+  @media screen and (min-width: myF.bp(thmda_wideenough)) and (max-width: myF.bp(afl_medium_just_before)) {
+    width: 352px;
+    height: 352px; /* note fxFlex.lt-md in container in html; breakpoints do not fully line up (768px vs. 959 px) so perhaps revisit styling later... !!!TBD!!! */
+  }
+  @media screen and (min-width: myF.bp(afl_medium)) {
+    width: 352px; /* see container html (a great-great grandparent flex container of this perhaps) */
+    height: 352px; /* NOTE: see fxFlex.gt-sm in container in html; adjust the fxFlex size value for this style's container (headshot__img-backdrop element) in html to match */
+  }
 }
 
-.headshot__image {
-    transform: scale(1.1);
-    width: 100%;
-
-     @media (max-width: bp(large) - 1) and (min-width: bp(medium)) {
-        width: 100%;
-     }
-}
-
-.bio-details {
-    background-color: color(secondary);
+.bio-details-desktop {
+    background-color: myF.color(secondary);
     border-color: transparent;
     border-radius: 0;
     color: #fff;
-    position: relative;
-
-    &--mobile {
-        @extend %mobile-only;
-
-        margin-bottom: em(15);
-
-        &::before {
-            border-left: em(15) solid transparent;
-            border-bottom: em(15) solid color(secondary);
-            border-right: em(15) solid transparent;
-            content: '';
-            height: 0;
-            left: calc(50% - 15px);
-            position: absolute;
-            top: - em(5);
-            transform: translateY(-50%);
-            width: 0;
-        }
-
-        .bio-details__title {
-            font-size: em(21);
-            letter-spacing: normal;
-        }
-    }
-
-    &--desktop {
-        @extend %desktop-only;
-
-        flex: 1;
-        position: relative;
-
-        &::before {
-            border-left: em(15) solid transparent;
-            border-bottom: em(15) solid color(secondary);
-            border-right: em(15) solid transparent;
-            content: '';
-            height: 0;
-            left: calc(50% - 15px);
-            position: absolute;
-            top: - em(5);
-            transform: translateY(-50%);
-            width: 0;
-
-            @media (min-width: bp(large)) {
-                border-left: 0;
-                border-bottom: em(15) solid transparent;
-                border-right: em(15) solid color(secondary);
-                border-top: em(15) solid transparent;
-                left: - em(14);
-                top: 50%;
-            }
-        }
-    }
-
-    @media (max-width: bp(large) - 1) and (min-width: bp(medium)) {
-        // transform: scale(1.1);
-    }
 }
 
 .bio-details__title-container {
-    align-items: center;
-    color: #fff;
-    display: flex;
-    font-size: em(14);
-    justify-content: space-between;
-    padding: em(10) em(15);
-
-    &:focus {
-        text-decoration: none;
-    }
+    margin: myF.em(2) 0 myF.em(2); /* top, left and right, bottom */
+    padding: 0;
 }
+
 .bio-details__title {
-    @extend %oswald;
+    @include myGlobals.oswald;
 
     color: #fff;
-    font-size: em(18);
-    letter-spacing: -.5px;
-    text-transform: uppercase;
+    font-size: 1.7rem;
+    padding: 0 myF.em(4) myF.em(4);
+    text-align: center;
+    letter-spacing: .5px;
+    line-height: normal;
 
-    @media (min-width: bp(medium) + 1) {
-        font-size: em(26);
-        padding: em(15, 21) 15px em(5,21);
-        letter-spacing: .5px;
+    @media screen and (min-width: myF.bp(afl_medium)) {
+        font-size: 2rem;
+        margin-bottom: myF.em(2);
     }
 }
 
-.bio-details__list {
-    padding: 0 em(15);
-    margin-bottom: 0;
+.bio-details__item {
+   @include myGlobals.source-sans;
+    font-size: 1rem;
+    padding: 0 myF.em(2);
+    margin: 0;
+    line-height: 120%;
 
-    dd, dt { display: inline-block; }
-
-    dt {
-        padding-right: em(5);
+    .key-piece {
+      display: inline-block;
+      font-weight: 700;
+      padding-right: myF.em(5);
     }
+    .value-piece {
+      display: inline-block;
+    }
+}
+
+.bio-details__def { /* very close to bio-details__item */
+ @include myGlobals.source-sans;
+  font-size: 1rem;
+  padding: 0 myF.em(4) myF.em(4);
+  margin: 0;
+  line-height: 110%;
+
+  .key-piece {
+    display: inline-block;
+    font-weight: 700;
+    padding-left: myF.em(4);
+
+  }
+  .value-piece {
+    display: inline-block;
+    padding-left: myF.em(6);
+  }
 }
 
 .bio-details__interview {
-    padding: 0 em(15) em(15);
-    margin-top: em(10);
+   @include myGlobals.source-sans;
+    font-size: 1rem;
+    padding: 0 myF.em(9) myF.em(20);
+    margin-top: myF.em(10);
+    margin-bottom: myF.em(0);
 }
 
-.bio-details__def {
-    display: block;
-    font-size: em(16);
-    line-height: 120%;
-}
+.biography__header {
+    @include myGlobals.oswald;
 
-.biography__title {
-    @extend %oswald;
-
-    color: color(dark-grey);
-    font-size: em(16);
-    letter-spacing: -.4px;
-    line-height: em(20);
-    text-transform: uppercase;
+    color: black;
+    font-size: 1.4rem;
+    margin-top: myF.em(18);
 }
 
 .biography__abstract {
-    @media (min-width: bp(large)) {
-        font-size: em(16);
-        line-height: 20px;
-        margin-bottom: em(30);
-    }
+   @include myGlobals.source-sans;
+    color: black;
+    font-size: 1rem;
+    margin: myF.em(8) 0;
+    padding: 0;
 }
 
 .biography--mobile {
     @extend %mobile-only;
 
     border-radius: 0;
-    margin-bottom: em(15);
-
-    .biography__header {
-        background-color: color(primary);
-    }
-
-    .biography__title-container {
-        align-items: center;
-        color: #fff;
-        display: flex;
-        justify-content: space-between;
-        padding: em(10) em(15);
-
-        &:focus {
-            text-decoration: none;
-        }
-    }
-
-    .biography__title {
-        @extend %source-sans-bold;
-
-        color: #fff;
-        letter-spacing: initial;
-        text-transform: capitalize;
-    }
-}
-
-.playlist {
-
-    @media(max-width: bp(medium) - 1) {
-        display: none;
-    }
+    margin-bottom: myF.em(15);
 }
 
 .total-segments {
-    @extend %oswald;
+    @include myGlobals.oswald;
 
-    color: color(dark-grey);
-    flex: 1;
-    font-size: rem(18);
+    color: myF.color(dark-grey);
+    font-size: 1.4rem;
     letter-spacing: -.5px;
+    margin: 0;
+    padding: 0; /* top right bottom left */
 
-    @media (min-width: bp(medium)) {
-        font-size: rem(26);
-        width: auto;
+    @media screen and (min-width: myF.bp(afl_medium)) {
+        font-size: 1.7rem;
+    }
+
+    &:focus {
+      outline: 0;
+      text-decoration: underline;
     }
 }
 
-.back-button {
-    @extend %oswald;
+.total-segments-mobile {
+  @include myGlobals.oswald;
 
-    align-items: center;
-    background-color: transparent;
-    color: color(primary);
-    display: flex;
-    font-size: rem(18);
-    text-transform: uppercase;
+  color: myF.color(dark-grey);
+  font-size: 1.5rem;
+  letter-spacing: -.5px;
+  margin: myF.em(4) 0 myF.em(4) 0;
+  padding: 0 myF.em(2) 0 myF.em(2); /* top right bottom left */
 
-    &--mobile {
-        @extend %mobile-only;
-
-        margin-bottom: em(12, 18);
-    }
-
-    &--desktop {
-        @extend %desktop-only;
-
-        @media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
-            flex: 1;
-            justify-content: flex-end;
-        }
-    }
+  &:focus {
+    outline: 0;
+    text-decoration: underline;
+  }
 }
 
-.back-button.back-button--desktop:hover {
-    color: #000;
-
-    .back-button__chevron {
-        fill: #000;
-    }
-}
-
-.back-button__chevron {
-    margin-right: em(8);
-}
-
-.back-button__ext-text {
-    display: none;
-}
-
-.page-view-row {
-    display: flex;
-    justify-content: space-between;
-}
-
-.tapes {
-    align-items: stretch;
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    margin: em(5) 0 em(14);
-    padding: 0;
-
-    &--list {
-        padding: 0 0 em(14);
-    }
+.mobile-controls-line {
+    margin: myF.em(2) 0 myF.em(16) 0; /* top right bottom left */
+    padding: myF.em(2) 0 myF.em(12) 0; /* top right bottom left */
 }
 
 .tapes__title {
-    @extend %oswald;
+    @include myGlobals.oswald;
 
-    color: color(primary);
-    font-size: rem(16);
-    line-height: em(20, 16);
-    margin-bottom: em(14, 16);
+    color: myF.color(primary);
+    font-size: 1.4rem;
+    margin: myF.em(20) 0 0;
 
-    @media (min-width: bp(medium)) {
-        margin-bottom: 0;
+    &:first-of-type { /* first one has gap before it already, don't add to gap */
+        margin-top: 0;
     }
+
+    @media screen and (min-width: myF.bp(afl_medium)) {
+        font-size: 1.7rem;
+        margin-bottom: myF.em(2);
+    }
+}
+
+.page-view-option-piece {
+  margin: 0; /* top right bottom left */
+  padding: 0 0 myF.em(12);
+}
+
+.tapes {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  /* Default of 2 per row */
+  grid-template-columns: repeat(2, 1fr); /* the "1fr" makes all rows equal height;
+     e.g., see stackoverflow.com/questions/44488357/equal-height-rows-in-css-grid-layout */
+  grid-auto-rows: 1fr;
+  gap: myF.gutter(thmda-tight);
+
+  /* Note: layout set-up assumes that each card plus its gap accounts for roughly 128 pixels.
+     At these widths, we have these needs:
+     Breakpoint Name  Pixel-Value Max-Columns (stamps per row)
+     thmda_narrow     392px       3
+     BUT NOW at afl_small and up, only 70% of screen is used for stamp area, so adjust further:
+     Breakpoint Name  Pixel-Value 0.7-Value Max-Columns (stamps per row)
+     afl_small        600px       420       3
+     thmda_wideenough 768px       537       4
+     afl_medium       960         672       5 (not 4 as perhaps used elsewhere when just 66% and not 70% saved for stamp area)
+     afl_large        1280        896       7 (not 6 as perhaps used elsewhere when just 66% and not 70% saved for stamp area)
+     afl_xlarge       1920        1344      10
+     xlarge           2400        1680      12
+
+     Client was not happy with so much squeezing, so relax to:
+     thmda_wideenough 768px       537       3
+     afl_medium       960         672       4
+     afl_large        1280        896       5
+     But then on Aug. 11, 2020 accessibility experts liked the original layout better.  Reverted back to it
+     relaxing only the maximum from 7 to 6 (4, 5, 6).
+  */
+
+  /* For widths between afl_medium and afl_large, be 5 per row with gap increase: */
+  @media screen and (min-width: myF.bp(afl_medium)) and (max-width: myF.bp(afl_large_just_before)) {
+    grid-template-columns: repeat(3, 1fr);
+    gap:  myF.gutter(thmda-medium);
+  }
+
+  /* New!  With maximum of thmda_maxwidth, afl_large < thmda_maxwidth < afl_xlarge < xlarge, simply max out now at afl_large or greater...
+     For widths of afl_large or greater, be 6 per row: */
+  @media screen and (min-width: myF.bp(afl_large)) {
+    grid-template-columns: repeat(4, 1fr);
+    gap: myF.gutter(thmda-medium);
+  }
 }
 
 .tape {
-    position: relative;
-    display: flex;
-    margin-bottom: 1rem;
-    margin-right: 1rem;
-    vertical-align: top;
-    width: calc(50% - .5rem);
-
-    &:nth-of-type(2n+0) {
-        margin-right: 0;
-    }
-
-    @media (min-width: bp(small)) {
-        width: calc(33.33333333333333% - (1rem * .6666666666666666));
-
-        &:nth-of-type(2n+0) {
-            margin-right: 1rem;
-        }
-
-        &:nth-of-type(3n+0) {
-            margin-right: 0;
-        }
-    }
-
-    //IE
-    @media screen and (min-width: bp(small)) and (-ms-high-contrast: active), (-ms-high-contrast: none) {
-        width: calc(33.22222222222222% - (1rem * .6666666666666666));
-    }
-
-    @media (min-width: 1024px) {
-        width: calc(33.33333333333333% - (1rem * .6666666666666666));
-
-        &:nth-of-type(2n+0) {
-            margin-right: 1rem;
-        }
-
-        &:nth-of-type(3n+0) {
-            margin-right: 0;
-        }
-    }
-
-    //IE
-    @media screen and (min-width: 1024px) and (-ms-high-contrast: active), (-ms-high-contrast: none) {
-        width: calc(33.22222222222222% - (1rem * .6666666666666666));
-    }
-
-    @media (min-width: 1024px) and (min-width: bp(large)) {
-        width: calc(25% - (1rem * .75));
-
-        &:nth-of-type(3n+0) {
-            margin-right: 1rem;
-        }
-
-        &:nth-of-type(4n+0) {
-            margin-right: 0;
-        }
-    }
-
-    &.tape--list {
-        padding: 0 em(10);
-        margin: 0 !important;
-        width: 100%;
-    }
+  padding: 0;
+  margin: 0;
 }
 
-thda-story {
-    display: flex;
-    width: 100%;
+.tape-as-list {
+  padding: 0;
+  margin: 0 0 myF.em(20) 0; /* top right bottom left */
 }
 
-.view {
-    display: inline-flex;
-    flex: 1 0 auto;
-    justify-content: space-between;
-    max-width: 100px;
-    margin-left: -10px;
-
-    @media (min-width: bp(medium)) {
-        display: flex;
-        margin-left: 0;
-    }
+.tapes-as-list {
+  list-style: none;
+  padding: 0;
 }
-
-.view__button-container {
-    display: flex;
-    flex: 1;
-    height: em(30);
-    justify-content: center;
-    margin: auto 0;
-
-    &:first-of-type {
-        border-right: 1px solid color(grey);
-    }
-}
-
-.view__grid-button,
-.view__list-button {
-    background: transparent;
-    color: color(grey);
-    outline: 0;
-    padding: 0;
-    transition: color .2s ease-in-out;
-
-    &.active { color: color(secondary); }
-}
-
-.view__grid-button {
-    height: em(30);
-    width: em(30);
-
-    &:hover .grid {
-        fill: color(secondary);
-    }
-}
-
-.view__list-button {
-    height: em(30);
-    width: em(33);
-
-    &:hover .list {
-        fill: color(secondary);
-    }
-}
-
-.summaries-button {
-    @extend %source-sans;
-
-    background-color: color(primary);
-    border-radius: 0;
-    box-sizing: border-box;
-    color: #fff;
-    flex: 1;
-    height: em(30);
-    max-width: em(126);
-    white-space: nowrap;
-
-    //iPhone only
-    @media screen and (max-device-width: 480px) {
-        max-width: 100%;
-        height: auto;
-    }
-
-    @media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
-        max-width: 10em;
-        flex: 1 0 auto;
-    }
-
-    &--active {
-        background-color: color(light-grey);
-        border: 1px solid color(grey);
-        color: color(dark-grey);
-    }
-
-    &:focus {
-        outline: 0;
-    }
-
-    //iPhone
-    @media screen and (max-device-width: 480px) {
-        max-width: 10em;
-    }
-}
-
-.page-view-options {
-    align-items: center;
-    display: flex;
-    flex: 1;
-    flex-direction: column;
-    justify-content: space-between;
-    flex-direction: row;
-    flex-wrap: wrap;
-    margin-bottom: 10px;
-
-    @media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
-        flex: 1 0 auto;
-    }
-
-    @media screen and (min-width: bp(medium) + 1) {
-        align-items: center;
-        flex-direction: row;
-        max-width: em(400);
-    }
-}
-
-.playlist {
-    background-color: color(secondary);
-    color: #fff;
-    font-size: 1rem;
-    min-height: em(150);
-    padding: em(15);
-    width: 100%;
-}
-
-.playlist__title-row {
-    align-items: center;
-    display: flex;
-}
-
-.playlist__title {
-    @extend %oswald;
-
-    font-size: em(21);
-    letter-spacing: -.5px;
-    text-transform: uppercase;
-}
-
-.playlist__link {
-    cursor: pointer;
-    margin-left: auto;
-}
-
-.playlist__total {
-    @extend %source-sans-semi-bold-italic;
-
-    color: #fff;
-    font-size: em(16);
-    margin-left: em(5);
-    margin-top: em(5);
-}
-
-.playlist__item {
-    display: flex;
-    margin-bottom: em(10);
-
-    &:hover {
-        text-decoration: none;
-    }
-}
-
-.playlist__item-desc {
-    background-color: color(light-grey);
-    color: color(dark-grey);
-    flex: 1;
-    font-size: em(10);
-    padding: em(7,10) em(10,10);
-}
-
-// Start of search styles
-
-.search {
-    @extend %source-sans;
-
-    display: flex;
-    flex-wrap: wrap;
-    font-size: 1rem;
-
-    &.search--desktop {
-        @extend %desktop-only;
-
-        .input-dropdown {
-            padding-right: 0;
-        }
-
-        .search__submit {
-            order: 4;
-        }
-    }
-
-}
-
-.search__submit {
-    @extend %source-sans-semi-bold;
-
-    align-items: center;
-    background-color: color(primary);
-    border-radius: 0;
-    color: #fff;
-    cursor: pointer;
-    display: flex;
-    font-size: em(20, 16);
-    height: em(43, 16);
-    justify-content: center;
-    letter-spacing: .5px;
-    order: 4;
-    text-transform: uppercase;
-    transition: box-shadow .15s ease-in-out;
-    width: 100%;
-
-    @media screen and (min-width: bp(small)) {
-        font-size: em(16);
-        margin-left: auto;
-        width: em(156, 16);
-    }
-
-    @media screen and (min-width: bp(large)) {
-        order: initial;
-    }
-
-    &:hover {
-        box-shadow: inset 0 0 5px rgba(51,51,51,.6);
-    }
-
-    &:disabled {
-        cursor: not-allowed;
-        opacity: .4;
-    }
-
-    span {
-        width: 100%;
-    }
-}
-
-.search__submit-icon {
-    height: em(16, 16);
-    margin-left: 8px;
-}
-
-.search__advanced {
-    color: color(primary);
-}
-
-.search__links-container {
-    margin-bottom: em(17);
-    width: 100%;
-
-    @media screen and (min-width: bp(small)) {
-        margin-bottom: 0;
-    }
-
-    @media screen and (min-width: bp(large)) {
-        margin-bottom: em(12);
-    }
-}
-
-.search__routerLink {
-    cursor: pointer;
-}
-
-.search__rpp-container {
-    align-items: center;
-    display: flex;
-    justify-content: space-between;
-    margin-top: auto;
-    margin-bottom: em(17);
-    margin-right: em(5);
-    width: auto;
-
-    @media screen and (min-width: bp(small)) {
-        margin-bottom: initial;
-        max-width: em(290);
-    }
-
-}
-
-.search__res-per-pg {
-    align-self: flex-end;
-    display: inline-block;
-}
-
-.search__res-per-pg-button {
-    @extend %source-sans;
-
-    align-items: center;
-    background-color: color(light-grey);
-    border-radius: 0;
-    border: 1px solid #cccccc;
-    color: #333333;
-    display: flex;
-    font-size: 1rem;
-    height: em(30);
-    justify-content: space-between;
-    padding: 0 em(10);
-    transition: background-color .2s ease-in-out, box-shadow .2s ease-in-out;
-
-    &[aria-expanded="true"] {
-        background-color: color(grey);
-        box-shadow: inset 0 0 5px rgba(51,51,51,.5);
-    }
-
-    .caret {
-        margin: 7% 0 7% 5px;
-    }
-
-    &:focus {
-        outline: 1px solid color(dark-grey);
-    }
-}
-
-.search__match {
-  left: -999em;
-  position: absolute;
-}
-
-.search__match-group {
-    display: flex;
-    flex-direction: column;
-    list-style-type: none;
-}
-
-.search__match-container {
-    align-items: center;
-    display: flex;
-    height: 100%;
-}
-
-.search__match-label {
-    align-items: center;
-    cursor: pointer;
-    display: flex;
-    font-weight: normal;
-    margin-bottom: 0;
-
-    &:before {
-        background: white;
-        box-shadow: 0 0 0 1px color(grey);
-        content: '\a0';
-        display: inline-block;
-        height: em(14);
-        line-height: 1.4;
-        margin-right: .6em;
-        text-indent: .15em;
-        vertical-align: .2em;
-        width: em(14);
-    }
-}
-
-.search__match:checked + .search__match-label:before {
-    background: url('/assets/checked.png') center no-repeat #fff;
-}
-
-
-.input-dropdown {
-    display: flex;
-    margin-right: auto;
-    margin-bottom: em(17);
-    width: 100%;
-
-    @media screen and (min-width: bp(small)) {
-        margin-bottom: em(12);
-    }
-
-    @media screen and (min-width: bp(large)) {
-        padding-right: em(10);
-    }
-
-    label {
-        display: flex;
-        flex: 2;
-        font-weight: inherit;
-        margin-bottom: 0;
-    }
-
-    .dropdown .input-dropdown__button:focus {
-        border: 1px solid color(dark-grey);
-        outline: 0;
-    }
-}
-
-.input-dropdown__input {
-    @extend %source-sans;
-
-    border-top: 1px solid color(grey);
-    border-left: 1px solid color(grey);
-    border-bottom: 1px solid color(grey);
-    border-right: 0;
-    border-radius: 0;
-    color: color(dark-grey);
-    font-size: em(16);
-    flex: 2;
-    height: em(43, 16);
-    padding-left: em(9, 16);
-    width: 100%;
-
-    @media screen and (min-width: bp(medium)) {
-        padding-left: em(26, 16);
-    }
-
-    @media screen and (min-width: bp(medium)) {
-        font-size: em(18);
-        height: em(43, 18);
-        padding-left: em(26, 18);
-    }
-
-    &:focus {
-        border: 1px solid color(dark-grey);
-        outline: 0;
-    }
-
-    // opacity used to override Firefox default value for placeholders
-    &::placeholder {
-        color: #999;
-        opacity: 1;
-        //text-transform: capitalize;
-    }
-}
-
-.input-dropdown__button {
-    @extend %source-sans;
-
-    background-color: #fff;
-    border: 1px solid color(grey);
-    border-radius: 0;
-    color: color(dark-grey);
-    height: em(43, 16);
-    font-size: em(16);
-    text-transform: capitalize;
-    transition: background-color .2s ease-in-out, box-shadow .2s ease-in-out;
-    width: 90px;
-
-    &[aria-expanded="true"] {
-        background-color: color(grey);
-        box-shadow: inset 0 0 5px rgba(51,51,51,.5);
-    }
-
-    @media screen and (min-width: bp(small)) {
-        width: 126px;
-    }
-
-    @media screen and (max-width: 544px) {
-        padding: 0 em(5);
-    }
-
-    @media screen and (min-width: bp(large)) {
-        height: em(43, 18);
-        font-size: em(18);
-    }
-
-
-}
-
-.dropdown-menu {
-    border: 1px solid rgba(0,0,0,.1);
-    border-radius: 0;
-}
-
-.dropdown__option {
-    background: none;
-    border: none;
-    color: color(dark-grey);
-    cursor: arrow;
-    font-size: em(16);
-    line-height: em(26, 16);
-    padding: 0 em(17, 16);
-    text-transform: capitalize;
-
-    &:hover {
-        background: transparent;
-        color: color(primary);
-    }
-}
-
-// End of search styles

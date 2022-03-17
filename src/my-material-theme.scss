@@ -1,0 +1,33 @@
+/* NOTE: This work done February 2022 with Angular 13 and its material package.
+   Advice from material.angular.io/guide/theming#defining-a-theme used to create this file
+   using the latest Sass rules.
+   But, then need to get the css via the "sass" command, as in:
+   sass my-material-theme.scss my-thmda-material-theme.css
+   ...and then, need to tweak a few of the outputted styles as was done earlier per advice from accessibility experts
+   so see comments within my-thmda-material-theme.css for that tailoring.
+*/
+@use "../node_modules/@angular/material" as mat;
+
+@include mat.core();
+
+$my-primary: mat.define-palette(mat.$purple-palette, 500);
+$my-accent: mat.define-palette(mat.$grey-palette, A200, A100, A400);
+
+$my-theme: mat.define-light-theme((
+ color: (
+   primary: $my-primary,
+   accent: $my-accent,
+ )
+));
+
+/* Emit theme-dependent styles for common features used across multiple components. */
+@include mat.core-theme($my-theme);
+
+/* Emit styles for MatButton based on `$my-theme`. Because the configuration
+   passed to `define-light-theme` omits typography, `button-theme` will not
+   emit any typography styles. */
+@include mat.button-theme($my-theme);
+
+/* Include the theme mixins for other components you use here. Important: update slider theme! That is the critical one used in video player
+   and updated (perhaps) in exported my-thmda-material-theme.css to improve accessibility! */
+@include mat.slider-theme($my-theme);

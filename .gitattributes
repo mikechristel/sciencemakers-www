@@ -6,7 +6,6 @@
 .gitattributes text
 .gitignore     text
 LICENSE        text
-Web.config     text
 
 # Treat these file types as text
 *.md   text
@@ -16,10 +15,6 @@ Web.config     text
 *.txt  text
 *.html text
 *.json text
-
-
-# Must keep Windows line ending to be parsed correctly
-web.config  text eol=crlf
 
 # Binary files such as jpeg images
 *.jpg  binary

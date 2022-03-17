@@ -1,5 +1,4 @@
 ﻿export class SearchFacetDetail {
-    public id: number;
+    public id: string;
     public label: string;
-    public description: string;
 }

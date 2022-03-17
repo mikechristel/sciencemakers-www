@@ -1,0 +1,99 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>ScienceMakers Digital Archive quick check</title>
+  <base href="/">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="shortcut icon" href="assets/THM_favicon.png" type="image/png" />
+
+  <script type="text/javascript">
+    /*****
+     ** FOR DEBUGGING PURPOSES ONLY
+     *****/
+    // The jwt below decodes to:
+    // {
+    //   "session_id": "clientdevelopment",       -- Unique identifier for debugging sessions
+    //   "publisher_id": "58d4a73bb1b932be",      -- Events written to the HistoryMakers-Dev account
+    //   "account_id": 24918942,                  -- I don't know what this value is, perhaps used by the auth proxy
+    //   "account_name": "Test And Development",  -- Display name of test account
+    //   "publisher_reference": "testdev",        -- Internal identifier for test account
+    //   "iat": 1634916430,                       -- Issued  Oct 22, 2021 11:37:40 AM EDT
+    //   "exp": 1767243599                        -- Expires Dec 31, 2012 11:59:59 PM EST
+    // }
+    const jwt = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzZXNzaW9uX2lkIjoiY2xpZW50ZGV2ZWxvcG1lbnQiLCJwdWJsaXNoZXJfaWQiOiI1OGQ0YTczYmIxYjkzMmJlIiwiYWNjb3VudF9pZCI6MjQ5MTg5NDIsImFjY291bnRfbmFtZSI6IlRlc3QgQW5kIERldmVsb3BtZW50IiwicHVibGlzaGVyX3JlZmVyZW5jZSI6InRlc3RkZXYiLCJpYXQiOjE2MzQ5MTY0MzAsImV4cCI6MTc2NzI0MzU5OX0.JV5kPhwiPSicRTPcEHRHavKjMBNPLQ3_d2klONLBLQk";
+    document.cookie = `da_auth=${jwt}`;
+  </script>
+</head>
+<body>
+  <my-app >Loading...</my-app>
+  <script>
+    // Flag indicates if all preflight checks pass
+    var _browserTestsPassed = false;
+
+    (function () {
+      var myapp = document.getElementsByTagName('my-app')[0];
+
+      var cookiesEnabled = (function () {
+        if (navigator.cookieEnabled) return true;
+
+        // set and read cookie
+        document.cookie = "cookietest=1";
+        var ret = document.cookie.indexOf("cookietest=") != -1;
+
+        // delete cookie
+        document.cookie = "cookietest=1; expires=Thu, 01-Jan-1970 00:00:01 GMT";
+
+        return ret;
+      })();
+
+      var cookieMissing = (function () {
+        if (document.cookie == null || document.cookie == "") {
+          return true;
+        }
+
+        return (document.cookie.indexOf('da_auth=') == -1)
+      })();
+
+      var iframeDetected = (function () {
+        try {
+          return window.self !== window.top;
+        } catch (e) {
+          return true;
+        }
+      })();
+
+
+      ////////////////////////////////////////////////////////////
+      // CHECK IF COOKIES ENABLED
+      if (!cookiesEnabled) {
+        myapp.innerHTML = '<h2>ScienceMakers Digital Archive Requires Cookies</h2';
+        myapp.innerHTML += '<p>Please enable cookies if you wish to use this application.</p>';
+        myapp.innerHTML += '<a href="https://www.whatismybrowser.com/guides/how-to-enable-cookies/auto">How to Enable Cookies provided by WhatIsMyBrowser.com</a>';
+        return;
+      }
+
+      // CHECK FOR IFRAME WITHOUT COOKIE
+      if (iframeDetected && cookieMissing) {
+        myapp.innerHTML = '<h2>ScienceMakers Digital Archive Will Not Run Inside an IFrame</h2';
+        myapp.innerHTML += '<p>Click the link below to open the application in a separate browser tab/window.</p>';
+        myapp.innerHTML += `<a href="${window.location.href}" target="_blank">${window.location.href}</a>`;
+        return;
+      }
+
+      // CHECK IF COOKIE IS MISSING
+      if (cookieMissing) {
+        myapp.innerHTML = '<h2>ScienceMakers Digital Archive Session Cookie Is Missing</h2';
+        myapp.innerHTML += '<p>A valid session cookie could not be found, please click the link below to reload the application.</p>';
+        myapp.innerHTML += `<a href="${window.location.href}">${window.location.href}</a>`;
+        return;
+      }
+
+      // ALL GOOD
+      _browserTestsPassed = true;
+      myapp.innerHTML = 'Awesomeness is about to happen...';
+    })();
+  </script>
+</body>
+</html>

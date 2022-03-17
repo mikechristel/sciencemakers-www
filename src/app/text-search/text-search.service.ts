@@ -1,5 +1,6 @@
 ﻿import { Injectable, Inject, OnInit } from '@angular/core';
-import { Observable } from 'rxjs/Rx';
+import { Observable, throwError } from "rxjs";
+import { catchError, mergeMap } from "rxjs/operators";
 import { HttpClient } from '@angular/common/http';
 
 import { SearchResult } from '../storyset/search-result';
@@ -7,20 +8,20 @@ import { HistoryMakerService } from '../historymakers/historymaker.service';
 import { environment } from '../../environments/environment';
 import { GlobalState } from '../app.global-state';
 
-import { GoogleAnalyticsEventsService } from '../google-analytics-events.service';
-
 @Injectable()
 export class TextSearchService {
     private txtSearchURL = 'StorySearch?query='; // require query argument, so it is already tacked on
 
-    constructor(private http: HttpClient,
-      private historyMakerService: HistoryMakerService,
-      private gaService: GoogleAnalyticsEventsService) { }
+    constructor(
+      private http: HttpClient, private globalState: GlobalState,
+      private historyMakerService: HistoryMakerService) { }
 
     getTextSearch(query: string, interviewYearFilter: string, parentBiographyForAllStories: number, matchTitleOnly: boolean, matchTranscriptOnly: boolean,
-        givenPage: number, givenPageSize: number, genderFacet: string, birthyearFacets: string, makerFacets: string, jobFacets: string, sortField: string, sortInDescendingOrder: boolean): Observable<SearchResult> {
+      givenPage: number, givenPageSize: number, genderFacet: string, birthDecadeFacets: string, makerFacets: string, jobFacets: string,
+      regionUSStateFacets: string, organizationFacets: string, namedDecadeFacets:string, namedYearFacets: string,
+      sortField: string, sortInDescendingOrder: boolean): Observable<SearchResult> {
         var addedArgs: string = "";
-        if (parentBiographyForAllStories != GlobalState.NOTHING_CHOSEN)
+        if (parentBiographyForAllStories != this.globalState.NOTHING_CHOSEN)
             addedArgs = addedArgs + "&parentBiographyID=" + parentBiographyForAllStories;
         if (givenPage != null && givenPage > 0)
             addedArgs = addedArgs + "&currentPage=" + givenPage;
@@ -32,12 +33,21 @@ export class TextSearchService {
             addedArgs = addedArgs + "&searchFields=transcript";
         if (genderFacet != null && genderFacet.length > 0)
             addedArgs = addedArgs + "&genderFacet=" + genderFacet;
-        if (birthyearFacets != null && birthyearFacets.length > 0)
-            addedArgs = addedArgs + "&yearFacet=" + birthyearFacets;
+        if (birthDecadeFacets != null && birthDecadeFacets.length > 0)
+            addedArgs = addedArgs + "&yearFacet=" + birthDecadeFacets;
         if (makerFacets != null && makerFacets.length > 0)
             addedArgs = addedArgs + "&makerFacet=" + makerFacets;
         if (jobFacets != null && jobFacets.length > 0)
             addedArgs = addedArgs + "&jobFacet=" + jobFacets;
+        if (regionUSStateFacets != null && regionUSStateFacets.length > 0)
+            addedArgs = addedArgs + "&entityStateFacet=" + regionUSStateFacets;
+        if (organizationFacets != null && organizationFacets.length > 0)
+            addedArgs = addedArgs + "&entityOrgFacet=" + organizationFacets;
+        if (namedDecadeFacets != null && namedDecadeFacets.length > 0)
+            addedArgs = addedArgs + "&entityDecadeFacet=" + namedDecadeFacets;
+        if (namedYearFacets != null && namedYearFacets.length > 0)
+            addedArgs = addedArgs + "&entityYearFacet=" + namedYearFacets;
+
         if (sortField != null && sortField.length > 0) {
             addedArgs = addedArgs + "&sortField=" + sortField;
             // Only bother with sortInDescendingOrder if sortField non-empty.
@@ -61,25 +71,9 @@ export class TextSearchService {
             }
         }
 
-        // NOTE: cannot proceed to a text search before first having search facets all in place.
-        return this.historyMakerService.getFacetDetails()
-          .flatMap(fd => this.http.get<SearchResult>(environment.serviceBase + this.txtSearchURL + query + addedArgs))
-          .do(res => {
-            if (res.count > 0)
-                this.gaService.emitEvent("Text Query", "query=" + query + "&count=" + res.count + addedArgs);
-            else
-                this.gaService.emitEvent("Text Query (Empty)", "query=" + query + addedArgs);
-          }
+        // NOTE: cannot proceed to a text search before first having story search facets all in place.
+        return this.historyMakerService.getStoryFacetDetails().pipe(
+          mergeMap(fd => this.http.get<SearchResult>(environment.serviceBase + this.txtSearchURL + query + addedArgs))
         );
-    }
-
-    private handleError(error: any) {
-        if (error && error.status == 400 && error.statusText != null && error.statusText.length > 0)
-            // don't bother with console display; hand on down to caller who will deal with reporting statusText
-            return Promise.reject(error.statusText);
-
-        // For other cases, do our default action.
-        console.error('An error occurred', error);
-        return Promise.reject(error.message || error);
     }
 }

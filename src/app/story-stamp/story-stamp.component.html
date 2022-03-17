@@ -1,63 +1,32 @@
-﻿<a class="card"  [class.hide]="isStarredSetItem && !inPlaylist" [class.selected]="isSelected(story.storyID)" *ngIf="cardView" tabindex="0" (keyup.enter)="onSelect(story.storyID)">
-    <img class="card__img" [thdaScrollToMe]="isSelected(story.storyID)" (click)="onSelect(story.storyID)" src="{{myMediaBase}}story/image/{{story.storyID}}" alt="story {{story.storyID}}" />
-    <div class="card__overlay" [thdaScrollToMe]="isSelected(story.storyID)" (click)="onSelect(story.storyID)"></div>
-    <div>
-        <svg tooltip="Add to Playlist" container="body" placement="left" (click)="togglePlaylist(story)" [class.hide]="inPlaylist" class="card__add-story" width="30" height="30" viewBox="0 0 30 30" xmlns="http://www.w3.org/2000/svg">
-            <title>
-                Add symbol to add story
-            </title>
-            <path d="M15 0C6.716 0 0 6.716 0 15c0 8.284 6.716 15 15 15 3.978 0 7.794-1.58 10.607-4.393C28.42 22.794 30 18.977 30 15c0-8.284-6.716-15-15-15zm0 2.57c3.297 0 6.46 1.308 8.79 3.64 2.332 2.33 3.64 5.493 3.64 8.79 0 3.297-1.308 6.46-3.64 8.79-2.33 2.332-5.493 3.64-8.79 3.64-3.297 0-6.46-1.308-8.79-3.64-2.332-2.33-3.64-5.493-3.64-8.79 0-3.297 1.308-6.46 3.64-8.79C8.54 3.878 11.703 2.57 15 2.57zm-.685 4.373c-.405 0-.73.327-.73.732v5.91h-5.91c-.405 0-.732.325-.732.73v1.37c0 .405.327.73.732.73h5.91v5.91c0 .405.325.732.73.732h1.37c.405 0 .73-.327.73-.732v-5.91h5.91c.405 0 .732-.325.732-.73v-1.37c0-.405-.327-.73-.732-.73h-5.91v-5.91c0-.405-.325-.732-.73-.732h-1.37z" fill-rule="nonzero" fill="#FFF"/>
-        </svg>
-        <svg (click)="togglePlaylist(story); removeCard(isStarredSetItem)" tooltip="Remove from Playlist" container="body" placement="left" [class.hide]="!inPlaylist" class="card__add-story card__remove-story" width="20" height="20" viewBox="0 0 17 17" xmlns="http://www.w3.org/2000/svg">
-            <title>
-                Remove from playlist
-            </title>
-            <path d="M14.612.47c-.355-.356-.928-.356-1.284 0L8.142 5.656 2.956.47C2.6.114 2.028.114 1.672.47L.47 1.672c-.356.356-.356.928 0 1.284l5.186 5.186L.47 13.328c-.356.356-.356.93 0 1.284l1.202 1.202c.356.356.928.356 1.284 0l5.186-5.186 5.186 5.186c.356.356.93.356 1.284 0l1.202-1.202c.356-.355.356-.928 0-1.284l-5.186-5.186 5.186-5.186c.356-.356.356-.928 0-1.284L14.612.47z" fill-rule="nonzero" fill="#FFF"/>
-        </svg>
+﻿<!-- NOTE: stamp view leading to route of form /story/ID, e.g., "['/story/' + story.storyID]"
+Because this stamp may be nested at different points within a page, either at an h3 level or an h4 level,
+gate which is used by the overrideToH4Nesting flag. -->
+<a tabindex="0" role="link" [ngClass]="{'card': cardView,'list':!cardView}"
+  [routerLink]="queryForTranscript ? ['/story/' + story.storyID, {q: queryForTranscript}] : ['/story/' + story.storyID]"
+  routerLinkActive="active"
+  fxLayout="column" fxLayoutAlign="space-between stretch" fxLayoutGap="0"
+  [thdaScrollToMe]="isSelected(story.storyID)">
+    <div *ngIf="cardView" fxFlex="1 0 calc(150px)" class="card_img-backdrop">
+      <img class="card__img" src="{{myMediaBase}}story/image/{{story.storyID}}" alt="" />
     </div>
-    <div id="s{{story.storyID}}" class="card__info-overlay" [thdaScrollToMe]="isSelected(story.storyID)" (click)="onSelect(story.storyID)">
-        <p class="card__story-title">{{truncatedAsNeeded(story.title)}}</p>
-        <p class="storyduration">
+    <div *ngIf="cardView" fxFlexFill class="card__info-overlay">
+        <h3 *ngIf="!overrideToH4Nesting" class="card__story-title">{{truncatedAsNeeded(story.title)}}</h3>
+        <h4 *ngIf="overrideToH4Nesting" class="card__story-title">{{truncatedAsNeeded(story.title)}}</h4>
+        <p class="card__story-duration">
             {{convertToMMSS(story.duration)}}
-            <span class="storydate">&nbsp;{{makeDatePretty(story.interviewDate)}}</span>
         </p>
     </div>
-</a>
-<a class="list" [class.hide]="isStarredSetItem && !inPlaylist"  *ngIf="!cardView" [thdaScrollToMe]="isSelected(story.storyID)" >
-    <div class="list__left-col" (click)="onSelect(story.storyID)">
-        <h4 *ngIf="!highlights || !highlights.title" class="list__name">{{truncatedAsNeeded(story.title)}}</h4>
-        <h4 *ngIf="highlights && highlights.title" class="list__name" [innerHTML]="highlights.title"></h4>
-        <span>Length: {{convertToMMSS(story.duration)}}</span>
-        <span class="storydate">Interview Date: {{makeDatePretty(story.interviewDate)}}</span>
-        <div *ngIf="highlights && highlights.transcript"><span *ngFor="let transcript of highlights.transcript" [innerHTML]="transcript"></span></div>
-    </div>
-    <div>
-        <svg tooltip="Add to Playlist" container="body" placement="left" (click)="togglePlaylist(story)" [class.hide]="inPlaylist" class="list__add-story desktop-only" width="30" height="30" viewBox="0 0 30 30" xmlns="http://www.w3.org/2000/svg">
-            <title>
-                Add symbol to add story
-            </title>
-            <path d="M15 0C6.716 0 0 6.716 0 15c0 8.284 6.716 15 15 15 3.978 0 7.794-1.58 10.607-4.393C28.42 22.794 30 18.977 30 15c0-8.284-6.716-15-15-15zm0 2.57c3.297 0 6.46 1.308 8.79 3.64 2.332 2.33 3.64 5.493 3.64 8.79 0 3.297-1.308 6.46-3.64 8.79-2.33 2.332-5.493 3.64-8.79 3.64-3.297 0-6.46-1.308-8.79-3.64-2.332-2.33-3.64-5.493-3.64-8.79 0-3.297 1.308-6.46 3.64-8.79C8.54 3.878 11.703 2.57 15 2.57zm-.685 4.373c-.405 0-.73.327-.73.732v5.91h-5.91c-.405 0-.732.325-.732.73v1.37c0 .405.327.73.732.73h5.91v5.91c0 .405.325.732.73.732h1.37c.405 0 .73-.327.73-.732v-5.91h5.91c.405 0 .732-.325.732-.73v-1.37c0-.405-.327-.73-.732-.73h-5.91v-5.91c0-.405-.325-.732-.73-.732h-1.37z" fill-rule="nonzero" fill="#525E16"/>
-        </svg>
-        <svg (click)="togglePlaylist(story); removeCard(isStarredSetItem)" tooltip="Remove from Playlist" container="body" placement="left" [class.hide]="!inPlaylist" class="list__add-story desktop-only" width="20" height="20" viewBox="0 0 17 17" xmlns="http://www.w3.org/2000/svg">
-            <title>
-                Remove from playlist
-            </title>
-            <path d="M14.612.47c-.355-.356-.928-.356-1.284 0L8.142 5.656 2.956.47C2.6.114 2.028.114 1.672.47L.47 1.672c-.356.356-.356.928 0 1.284l5.186 5.186L.47 13.328c-.356.356-.356.93 0 1.284l1.202 1.202c.356.356.928.356 1.284 0l5.186-5.186 5.186 5.186c.356.356.93.356 1.284 0l1.202-1.202c.356-.355.356-.928 0-1.284l-5.186-5.186 5.186-5.186c.356-.356.356-.928 0-1.284L14.612.47z" fill-rule="nonzero" fill="#525E16"/>
-        </svg>
-        <div class="list__mobile-container">
-            <div class="list__tooltip" [class.hide]="!mobilePopover">{{mobileTooltipMessage}}</div>
-            <svg (click)="togglePlaylist(story)" [class.hide]="inPlaylist" class="list__add-story" width="30" height="30" viewBox="0 0 30 30" xmlns="http://www.w3.org/2000/svg">
-                <title>
-                    Add symbol to add story
-                </title>
-                <path d="M15 0C6.716 0 0 6.716 0 15c0 8.284 6.716 15 15 15 3.978 0 7.794-1.58 10.607-4.393C28.42 22.794 30 18.977 30 15c0-8.284-6.716-15-15-15zm0 2.57c3.297 0 6.46 1.308 8.79 3.64 2.332 2.33 3.64 5.493 3.64 8.79 0 3.297-1.308 6.46-3.64 8.79-2.33 2.332-5.493 3.64-8.79 3.64-3.297 0-6.46-1.308-8.79-3.64-2.332-2.33-3.64-5.493-3.64-8.79 0-3.297 1.308-6.46 3.64-8.79C8.54 3.878 11.703 2.57 15 2.57zm-.685 4.373c-.405 0-.73.327-.73.732v5.91h-5.91c-.405 0-.732.325-.732.73v1.37c0 .405.327.73.732.73h5.91v5.91c0 .405.325.732.73.732h1.37c.405 0 .73-.327.73-.732v-5.91h5.91c.405 0 .732-.325.732-.73v-1.37c0-.405-.327-.73-.732-.73h-5.91v-5.91c0-.405-.325-.732-.73-.732h-1.37z" fill-rule="nonzero" fill="#525E16"/>
-            </svg>
-            <svg (click)="togglePlaylist(story); removeCard(isStarredSetItem)" [class.hide]="!inPlaylist" class="list__add-story" width="20" height="20" viewBox="0 0 17 17" xmlns="http://www.w3.org/2000/svg">
-                <title>
-                    Remove from playlist
-                </title>
-                <path d="M14.612.47c-.355-.356-.928-.356-1.284 0L8.142 5.656 2.956.47C2.6.114 2.028.114 1.672.47L.47 1.672c-.356.356-.356.928 0 1.284l5.186 5.186L.47 13.328c-.356.356-.356.93 0 1.284l1.202 1.202c.356.356.928.356 1.284 0l5.186-5.186 5.186 5.186c.356.356.93.356 1.284 0l1.202-1.202c.356-.355.356-.928 0-1.284l-5.186-5.186 5.186-5.186c.356-.356.356-.928 0-1.284L14.612.47z" fill-rule="nonzero" fill="#525E16"/>
-            </svg>
+    <div *ngIf="!cardView" fxFlex="auto">
+        <h3 *ngIf="!overrideToH4Nesting && (!highlights || !highlights.title)" class="list__name">{{truncatedAsNeeded(story.title)}}</h3>
+        <h3 *ngIf="!overrideToH4Nesting && highlights && highlights.title" class="list__name" [innerHTML]="highlights.title"></h3>
+        <h4 *ngIf="overrideToH4Nesting && (!highlights || !highlights.title)" class="list__name">{{truncatedAsNeeded(story.title)}}</h4>
+        <h4 *ngIf="overrideToH4Nesting && highlights && highlights.title" class="list__name" [innerHTML]="highlights.title"></h4>
+        <p class="list__contents">Length: {{convertToMMSS(story.duration)}}</p>
+        <p *ngIf="!hideInterviewDate" class="list__storydate">Interview Date: {{makeDatePretty(story.interviewDate)}}</p>
+        <div *ngIf="highlights && highlights.transcript">
+            <span *ngFor="let transcript of highlights.transcript"
+              class="list__contents" [innerHTML]="transcript"></span>
         </div>
     </div>
 </a>
+

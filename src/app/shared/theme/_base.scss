@@ -1,26 +1,192 @@
-@import 'functions';
-@import 'variables';
-@import 'helpers';
+@use 'myGlobals';
+@use 'myF';
 
-// bootstrap overrides
+/* common styling, e.g., for title/main heading of the page/route */
+.page-title {
+  @include myGlobals.oswald;
 
-.container-fluid {
-    font-size: 1rem;
-    padding-top: em(16);
-    padding-bottom: em(16);
-    max-width: em(1500);
+  font-size: 1.4rem;
+  font-weight: 500;
+  margin-bottom: myF.em(8);
+  margin-top: 0;
 
-    &:focus {
-        outline: 0;
+  @media screen and (min-width: myF.bp(afl_small)) and (max-width: myF.bp(afl_medium_just_before)) {
+      font-size: 1.6rem;
+      margin-bottom: myF.em(10);
+  }
+
+  @media screen and (min-width: myF.bp(afl_medium)) {
+      font-size: 1.8rem;
+      margin-bottom: myF.em(12);
+  }
+
+  &:focus {
+    /* !!!TBD!!! This likely will be tweaked in the future: must show a visual focus indicator,
+       but do it well as EVERY route change ends up focusing the title element by request of accessibility experts.
+       So, this style is seen frequently on first posting of a route for the title/main heading.
+       Inspect not just this style class, but others for non-interactive elements who received a
+       tabindex="-1" and (mousedown) to stop mouse focus activation that are currently using:
+       outline: 0; and text-decoration: underline; */
+    outline: 0;
+    text-decoration: underline;
+  }
+}
+
+/* common style for subheadings (just a bit smaller than main title) */
+.mysubheading {
+  @include myGlobals.oswald;
+
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: black;
+  margin-bottom: myF.em(6);
+  margin-top: 0;
+
+  @media screen and (min-width: myF.bp(afl_small)) and (max-width: myF.bp(afl_medium_just_before)) {
+      font-size: 1.4rem;
+      margin-bottom: myF.em(8);
+  }
+
+  @media screen and (min-width: myF.bp(afl_medium)) {
+      font-size: 1.6rem;
+      margin-bottom: myF.em(10);
+  }
+
+  &:focus {
+    outline: 0;
+    text-decoration: underline;
+  }
+}
+
+.mysubheading-gap-before {
+  @include myGlobals.oswald;
+
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: black;
+  margin-bottom: myF.em(6);
+  margin-top: myF.em(12);
+
+  @media screen and (min-width: myF.bp(afl_small)) and (max-width: myF.bp(afl_medium_just_before)) {
+      font-size: 1.4rem;
+      margin-bottom: myF.em(8);
+      margin-top: myF.em(16);
+  }
+
+  @media screen and (min-width: myF.bp(afl_medium)) {
+      font-size: 1.6rem;
+      margin-bottom: myF.em(10);
+      margin-top: myF.em(20);
+  }
+
+  &:focus {
+    outline: 0;
+    text-decoration: underline;
+  }
+}
+
+p, li {
+  font-size: 1rem;
+  padding: 0 0.2em 0;
+
+  @media screen and (min-width: myF.bp(afl_medium)) {
+      font-size: 1rem;
+  }
+}
+
+.noMargins {
+  margin: 0;
+}
+
+.noSpacing {
+  margin: 0;
+  padding: 0;
+}
+
+.noExtraPadding {
+  margin: auto;
+  padding: 0;
+}
+
+/* Fieldset, legend, checkbox input */
+fieldset {
+  display: block;
+  margin-inline-start: 2px;
+  margin-inline-end: 2px;
+  padding-block-start: 0.35em;
+  padding-inline-start: 0.75em;
+  padding-inline-end: 0.75em;
+  padding-block-end: 0.625em;
+  min-inline-size: min-content;
+  min-width: 0;
+  padding: 0;
+  margin: 0;
+  border: 0;
+}
+
+.no-legend-border {
+  display: block;
+  width: 100%;
+  padding: 0;
+  font-size: 1.4rem;
+  margin: 0;
+  border: 0;
+  @media screen and (min-width: myF.bp(afl_medium)) {
+      font-size: 1.6rem;
+  }
+}
+
+/* Courtesy of stackoverflow.com/questions/306252/how-to-align-checkboxes-and-their-labels-consistently-cross-browsers
+*/
+input[type=checkbox] {
+vertical-align: middle;
+position: relative;
+top: -3px;
+}
+
+/* Use noBreak class on outer label enclosing a checkbox to keep label and checkbox on same line.
+*/
+.noBreak {
+white-space: nowrap;
+}
+
+.unstyled-list-nowhitespace {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+ul.list-unstyled {
+    padding: 0 0.05em 0;
+
+    li {
+        list-style: none;
     }
 
-    @media screen and (min-width: bp(small)) {
-        padding-top: em(30);
-    }
+    label {
+        @include myGlobals.source-sans;
+        font-size: 1rem;
+        cursor: pointer;
+        color: black;
 
-    @media screen and (min-width: bp(medium)) {
-        padding-left: em(30);
-        padding-right: em(30);
-        padding-bottom: em(30);
+        &:hover,
+        &:focus {
+            color: myF.color(secondary);
+        }
+
+        @media screen and (min-width: myF.bp(afl_small)) {
+            font-size: 1.1rem;
+        }
     }
+}
+
+.nothing-for-ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+.nothing-for-li {
+  margin: 0;
+  padding: 0;
 }

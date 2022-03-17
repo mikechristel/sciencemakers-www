@@ -1,46 +1,54 @@
-﻿import { Component, Input, Output, OnInit, EventEmitter, Inject } from '@angular/core';
+﻿import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { takeUntil } from "rxjs/operators";
 
 import { ActivatedRoute, Router, Params } from '@angular/router';
-import { BriefStory } from './brief-story';
 import { BiographyStorySetService } from './biography-storyset.service';
 import { HistoryMakerService } from '../historymakers/historymaker.service';
-import { TitleManagerService } from '../title-manager.service';
-import { MenuService } from '../menu/menu.service';
-import { PlaylistManagerService } from '../playlist-manager/playlist-manager.service'
+import { TextSearchService } from '../text-search/text-search.service';
+import { TitleManagerService } from '../shared/title-manager.service';
+import { SearchFormService } from '../shared/search-form/search-form.service';
 
-import { StorySetType} from '../storyset/storyset-type';
 import { StoryDocument} from '../storyset/story-document';
 import { GlobalState } from '../app.global-state';
 import { environment } from '../../environments/environment';
 
 import { DetailedBiographyStorySet } from './detailed-biography-storyset';
 import { BiographyFavorites } from '../story/biography-favorites';
-import { Playlist } from '../shared/playlist/playlist';
+
+import { SearchFormOptions } from '../shared/search-form/search-form-options';
+import { BaseComponent } from '../shared/base.component';
+import { USMapDistribution } from '../US-map/US-map-distribution';
+import { SearchResult } from '../storyset/search-result';
+import { USMapManagerService } from '../US-map/US-map-manager.service';
+import { WindowService } from '../shared/services';
+import { UserSettingsManagerService } from '../user-settings/user-settings-manager.service';
+import {LiveAnnouncer} from '@angular/cdk/a11y'; // used to read changes to set title
 
 @Component({
     selector: 'my-bio-storyset',
     templateUrl: './biography-storyset.component.html',
     styleUrls: ['./biography-storyset.component.scss']
 })
-export class BiographyStorySetComponent implements OnInit {
+export class BiographyStorySetComponent extends BaseComponent implements OnInit {
+  @ViewChild('rg1Map') radioGroup1_Map: ElementRef;
+  @ViewChild('rg1Text') radioGroup1_Text: ElementRef;
+  @ViewChild('rg1Pic') radioGroup1_Pic: ElementRef;
+  @ViewChild('rg2Map') radioGroup2_Map: ElementRef;
+  @ViewChild('rg2Text') radioGroup2_Text: ElementRef;
+  @ViewChild('rg2Pic') radioGroup2_Pic: ElementRef;
+
+    signalFocusToTitle: boolean; // is used in html rendering of this component
+    signalFocusToStoryID: number; // ID of the story, if any, that is selected in the story list
 
     myAccession: string;
-    titleForStorySet: string = null;
+    titleForEmptyStorySet: string = null; // only used for bogus parameter(s) resulting in empty data
+    titleForCompletedStorySet: string = null; // one of this or titleForEmptyStorySet used for route's h1 element and html title
 
-    storiesTextQuery: string = ""; // this query string is for the common-area text search input (TODO: could become a search behavior in refactoring of code if this stays across pages !!!TBD!!!)
-
-    specFromParent: string; // a pass-through value from caller, used in routing out via goBack call
-    pageSizeFromParent: number; // a pass-through value from caller, used in routing out via goBack call
-    currentPageFromParent: number; // a pass-through value from caller, used in routing out via goBack call
-    queryFromParent: string;
-    searchJustLastNameFlagFromParent: boolean;
-    searchJustPreferredNameFlagFromParent: boolean;
-    searchFieldSortOrderSpecifierFromParent: number;
-    reduceToBornThisTimeFlagFromParent: boolean; // NOTE: this time might be this day, this week, etc.
-
-    needToggleDetails: boolean = false;
+    isNonemptyContent: boolean = false;
     toggleDetailsLabel: string;
     tapeSummariesShown: boolean = false;
+    bioDetailOpened: boolean = false;
+    bioDescriptionOpened: boolean = false;
 
     tapeTitlesCache: string[] = []; // At client request, title the tape "chunk" in a particular way when tapeSummariesShown
     tapeSummariesCache: string[] = [];
@@ -48,7 +56,7 @@ export class BiographyStorySetComponent implements OnInit {
     myStoryList: StoryDocument[];
     bioSessionDetails: string[] = [];
 
-    selectedStoryID: number; // ID of the story, if any, that is selected in the story list
+    USStateDistribution: USMapDistribution;
 
     bioDetail: DetailedBiographyStorySet;
 
@@ -67,200 +75,61 @@ export class BiographyStorySetComponent implements OnInit {
     biographyFavoriteQuote: string;
 
     cardView: boolean = true;
+    textView: boolean = false;
 
-    txtQuery: string = ""; // this is the query string as edited by the user
-    inputPlaceholder: string;
-    searchTitleOnly: boolean;
-    searchTranscriptOnly: boolean;
-    resultsSize: number;
-    searchLastNameOnly: boolean;
-    searchPreferredNameOnly: boolean;
-    fields: string[] = ['all fields','title','transcript']
-    searchByField: string;
-    biographyIDForLimitingSearch: number;
-    myMediaBase: string;
+    private myMediaBase: string;
 
     constructor(
         private route: ActivatedRoute,
         private router: Router,
+        private globalState: GlobalState,
         private biographyStorySetService: BiographyStorySetService,
         private historyMakerService: HistoryMakerService,
+        private textSearchService: TextSearchService,
         private titleManagerService: TitleManagerService,
-        private menuService: MenuService,
-        private playlistManagerService: PlaylistManagerService) {
+        private myUSMapManagerService: USMapManagerService,
+        private windowService: WindowService,
+        private userSettingsManagerService: UserSettingsManagerService,
+        private searchFormService: SearchFormService, private liveAnnouncer: LiveAnnouncer) {
 
-        this.myMediaBase = environment.mediaBase;
+          super(); // for BaseComponent extension (brought in to cleanly unsubscribe from subscriptions)
+
+          // Start off with an empty signal about what to focus on
+          this.clearSignalsForCurrentFocusSetting();
+
+          this.myMediaBase = environment.mediaBase;
+
+          myUSMapManagerService.clickedRegionID$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((value) => {
+              this.filterOnUSMapRegion(value);
+          });
+
+          this.searchFormService.setSearchOptions(new SearchFormOptions(false, this.globalState.NOTHING_CHOSEN, this.globalState.NO_ACCESSION_CHOSEN, false)); // note: will likely be called again with a chosen bio ID
     }
 
     // NOTE: This component shows all the stories for a given biography.
     // A required argument is the biography ID (now a string accession value).
-    // Optional arguments are sID for selected story ID (what to highlight/page into view, if anything), as well as information
-    // about the calling context.
-    //
-    // The routing "pspec" is for the caller context, e.g.,  parent might be all female list of interviewees, that info passed here as "pspec"
-    // so that on "Entire Interview" the list of all females is brought back. Likewise the parent might be on page 4 with page size of 30, so there are
-    // also parent page size and parent page parameters along with parent specification.
-    // So, have "parent" context of ppg, ppgS, pspec.  Parent might have query too, so other optional parameters are q (query),
-    // and t (title only).
     ngOnInit() {
-        this.inputPlaceholder = "Search this person's stories...";
-        this.searchTitleOnly = GlobalState.SearchTitleOnly;
-        this.searchTranscriptOnly = GlobalState.SearchTranscriptOnly;
-        this.resultsSize = GlobalState.SearchPageSize;
-        this.menuService.setSearchOption('storiesInBio');
-        this.setField();
         this.route.params.forEach((params: Params) => {
-            var proposedSelectedStoryID: number; // it will only be "proposed" until a story set is resolved; then it can be acted on....
             var titlePiece: string;
 
-            this.titleForStorySet = null;
-            this.titleManagerService.setTitle(GlobalState.PENDING_STORY_SET_TITLE);
-            if (params['sID'] !== undefined)
-                proposedSelectedStoryID = +params['sID'];
-            else
-                proposedSelectedStoryID = GlobalState.NOTHING_CHOSEN;
-
-            // Get parent context (specification, page, page size) which may be undefined. Parent context is pspec, ppg, ppgS (NOT local spec, pg, pgS).
-            this.specFromParent = null;
-            this.pageSizeFromParent = null;
-            this.currentPageFromParent = null;
-            this.queryFromParent = null;
-            this.searchJustLastNameFlagFromParent = null;
-            this.searchJustPreferredNameFlagFromParent = null;
-            this.searchFieldSortOrderSpecifierFromParent = null;
-            this.reduceToBornThisTimeFlagFromParent = null;
-
-            if (params['pspec'] !== undefined) {
-                this.specFromParent = params['pspec'];
-                if (this.specFromParent.length == 0)
-                    this.specFromParent = null; // spec of "" same as no spec at all
-            }
-
-            if (params['q'] !== undefined) {
-                this.queryFromParent = params['q'];
-                if (this.queryFromParent.length == 0)
-                    this.queryFromParent = null; // query of "" same as no query at all
-            }
-
-            if (params['ln'] !== undefined) {
-                this.searchJustLastNameFlagFromParent = (params['ln'] == "1");
-            }
-
-            if (params['pn'] !== undefined) {
-                this.searchJustPreferredNameFlagFromParent = (params['pn'] == "1");
-            }
-
-            if (params['so'] !== undefined && !isNaN(+params['so'])) {
-                this.searchFieldSortOrderSpecifierFromParent = +params['so'];
-            }
-
-            if (params['bt'] !== undefined) {
-                this.reduceToBornThisTimeFlagFromParent = (params['bt'] == "1");
-            }
-
-            if (params['ppgS'] !== undefined) {
-                var candidatePageSize = +params['ppgS'];
-                if (candidatePageSize != null && candidatePageSize > 0)
-                    this.pageSizeFromParent = candidatePageSize;
-            }
-
-            if (params['ppg'] !== undefined) {
-                var candidatePage = +params['ppg'];
-                if (candidatePage != null && candidatePage > 0)
-                    this.currentPageFromParent = candidatePage;
-            }
+            this.titleForEmptyStorySet = null;
+            this.titleForCompletedStorySet = null;
+            this.titleManagerService.setTitle("Biography Story Set, Results Pending"); // placeholder until content load tried
 
             // NOTE:  ID is expected
             if (params['ID'] !== undefined) {
-                this.titleForStorySet = "Searching... (in progress)";
                 this.myAccession = params['ID'];
 
-                this.getBiographyResults(proposedSelectedStoryID); // assumes this.myAccession already set
+                this.getBiographyResults(); // assumes this.myAccession already set
             }
             else { // never expected, i.e., we assume we will have a valid accession ID in this.myAccession, but just in case, clear out interface
                 this.bioDetail = null;
-                this.titleForStorySet = "This page requires a biography accession ID to then load the biography details.";
+                this.titleForEmptyStorySet = "Biography Story Set Empty (missing biography identifier)";
+                this.titleForCompletedStorySet = null;
+                this.titleManagerService.setTitle(this.titleForEmptyStorySet);
+                this.liveAnnouncer.announce(this.titleForEmptyStorySet); // NOTE: using LiveAnnouncer to eliminate possible double-speak
             }
         });
-    }
-
-    // toggleMenu() {
-    //     this.menuState.emit('close');
-    // }
-
-    doSearch() {
-        GlobalState.SearchTitleOnly = this.searchTitleOnly;
-        GlobalState.SearchTranscriptOnly = this.searchTranscriptOnly;
-
-        // Accumulate routing parameters specifying filter specification, page information, etc.
-        if (this.txtQuery != null && this.txtQuery.length > 0) {
-            // Proceed with route parameter computations and doing the search.
-            var moreOptions = [];
-
-            moreOptions['q'] = GlobalState.cleanedRouterParameter(this.txtQuery);
-            this.titleManagerService.setTitle(GlobalState.PENDING_STORY_SET_TITLE);
-            moreOptions['pg'] = 1; // always show page 1 of new query
-            moreOptions['pgS'] = GlobalState.SearchPageSize; // use global context page size
-
-            if (this.searchTitleOnly) // use explicit "search-title-only" indicator of sT if true
-                moreOptions['sT'] = "1";
-            else if (this.searchTranscriptOnly) // use explicit "search-transcript-only" indicator of sS (search spoken) if true
-                moreOptions['sS'] = "1";
-            // else default to "both" without the use of an explicit flag
-
-            if (this.biographyIDForLimitingSearch != null && this.biographyIDForLimitingSearch != GlobalState.NOTHING_CHOSEN)
-                moreOptions['ip'] = this.biographyIDForLimitingSearch; // flag that an "inside THIS person" search context will be set and used
-
-            this.router.navigate(['/stories', StorySetType.TextSearch, moreOptions]);
-        }
-    }
-
-    noNeedForSearch(): boolean { // Returns true iff there is no need for search action (i.e., no search query).
-        return (this.txtQuery == null || this.txtQuery.length == 0);
-    }
-
-    setPageSize(newSize: number) {
-        GlobalState.SearchPageSize = newSize;
-        this.resultsSize = newSize;
-     }
-
-    setField() {
-        if (this.searchTitleOnly === true) {
-            this.searchByField = "title";
-        }
-        else if (this.searchTranscriptOnly === true) {
-            this.searchByField = "transcript";
-        }
-        else { // "both" picked, so do not limit search to just one field or the other
-            this.searchByField = "all fields";
-        }
-    }
-
-    searchFieldChange(currentPick: string) {
-        if (currentPick == "title") {
-            this.searchTitleOnly = true;
-            this.searchTranscriptOnly = false;
-        }
-        else if (currentPick == "transcript") {
-            this.searchTitleOnly = false;
-            this.searchTranscriptOnly = true;
-        }
-        else { // "both" picked, so do not limit search to just one field or the other
-            this.searchTitleOnly = false;
-            this.searchTranscriptOnly = false;
-        }
-        this.searchByField = currentPick;
-        GlobalState.SearchTitleOnly = this.searchTitleOnly;
-        GlobalState.SearchTranscriptOnly = this.searchTranscriptOnly;
-    }
-
-    routeToAdvancedSearch() {
-        var moreOptions = [];
-
-        if (this.biographyIDForLimitingSearch != null && this.biographyIDForLimitingSearch != GlobalState.NOTHING_CHOSEN)
-            moreOptions['ip'] = this.biographyIDForLimitingSearch; // flag that an "inside THIS person" search context will be set and used
-
-        this.router.navigate(['/storyadvs', moreOptions]);
     }
 
     // With optional city, state, and country specifiers, return a string of the form:
@@ -294,58 +163,52 @@ export class BiographyStorySetComponent implements OnInit {
         return accumulatedVal;
     }
 
-    private getBiographyResults(proposedSelectedStoryID: number) {
-        this.biographyStorySetService.getStoriesInBiography(this.myAccession)
+    private getBiographyResults() {
+        this.biographyStorySetService.getStoriesInBiography(this.myAccession).pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(
               bioDetail => {
-                var pageSizeInEffectiveUse: number;
-                var totalCount: number;
                 var oneSessionInterviewInfo: string;
 
                 this.bioDetail = bioDetail;
 
                 if (bioDetail != null) {
-                    this.biographyIDForLimitingSearch = bioDetail.biographyID;
-                    this.menuService.setBiographyID(bioDetail.biographyID);
+                    this.searchFormService.setSearchOptions(new SearchFormOptions(false, bioDetail.biographyID, bioDetail.accession, false)); // let search form know we will search within this bio for stories
+
                     this.tailoredImage = this.myMediaBase + "biography/image/" + bioDetail.biographyID;
                     if (bioDetail.birthDate == null)
                         this.tailoredBirthDate = "";
                     else
-                        this.tailoredBirthDate = GlobalState.cleanedMonthDayYear(bioDetail.birthDate);
+                        this.tailoredBirthDate = this.globalState.cleanedMonthDayYear(bioDetail.birthDate);
                     if (bioDetail.deceasedDate == null)
                         this.tailoredDeceasedDate = "";
                     else
-                        this.tailoredDeceasedDate = GlobalState.cleanedMonthDayYear(bioDetail.deceasedDate);
+                        this.tailoredDeceasedDate = this.globalState.cleanedMonthDayYear(bioDetail.deceasedDate);
                     this.tailoredBirthLocation = this.getBirthLocationString();
 
-                    var facetIndicators: number[] = [];
+                    var facetIndicators: string[] = [];
                     var i: number;
-                    var oneFacetIndicator: number;
+                    var oneFacetIndicator: string;
 
                     for (i = 0; i < bioDetail.occupationTypes.length; i++) {
-                        oneFacetIndicator = Number(bioDetail.occupationTypes[i]);
-                        if (!isNaN(oneFacetIndicator))
-                            facetIndicators.push(oneFacetIndicator);
+                        oneFacetIndicator = bioDetail.occupationTypes[i];
+                        facetIndicators.push(oneFacetIndicator);
                     }
                     this.EstablishFavoritesBlock(bioDetail.favorites);
 
                     this.tailoredJobFamilyList = null;
-                    this.historyMakerService.getJobFamilyList(facetIndicators)
-                      .subscribe(
-                        bioDetailJobList => {
-                          this.tailoredJobFamilyList = bioDetailJobList;
+                    this.historyMakerService.getJobFamilyList(facetIndicators).pipe(takeUntil(this.ngUnsubscribe))
+                      .subscribe(bioDetailJobList => {
+                        this.tailoredJobFamilyList = bioDetailJobList;
                     });
                     facetIndicators = [];
                     for (i = 0; i < bioDetail.makerCategories.length; i++) {
-                        oneFacetIndicator = Number(bioDetail.makerCategories[i]);
-                        if (!isNaN(oneFacetIndicator))
-                            facetIndicators.push(oneFacetIndicator);
+                        oneFacetIndicator = bioDetail.makerCategories[i];
+                        facetIndicators.push(oneFacetIndicator);
                     }
                     this.tailoredMakerGroupList = null;
-                    this.historyMakerService.getMakerGroupList(facetIndicators)
-                      .subscribe(
-                        bioDetailMakerGroupList => {
-                          this.tailoredMakerGroupList = bioDetailMakerGroupList;
+                    this.historyMakerService.getMakerGroupList(facetIndicators).pipe(takeUntil(this.ngUnsubscribe))
+                      .subscribe(bioDetailMakerGroupList => {
+                        this.tailoredMakerGroupList = bioDetailMakerGroupList;
                     });
 
                     var oneStringFacet: string;
@@ -371,16 +234,17 @@ export class BiographyStorySetComponent implements OnInit {
                     this.tapeSummariesCache = [];
                     this.myStoryList = [];
                     this.myStoryListByTape = [];
+                    this.USStateDistribution = null;
                     var oneTapeStoryList: StoryDocument[] = [];
                     var storyCount: number = 0;
                     var oneStoryDocument: StoryDocument;
                     for (i = 0; i < bioDetail.sessions.length; i++) {
-                        oneSessionInterviewInfo = "Interviewed on " + GlobalState.cleanedMonthDayYear(bioDetail.sessions[i].interviewDate) + " by " +
+                        oneSessionInterviewInfo = "Interviewed on " + this.globalState.cleanedMonthDayYear(bioDetail.sessions[i].interviewDate) + " by " +
                             bioDetail.sessions[i].interviewer + " at " + bioDetail.sessions[i].location + ", videographer " + bioDetail.sessions[i].videographer;
                         this.bioSessionDetails.push(oneSessionInterviewInfo);
                         for (var j = 0; j < bioDetail.sessions[i].tapes.length; j++) {
                             this.tapeTitlesCache.push("Tape " + bioDetail.sessions[i].tapes[j].tapeOrder + ", " +
-                                GlobalState.cleanedMonthDayYear(bioDetail.sessions[i].interviewDate));
+                            this.globalState.cleanedMonthDayYear(bioDetail.sessions[i].interviewDate));
                             this.tapeSummariesCache.push(bioDetail.sessions[i].tapes[j].abstract);
                             oneTapeStoryList = [];
                             if (bioDetail.sessions[i].tapes[j].stories != null) {
@@ -397,11 +261,6 @@ export class BiographyStorySetComponent implements OnInit {
                                     oneStoryDocument.tapeOrder = String(bioDetail.sessions[i].tapes[j].tapeOrder);
                                     this.myStoryList.push(oneStoryDocument);
                                     oneTapeStoryList.push(oneStoryDocument);
-
-                                    // Confirm whether proposed story ID to highlight is in set; if so, mark it for highlight
-                                    if (proposedSelectedStoryID == oneStoryDocument.storyID) {
-                                        this.selectedStoryID = proposedSelectedStoryID; // ID is in set, so use it as the current selection
-                                    }
                                 }
                             }
                             this.myStoryListByTape.push(oneTapeStoryList);
@@ -422,12 +281,33 @@ export class BiographyStorySetComponent implements OnInit {
                     pendingTitle += fragment;
                     this.tailoredStoryCountInfo = fragment;
 
-                    this.titleForStorySet = null; // not needed, redundant with information shown elsewhere
-                    this.titleManagerService.setTitle(pendingTitle);
+                    // !!!TBD!!! NOTE: Until the API is updated, US State information is NOT returned from the getStoriesInBiography service call
+                    // for stories within a biography.  Make a separate call that will load up this information for the stories.  Also, this implies
+                    // that for this view, for biography-storyset, there is no filtering: all the stories for this biography are included.
+                    // Before October 2021: This was done via an IDSearch using all the story IDs for this person.  That could be a long list, and a bug
+                    // was discovered in LibLynx layers that long URLs during authentication were truncated.  So, instead, we can do a story search for * (all)
+                    // within this person, which is the method used here, avoiding the need for a long ID list.
+                    // OLD: this.idSearchService.getIDSearch(IDListToLoad, 1, this.myStoryList.length + 1)
+                    // NEW: this.textSearchService.getTextSearch("*", "", bioDetail.biographyID, .. (no filters)
+                    if (bioDetail.biographyID != this.globalState.NOTHING_CHOSEN) {
+                        this.textSearchService.getTextSearch("*", "", bioDetail.biographyID, false, false, null, null, null, null, null, null, null, null, null, null, null, false)
+                          .pipe(takeUntil(this.ngUnsubscribe)).subscribe(retSet => {
+                            this.initializeUSStateCounts(bioDetail.preferredName, retSet); // harvest and use the entities/states facet to populate the US state region counts
+                        },
+                        error => { // give up on finding additional map information for the story set
+                            this.initializeUSStateCounts(bioDetail.preferredName, null); // effectively empties the map view of any story information
+                        });
+                    }
 
-                    this.needToggleDetails = true;
+                    this.titleForEmptyStorySet = null; // not needed, redundant with information shown elsewhere
+                    this.titleForCompletedStorySet = pendingTitle;
+                    this.titleManagerService.setTitle(pendingTitle);
+                    this.liveAnnouncer.announce(pendingTitle); // NOTE: using LiveAnnouncer to eliminate possible double-speak
+
+                    this.isNonemptyContent = true;
                     this.toggleDetailsLabel = "Hide Summaries";
                     this.tapeSummariesShown = true; // default to showing them once loaded
+                    this.setFocusAsNeeded(); // set focus once context and content fully loaded
                 }
                 else {
                     // No biography details available
@@ -437,7 +317,7 @@ export class BiographyStorySetComponent implements OnInit {
                     this.tailoredJobFamilyList = null;
                     this.tailoredOccupationList = null;
                     this.tailoredMakerGroupList = null;
-                    this.needToggleDetails = false;
+                    this.isNonemptyContent = false;
                     this.tapeSummariesShown = false;
                     this.ClearFavoritesBlock();
                 }
@@ -449,103 +329,124 @@ export class BiographyStorySetComponent implements OnInit {
             );
     }
 
+    private setFocusAsNeeded() {
+        var focusSetElsewhere: boolean = false;
+
+        // Check on scroll and focus to selected story item once everything is set up, but only do focus/scroll action
+        // if focus is not set to something else above.
+        var selectedItem: number = this.userSettingsManagerService.currentStoryIDToFocus();
+        if (selectedItem != this.globalState.NOTHING_CHOSEN) {
+            if (!focusSetElsewhere) {
+                this.signalFocusToStoryID = selectedItem; // can focus to story item because nothing else was picked earlier
+                focusSetElsewhere = true;
+            }
+            // Once used, or once something else was focused on via "focusSetElsewhere", clear it.
+            this.userSettingsManagerService.updateStoryIDToFocus(this.globalState.NOTHING_CHOSEN);
+        }
+        // If any routes being returned back to have a way to put focus on this particular Maker (biography ID),
+        // indicate that it should be done via a user setting "BioIDToFocus" since biography is this route's context:
+        this.userSettingsManagerService.updateBioIDToFocus(this.myAccession);
+
+        if (this.globalState.IsInternalRoutingWithinSPA) {
+            this.globalState.IsInternalRoutingWithinSPA = false;
+            if (!focusSetElsewhere)
+                // Set default focus to the title for this route, since we did internally route
+                // in the SPA (single page application)
+                // (as it is the target for skip-to-main content as well)
+                this.signalFocusToTitle = true;
+        }
+
+        // If we used pending focus flags, here is where they would be reset, after signals are all in place: this.clearPendingFocusInstructions();
+    }
+    private clearSignalsForCurrentFocusSetting() {
+        this.signalFocusToStoryID = this.globalState.NOTHING_CHOSEN;
+        this.signalFocusToTitle = false;
+    }
+
+    private initializeUSStateCounts(ownerName: string, resultSet: SearchResult) {
+        var postedDistribution: USMapDistribution = new USMapDistribution();
+
+        postedDistribution.mapRegionListTitle = "U.S. State";
+        postedDistribution.keyEntitySingular = "story";
+        postedDistribution.keyEntityPlural = "stories";
+        postedDistribution.verbLeadIn = "discuss";
+        postedDistribution.verbLeadInSingular = "discusses";
+        postedDistribution.verbPhrase = "Discussed in";
+        if (ownerName && ownerName.length > 0) {
+            postedDistribution.keyTitle = "States Mentioned in Stories for " + ownerName;
+            postedDistribution.keySuffix = "from " + ownerName; // used to compose key message of form: "1 Story from Timuel Black" etc.
+        }
+        else {
+            postedDistribution.keyTitle = "States Mentioned in One Person's Stories";
+            postedDistribution.keySuffix = "from this person"; // used to compose key message of form: "20 Stories from this person" etc.
+        }
+        postedDistribution.exceptionDescription = null;
+
+        if (resultSet)
+            postedDistribution.keyEntitySetCount = resultSet.count;
+        else
+            postedDistribution.keyEntitySetCount = 0;
+
+        postedDistribution.count = [];
+        // Initially zero out the count.  Then, update if we have a resultSet
+        for (var i = 0; i <= 51; i++)
+            postedDistribution.count.push(0);
+        if (resultSet && resultSet.facets && resultSet.facets.entityStates && resultSet.facets.entityStates.length > 0) {
+            // Handle region (U.S. state):
+            var oneFacetID: string;
+            var oneFacetCount: number;
+            var numericIndexForMap: number;
+            for (i = 0; i < resultSet.facets.entityStates.length; i++) {
+                oneFacetCount = resultSet.facets.entityStates[i].count;
+                oneFacetID = resultSet.facets.entityStates[i].value; // two-letter code e.g., NY or PA or DC
+                numericIndexForMap = this.globalState.MapIndexForUSState(oneFacetID);
+                postedDistribution.count[numericIndexForMap] = oneFacetCount;
+            }
+        }
+        this.USStateDistribution = postedDistribution;
+    }
+
     // Set interface for empty results.  If no improvedTitle is given, use "No stories found." as the title.
     private setInterfaceForEmptyStorySet(improvedTitle: string) {
         if (improvedTitle == null || improvedTitle.length == 0)
-            this.titleForStorySet = "No stories found.";
+            this.titleForEmptyStorySet = "No stories found";
         else
-            this.titleForStorySet = improvedTitle;
-        this.titleManagerService.setTitle(GlobalState.EMPTY_STORY_SET_TITLE);
-
-        this.selectedStoryID = null; // no stories to select
-        this.needToggleDetails = false;
+            this.titleForEmptyStorySet = improvedTitle;
+        this.titleForCompletedStorySet = null;
+        this.titleManagerService.setTitle(this.titleForEmptyStorySet + " | Biography Story Set");
+        this.liveAnnouncer.announce("Empty Biography Story Set"); // NOTE: using LiveAnnouncer to eliminate possible double-speak
+        this.isNonemptyContent = false;
         this.tapeSummariesShown = false;
     }
 
-    private setOptionsAndRouteToStoryPage(storyID: number) {
-        // NOTE: Story ID is *REQUIRED* and so is part of router.navigate path below (along with /story) rather than in moreQueryParams.
-        var moreQueryParams = [];
+    filterOnUSMapRegion(chosenUSMapRegionID: string) {
+        // In this particular interface, given region can never be already picked, so just filter on the given region.
+        // A route like .../storiesForBio;ID=A2006.075 is same as route like
+        // .../stories/2;q=*;pg=1;pgS=30;ip=6101;ia=A2006.075 which can turn into a filtered-to-one-region route of:
+        // .../stories/2;ffu=1;pgS=30;spec=----VA---;q=*;sT=0;sS=0;ip=6101;ia=A2006.075;pg=1 or simplied to:
+        // .../stories/2;spec=----VA---;q=*;ip=6101;ia=A2006.075
+        if (chosenUSMapRegionID && chosenUSMapRegionID.length == 2) {
+            // Only continue with 2-letter US Map Region IDs...
+            var moreParams = {};
 
-        // NOTE:  specification for filtering may be null, as may full name and others, but accession ID is expected.
-        if (this.myAccession != null) {
-            moreQueryParams['cID'] = this.myAccession;
-            // Flag that story is from a list of stories from the biography set of stories:
-            moreQueryParams['type'] = StorySetType.BiographyCollection;
+            moreParams['ia'] = this.myAccession;
+            moreParams['ip'] = this.bioDetail.biographyID;
+            moreParams['q'] = "*"; // return ALL stories for this biography ID
+            moreParams['spec'] = "----" + chosenUSMapRegionID + "---";
+            // !!!TBD!!! This knowledge of the length for the filter specification is something that could be fixed by centralizing search filtering!
 
-            if (this.queryFromParent != null && this.queryFromParent.length > 0)
-                moreQueryParams['q'] = GlobalState.cleanedRouterParameter(this.queryFromParent);
-            if (this.searchJustLastNameFlagFromParent != null) {
-                if (this.searchJustLastNameFlagFromParent)
-                    moreQueryParams['ln'] = "1";
-                else
-                    moreQueryParams['ln'] = "0";
-            }
-            if (this.searchJustPreferredNameFlagFromParent != null) {
-                if (this.searchJustPreferredNameFlagFromParent)
-                    moreQueryParams['pn'] = "1";
-                else
-                    moreQueryParams['pn'] = "0";
-            }
-            if (this.searchFieldSortOrderSpecifierFromParent != null)
-                moreQueryParams['so'] = this.searchFieldSortOrderSpecifierFromParent;
-
-            if (this.reduceToBornThisTimeFlagFromParent != null) {
-                if (this.reduceToBornThisTimeFlagFromParent)
-                    moreQueryParams['bt'] = "1";
-                else
-                    moreQueryParams['bt'] = "0";
-            }
-            if (this.specFromParent != null && this.specFromParent.length > 0)
-                moreQueryParams['pspec'] = this.specFromParent;
-            if (this.currentPageFromParent != null && this.currentPageFromParent > 0)
-                moreQueryParams['ppg'] = this.currentPageFromParent;
-            if (this.pageSizeFromParent != null && this.pageSizeFromParent > 0)
-                moreQueryParams['ppgS'] = this.pageSizeFromParent;
+            this.clearSignalsForCurrentFocusSetting(); // forget signals before launching router navigation
+            this.router.navigate(['/stories/2', moreParams]);
         }
-        // else giving up being able to go back if the ID is not given for the biography; just go to story page without a "go back" option
-        this.router.navigate(['/story', storyID, moreQueryParams]);
     }
 
-    onSelected(givenStoryID: number) {
-        this.selectedStoryID = givenStoryID;
-        this.setOptionsAndRouteToStoryPage(this.selectedStoryID);
-    }
+    goBack($event: MouseEvent): void {
+        $event.preventDefault();
 
-    goBack() {
-        var moreParams = {};
-        this.selectedStoryID = null;
+        // !!!TBD!!! FYI, as needed this.routerHistoryService.previousUrl holds this route where we
+        // head back to; see router-history for context and credit with RouterHistoryService sourced like WindowService
 
-        moreParams['ID'] = this.myAccession;
-        if (this.specFromParent != null && this.specFromParent.length > 0)
-            moreParams['spec'] = this.specFromParent;
-        if (this.pageSizeFromParent != null && this.pageSizeFromParent > 0)
-            moreParams['pgS'] = this.pageSizeFromParent;
-        if (this.currentPageFromParent != null && this.currentPageFromParent > 0)
-            moreParams['pg'] = this.currentPageFromParent;
-        if (this.queryFromParent != null && this.queryFromParent.length > 0)
-            moreParams['q'] = GlobalState.cleanedRouterParameter(this.queryFromParent);
-        if (this.searchJustLastNameFlagFromParent != null) {
-            if (this.searchJustLastNameFlagFromParent)
-                moreParams['ln'] = "1";
-            else
-                moreParams['ln'] = "0";
-        }
-        if (this.searchJustPreferredNameFlagFromParent != null) {
-            if (this.searchJustPreferredNameFlagFromParent)
-                moreParams['pn'] = "1";
-            else
-                moreParams['pn'] = "0";
-        }
-        if (this.searchFieldSortOrderSpecifierFromParent != null)
-            moreParams['so'] = this.searchFieldSortOrderSpecifierFromParent;
-
-        if (this.reduceToBornThisTimeFlagFromParent != null) {
-            if (this.reduceToBornThisTimeFlagFromParent)
-                moreParams['bt'] = "1";
-            else
-                moreParams['bt'] = "0";
-        }
-        this.router.navigate(['/all', moreParams]);
+        this.windowService.nativeWindow.history.back();
     }
 
     toggleDetails() {
@@ -612,25 +513,105 @@ export class BiographyStorySetComponent implements OnInit {
         this.biographyFavoriteQuote = null;
     }
 
-    // (TODO: Code below could become a search behavior in refactoring of code if this stays across pages !!!TBD!!!:
-    // this.storiesTextQuery. doStorySearch() and noNeedForStorySearch().)
-    doStorySearch() {
-        // Accumulate routing parameters specifying filter specification, page information, etc.
-        if (this.storiesTextQuery != null && this.storiesTextQuery.length > 0) {
-            // Proceed with route parameter computations and doing the search.
-            var moreOptions = [];
-
-            moreOptions['q'] = GlobalState.cleanedRouterParameter(this.storiesTextQuery);
-            this.titleManagerService.setTitle(GlobalState.PENDING_STORY_SET_TITLE);
-            this.router.navigate(['/stories', StorySetType.TextSearch, moreOptions]);
+    public setViewOptions(eventCode: string, comingFromPicOption: boolean, comingFromTextOption: boolean) {
+        if (comingFromPicOption) {
+            // Next is text, back is map, current is pic grid.
+            if (eventCode == "ArrowDown" || eventCode == "ArrowRight")
+                this.focusPicViewOption(false, true); // set "text"
+            else if (eventCode == "ArrowUp" || eventCode == "ArrowLeft")
+                this.focusPicViewOption(false, false); // set "map"
+            else if (eventCode == " " || eventCode == "Enter") {
+                this.cardView = true;
+                this.textView = false;
+            }
+        }
+        else if (comingFromTextOption) {
+            // Next is map, back is pic, current is text.
+            if (eventCode == "ArrowDown" || eventCode == "ArrowRight")
+                this.focusPicViewOption(false, false); // set "map"
+            else if (eventCode == "ArrowUp" || eventCode == "ArrowLeft")
+                this.focusPicViewOption(true, false); // set "pic"
+            else if (eventCode == " " || eventCode == "Enter") {
+                this.cardView = false;
+                this.textView = true;
+            }
+        }
+        else {
+            // Next is pic, back is text, current is map.
+            if (eventCode == "ArrowDown" || eventCode == "ArrowRight")
+                this.focusPicViewOption(true, false); // set "pic"
+            else if (eventCode == "ArrowUp" || eventCode == "ArrowLeft")
+                this.focusPicViewOption(false, true); // set "text"
+            else if (eventCode == " " || eventCode == "Enter") {
+                this.cardView = false;
+                this.textView = false;
+            }
         }
     }
 
-    noNeedForStorySearch(): boolean { // Returns true iff there is no need for search action (i.e., no search query).
-        return (this.storiesTextQuery == null || this.storiesTextQuery.length == 0);
+    public setViewOptionsInNarrowContainer(eventCode: string, comingFromPicOption: boolean, comingFromTextOption: boolean) {
+        if (comingFromPicOption) {
+            // Next is text, back is map, current is pic grid.
+            if (eventCode == "ArrowDown" || eventCode == "ArrowRight")
+                this.focusPicViewInNarrowContainer(false, true); // set "text"
+            else if (eventCode == "ArrowUp" || eventCode == "ArrowLeft")
+                this.focusPicViewInNarrowContainer(false, false); // set "map"
+            else if (eventCode == " " || eventCode == "Enter") {
+                this.cardView = true;
+                this.textView = false;
+            }
+        }
+        else if (comingFromTextOption) {
+            // Next is map, back is pic, current is text.
+            if (eventCode == "ArrowDown" || eventCode == "ArrowRight")
+                this.focusPicViewInNarrowContainer(false, false); // set "map"
+            else if (eventCode == "ArrowUp" || eventCode == "ArrowLeft")
+                this.focusPicViewInNarrowContainer(true, false); // set "pic"
+            else if (eventCode == " " || eventCode == "Enter") {
+                this.cardView = false;
+                this.textView = true;
+            }
+        }
+        else {
+            // Next is pic, back is text, current is map.
+            if (eventCode == "ArrowDown" || eventCode == "ArrowRight")
+                this.focusPicViewInNarrowContainer(true, false); // set "pic"
+            else if (eventCode == "ArrowUp" || eventCode == "ArrowLeft")
+                this.focusPicViewInNarrowContainer(false, true); // set "text"
+            else if (eventCode == " " || eventCode == "Enter") {
+                this.cardView = false;
+                this.textView = false;
+            }
+        }
     }
 
-    toggleAddToPlaylist(story) {
-        this.playlistManagerService.toggleAddToPlaylist(story);
+    private focusPicViewInNarrowContainer(settingPicStampFocus: boolean, settingTextStampFocus: boolean) {
+        if (settingPicStampFocus) { // set focus to radioGroup1_Pic
+            if (this.radioGroup1_Pic && this.radioGroup1_Pic.nativeElement)
+                this.radioGroup1_Pic.nativeElement.focus();
+        }
+        else if (settingTextStampFocus) { // set focus to radioGroup1_Text
+            if (this.radioGroup1_Text && this.radioGroup1_Text.nativeElement)
+                this.radioGroup1_Text.nativeElement.focus();
+        }
+        else { // set focus to radioGroup1_Map
+            if (this.radioGroup1_Map && this.radioGroup1_Map.nativeElement)
+                this.radioGroup1_Map.nativeElement.focus();
+        }
+    }
+
+    private focusPicViewOption(settingPicStampFocus: boolean, settingTextStampFocus: boolean) {
+        if (settingPicStampFocus) { // set focus to radioGroup2_Pic
+            if (this.radioGroup2_Pic && this.radioGroup2_Pic.nativeElement)
+                this.radioGroup2_Pic.nativeElement.focus();
+        }
+        else if (settingTextStampFocus) { // set focus to radioGroup2_Text
+            if (this.radioGroup2_Text && this.radioGroup2_Text.nativeElement)
+                this.radioGroup2_Text.nativeElement.focus();
+        }
+        else { // set focus to radioGroup2_Map
+            if (this.radioGroup2_Map && this.radioGroup2_Map.nativeElement)
+                this.radioGroup2_Map.nativeElement.focus();
+        }
     }
 }

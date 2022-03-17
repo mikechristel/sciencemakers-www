@@ -1,4 +1,4 @@
 ﻿export class Facet {
-    public ID: number;
+    public ID: string;
     public value: string;
 }

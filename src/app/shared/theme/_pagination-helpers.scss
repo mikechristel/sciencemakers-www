@@ -1,0 +1,84 @@
+@use 'myGlobals'; /* e.g., for thmda_narrow */
+@use 'myF';
+
+/* Typical use: pagination button set to allow paging for a list of items */
+.pagination {
+  font-size: 1rem;
+  margin-bottom: myF.em(8);
+  max-width: 22.5rem;
+  width: 100%;
+}
+
+%pagination__item {
+  background-color: #fff;
+  border-bottom: 1px solid myF.color(light-grey);
+  border-left: 1px solid myF.color(light-grey);
+  border-radius: 0;
+  border-top: 1px solid myF.color(light-grey);
+  color: myF.color(secondary);
+  font-size: 1rem;
+  height: myGlobals.$buttonHeight;
+  outline: 0;
+  width: 2.375rem;
+  margin: 0;
+  padding: 0;
+
+  @media screen and (min-width: myF.bp(afl_medium)) {
+      height: myGlobals.$buttonHeight;
+      width: 2rem;
+  }
+
+  &:focus {
+      border: 1px solid myF.color(dark-grey);
+  }
+
+  &:hover {
+      cursor: pointer;
+      border: 1px solid myF.color(dark-grey);
+  }
+}
+
+.pagination__prev,
+.pagination__next {
+  @extend %pagination__item;
+  @include myGlobals.source-sans-semi-bold;
+
+  &:disabled {
+      cursor: not-allowed;
+
+      span {
+          opacity: .5;
+      }
+  }
+
+  span {
+      color: myF.color(secondary);
+      padding: 0;
+      border: none;
+  }
+}
+
+.pagination__next {
+  border-right: 1px solid myF.color(light-grey);
+}
+
+.pagination__button {
+  @extend %pagination__item;
+  @include myGlobals.source-sans-semi-bold;
+
+  &.active {
+      border: 1px solid myF.color(secondary);
+      background-color: myF.color(secondary);
+      color: #fff;
+
+      &:focus {
+          border: 1px solid myF.color(dark-grey);
+      }
+  }
+
+  &.pagination__button--narrow-hidden {
+      @media screen and (max-width: myF.bp(thmda_narrow_just_before)) {
+          display: none;
+      }
+  }
+}

@@ -1,0 +1,81 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>ScienceMakers Digital Archive</title>
+  <base href="/">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="shortcut icon" href="assets/THM_favicon.png" type="image/png" />
+</head>
+<body>
+  <my-app >Loading...</my-app>
+  <script>
+    // Flag indicates if all preflight checks pass
+    var _browserTestsPassed = false;
+
+    (function () {
+      var myapp = document.getElementsByTagName('my-app')[0];
+
+      var cookiesEnabled = (function () {
+        if (navigator.cookieEnabled) return true;
+
+        // set and read cookie
+        document.cookie = "cookietest=1";
+        var ret = document.cookie.indexOf("cookietest=") != -1;
+
+        // delete cookie
+        document.cookie = "cookietest=1; expires=Thu, 01-Jan-1970 00:00:01 GMT";
+
+        return ret;
+      })();
+
+      var cookieMissing = (function () {
+        if (document.cookie == null || document.cookie == "") {
+          return true;
+        }
+
+        return (document.cookie.indexOf('da_auth=') == -1)
+      })();
+
+      var iframeDetected = (function () {
+        try {
+          return window.self !== window.top;
+        } catch (e) {
+          return true;
+        }
+      })();
+
+
+      ////////////////////////////////////////////////////////////
+      // CHECK IF COOKIES ENABLED
+      if (!cookiesEnabled) {
+        myapp.innerHTML = '<h2>ScienceMakers Digital Archive Requires Cookies</h2';
+        myapp.innerHTML += '<p>Please enable cookies if you wish to use this application.</p>';
+        myapp.innerHTML += '<a href="https://www.whatismybrowser.com/guides/how-to-enable-cookies/auto">How to Enable Cookies provided by WhatIsMyBrowser.com</a>';
+        return;
+      }
+
+      // CHECK FOR IFRAME WITHOUT COOKIE
+      if (iframeDetected && cookieMissing) {
+        myapp.innerHTML = '<h2>ScienceMakers Digital Archive Will Not Run Inside an IFrame</h2';
+        myapp.innerHTML += '<p>Click the link below to open the application in a separate browser tab/window.</p>';
+        myapp.innerHTML += `<a href="${window.location.href}" target="_blank">${window.location.href}</a>`;
+        return;
+      }
+
+      // CHECK IF COOKIE IS MISSING
+      if (cookieMissing) {
+        myapp.innerHTML = '<h2>ScienceMakers Digital Archive Session Cookie Is Missing</h2';
+        myapp.innerHTML += '<p>A valid session cookie could not be found, please click the link below to reload the application.</p>';
+        myapp.innerHTML += `<a href="${window.location.href}">${window.location.href}</a>`;
+        return;
+      }
+
+      // ALL GOOD
+      _browserTestsPassed = true;
+      myapp.innerHTML = 'Awesomeness is about to happen...';
+    })();
+  </script>
+</body>
+</html>

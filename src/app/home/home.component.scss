@@ -1,520 +1,113 @@
-﻿@import '../shared/theme/base';
-
-.gaptop {
-    margin-top: 0.2em;
-}
-
-/* Increase space between checkbox and its text */
-label input {
-    margin-right: 5px;
-}
-
-/* Courtesy of http://stackoverflow.com/questions/306252/how-to-align-checkboxes-and-their-labels-consistently-cross-browsers
-*/
-input[type=checkbox] {
-    vertical-align: middle;
-    position: relative;
-    top: -3px;
-}
-
-/* Use noBreak class on outer label enclosing a checkbox to keep label and checkbox on same line.
-*/
-.noBreak {
-    white-space: nowrap;
-    font-size: 0.9em;
-    font-weight: normal;
-    color: #1E1810;
-}
-
-input[type="radio"] {
-  margin-top: -3px;
-  vertical-align: middle;
-}
-
-.extraTopGap {
-    margin-top: 6px;
-}
-
-.thinButtonPgSize {
-    margin-top: 0.1em;
-    margin-bottom: 0.5em;
-}
+﻿@use '../shared/theme/myF';
+@use '../shared/theme/myGlobals';
+@use '../shared/theme/helpers';
+@use '../shared/theme/base';
 
 .maker-directory__bottom-row {
-    margin-top: em(10);
+    margin-top: myF.em(10);
 }
 
-// NOTE:  Removing this section as it is only needed for more complex home pages having
-// other elements like a "mixtape" section:
-// Rearrange in mobile
-//@media screen and (max-width: bp(medium)) {
-//
-//    .container-fluid.adjust-height-home .row {
-//        display: flex;
-//        flex-direction: column-reverse;
-//
-//        .col-sm-8.mobile-only {
-//            order: 1;
-//            margin-top: 1.14286em;
-//        }
-//    }
-//}
-
-.page-title {
-    @extend %oswald;
-
-    color: color(dark-grey);
-    font-size: rem(18);
-    font-weight: 500;
-    line-height: em(22, 18);
-    margin-bottom: 15px;
-    margin-top: 0;
-    text-transform: uppercase;
-
-    @media screen and (min-width: bp(medium)) {
-        font-size: rem(22);
-        margin-bottom: em(58,22);
-    }
-
-    @media screen and (min-width: bp(large)) {
-        font-size: rem(26);
-        margin-bottom: em(58,26);
-    }
-}
-
+/* Homepage */
 .welcome-paragraph {
-    @extend %source-sans-semi-bold;
+    @include myGlobals.source-sans-semi-bold;
 
-    background: color(primary);
+    background: myF.color(secondary);
     color: #fff;
-    font-size: rem(16);
-    letter-spacing: 1px;
-    line-height: em(20, 16);
-    margin-bottom: em(30, 16);
-    margin-top: em(15, 16);
-    padding: em(15, 16);
+    font-size: 1.2rem;
+    padding: myF.em(15);
 
-    @media screen and (min-width: bp(medium) ) {
-        margin-top: inherit;
-        padding: em(17,16) em(20,16);
-    }
-
-    @media screen and (min-width: em(1000, 16) ) {
-        font-size: rem(18);
-        line-height: 1.3;
-        margin-bottom: em(28,18);
-        padding: em(20,18);
+    @media screen and (min-width: myF.bp(afl_medium) ) {
+        margin: myF.em(0) myF.em(0) myF.em(10) myF.em(0); /* top right bottom left */
     }
 
 }
 
 .welcome-paragraph__stories {
-    @extend %source-sans-bold;
+   @include myGlobals.source-sans-bold;
 
-    font-size: em(29, 16);
-    line-height: 1;
-
-    @media screen and (min-width: em(1000) ) {
-        font-size: em(33, 18);
-    }
-
+    font-size: 2rem;
 }
 
-.search {
-    @extend %source-sans;
-
-    display: flex;
-    flex-wrap: wrap;
-    font-size: 1rem;
-    margin-bottom: em(37);
-
-    @media screen and (max-width: bp(medium)) {
-        display: none;
-    }
-
-    @media screen and (min-width: bp(medium)) {
-        margin-bottom: em(60);
-    }
-
-    @media screen and (max-width: 1199px) {
-        justify-content: space-between;
-    }
-
-    @media screen and (min-width: bp(large)) {
-        margin-left: em(30);
-        margin-right: em(30);
-    }
-
-}
-
-.search__submit {
-    @extend %source-sans-semi-bold;
-
-    align-items: center;
-    background-color: color(primary);
-    border-radius: 0;
-    color: #fff;
-    cursor: pointer;
-    display: flex;
-    font-size: em(20, 16);
-    height: em(43, 16);
-    justify-content: center;
-    letter-spacing: .5px;
-    order: 4;
-    text-transform: uppercase;
-    transition: box-shadow .15s ease-in-out;
-    width: 100%;
-
-    @media screen and (min-width: bp(small)) {
-        font-size: em(16);
-        margin-left: auto;
-        width: em(156, 16);
-    }
-
-    @media screen and (min-width: bp(medium)) {
-        order: 4;
-    }
-
-    @media screen and (min-width: bp(large)) {
-        order: 2;
-    }
-
-    &:hover {
-        box-shadow: inset 0 0 5px rgba(51,51,51,.6);
-    }
-
-    &:disabled {
-        cursor: not-allowed;
-        opacity: .4;
-    }
-
-    span {
-        width: 100%;
-    }
-}
-
-.search__submit-icon {
-    height: em(16, 16);
-    margin-left: 8px;
-
-    //IE 11
-    @media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
-        width: em(18);
-    }
-}
-
-.search__advanced {
-    color: color(primary);
-
-    &:hover {
-        cursor: arrow;
-    }
-}
-
-.search__links-container {
-    margin-bottom: em(17);
-    order: 3;
-    width: 100%;
-
-    @media screen and (min-width: bp(small)) {
-        margin-bottom: em(12);
-    }
-
-    @media screen and (max-width: 1199px) {
-        order: 2;
-    }
-}
-
-.search__rpp-container {
-    display: flex;
-    justify-content: space-between;
-    margin-top: auto;
-    margin-bottom: em(17);
-    order: 3;
-    width: 100%;
-
-    @media screen and (min-width: bp(small)) {
-        margin-bottom: initial;
-        max-width: em(290);
-    }
-
-    @media screen and (max-width: 1199px) {
-        flex: 0 1 40%;
-    }
-
-    @media screen and (max-width: 544px) {
-        flex: 0 1 100%;
-    }
-
-    @media screen and (min-width: bp(large)) {
-        order: 4;
-    }
-}
-
-.search__res-per-pg {
-    align-self: flex-end;
-    display: inline-block;
-}
-
-.search__res-per-pg-button {
-    @extend %source-sans;
-
-    align-items: center;
-    background-color: color(light-grey);
-    border-radius: 0;
-    border: 1px solid #cccccc;
-    color: #333333;
-    display: flex;
-    font-size: 1rem;
-    height: em(30);
-    justify-content: space-between;
-    padding: 0 em(10);
-    transition: background-color .2s ease-in-out, box-shadow .2s ease-in-out;
-
-    &[aria-expanded="true"] {
-        background-color: color(grey);
-        box-shadow: inset 0 0 5px rgba(51,51,51,.5);
-    }
-
-    .caret {
-        margin: 7% 0 7% 5px;
-    }
-
-    &:focus {
-        outline: 1px solid color(dark-grey);
-    }
-}
-
-.input-dropdown {
-    display: flex;
-    margin-right: auto;
-    margin-bottom: em(17);
-    order: 1;
-    width: 100%;
-
-    @media screen and (min-width: bp(small)) {
-        margin-bottom: em(12);
-    }
-
-    @media screen and (max-width: 1199px) {
-        order: 1;
-    }
-
-    @media screen and (min-width: bp(large)) {
-        flex: 1;
-        padding-right: em(10);
-    }
-
-    label {
-        display: flex;
-        flex: 2;
-        font-weight: inherit;
-        margin-bottom: 0;
-
-        input {
-            margin-right: 0;
-        }
-    }
-
-    .dropdown .input-dropdown__button:focus {
-        border: 1px solid color(dark-grey);
-        outline: 0;
-    }
-}
-
-.input-dropdown__input {
-    @extend %source-sans;
-
-    border-top: 1px solid color(grey);
-    border-left: 1px solid color(grey);
-    border-bottom: 1px solid color(grey);
-    border-right: 0;
-    border-radius: 0;
-    color: color(dark-grey);
-    font-size: em(16);
-    flex: 2;
-    height: em(43, 16);
-    padding-left: em(9, 16);
-
-    @media screen and (min-width: bp(medium)) {
-        padding-left: em(26, 16);
-    }
-
-    @media screen and (min-width: bp(medium)) {
-        font-size: em(18);
-        height: em(43, 18);
-        padding-left: em(26, 18);
-    }
-
-    &:focus {
-        border: 1px solid color(dark-grey);
-        outline: 0;
-    }
-
-    // opacity used to override Firefox default value for placeholders
-    &::placeholder {
-        color: #999;
-        opacity: 1;
-        text-transform: capitalize;
-    }
-}
-
-
-
-.input-dropdown__button {
-    @extend %source-sans;
-
-    background-color: #fff;
-    border: 1px solid color(grey);
-    border-radius: 0;
-    color: color(dark-grey);
-    height: em(43, 16);
-    font-size: em(16);
-    text-transform: capitalize;
-    transition: background-color .2s ease-in-out, box-shadow .2s ease-in-out;
-    width: em(105, 16);
-
-    &[aria-expanded="true"] {
-        background-color: color(grey);
-        box-shadow: inset 0 0 5px rgba(51,51,51,.5);
-    }
-
-    @media screen and (min-width: bp(small)) {
-        width: em(126, 16);
-    }
-
-    @media screen and (max-width: 544px) {
-        padding: 0 em(10);
-    }
-
-    @media screen and (min-width: bp(large)) {
-        height: em(43, 18);
-        font-size: em(18);
-        width: em(126, 18);
-    }
-
-
-}
-
-.dropdown-menu {
-    border: 1px solid rgba(0,0,0,.1);
-    border-radius: 0;
-}
-
-.dropdown__option {
-    background: none;
-    border: none;
-    color: color(dark-grey);
-    cursor: arrow;
-    font-size: em(16);
-    line-height: em(26, 16);
-    padding: 0 em(17, 16);
-    text-transform: capitalize;
-
-    &:hover {
-        background: transparent;
-        color: color(primary);
-    }
-}
-
-.biographies {
-  align-items: stretch;
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
+.biographies { /* note: sized bigger on this page than the grid of biographies at historymakers.component.scss */
+  list-style: none;
   padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* the "1fr" makes all rows equal height;
+       e.g., see  stackoverflow.com/questions/44488357/equal-height-rows-in-css-grid-layout */
+  grid-auto-rows: 1fr;
+  gap: myF.gutter(thmda-tight);
+
+  /* For widths between thmda_narrow (which is less than afl_small) and afl_small, be 2 per row */
+  @media screen and (min-width: myF.bp(thmda_narrow)) and (max-width: myF.bp(afl_small_just_before)) {
+    grid-template-columns: repeat(2, 1fr);
+    gap: myF.gutter(thmda-medium);
+  }
+
+  /* For widths between afl_small and thmda_wideenough, be 3 per row */
+  @media screen and (min-width: myF.bp(afl_small)) and (max-width: myF.bp(thmda_wideenough_just_before)) {
+    grid-template-columns: repeat(3, 1fr);
+    gap: myF.gutter(thmda-medium);
+  }
+
+  /* For widths between thmda_wideenough and afl_medium, be 4 per row */
+  @media screen and (min-width: myF.bp(thmda_wideenough)) and (max-width: myF.bp(afl_medium_just_before)) {
+    grid-template-columns: repeat(4, 1fr);
+    gap: myF.gutter(thmda-medium);
+  }
+
+  /* For widths between afl_medium and afl_large, be 3 per row (due to sharing a column of info in the horizontal space) */
+  @media screen and (min-width: myF.bp(afl_medium)) and (max-width: myF.bp(afl_large_just_before)) {
+    grid-template-columns: repeat(3, 1fr);
+    gap: myF.gutter(thmda-medium);
+  }
+
+  /* With maximum of thmda_maxwidth, afl_large < thmda_maxwidth < afl_xlarge < xlarge, simply max out now at afl_large or greater...
+     For widths of afl_large or more, be 5 per row: */
+  @media screen and (min-width: myF.bp(afl_large)) {
+    grid-template-columns: repeat(4, 1fr);
+    gap: myF.gutter(thmda-big);
+  }
 }
 
 .biography {
-  position: relative;
-  display: flex;
   padding: 0;
-
-  margin-bottom: 0.9rem;
-  margin-right: 0.9rem;
-  vertical-align: top;
-  width: calc(50% - 0.5rem);
-
-  // NOTE: IE Fix not even attempted, as the hard-coded numbers changed for supporting other browsers properly,
-  // e.g., so that for result sets of 11 the bottom row would not be goofily offset for final item.
-  // So, there likely will be unusual IE spacings, i.e., Internet Explorer is not officially supported.
-    // IE Fix
-    //@media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
-    //    width: calc(49.9% - (1.07143em / 2));
-    //}
-
-  // Default:  2 per row, with gaps at sides and between
-  @media screen and (max-width: bp(small) - 1) {
-    &:nth-of-type(2n+0) {
-        margin-right: 0;
-    }
-  }
-
-  // For widths between small and medium, e.g., let's say 544 to 768 pixels wide, be 3 per row:
-  @media screen and (min-width: bp(small)) and (max-width: bp(medium)) {
-      width: calc(33.33333333333333% - (1rem * .6666666666666666));
-
-      &:nth-of-type(3n+0) {
-          margin-right: 0;
-      }
-  }
-
-  // For widths between medium, but not exactly medium, and large, e.g., let's say 769 to 1199 pixels wide, be 4 per row:
-  @media screen and (min-width: bp(medium) + 1) and (max-width: bp(large) - 1) {
-      width: calc(25% - (1rem * .75)); // must be small enough so that 4 items fit across at smallest width of bp(medium) + 1
-
-      &:nth-of-type(4n+0) {
-        margin-right: 0;
-      }
-  }
-
-  // For widths of large or more, e.g., more than 1200 pixels wide, be 4 per row (a difference from the 8 per row used in historymakers.component.scss for example):
-  @media screen and (min-width: bp(large)) {
-      width: calc(25% - (1rem * .75)); // must be small enough so that 4 items fit across at smallest width of bp(medium) + 1
-
-      &:nth-of-type(4n+0) {
-          margin-right: 0;
-      }
-  }
+  margin: 0;
 }
 
-.biography--list {
-  margin-bottom: em(20);
-  width: 100%;
-}
+.homepage__heading {
+    @include myGlobals.oswald;
 
-thda-bio {
-  display: flex;
-  width: 100%;
-}
+    font-size: 1.4rem;
+    font-weight: 500;
+    margin: 0;
+    color: black;
 
-.birthdays__title {
-    @extend %oswald;
-
-    color: color(dark-grey);
-    font-size: rem(18);
-    margin-bottom: em(15,18);
-    margin-top: 0;
-    text-transform: uppercase;
-
-    @media screen and (min-width: bp(medium)) {
-        font-size: rem(20);
-        margin-bottom: em(15,20);
+    @media screen and (min-width: myF.bp(afl_small)) and (max-width: myF.bp(afl_medium_just_before)) {
+        font-size: 1.6rem;
     }
 
-    @media screen and (min-width: bp(large)) {
-        font-size: rem(26);
-        margin-bottom: em(15,26);
+    @media screen and (min-width: myF.bp(afl_medium)) {
+        font-size: 1.8rem;
+    }
+}
+
+.extra-margin-whitespace {
+    margin-bottom: myF.em(24);
+
+    @media screen and (min-width: myF.bp(afl_small)) and (max-width: myF.bp(afl_medium_just_before)) {
+        margin-bottom: myF.em(25);
     }
 }
 
 .birthdays__empty-message {
-    @extend %source-sans-semi-bold;
+  @include myGlobals.source-sans-semi-bold;
 
-    color: color(dark-grey);
-    font-size: em(14);
+  color: myF.color(dark-grey);
+  font-size: 1.2rem;
 
-    @media screen and (min-width: bp(medium)) {
-        font-size: em(18);
-    }
+  @media screen and (min-width: myF.bp(afl_medium)) {
+      font-size: 1.4rem;
+  }
 }
+
+

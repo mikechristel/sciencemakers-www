@@ -1,15 +1,21 @@
-﻿import { Component }       from '@angular/core';
-import { Router, NavigationEnd } from '@angular/router'; // Router added to provide analytics on route changes
-
-// Add the RxJS Observable operators we need in this app.
-import './rxjs-operators';
+﻿import { Component, ViewChild, ElementRef }       from '@angular/core';
+import { Router, NavigationEnd } from '@angular/router';
 
 import { FeedbackService } from './feedback/feedback.service';
+import { AuthManagerService } from './auth/auth-manager.service';
 import { PlaylistManagerService } from './playlist-manager/playlist-manager.service';
-import { Playlist } from './shared/playlist/playlist';
-import { Subscription }   from 'rxjs/Subscription';
+import { Playlist } from './playlist-manager/playlist';
+import { takeUntil } from "rxjs/operators";
 
-declare let ga: Function; // Declaration used with Google Analytics
+import { SearchFormService } from './shared/search-form/search-form.service';
+import { SearchFormOptions } from './shared/search-form/search-form-options';
+
+import { TitleManagerService } from './shared/title-manager.service';
+
+import { RouterHistoryService } from './shared/services';
+
+import { BaseComponent } from './shared/base.component';
+import { UserSettingsManagerService } from './user-settings/user-settings-manager.service';
 
 @Component({
     selector: 'my-app',
@@ -17,128 +23,321 @@ declare let ga: Function; // Declaration used with Google Analytics
     styleUrls: ['./app.component.scss']
 })
 
-export class AppComponent {
+export class AppComponent extends BaseComponent {
+    @ViewChild('feedbackInput') feedbackInputArea: ElementRef;
+    @ViewChild('myClipsTitleInput') myClipsTitleInputArea: ElementRef;
+
     public givenFeedback: string = null;
     public optionalFeedbackEmail: string = null;
-    public menuOpen: boolean = false;
-    public mobileSearchOpen: boolean = false;
-    private subscription: Subscription;
-    public playlist: Playlist[];
+    public myClips: Playlist[];
+    public myClipsWithCountMsg: string;
+
+    public showMyContactUsModalForm: boolean = false;
+    public showMyExportMyClipsModalForm: boolean = false;
+    public showMyConfirmClearingMyClipsModalForm: boolean = false;
+    public showMyConfirmReloadModalForm: boolean = false;
+    public inSearchFormRoute: boolean = false;
+    public inContentLinksRoute: boolean = false;
+    public inShowingManyItemsRoute: boolean = false; // for any of biography set, story set, one biography story set
+
+    public cachedTitle: string;
+    public myClipsTitleCandidate: string;
+    public myClipsTitleMaxLength: number = 140;
+    public myClipsTitleLengthHelper: string = "lengthLimitInfoForMyClipsTitle"; // ID for which char count in title is given
+    public myClipsURLCopyActionFresh: boolean = false;
+
+    public hideTopicSearch: boolean = false; // value will be read and set from userSettingsManagerService
+
+    // Via RouterHistoryService
+    previousUrlViaRouterHistoryService$ = this.routerHistoryService.previousUrl$;
+    currentUrlViaRouterHistoryService$ = this.routerHistoryService.currentUrl$;
 
     constructor(public router: Router,
+        private routerHistoryService: RouterHistoryService,
         private feedbackService: FeedbackService,
-        private playlistManagerService: PlaylistManagerService) {
-        this.subscription = playlistManagerService.playlist$.subscribe((value) => {
-            this.playlist = value;
-        })
-        // The event tracking tying in navigation ending of routing with Google Analytics is following
-        // advice from blog.thecodecampus.de/angular-2-google-analytics-google-tag-manager/
-        this.router.events.subscribe(event => {
-          if (event instanceof NavigationEnd) {
-            // NOTE:  It would be nice to just use event.urlAfterRedirects, *but* unfortunately, the semicolon(s) used
-            // to separate query parameters in the route, i.e., matrix URL notation, mess up Google Analytics, which stops
-            // reporting the URL from the first encountered semicolon onward.  So, process the URL and replace the first
-            // ";" with "?" and all subsequent ";" with "&" and pass that on to Google Analytics instead.
-            // See https://github.com/DSpace/dspace-angular/issues/109 for details (which were still in effect June 2017).
-            ga('set', 'page', this.cleanedForAnalyticsReport(event.urlAfterRedirects));
-            ga('send', 'pageview');
-          }
+        private searchFormService: SearchFormService,
+        private titleManagerService: TitleManagerService,
+        private userSettingsManagerService: UserSettingsManagerService,
+        private playlistManagerService: PlaylistManagerService,
+        private authManagerService: AuthManagerService) {
+
+        super(); // since this is a derived class from BaseComponent
+
+        // Get subscriptions tied in using best practice recommendation for how to unsubscribe, here and
+        // below in this component wherever .subscribe is used:
+        playlistManagerService.myClips$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((value) => {
+            this.myClips = value;
+            this.setMyClipsCountMessage();
         });
 
+        playlistManagerService.presentMyClipsExportForm$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((value) => {
+            if (value)
+                this.openMyExportMyClipsModalForm();
+        });
+
+        playlistManagerService.presentMyClipsConfirmClearingForm$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((value) => {
+            if (value)
+                this.openMyConfirmClearMyClipsModalForm();
+        });
+
+        authManagerService.presentConfirmReloadForm$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((value) => {
+            if (value)
+                this.openMyConfirmReloadModalForm();
+        });
+
+        feedbackService.presentFeedbackInputForm$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((value) => {
+            if (value)
+                this.openMyContactUsModalForm();
+        });
+
+        userSettingsManagerService.hideTopicSearch$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((value) => {
+            this.hideTopicSearch = value;
+        });
+
+        // Certain UI features toggle on/off in this component's html rendering based on settings like "are we in a search form" (advanced search decoration on), etc.
+        this.router.events.pipe(takeUntil(this.ngUnsubscribe)).subscribe(event => {
+          if (event instanceof NavigationEnd) {
+
+            var inspectedURL: string = event.urlAfterRedirects;
+
+            this.inSearchFormRoute = (inspectedURL.startsWith("/search") || inspectedURL.startsWith("/storyadvs")
+                                       || inspectedURL.startsWith("/bioadvs") || inspectedURL.startsWith("/tag")); // NOTE: considering tag/topic search route a search form, too
+            if (this.inSearchFormRoute) {
+              this.inContentLinksRoute = false;
+              this.inShowingManyItemsRoute = false;
+            }
+            else
+            {
+              this.inShowingManyItemsRoute = (inspectedURL.startsWith("/all") || inspectedURL.startsWith("/stories/")
+                || inspectedURL.startsWith("/storiesForBio"));
+              if (this.inShowingManyItemsRoute) {
+                this.inContentLinksRoute = false;
+              }
+              else {
+                this.inContentLinksRoute = inspectedURL.startsWith("/contentlinks");
+              }
+            }
+          }
+        });
+    }
+
+    private setMyClipsCountMessage() {
+        var storyCount: number = 0;
+        if (this.myClips)
+            storyCount = this.myClips.length;
+
+        if (storyCount == 1)
+            this.myClipsWithCountMsg = "My Clips, 1 story";
+        else
+            this.myClipsWithCountMsg = "My Clips, " + storyCount + " stories";
     }
 
     ngOnInit() {
-        this.playlist = this.playlistManagerService.initializePlaylist();
+        this.hideTopicSearch = this.userSettingsManagerService.currentHideTopicSearch();
+        this.myClips = this.playlistManagerService.initializeMyClips();
+        this.setMyClipsCountMessage();
     }
 
-    private cleanedForAnalyticsReport(givenURI: string): string {
-        var retVal: string = givenURI;
-        const symbolToCleanAway: string = ";";
-        var workVal: number = retVal.indexOf(symbolToCleanAway);
+    openContentLinks() {
+      this.router.navigate(['/contentlinks']);
+    }
 
-        // Turn string like /stories/2;q=mischief;pg=1;pgS=30;a=0 into /stories/2?q=mischief&pg=1&pgS=30&a=0 and
-        // /stories/2;q=snow%20%26%20ice;a=0;sT=0;sS=0;sID=55079;spec=--;pgS=30;pg=1 into
-        // /stories/2?q=snow%20%26%20ice&a=0&sT=0&sS=0&sID=55079&spec=--&pgS=30&pg=1
-        if (workVal >= 0) {
-            if (workVal == 0)
-                retVal = "?" + retVal.substring(1);
-            else if (workVal < retVal.length - 1)
-                retVal = retVal.substring(0, workVal) + "?" + retVal.substring(workVal + 1);
-            else
-                retVal = retVal.substring(0, workVal) + "?";
-            workVal = retVal.indexOf(symbolToCleanAway);
-            while (workVal >= 0) {
-                if (workVal < retVal.length - 1)
-                    retVal = retVal.substring(0, workVal) + "&" + retVal.substring(workVal + 1);
-                else
-                    retVal = retVal.substring(0, workVal) + "&";
-                workVal = retVal.indexOf(symbolToCleanAway);
+    scrollHeaderIntoView(headerID: string) {
+        // !!!TBD!!! Ideally we never need to use document, and ideally we can make use of newer Angular 9+ patterns like ViewportScroller.
+        // See https://stackoverflow.com/questions/36101756/angular2-routing-with-hashtag-to-page-anchor for context.
+        setTimeout(() => {
+            const anchor = document.getElementById(headerID);
+            if (anchor) {
+                anchor.focus();
+                anchor.scrollIntoView();
+            }
+        });
+    }
+
+    isRouteActive(routeToCheck: string): boolean {
+        return (this.router && this.router.url && this.router.url == routeToCheck);
+    }
+
+    setNavChoice(newRoute: string) {
+        if (!this.isRouteActive(newRoute)) {
+            var routerCommands: string[] = [];
+            routerCommands.push(newRoute);
+            this.router.navigate(routerCommands);
+        }
+    }
+
+    openMySimpleSearch() {
+        // This search takes different forms, depending on the status of the search form service.
+        // Pass the form in router parameters so that on a series of browser "go back" operations the
+        // appropriate state of the search will be returned to (e.g., search stories, or just one person's stories, etc.).
+        var moreNavigationParams = {};
+        var currentSearchOptions: SearchFormOptions = this.searchFormService.currentSearchOptions();
+
+        if (currentSearchOptions.searchingBiographies)
+            moreNavigationParams['forBio'] = "1" ;
+        else {
+            moreNavigationParams['forBio'] = "0" ;
+            if (currentSearchOptions.biographyAccessionID != "") {
+                moreNavigationParams['ID'] = currentSearchOptions.biographyAccessionID; // search within this person's stories
             }
         }
-        return retVal;
+        this.router.navigate(['/search', moreNavigationParams]);
     }
 
-    toggleMenu(menuState?: string) {
-        switch(menuState) {
-            case 'open':
-                this.menuOpen = true;
-                this.mobileSearchOpen = false;
-                break;
-            case 'close':
-                this.menuOpen = false;
-                break;
-            default:
-                this.menuOpen ? this.menuOpen = false : this.menuOpen = true;
-                this.mobileSearchOpen = false;
-        }
+    openMyContactUsModalForm() {
+        this.cachedTitle = this.titleManagerService.getTitle();
+        this.titleManagerService.setTitle("Contact Us, ScienceMakers Digital Archive");
+        this.showMyContactUsModalForm = true;
     }
 
-    toggleMobileSearch(menuState?: string) {
-        switch(menuState) {
-            case 'open':
-                this.mobileSearchOpen = true;
-                this.menuOpen = false;
-                break;
-            case 'close':
-                this.mobileSearchOpen = false;
-                break;
-            default:
-                this.mobileSearchOpen ? this.mobileSearchOpen = false : this.mobileSearchOpen = true;
-                this.menuOpen= false;
-        }
+    closeMyContactUsModalForm() {
+        this.titleManagerService.setTitle(this.cachedTitle);
+        this.showMyContactUsModalForm = false;
     }
 
     clearFeedback() {
         this.givenFeedback = null;
         this.optionalFeedbackEmail = null;
+        // Set the focus away from the Clear button, to the feedback input area.
+        // NOTE: this technique is discussed here: https://codeburst.io/focusing-on-form-elements-the-angular-way-e9a78725c04f
+        if (this.feedbackInputArea && this.feedbackInputArea.nativeElement)
+            this.feedbackInputArea.nativeElement.focus();
     }
 
-    cancelFeedback() {
-        // NOTE: not clearing out either the feedback nor the email on closing out feedback form at this point in time.
+    cancelFeedbackAndCloseMyModal() {
+        this.givenFeedback = null;
+        this.optionalFeedbackEmail = null;
+
+        this.closeMyContactUsModalForm();
     }
 
-    postFeedback() {
+    postFeedbackAndCloseMyModal() {
         var feedbackMessage: string;
+        var feedbackEmail: string = null;
 
         if (this.givenFeedback) {
             feedbackMessage = this.givenFeedback.trim();
             if (feedbackMessage.length > 0) {
-                if (this.optionalFeedbackEmail && this.optionalFeedbackEmail.trim().length > 0) {
-                    // Tack on "Comment provider email: " addendum
-                    feedbackMessage += "\n  Comment provider email: " + this.optionalFeedbackEmail.trim();
-                }
-                this.feedbackService.postFeedback(feedbackMessage);
+              if (this.optionalFeedbackEmail && this.optionalFeedbackEmail.trim().length > 0) {
+                  // Clean up given email.
+                  feedbackEmail = this.optionalFeedbackEmail.trim();
+              }
+              this.feedbackService.postFeedback(feedbackMessage, feedbackEmail);
             }
         }
         // Clear feedback after it is submitted:
         this.givenFeedback = null;
         this.optionalFeedbackEmail = null;
+
+        this.closeMyContactUsModalForm();
     }
 
-    shiftFocus(focusTarget: string) {
-        // Used to shift focus to the main container for a11y support. This is a temporary workaround
-        // until Angular router fully supports id hash links: https://github.com/angular/angular/issues/6595
-        document.getElementById(focusTarget).focus();
+    openMyConfirmReloadModalForm() {
+        this.cachedTitle = this.titleManagerService.getTitle(); // browser window page title
+        this.titleManagerService.setTitle("Confirm reload action, ScienceMakers Digital Archive");
+        this.showMyConfirmReloadModalForm = true;
     }
 
+    closeMyConfirmReloadModalForm() {
+        this.titleManagerService.setTitle(this.cachedTitle);
+        this.showMyConfirmReloadModalForm = false;
+    }
+
+    executeWindowReload() {
+        // Do the window reload action.
+        window.location.reload(); // reload the current page
+    }
+
+    // The functions below deal with the "My Clips Title/URL" exporting.
+    openMyExportMyClipsModalForm() {
+        if (this.myClipsTitleCandidate == null)
+            this.myClipsTitleCandidate = "";
+        this.cachedTitle = this.titleManagerService.getTitle(); // browser window page title
+        this.titleManagerService.setTitle("Export your clips, ScienceMakers Digital Archive");
+        this.showMyExportMyClipsModalForm = true;
+    }
+
+    closeMyExportMyClipsModalForm() {
+        // NOTE:  accessibility experts asked for clarity in modal form with no side effects, and so
+        // there is no persistence of the last title candidate entered: it is cleared so on next display of the
+        // modal form, it starts off empty.  For that reason, "Clear" button removed as well, since on close
+        // of the modal the myClipsTitleCandidate will be cleared.
+        this.myClipsTitleCandidate = "";
+        this.titleManagerService.setTitle(this.cachedTitle);
+        this.myClipsURLCopyActionFresh = false;
+        this.showMyExportMyClipsModalForm = false;
+    }
+
+    // The functions below deal with the "My Clips" clearing and getting a confirmation for this action.
+    openMyConfirmClearMyClipsModalForm() {
+        this.cachedTitle = this.titleManagerService.getTitle(); // browser window page title
+        this.titleManagerService.setTitle("Confirm clearing your clips, ScienceMakers Digital Archive");
+        this.showMyConfirmClearingMyClipsModalForm = true;
+    }
+
+    closeMyConfirmClearMyClipsModalForm() {
+        this.titleManagerService.setTitle(this.cachedTitle);
+        this.showMyConfirmClearingMyClipsModalForm = false;
+    }
+
+    clearMyClipsConfirmed() {
+        // Clear My Clips back to an empty set.
+        this.titleManagerService.setTitle(this.cachedTitle); // important this is done before clearMyClips() call which might trigger other title changes
+        this.playlistManagerService.clearMyClips();
+        this.showMyConfirmClearingMyClipsModalForm = false;
+    }
+
+    myTitledMyClipsURI(): string {
+        // Via Angular 9+ directive cdkCopyToClipboard, copy to the clipboard.
+        if (this.myClipsTitleCandidate && this.myClipsTitleCandidate.length > 0)
+            return this.titledMyClipsAsURL(this.myClipsTitleCandidate);
+        else
+            return "";
+    }
+
+    private markMyClipsURICopyAsDone() {
+        this.myClipsURLCopyActionFresh = true; // FYI, actual copy to clipboard done via Angular 9+ directive cdkCopyToClipboard
+    }
+
+    private titledMyClipsAsURL(titlePiece: string): string {
+        // NOTE: assumptions exist here regarding the route fragment to get to a story set (/stories/6;IDList=)
+        var retVal: string = "";
+        var url: string = ""
+        var favCount: number = this.myClips.length;
+        if (favCount > 0) {
+            retVal = this.myClips[0].storyID.toString();
+            for (var i:number = 1; i < this.myClips.length; i++)
+                retVal = retVal + "%2C" + this.myClips[i].storyID;
+            url = window.location.protocol + '//' + window.location.hostname + (window.location.port ? ':' + window.location.port: '') + "/stories/6;IDList=" + retVal;
+
+            // NOTE: certain characters in router mess up router parsing, e.g., !
+            // Rather than figure out nuances of router parsing, simplify what can be used
+            // as a title to just alphanumeric and space.
+            var cleanedTitle: string = titlePiece.replace(/\s\s+/g, ' '); // consecutive whitespace turned into single space
+            cleanedTitle = cleanedTitle.replace(/[^a-zA-Z0-9 \-\,\'\"\_\.]/g, ''); // keep only alphanumeric, dash -, comma, single or double quote ' ", underscore _, period . and space, nothing else
+
+            if (cleanedTitle) url = url + ";ListTitle=" + encodeURIComponent(cleanedTitle);
+        }
+        else url = "";
+        return url;
+    }
+
+    private handleMyClipsTitleInput() {
+        // Used to help label the characters left in the given myClips title in a modal form according to accessibility expert advice.
+        // On "input", remove the aria-describedby attribute (by setting what it is bound to, myClipsTitleLengthHelper, to "") so
+        // that on entering title characters this title length is not read incrementally and annoyingly.
+        this.myClipsTitleLengthHelper = "";
+        this.myClipsURLCopyActionFresh = false;
+    }
+    private handleMyClipsTitleInputBlur() {
+        // Used to help label the characters left in the given myClips title in a modal form according to accessibility expert advice.
+        // On "blur", restore the described by attribute for the textarea input element (bound to myClipsTitleLengthHelper)
+        setTimeout(() => this.myClipsTitleLengthHelper = "lengthLimitInfoForMyClipsTitle", 0);
+    }
+    private thinToLegalMyClipsTitleKeyUp() {
+        // Purpose: thin out characters just like titledMyClipsAsURL behaves, i.e.,
+        // keep only alphanumeric, dash -, comma, single or double quote ' ", underscore _, period . and space, nothing else
+        if (this.myClipsTitleCandidate.match(/[^a-zA-Z0-9 \-\,\'\"\_\.]/g))
+            this.myClipsTitleCandidate = this.myClipsTitleCandidate.replace(/[^a-zA-Z0-9 \-\,\'\"\_\.]/g, '');
+    }
 }

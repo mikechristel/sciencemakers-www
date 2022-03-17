@@ -1,16 +1,60 @@
-<div class="container-fluid adjust-height">
-    <h1 class="page-title">Playlist Creation and Sharing</h1>
-    <p class="helptext">Stories are represented as image stamps or text rows in sets of stories.  Whether shown as an image stamp or text row, an interface is present to let you add and remove stories from "My Playlist."</p>
-    <p class="helptext">You can mark a story to become part of your playlist by selecting the icon that looks like a + in a circle, perhaps shown with helper text "Add to Playlist."</p>
-    <p class="helptext">You can remove a story from your playlist by selecting the icon that looks like an X, perhaps shown with helper text "Remove from Playlist."</p>
-    <p class="helptext">Also, from the story's video playback page, there are buttons to let you add and remove this particular story from your playlist.</p>
-    <p class="helptext">You have access to your playlist, titled "MY PLAYLIST" in the main routes for the application, at any time.  Selecting MY PLAYLIST will show you the stories you have marked.
-      One main purpose of collecting a set is to then bookmark it for future recollection, or share it so others can make use of this set.  From the link at the top of the MY PLAYLIST page, which is named "Title your playlist to save/share",
-      you select this link to then be shown a dialog box where you enter the title for your playlist.  On clicking SUBMIT, that link is now in your clipboard which you can then copy into the browser address bar, into email to colleagues,
-      into your own bookmarks bar, etc., to save and share.</p>
-    <p class="helptext">For example, you looked through stories on baseball and kerosene and are intrigued by two, from Ted Radcliffe and Dorothy Jackson.  You select the "add to playlist" icon on each story representation.
-      You navigate to "MY PLAYLIST" and see these two stories in their story set. You select the "Title your playlist to save/share..." link and enter a title "Baseball and Kerosene."  The result is a link,
-      <a [routerLink]="['/stories/6',  {IDList: '8849,12017', ListTitle: 'Baseball and Kerosene'}]"  routerLinkActive="active">example titled set of two stories</a>, which is presented in a form on your clipboard that allows
-      you to paste and go with that link in browsers.  NOTE:  the character set for saved titles is limited to letters, numbers, dashes, quotes, periods, and spaces.</p>
-    <p class="helptext"><a routerLink="/help" routerLinkActive="active">Back to FAQ/Help...</a></p>
+<h1 id="mmainHeader" [thdaIsFocused]="signalFocusToTitle" tabindex="-1" class="page-title mobile-only" (mousedown)="noMouseFocus($event)">My Clips Creation, Sharing and Clearing</h1>
+<h1 id="dmainHeader" [thdaIsFocused]="signalFocusToTitle" tabindex="-1" class="page-title desktop-only" (mousedown)="noMouseFocus($event)">My Clips Creation, Sharing and Clearing</h1>
+<p class="helptext">On a story's video playback page, you can mark that story to become part of "My Clips" by
+  clicking/tapping the "Add to My Clips" button.</p>
+<div fxLayout="column" fxLayoutAlign="space-around center">
+  <img fxFlex="0 0 auto" class="help__img" src="assets/help-add-to-my-clips.jpg" alt="Add to My Clips button" />
 </div>
+<p class="helptext">If the story is already in the local set of clips, you see a "Remove from My Clips" button instead.
+  Clicking/tapping that button will remove the story from "My Clips."  Note that "My Clips" is only a local working area on this browser and device.
+  That means on a different browser or different computer/device, you will not see this same set of stories.
+  If you want to use this story set, i.e., "My Clips", on another device or at a different time, you need to save it.</p>
+<div fxLayout="column" fxLayoutAlign="space-around center">
+  <img fxFlex="0 0 auto" class="help__img" src="assets/help-remove-my-clips.jpg" alt="Remove from My Clips button" />
+</div>
+<p class="helptext">
+  One way to move a story in "My Clips" to the very last slot is to go to that story's video page,
+  click/tap the "Remove from My Clips" button and then the "Add to My Clips" button.
+  This removes the story from its old position in the local list of clips and puts it into the last slot.</p>
+<p class="helptext">You have access to your workspace, titled "My Clips" in the main routes for the application, at any time.
+  Selecting "My Clips" will show you the stories you have marked.
+  One main purpose of collecting a set is to then bookmark it for future recollection, or share it so others can make use of this set.
+  From the button at the top of the "My Clips" page, which is named "Share My Clips...",
+  you select it to then be shown a dialog box where you enter the title for your set of clips.
+  On clicking the "copy to clipboard" button in the dialog, that title and the list is now in your clipboard
+  which you can then copy into the browser address bar, into email to colleagues, into your own bookmarks bar, etc., to save and share.</p>
+<div class="mobile-only" fxLayout="column" fxLayoutAlign="space-around center">
+  <img fxFlex="0 0 auto" class="help__img" src="assets/help-my-clips-1m.jpg" alt="screen shot of 2 stories in My Clips set" />
+</div>
+<div class="desktop-only" fxLayout="column" fxLayoutAlign="space-around center">
+  <img fxFlex="0 0 auto" class="help__img" src="assets/help-my-clips-1.jpg" alt="screen shot of 2 stories in My Clips set" />
+</div>
+<p class="helptext">For example, you looked through stories on space satellites and are intrigued by three.
+  You select the "Add to My Clips" button on each story's page.
+  You navigate to "My Clips" and see these three stories in their story set. You select the "Share My Clips..." button and enter a title
+  "Space Satellites" in the interface.  The result is a link,
+  <a [routerLink]="['/stories/6',  {IDList: '30490,31182,27826', ListTitle: 'Space Satellites'}]"  routerLinkActive="active">example titled set of three stories</a>,
+  which is presented in a text format on your clipboard that allows you to paste and go with that link in browsers.  NOTE:
+  the character set for saved titles is limited to letters, numbers, dashes, quotes, periods, and spaces.</p>
+  <p class="helptext">Also on the "My Clips" page is a button to "Clear My Clips" which lets you remove everything from your local workspace, i.e., "My Clips".
+  This is useful when you have multiple sets of stories to work on.
+  For example, perhaps you are doing research on 1950s and 1960s satellite and space stories, and 2000s satellite and space stories.
+  You set up a number of stories in My Clips from the 1950s and 1960s.  Importantly, you saved this set using the method described above (e.g.,
+  after "copy to clipboard" you paste that text link into a text file).  You then clear the local workspace, i.e., "My Clips", using "Clear My Clips" and
+  assemble a new list of 2000s stories, and save that set using the copy to clipboard method.
+  Again, copy that link to your text file.  If you want to load up either of these sets as your "My Clips", you can do so by using "Clear My Clips",
+  then loading the saved route in your text file for the 1950s/60s or the 2000s set,
+  seeing that there is a button "Add X stories into My Clips" where X is the number of stories shown.
+  In this figure, X is 3, i.e., 3 stories in the set.
+</p>
+<div class="mobile-only" fxLayout="column" fxLayoutAlign="space-around center">
+  <img fxFlex="0 0 auto" class="help__img" src="assets/help-my-clips-2m.jpg" alt="screen shot of titled story set with Add to My Clips button" />
+</div>
+<div class="desktop-only" fxLayout="column" fxLayoutAlign="space-around center">
+  <img fxFlex="0 0 auto" class="help__img" src="assets/help-my-clips-2.jpg" alt="screen shot of titled story set with Add to My Clips button" />
+</div>
+<p class="helptext">
+  You click this button to append those X stories into your "My Clips" set.  Through use of saving your "My Clips" set,
+  clearing it, loading up saved lists, and adding those saved lists into "My Clips" you have the ability to assemble, title, save, clear and
+  reset groups of stories.
+  <p class="helptext"><a routerLink="/help" routerLinkActive="active">Back to FAQ/Help</a></p>

@@ -6,4 +6,4 @@ export const storyRoutes: Routes = [
     { path: 'story/:ID', component: StoryComponent }
 ];
 
-export const storyRouting: ModuleWithProviders = RouterModule.forChild(storyRoutes);
+export const storyRouting: ModuleWithProviders<any> = RouterModule.forChild(storyRoutes);

@@ -1,0 +1,214 @@
+@use '../theme/myF';
+@use '../theme/myGlobals';
+@use '../theme/helpers';
+@use '../theme/base';
+
+.panel-parent {
+  margin-bottom: myF.em(8, 14);
+  border-radius: 0;
+  box-shadow: none;
+  border: 1px solid myF.color(primary);
+  box-sizing: border-box;
+}
+
+.panel-title-item {
+  @include myGlobals.oswald;
+  font-size: 1.2rem;
+  margin: auto;
+}
+
+.panel-open-close {
+  padding: 0;
+
+  background-color: myF.color(primary);
+  border: 0;
+  border-radius: 0;
+  color: #fff;
+  height: myGlobals.$buttonHeight; /* corresponds to 30px(42px) where 16px is default but allows users to resize text up to 200% and container grows, too */
+  text-align: left;
+  width: 100%;
+
+  padding-left: myF.em(8,16);
+  padding-right: myF.em(8,16);
+
+  @media screen and (min-width: myF.bp(afl_medium)) and (max-width: myF.bp(afl_large_just_before)) {
+    padding-left: myF.em(12,16);
+    padding-right: myF.em(12,16);
+  }
+
+  @media screen and (min-width: myF.bp(afl_large)) {
+    padding-left: myF.em(16,16);
+    padding-right: myF.em(16,16);
+  }
+
+  &:hover,
+  &:focus {
+    background-color: myF.color(secondary);
+    color: #fff;
+  }
+
+  &.active {
+    background-color: myF.color(primary);
+    color: #fff;
+  }
+}
+
+.panel-reverse-parent {
+  margin-bottom: myF.em(8, 14);
+  border-radius: 0;
+  box-shadow: none;
+  border: 1px solid myF.color(secondary);
+  box-sizing: border-box;
+}
+
+.panel-reverse-title-item {
+  @include myGlobals.oswald;
+  font-size: 1.2rem;
+  margin: auto;
+
+  @media screen and (min-width: myF.bp(afl_small)) {
+      font-size: 1.4rem;
+  }
+}
+
+.panel-reverse-open-close {
+  padding: 0;
+
+  background-color: myF.color(secondary);
+  border: 0;
+  border-radius: 0;
+  color: #fff;
+  height: myGlobals.$buttonHeight;
+  width: 100%;
+
+  padding-left: myF.em(8,16);
+  padding-right: myF.em(8,16);
+
+  @media screen and (min-width: myF.bp(afl_medium)) and (max-width: myF.bp(afl_large_just_before)) {
+    padding-left: myF.em(12,16);
+    padding-right: myF.em(12,16);
+  }
+
+  @media screen and (min-width: myF.bp(afl_large)) {
+    padding-left: myF.em(16,16);
+    padding-right: myF.em(16,16);
+  }
+
+  &:hover,
+  &:focus {
+    background-color: myF.color(primary);
+    color: #fff;
+  }
+
+  &.active {
+    background-color: myF.color(secondary);
+    color: #fff;
+  }
+}
+
+/* Topic Search */
+.panel-GRANDparent {
+  background-color: myF.color(light-grey);
+  margin-bottom: myF.em(18);
+  border-radius: 0;
+  box-shadow: none;
+  border: 1px solid myF.color(black);
+  box-sizing: border-box;
+}
+
+.panel-GRANDparent > div.panel-body {
+  background-color: myF.color(light-grey);
+  padding: myF.em(15);
+}
+
+.panel-GRANDparent > div.panel-body .panel-parent {
+  margin-bottom: myF.em(15);
+}
+
+.panel-GRANDparent-title-item {
+ @include myGlobals.source-sans;
+  font-size: 1rem;
+  font-style: italic;
+  margin: auto;
+
+  @media screen and (min-width: myF.bp(afl_small)) {
+      font-size: 1.2rem;
+  }
+}
+
+.panel-GRANDparent-open-close {
+  padding: 0;
+
+  background-color: myF.color(black);
+  border: 0;
+  border-radius: 0;
+  color: #fff;
+  height: myGlobals.$buttonHeight;
+  margin-bottom: myF.em(8);
+  width: 100%;
+
+  padding-left: myF.em(8,16);
+  padding-right: myF.em(8,16);
+
+  @media screen and (min-width: myF.bp(afl_medium)) and (max-width: myF.bp(afl_large_just_before)) {
+    padding-left: myF.em(12,16);
+    padding-right: myF.em(12,16);
+  }
+
+  @media screen and (min-width: myF.bp(afl_large)) {
+    padding-left: myF.em(16,16);
+    padding-right: myF.em(16,16);
+  }
+
+  &:hover,
+  &:focus {
+    background-color: myF.color(secondary);
+    color: #fff;
+  }
+
+  &.active {
+    background-color: myF.color(black);
+    color: #fff;
+  }
+}
+
+.h3-container {
+  margin: auto;
+  padding: 0;
+}
+
+.h4-container {
+  margin: auto;
+  padding: 0;
+}
+
+.opened-caret {
+  display: inline-block;
+  width: 0;
+  max-width: 8px;
+  height: 0;
+  margin-left: 2px;
+  vertical-align: middle;
+  border-bottom: 4px dashed;
+  border-bottom: 4px solid\9;
+  border-right: 4px solid transparent;
+  border-left: 4px solid transparent;
+}
+
+.closed-caret {
+  display: inline-block;
+  width: 0;
+  max-width: 8px;
+  height: 0;
+  margin-left: 2px;
+  vertical-align: middle;
+  border-top: 4px dashed;
+  border-top: 4px solid\9;
+  border-right: 4px solid transparent;
+  border-left: 4px solid transparent;
+}
+
+.panel-body {
+  padding: myF.em(4,14) myF.em(6,14);
+  background-color: white;
+}

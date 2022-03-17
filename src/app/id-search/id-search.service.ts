@@ -1,5 +1,6 @@
 ﻿import { Injectable, Inject, OnInit } from '@angular/core';
-import { Observable } from "rxjs/Observable";
+import { Observable, throwError } from "rxjs";
+import { catchError, mergeMap } from "rxjs/operators";
 import { HttpClient } from '@angular/common/http';
 
 import { SearchResult } from '../storyset/search-result';
@@ -8,11 +9,14 @@ import { environment } from '../../environments/environment';
 
 @Injectable()
 export class IDSearchService {
-    private idSearchURL = 'FavoritesSet?csvStoryIDs='; // require csv argument, so it is already tacked on
+    private idSearchURL = 'StorySet?csvStoryIDs='; // require csv argument, so it is already tacked on
 
-    constructor(private http: HttpClient, private historyMakerService: HistoryMakerService) { }
+    constructor(private http: HttpClient, private historyMakerService: HistoryMakerService) {}
 
-    getIDSearch(csvIDList: string, givenPage: number, givenPageSize: number, genderFacet: string, yearFacets: string, makerFacets: string, jobFacets: string): Observable<SearchResult> {
+    // NOTE: facet arguments are optional; if not given, then no filtering by facets will occur, i.e., no facet arguments passed into the service.
+    getIDSearch(csvIDList: string, givenPage: number, givenPageSize: number, genderFacet?: string, yearFacets?: string,
+      makerFacets?: string, jobFacets?: string, regionUSStateFacets?: string, organizationFacets?: string,
+      namedDecadeFacets?: string, namedYearFacets?: string): Observable<SearchResult> {
         var addedArgs: string = "";
         if (givenPage != null && givenPage > 0)
             addedArgs = addedArgs + "&currentPage=" + givenPage;
@@ -26,9 +30,23 @@ export class IDSearchService {
             addedArgs = addedArgs + "&makerFacet=" + makerFacets;
         if (jobFacets != null && jobFacets.length > 0)
             addedArgs = addedArgs + "&jobFacet=" + jobFacets;
+        if (regionUSStateFacets != null && regionUSStateFacets.length > 0)
+            addedArgs = addedArgs + "&entityStateFacet=" + regionUSStateFacets;
+        if (organizationFacets != null && organizationFacets.length > 0)
+            addedArgs = addedArgs + "&entityOrgFacet=" + organizationFacets;
+        if (namedDecadeFacets != null && namedDecadeFacets.length > 0)
+            addedArgs = addedArgs + "&entityDecadeFacet=" + namedDecadeFacets;
+        if (namedYearFacets != null && namedYearFacets.length > 0)
+            addedArgs = addedArgs + "&entityYearFacet=" + namedYearFacets;
 
-        // NOTE: cannot proceed to an ID search before first having search facets all in place.
-        return this.historyMakerService.getFacetDetails()
-          .flatMap(fd => this.http.get<SearchResult>(environment.serviceBase + this.idSearchURL + csvIDList + addedArgs));
+        // NOTE: cannot proceed to an story ID search before first having story search facets all in place.
+        return this.historyMakerService.getStoryFacetDetails().pipe(
+          mergeMap(fd => this.http.get<SearchResult>(environment.serviceBase + this.idSearchURL + csvIDList + addedArgs).pipe(
+            catchError( err => {
+              // TODO: (!!!TBD!!!) Decide if we wish to log errors in any way or use console, e.g., console.log('error caught: ', err);
+              return throwError( err ); }
+            )
+          ))
+        );
     }
 }

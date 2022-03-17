@@ -1,7 +1,9 @@
-// Helper classes
-// --------------------------------------------------
-// Classes to use for small, common tasks. If used in conjunction
-// with other styles, please create a class and extend the placeholder.
+/* Helper classes
+   --------------------------------------------------
+   Classes to use for small, common tasks. If used in conjunction
+   with other styles, please create a class and extend the placeholder. */
+@use 'myGlobals';
+@use 'myF';
 
 .bold,
 %bold { font-weight: 700; }
@@ -17,30 +19,16 @@
 
 %mobile-only,
 .mobile-only {
-  @media screen and (min-width: 769px) {
-    display: none !important;
-  }
-}
-
-%tablet-and-above,
-.tablet-and-above {
-  @media screen and (max-width: bp(small)) {
+  @media screen and (min-width: myF.bp(afl_small)) {
     display: none !important;
   }
 }
 
 %desktop-only,
 .desktop-only {
-  @media screen and (max-width: 768px) {
+  width: 100%;
+
+  @media screen and (max-width: myF.bp(afl_small_just_before)) {
     display: none !important;
   }
-}
-
-%limited-text {
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 3;
-    display: -webkit-box;
-    line-height: 1.1em;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }

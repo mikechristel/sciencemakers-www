@@ -3,7 +3,6 @@ export class StorySearchSortField {
         public id: number,
         public value: string,
         public sortField: string,
-        public sortInDescendingOrder: boolean,
-        public selected: boolean
+        public sortInDescendingOrder: boolean
     ) { }
 }

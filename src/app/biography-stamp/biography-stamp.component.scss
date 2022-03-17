@@ -1,108 +1,73 @@
-﻿@import '../shared/theme/base';
+﻿@use '../shared/theme/myF';
+@use '../shared/theme/myGlobals';
+@use '../shared/theme/helpers';
+@use '../shared/theme/base';
+
+/* For biographies, the mockup for home page born this time (week or day) showed a card width of up to 284 (height 272 for the image part).
+   For HistoryMakers biography searches, we don't want to go that tall of image height (or wide), so that we can show more
+   results in limited space; hence a different class of biography-result-stamp was born (which also has a list view option). */
 
 .card {
-    border: 1px solid color(grey);
-    display: flex;
-    flex-direction: column;
-    font-size: em(17);
-    overflow: hidden;
-    height: auto;
-    position: relative;
-    transition: border .2s ease-in-out;
+  border: 1px solid myF.color(ok-grey);
+  color: myF.color(dark-grey);
+  background-color: myF.color(light-grey);
+  text-decoration: none;
+  overflow: hidden; /* necessary to hide any overflow of image for narrow card widths */
+  height: 100%; /* needed to fill all of the allocated flex layout or grid space */
 
-    &:hover {
-        border: 1px solid color(primary);
-        text-decoration: none;
-    }
+  &:focus {
+      /* Accessibility review noted:
+           Focus outline is missing in Firefox.
+           For the :focus psuedo selector, define an outline style which will be visible, such as "outline: 2px dashed black;".
+         So, here that is: */
+      outline: 2px dashed black;
+      border: 1px solid myF.color(secondary);
+      background: myF.color(primary);
+      color: #fff;
+  }
+
+  &:hover {
+      border: 1px solid myF.color(secondary);
+      background: myF.color(primary);
+      color: #fff;
+  }
+
+  &.active {
+      background-color: myF.color(light-grey);
+  }
 }
 
-.card__overlay {
-    background-color: color(primary);
-    opacity: 0;
-    height: 100%;
-    position: absolute;
-    transition: opacity .2s ease-in-out;
-    width: 100%;
-
-    .card:hover & {
-        cursor: pointer;
-        opacity: .5;
-        z-index: 1;
-    }
+.card_img-backdrop {
+  padding: 0;
+  margin: 0;
+  text-align: center;
 }
 
-.card__img {
-    border-radius: inherit;
-    display: block;
-    height: auto;
-    transform: translate(-5px, 0) scale(1.05);
-    transition: filter .2s ease-in-out;
-    width: calc(100% + 10px);
-
-    //IE fix image stretching
-    @media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
-        flex-shrink: 0;
-    }
-
-    .card:hover & {
-        filter: grayscale(100%);
-    }
-
+.card__img { /* note: source images come in as either 320x240 or 320x180 resolution */
+  object-fit: cover;
+  transform: scale(1.05); /* scaling to remove rounded corners on the majority of corpus (since others are squared corners) and fill top block always */
+  transition: filter .2s ease-in-out;
+  width: 100%;
+  max-width: 280px;
+  height: 240px; /* (fills the 240px allocated for image area in fxFlex in html rendering well) */
+  &:hover,
+  &:focus {
+    filter: grayscale(100%);
+  }
+  &.active {
+    filter: none;
+  }
 }
 
 .card__info-overlay {
-    @extend %oswald;
-
-    align-items: center;
-    align-self: flex-end;
-    background: color(light-grey);
-    color: color(dark-grey);
-    display: flex;
-    flex: 2;
-    justify-content: center;
-    line-height: em(18);
-    padding: em(7) em(10);
-    text-align: center;
-    transition: all .2s ease-in-out;
-    width: 100%;
-    z-index: 500;
-
-    //IE fix
-    @media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
-        flex: auto;
-    }
-
-    .card:hover & {
-        background: color(primary);
-        color: #fff;
-        cursor: pointer;
-    }
+  padding: 0;
+  margin: 0;
+  text-align: center;
 }
 
-.card.selected {
-    border: 2px solid color(tertiary);
-    opacity: .6;
-}
-
-.list {
-    border-bottom: 1px solid color(grey);
-    color: color(dark-grey);
-    cursor: pointer;
-    font-size: 1rem;
-    padding-bottom: em(10);
-    width: 100%;
-
-    &:hover,
-    &:hover .list__name {
-        color: color(primary);
-    }
-}
-
-.list__name {
-    @extend %oswald;
-
-    color: color(dark-grey);
-    font-size: em(16);
-    line-height: em(20, 16);
-    margin-bottom: 0;
+.card__contents {
+  @include myGlobals.oswald;
+  font-size: 1rem;
+  padding: myF.em(8) myF.em(11) myF.em(8) myF.em(11); /* top right bottom left */
+  margin: 0;
 }

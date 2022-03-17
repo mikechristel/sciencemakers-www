@@ -1,377 +1,477 @@
-﻿@import './shared/theme/base';
+﻿@use './shared/theme/myF';
+@use './shared/theme/myGlobals';
+@use './shared/theme/helpers';
+@use './shared/theme/base';
 
-.modal-content {
+/* NOTE: with Spring 2019 push for greater accessibility, making use of angular/CDK (e.g., for
+   drop-down menu box overlay that traps focus such as to choose which fields to search)
+   Useful walkthrough: blog.angularindepth.com/creating-a-toast-service-with-angular-cdk-a0d35fd8cc12
+   NOTE: in updating to Angular 10..11..12..13  the @import became @use at 12 to 13 update.
+*/
+@use "../../node_modules/@angular/cdk/overlay";
 
-  .modal-header {
+.mymodal {
+  /* detach from rest of the document */
+  position: fixed;
+  max-width: myF.bp(thmda_maxwidth);
+
+  /* center */
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+
+  /* ensure in front of rest of page -- increase as needed */
+  z-index: 1001;
+
+  /* visual illusion of being in front -- alter to taste */
+  box-shadow: rgba(0,0,0,0.4) 10px 10px 4px;
+
+  /* visual illusion of being a solid object -- alter to taste */
+  background-color: myF.color(light-grey);
+  border: 5px solid myF.color(primary);
+
+  padding: myF.em(10) myF.em(14) myF.em(10) myF.em(10); /* top right bottom left */
+
+  @media screen and (max-width: myF.bp(thmda_narrow_just_before)) {
+    width: 320px;
+  }
+  @media screen and (min-width: myF.bp(thmda_narrow)) and (max-width: myF.bp(afl_small_just_before)) {
+    width: 380px;
+  }
+  @media screen and (min-width: myF.bp(afl_small)) and (max-width: myF.bp(afl_medium_just_before)) {
+    width: 500px;
+  }
+  @media screen and (min-width: myF.bp(afl_medium)) and (max-width: myF.bp(afl_large_just_before)) {
+    width: 800px;
+  }
+  @media screen and (min-width: myF.bp(afl_large)) {
+    width: 1180px;
+  }
+
+  @media screen and (max-width: myF.bp(afl_small_just_before)) {
+    width: 90%;
+  }
+
+  .fade {
+    -webkit-transition: -webkit-transform .3s ease-out;
+    -o-transition: -o-transform .3s ease-out;
+    transition: transform .3s ease-out;
+    -webkit-transform: translate(0,-25%);
+    -ms-transform: translate(0,-25%);
+    -o-transform: translate(0,-25%);
+    transform: translate(0,-25%);
+  }
+
+  .mymodal-header {
     border-bottom: 0;
+    padding: 0 0 myF.em(22);
+  }
 
-    .modal-title {
-      @extend %oswald;
-      color: color(dark-grey);
-      font-size: em(22);
-      text-transform: uppercase;
+  .mymodal-title {
+    @include myGlobals.oswald;
+    color: myF.color(dark-grey);
+    line-height: 120%;
+    margin: 0 0 myF.em(4) myF.em(4); /* top right bottom left */
+    padding: 0;
+    font-size: 1.4rem;
+
+    @media screen and (min-width: myF.bp(afl_medium)) and (max-width: myF.bp(afl_large_just_before)) {
+      font-size: 1.6rem;
     }
 
-    button.close {
-      color: color(secondary);
-      text-shadow: none;
-      opacity: 1;
+    @media screen and (min-width: myF.bp(afl_large)) {
+      font-size: 1.8rem;
     }
+  }
 
-    .close:focus,
-    .close:hover {
-      background: transparent;
+  button.close {
+    color: #fff;
+    background-color: myF.color(primary);
+    text-shadow: none;
+    opacity: 1;
+
+    &:hover,
+    &:focus {
+        box-shadow: inset 0 0 5px rgba(51,51,51,.6);
+        background-color: myF.color(secondary);
     }
-  }//header
+  }
 
-  .modal-body {
+  .mymodal-body {
+    padding: myF.em(2) myF.em(4) myF.em(2); /* top, right and left, bottom */
 
     textarea,
     textarea:focus {
-      @extend %source-sans;
+     @include myGlobals.source-sans;
+      width: 100%;
+      height: auto;
+      background-color: #fff;
+      background-image: none;
       border: 1px solid #ccc;
       border-radius: 0;
       box-shadow: none;
-      color: color(dark-grey);
-      font-size: em(16);
-      margin-bottom: em(15, 16);
+      color: myF.color(dark-grey);
+      font-size: 1rem;
+      margin-bottom: myF.em(16);
       resize: none;
-    }
-  }
+      overflow: auto;
 
-  .modal-footer {
-    border-top: 0;
+      /* Safari will "zoom in" on the textarea with font-size like this, so it needs more space.
+         Rather than "fight it" and try to control Safari html-select element styling, give it the space
+         to do what it is doing (at least for Safari 13 on mobile, works as of May 2020). */
+      &:not(:root:root) {
+        width: 95%;
+      }
 
-    button,
-    button:focus {
-      @extend %source-sans-semi-bold;
-      background: color(primary);
-      border-radius: 0;
-      font-size: em(16);
-      padding: em(10) em(26);
-      margin-left: em(10);
-      text-transform: uppercase;
-      @media screen and (min-width: bp(medium)) {
-              margin-left: em(40);
+      -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+      box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+      -webkit-transition: border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;
+      -o-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+      transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+
+      @media screen and (min-width: myF.bp(afl_medium)) and (max-width: myF.bp(afl_large_just_before)) {
+        font-size: 1.2rem;
+      }
+
+      @media screen and (min-width: myF.bp(afl_large)) {
+        font-size: 1.4rem;
       }
     }
   }
-}
 
-.nav {
-  background-color: color(light-grey);
-  color: color(dark-grey);
-  display: flex;
-  font-size: rem(16);
-  justify-content: space-between;
-  transition: left .3s ease-in-out;
-  width: 100%;
-
-  &::before,
-  &::after { content: none }
-
-  @media screen and (max-width: bp(medium)) {
-    border-right: 1px solid #ccc;
-    box-shadow: 0 5px 7px rgba(0,0,0,.20);
-    flex-direction: column;
-    height: 100vh;
-    justify-content: initial;
-    left: - em(600, 16);
-    padding: 0 em(15,16) em(15,16);
-    position: absolute;
-    top: 0;
-    width: 78.75vw;
-    z-index: 1000;
-  }
-
-  &.nav--open {
-    left: 0;
-
-    //IE 11
-    @media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
-      justify-content: flex-start;
-    }
-
-  }
-}
-
-.nav__links-item {
-
-  @media screen and (max-width: bp(medium)) {
-    display: flex;
-    flex-direction: column;
+  .email_input {
+   @include myGlobals.source-sans;
     width: 100%;
+    height: auto;
+    color: myF.color(dark-grey);
+    background-color: #fff;
+    font-size: 1rem;
+
+    /* Safari will "zoom in" on the textarea with font-size like this, so it needs more space.
+       Rather than "fight it" and try to control Safari html-select element styling, give it the space
+       to do what it is doing (at least for Safari 13 on mobile, works as of May 2020). */
+    &:not(:root:root) {
+      width: 95%;
+    }
+
+    @media screen  and (max-width: myF.bp(afl_large_just_before))  {
+      font-size: 1.2rem;
+    }
+
+    @media screen and (min-width: myF.bp(afl_large)) {
+      font-size: 1.4rem;
+    }
   }
 
-  &:first-of-type {
-    @media screen and (max-width: bp(medium)) {
-      padding-top: em(10, 16)
+  .mymodal-footer { /* note similarity with search__submit style for search button */
+    border-top: 0;
+    padding-bottom: 6px;
+
+    button {
+      @include myGlobals.oswald;
+      background: myF.color(primary);
+      border: 1px solid myF.color(primary); /* note: added for accessibility, to provide a button border in high contrast mode */
+      border-radius: 0;
+      color: #fff;
+      font-size: 1.2rem;
+      height: myGlobals.$buttonHeight;
+      min-width: 3.125rem;
+      max-width: 6.25rem;
+      letter-spacing: .5px;
+      transition: box-shadow .15s ease-in-out;
+
+      &:hover,
+      &:focus {
+          box-shadow: inset 0 0 5px rgba(51,51,51,.6);
+          background-color: myF.color(secondary);
+      }
+
+      &:disabled {
+          cursor: not-allowed;
+          opacity: .4;
+      }
+
+      @media screen and (min-width: myF.bp(afl_medium)) and (max-width: myF.bp(afl_large_just_before)) {
+        font-size: 1.4rem;
+      }
+
+      @media screen and (min-width: myF.bp(afl_large)) {
+        font-size: 1.6rem;
+      }
     }
+
+    .button-secondary {
+      @include myGlobals.oswald;
+      background: myF.color(secondary);
+      border: 1px solid myF.color(secondary); /* note: added for accessibility, to provide a button border in high contrast mode */
+      border-radius: 0;
+      color: #fff;
+      font-size: 1.2rem;
+      height: myGlobals.$buttonHeight;
+      min-width: 3.125rem;
+      max-width: 6.25rem;
+      letter-spacing: .5px;
+      transition: box-shadow .15s ease-in-out;
+
+      &:hover,
+      &:focus {
+          box-shadow: inset 0 0 5px rgba(51,51,51,.6);
+          background-color: myF.color(primary);
+      }
+
+      @media screen and (min-width: myF.bp(afl_medium)) and (max-width: myF.bp(afl_large_just_before)) {
+        font-size: 1.4rem;
+      }
+
+      @media screen and (min-width: myF.bp(afl_large)) {
+        font-size: 1.6rem;
+      }
+    }
+  }
+
+  .modal-warning {
+   @include myGlobals.source-sans-bold;
+
+    color: myF.color(tertiary);
+
+    font-size: 1rem;
+
+    @media screen and (min-width: myF.bp(afl_medium)) and (max-width: myF.bp(afl_large_just_before)) {
+      font-size: 1.2rem;
+    }
+
+    @media screen and (min-width: myF.bp(afl_large)) {
+      font-size: 1.4rem;
+    }
+  }
+
+}
+
+.form-message {
+  font-size: 1rem;
+
+  @media screen and (min-width: myF.bp(afl_medium)) and (max-width: myF.bp(afl_large_just_before)) {
+    font-size: 1.2rem;
+  }
+
+  @media screen and (min-width: myF.bp(afl_large)) {
+    font-size: 1.4rem;
+  }
+}
+
+.mymodal-overlay {
+    /* See comment in https:stackoverflow.com/questions/43533463/how-to-create-a-modal-popup-that-is-compatible-with-angular-4
+       for origins of this approach to modal dialog presentation. */
+
+    /* detach from document */
+    position: fixed;
+
+    /* ensure in front of rest of page except modal */
+    z-index: 1000;
+
+    /* fill screen to catch mice */
+    top: 0;
+    left: 0;
+    width: 9999px;
+    height: 9999px;
+
+    /* dim screen 20% -- alter to taste */
+    opacity: 0.5;
+    background-color: black;
+}
+
+.nav-across-width { /* only use for desktop, not mobile; mobile shows hamburger menu via header__menu-icon instead */
+  @extend %desktop-only; /* counters the extend %mobile-only for header__menu-icon */
+  color: myF.color(dark-grey);
+  font-size: 1rem;
+  width: 100%;
+  padding-bottom: myF.em(14);
+
+  @media screen and (max-width: myF.bp(thmda_wideenough_just_before)) {
+    padding-bottom: myF.em(6);
+  }
+
+  @media screen and (min-width: myF.bp(thmda_wideenough)) and (max-width: myF.bp(afl_medium_just_before)) {
+    padding-bottom: myF.em(10);
+  }
+
+  @media screen and (min-width: myF.bp(afl_medium)) and (max-width: myF.bp(afl_large_just_before)) {
+    padding-bottom: myF.em(12);
   }
 
 }
 
 .nav__links {
   @extend %list-without-styles;
+  @include myGlobals.oswald;
 
-  display: flex;
-  justify-content: space-between;
+  margin: 0;
   width: 100%;
-
-  @media screen and (max-width: bp(medium)) {
-    flex-direction: column;
-  }
-
-}
-
-.nav__logo-container {
-  @extend %mobile-only;
-
-  align-items: center;
-  display: flex;
-  height: em(61,16);
-}
-
-.nav__logo {
-  height: 100%;
-  width: 58vw;
-
-  &:active {
-    outline: 0;
-  }
+  height: 1.875rem;
 }
 
 .nav__link {
-  border-bottom: 1px solid #fff;
-  color: color(dark-grey);
-  font-weight: bold;
-  letter-spacing: em(.5, 16);
-  padding: em(14,16) 0;
-  text-transform: uppercase;
-  transition: all .2s ease-in-out;
+    color: myF.color(dark-grey);
+    font-weight: 400;
+    font-size: 1rem;
+    letter-spacing: myF.em(.5, 16);
+    transition: all .2s ease-in-out;
+    text-decoration: none;
+    padding: 0 0 myF.em(1,16) 0; /* top right bottom left */
 
-  @media screen and (min-width: bp(medium) + 1) {
-    border-bottom: em(3,16) solid transparent;
-    padding: 0 em(8,16) em(12,16) em(8,16);
-  }
-
-  &.active {
-    color: color(tertiary);
-
-    @media screen and (min-width: bp(medium) + 1) {
-      border-bottom: em(3,16) solid color(tertiary);
+    &.active {
+      color: myF.color(nav-highlight-shade);
+      border-bottom: myF.em(8) solid myF.color(nav-highlight-shade);
       text-decoration: none;
     }
-  }
 
-  &:hover {
-    border-bottom: 1px solid #fff;
-    color: color(tertiary);
-    text-decoration: none;
-
-    @media screen and (min-width: bp(medium) + 1) {
-      border-bottom: em(3,16) solid color(tertiary);
+    &:hover {
+      color: myF.color(nav-highlight-shade);
+      text-decoration: none;
+      border-bottom: myF.em(8) solid myF.color(nav-highlight-shade);
     }
-  }
+
+    @media screen and (min-width: myF.bp(afl_small)) and (max-width: myF.bp(thmda_wideenough_just_before)) {
+      font-size: 1.0rem;
+    }
+
+    @media screen and (min-width: myF.bp(thmda_wideenough)) and (max-width: myF.bp(afl_medium_just_before)) {
+      font-size: 1.2rem;
+    }
+
+    @media screen and (min-width: myF.bp(afl_medium)) and (max-width: myF.bp(afl_large_just_before)) {
+      font-size: 1.3rem;
+    }
+
+    @media screen and (min-width: myF.bp(afl_large)) {
+      font-size: 1.4rem;
+    }
 }
 
-.nav__link--playlist { position: relative; }
+.nav__link--myclips { position: relative; } /* needed to add nav__badge as decoration to the "my clips" nav link */
 
 .nav__badge {
-    background-color: color(tertiary);
-    font-size: rem(12);
-    position: absolute;
-    right: 0;
-
-    @media screen and (min-width: bp(medium) + 1) {
-      right: - em(20, 12);
-      top: - em(10, 12);
-    }
+  display: inline-block;
+  min-width: 10px;
+  padding: 3px 7px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  line-height: 1;
+  color: #fff;
+  background-color: myF.color(nav-highlight-shade);
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  border-radius: 10px;
+  position: absolute;
+  right: - myF.em(24);
+  top: - myF.em(16);
+  @media screen and (max-width: myF.bp(afl_medium_just_before)) {
+    display: none !important; /* when too narrow, less than medium, don't show the badge */
+  }
 }
 
-@media screen and (max-width: 900px) {
+@media screen and (max-width: myF.bp(afl_medium_just_before)) {
   .nav_verbose {
     display: none !important;
   }
 }
 
-@media screen and (min-width: 901px) {
+@media screen and (min-width: myF.bp(afl_medium)) {
   .nav_terse {
     display: none !important;
   }
 }
 
-.header__offset {
-  margin-top: em(55);
-
-  //IE 11
-  @media screen and (min-width: bp(small)) and (-ms-high-contrast: active), (-ms-high-contrast: none) {
-      margin-top: em(55);
-  }
-
-  @media screen and (min-width: bp(medium) + 1) {
-    margin-top: 0;
-  }
+.appHeaderPlusContents {
+    margin: 0;
+    padding: 0;
+    max-width: myF.bp(thmda_maxwidth);
 }
 
 .header {
-  background-color: color(light-grey);
+  background-color: myF.color(light-grey);
   border-bottom: 1px solid #ccc;
   box-shadow: 0 0 10px rgba(0,0,0,.15);
-  font-size: 1rem;
-  padding: em(14) em(15);
-  position: fixed;
-  width: 100%;
-  z-index: 1000;
 
-  @media screen and (min-width: bp(medium) + 1) {
-    max-height: 100%;
-    padding: em(14) 0 0;
-    position: relative;
-    width: auto;
-    z-index: initial;
+  padding: myF.em(4) myF.em(8) 0; /* top, left and right, bottom */
+
+  @media screen and (min-width: myF.bp(afl_small)) and (max-width: myF.bp(afl_medium_just_before)) {
+      padding: myF.em(4) myF.em(12) 0; /* top, left and right, bottom */
+  }
+
+  @media screen and (min-width: myF.bp(afl_medium)) {
+      padding: myF.em(2) myF.em(16) 0; /* top, left and right, bottom */
   }
 }
 
 .header__content-container {
   margin: 0 auto;
-  max-width: em(1500);
-
-  @media screen and (min-width: bp(medium) + 1) {
-    padding-left: em(30);
-    padding-right: em(30);
+  @media screen and (min-width: myF.bp(thmda_maxwidth)) {
+      max-width: myF.bp(thmda_maxwidth);
   }
 }
 
-.header__top-row {
-  align-items: center;
-  display: flex;
-  justify-content: space-between;
-  min-height: em(32);
-
-  @media screen and (min-width: bp(medium) + 1) {
-    display: inline-flex;
-    margin-bottom: em(26);
-    min-height: auto;
+.imposeMaxContentsWidth {
+  margin: 0;
+  @media screen and (max-width: myF.bp(thmda_maxwidth_just_before)) {
+    margin: 0 auto;
+    width: 100%;
   }
-
-  //IE 11
-  @media screen and (min-width: bp(medium) + 1) and (-ms-high-contrast: active), (-ms-high-contrast: none) {
-    height: em(60);
-  }
-
-  @media screen and (min-width: bp(large)) {
-    margin-bottom: em(22);
-  }
-
-  //IE
-  @media screen and (min-width: bp(medium)) and (-ms-high-contrast: active) and (-ms-high-contrast: none) {
-    display: inline-block;
+  @media screen and (min-width: myF.bp(thmda_maxwidth)) {
+      margin: 0 auto;
+      width: myF.bp(thmda_maxwidth);
   }
 }
 
-.bannerLogo {
-  height: 100%;
-  max-width: 460px;
+.imposeMaxWidth {
+  margin: 0 auto;
+  max-width: myF.bp(thmda_maxwidth);
+}
+
+.header__top-flex-row {
+  padding: myF.gutter(thmda-big) 0; /* top and bottom, right and left */
+
+  @media screen and (max-width: myF.bp(thmda_wideenough_just_before)) {
+    padding-top: 0;
+  }
 }
 
 .header__logo {
   cursor: pointer;
-  height: 100%;
   outline: 0;
-  max-width: 58vw;
 
-  //IE
-  @media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
-    flex: 1 0 auto;
+  @media screen and (max-width: myF.bp(afl_medium_just_before)) {
+    max-width: 90%;
   }
-
-  @media screen and (max-width: bp(small)) {
-    width: 65vw;
-  }
-
-  @media screen and (min-width: bp(medium)) {
-    height: rem(32);
-    min-width: em(405);
-    width: 90%;
-  }
-
-  @media screen and (min-width: bp(large)) {
-    height: rem(36);
+  @media screen and (min-width: myF.bp(afl_medium)) {
+    height: 100%;
   }
 }
 
-.header__menu-icon {
+.desktop-top-row-tagline-area {
+  @extend %desktop-only;
+}
+
+.mobile-top-row-icon-area {
   @extend %mobile-only;
-
-  color: color(dark-grey);
-  transition: color .3s ease-in-out;
-
-  @media screen and (max-width: bp(small)) {
-    height: 8%;
-    width: em(34);
-  }
-
-  //IE 11
-  @media screen and (min-width: bp(small)) and (-ms-high-contrast: active), (-ms-high-contrast: none) {
-      height: em(30);
-      width: em(39);
-  }
 }
 
-.header__search-icon {
-  @extend %mobile-only;
-
-  color: color(dark-grey);
-  margin-left: auto;
-  margin-right: 15px;
-  transition: color .3s ease-in-out;
-
-  @media screen and (max-width: bp(small)) {
-    height: em(32);
-    width: em(32);
-  }
-
-  //IE 11
-  @media screen and (min-width: bp(small)) and (-ms-high-contrast: active), (-ms-high-contrast: none) {
-      height: em(32);
-      width: em(32);
-  }
-}
-
-.header__menu-icon--open,
-.header__search-icon--open {
-  color: color(tertiary);
-  height: em(30);
-}
-
-.header__bottom-row {
-  display: flex;
-  justify-content: space-between;
-
-  @media screen and (min-width: bp(medium)) {
-    display: inline-flex;
-    float: right;
-  }
+.header__icon {
+    color: myF.color(dark-grey);
+    margin-right: myF.em(18);
+    transition: color .3s ease-in-out;
 }
 
 .header__tagline {
-  @extend %source-sans-bold-italic;
-  @extend %desktop-only;
-
-  color: color(dark-grey);
-  font-size: em(12);
-  line-height: em(16, 12);
-  text-align: left;
-
-  @media screen and (min-width: bp(large)) {
-    font-size: em(14);
-    line-height: em(18);
+   @include myGlobals.source-sans-bold-italic;
+    color: myF.color(dark-grey);
+    font-size: 0.85rem;
+    line-height: 1.125rem;
     text-align: right;
-  }
 }
 
-// a11y skip to main content
+/* a11y skip to main content */
 .skip {
 	padding:6px;
 	position: absolute;
@@ -383,28 +483,15 @@
 	border-bottom-right-radius:8px;
 	background:transparent;
   transition: top 1s ease-out, background 1s linear;
-  z-index: 100;
 }
 
 a.skip:focus {
 	position:absolute;
 	left:0px;
 	top:0px;
-	background:color(tertiary);
+	background:color(nav-highlight-shade);
 	outline:0;
   transition: top .1s ease-in, background .5s linear;
-}
-
-.back-button {
-    @extend %oswald;
-
-    align-items: center;
-    background-color: transparent;
-    color: color(primary);
-    display: inline-flex;
-    font-size: rem(18);
-    justify-content: flex-end;
-    text-transform: uppercase;
 }
 
 @keyframes fadeOutLeft {
@@ -420,11 +507,6 @@ a.skip:focus {
 
 .fadeOutLeft {
   animation-name: fadeOutLeft;
-}
-
-.animated {
-  animation-duration: 1s;
-  animation-fill-mode: both;
 }
 
 @keyframes fadeOut {
@@ -453,4 +535,30 @@ a.skip:focus {
 
 .fadeIn {
   animation-name: fadeIn;
+}
+
+.hide-completely {
+  display: none;
+}
+
+@media screen and (max-width: myF.bp(afl_medium_just_before)) {
+  .copy_URI_verbose {
+    display: none !important;
+  }
+}
+
+@media screen and (min-width: myF.bp(afl_medium)) {
+  .copy_URI_terse {
+    display: none !important;
+  }
+}
+
+.tightOnTop {
+  margin-top: 0;
+}
+
+.tightOnTopInItalics {
+  margin-top: 0;
+  font-style: italic;
+  text-align: center;
 }

@@ -1,570 +1,372 @@
-﻿@import '../shared/theme/base';
+﻿@use '../shared/theme/myF';
+@use '../shared/theme/myGlobals';
+@use '../shared/theme/helpers';
+@use '../shared/theme/base';
+@use '../shared/theme/button-helpers';
 
-.col-sm-5,
-.col-sm-7 {
-    @media screen and (width: 768px) {
-        width: 100%;
-    }
+%video-narrow-view,
+.video-narrow-view {
+  @media screen and (min-width: myF.bp(required_video_in_column)) {
+    display: none !important;
+  }
 }
 
-.full-width-mobile {
-
-    @media screen and (max-width: bp(medium)) {
-        margin-top: - em(40);
-        padding: 0;
-    }
+%video-desktop-view,
+.video-desktop-view {
+  @media screen and (max-width: myF.bp(required_video_in_column_just_before)) {
+    display: none !important;
+  }
 }
 
-.selected {
-    background-color: rgba(244, 199, 161, 0.3); // NOTE: ScienceMakers brown family chosen over the light blue-gray that was rgba(45,133,211,.3)
-    color: black;
+.video-desktop-view.button-low-key-toggle {
+    margin-bottom: 12px;
 }
 
-.row--top {
-    display: flex;
-    margin-bottom: 30px;
+/* NOTE: see _base.scss, biography set title in historymakers.component.scss, etc. for similar page-title styling,
+   from which the following is derived but made "special" in its narrow view. */
+.page-title-video-page {
+  @include myGlobals.oswald;
 
-    .col-left {
-        display: flex;
-        flex-direction: column;
-    }
+  color: myF.color(black);
+  font-size: 1.4rem;
+  width: 100%;
+  margin-top: 0;
+  margin-bottom: myF.em(4);
+  padding: 0;
 
-    .page-title {
-        flex: 2;
-    }
+   @media screen and (min-width: myF.bp(afl_medium)) {
+      font-size: 1.7rem;
+  }
 
-    .button-bar {
-        margin: 0;
-    }
-}
-
-.search__links-container {
-    margin-bottom: 0;
-}
-
-.search__routerLink {
-    margin-bottom: 0;
-}
-
-.search--desktop {
-    margin-bottom: 0;
-}
-
-.button-bar {
-    align-items: center;
-    display: flex;
-    margin-top: em(16);
-    margin-bottom: 0.5em;
-}
-
-.video-header {
-    @extend %oswald;
-    @extend %mobile-only;
-
-    background-color: color(dark-grey);
+  /* NOTE: unique look just for this video page for narrow view titles */
+  @media screen and (max-width: myF.bp(afl_small_just_before)) {
+    background-color: black;
     color: #fff;
-    font-size: rem(18);
-    letter-spacing: -.5px;
-    line-height: em(22, 18);
+    font-size: 1.2rem;
     margin-bottom: 0;
-    padding: .5rem 1rem;
-    text-transform: uppercase;
+    padding: myF.gutter(thmda-tight) myF.gutter(thmda-tiny) myF.gutter(thmda-tight) myF.gutter(thmda-tiny); /* top right bottom left */
+  }
+
+  &:focus {
+    outline: 0;
+    text-decoration: underline;
+  }
 }
 
-.video-header__category {
-    text-transform: capitalize;
+.videoInfoContainer {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden; /* scrolling taken care of in parent container.... */
+  overflow-y: hidden; /* scrolling taken care of in parent container.... */
 }
 
-.video-title {
-    display: inline-block;
+.titleRow {
+  padding: 0;
+
+  @media screen and (min-width: myF.bp(afl_small)) and (max-width: myF.bp(afl_medium_just_before)) {
+    padding-bottom: myF.gutter(thmda-tight); /* keep buttons separated from content below at wider views */
+  }
+
+  @media screen and (min-width: myF.bp(afl_medium)) {
+    padding-bottom: myF.gutter(thmda-medium); /* keep buttons separated from content below at wider views */
+  }
 }
 
-.video-container {
-    background-color: #1E1810;
-    text-align: center;
-    align-content: center;
-    margin-bottom: 0.2em;
-    padding: 0;
+.title-buttons-area {
+  min-width: 340px; /* gives enough width for 3 buttons to fit with their labels without wrapping */
+
+  @media screen and (max-width: myF.bp(thmda_narrow_just_before)) {
+    min-width: 320px; /* give up cleaner layout to just get stuff into the narrowing view (match min width of videoColumn) */
+  }
+}
+.citationContainer {
+  padding-top: 10px;
 }
 
-.videoBlock {
-    display:block;
-    margin: 0 auto;
-    max-width: 320px; /* TODO: decide if we want greater than 1x display width, or stay at max 1x display width which is 320 pixels */
-    min-height: 180px;
-    height: auto;
-    object-fit: fill;
+.button-bar-piece {
+  padding: 0;
+  margin: 0;
 }
 
-.no-padding {
-    padding: 0;
+.contentRow {
+  padding: 0;
+  margin: 0;
+  height: 100%;
 }
 
-.no-left-padding {
-    padding-left: 0;
+.videoColumn {
+  width: 100%;
+  margin: 12px 0;
+  padding: 0;
+  min-width: 320px; /* need a bit of width to support match lines, controls, etc. */
 }
 
-.no-right-padding {
-    padding-right: 0;
+.transcriptColumnParent {
+  width: 100%;
+
+  /* NOTE: this container for transcript will not be shown for narrow views UNLESS video-narrow-view (see transcriptColumnParent--mobile-active) */
+  @media screen and (max-width: myF.bp(required_video_in_column_just_before)) {
+    display: none;
+  }
+}
+
+.transcriptColumnParent--mobile-active {
+  display: inherit;
+}
+
+.transcriptColumn {
+  min-height: 240px; /* NOTE: Insist on a bit of transcript showing (equivalent to height of video player area for 320x240 cases). */
+  max-height: 400px; /* ...but not too much transcript... */
+  overflow-x: hidden;
+  overflow-y: auto;
+  margin: 0 0 myF.em(8) 0; /* top right bottom left */
+  padding: myF.gutter(thmda-tiny) myF.gutter(thmda-tiny) myF.gutter(thmda-tiny) myF.gutter(thmda-tiny); /* top right bottom left */
+  border: 1px solid myF.color(dark-grey);
+  background-color: myF.color(light-grey);
+  color: black;
+  line-height: 1.125rem;
+  font-size: 1.2rem;
+
+  /* !!!TBD!!! !!!TODO: !!! NOTE: REVISIT later (or replace with ngStyle) to fill all available height in its flex container on wide views;
+     this is a COMPROMISE as for 320x240 videos, a max-height of 400px works fine, but for 320x180 videos, the max-height should be no more than 300px.
+     A compromise of 328px is used here; !!!TBD!!! !!!TODO: later tune based on 240 video height or 180 video height, plus if there are matches or not. */
+  @media screen and (min-width: myF.bp(thmda_wideenough)) {
+      max-height: 328px;
+  }
+}
+.transcriptColumn--mobile-active {
+  /* NOTE: when transcript is shown in narrow view ("mobile-active"), use smaller font, etc., layout */
+  @media screen and (max-width: myF.bp(required_video_in_column_just_before)) {
+    min-height: 120px; /* NOTE: Insist on a bit of transcript showing */
+    max-height: 180px; /* ...but not too much transcript... */
+    line-height: 1rem;
+    font-size: 1.1rem;
+  }
+}
+
+.transcriptArea {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.videoContents {
+  width: 100%;
 }
 
 .about {
-    /* TODO: Later, dress up with gradient backgrounds, e.g.,
-    background-color: transparent;
-    background-image: linear-gradient(to bottom, rgba(30, 87, 153, 0.2) 0%, rgba(125, 185, 232, 0) 100%);
-    background-repeat: repeat;
-    */
-    padding: em(37) 0;
-    margin-bottom: 0.5em;
+  /* TODO: Later, one could dress this up with gradient backgrounds, e.g.,
+  background-color: transparent;
+  background-image: linear-gradient(to bottom, rgba(30, 87, 153, 0.2) 0%, rgba(125, 185, 232, 0) 100%);
+  background-repeat: repeat;
+  ...but wait for the tri-color scheme to be improved first.
+  */
+  padding: myF.gutter(thmda-tight) 0 0 0; /* top right bottom left */
+  margin-bottom: 0.5em;
 
-    &--mobile {
-        @extend %mobile-only;
+  &--narrow-view {
+      @extend %video-narrow-view;
 
-        display: none;
-        padding: em(14) 0;
-    }
+      display: none;
+  }
 
-    &--mobile-active {
-        @media screen and (max-width: bp(medium) + 1) {
-            display: inherit;
-        }
-    }
+  &--mobile-active {
+      @media screen and (max-width: myF.bp(required_video_in_column_just_before)) {
+          display: inherit;
+      }
+  }
 
-    &--desktop {
-        @extend %desktop-only;
-    }
+  &--desktop {
+      @media screen and (max-width: myF.bp(required_video_in_column_just_before)) , screen and (min-width: myF.bp(thmda_wideenough))  {
+        display: none !important;
+      }
+      margin-bottom: 0;
+  }
 
-    p:last-of-type {
-        margin-bottom: 0;
-    }
+  &--wide-desktop {
+      @media screen and (max-width: myF.bp(thmda_wideenough_just_before)) {
+        display: none !important;
+      }
+      margin-bottom: 0;
+  }
+
+  p:last-of-type {
+      font-size: 1.25rem;
+      margin-bottom: myF.em(32);
+  }
 }
 
 .about__section {
-    border-bottom: 1px solid color(grey);
-    margin-bottom: em(10);
-    padding-bottom: em(12);
+  border-bottom: 1px solid myF.color(ok-grey);
+  margin-bottom: myF.gutter(thmda-big);
+  padding-bottom: myF.gutter(thmda-tight);
 
-    @media screen and (min-width: bp(medium)) {
-        margin-bottom: em(16);
-        padding-bottom: em(16);
-    }
+  &:first-of-type {
+      margin-top: myF.gutter(thmda-big);
 
-    &:first-of-type {
-        margin-top: em(22);
+      @media screen and (min-width: myF.bp(afl_small)) {
+          margin-top: 0;
+      }
+  }
 
-        @media screen and (min-width: bp(medium)) {
-            margin-top: 0;
-        }
-    }
+  &:last-of-type {
+      border-bottom: 0;
+      margin-bottom: 0;
+      padding-bottom: 0;
+  }
+}
 
-    &:last-of-type {
-        border-bottom: 0;
-    }
+.favorites-list {
+  list-style: none;
+  padding: 0;
 }
 
 .about__heading {
-    @extend %oswald;
+  @include myGlobals.oswald;
 
-    color: color(dark-grey);
-    font-size: em(16);
-    letter-spacing: -.4px;
-    line-height: em(20,16);
-    text-transform: uppercase;
-
+  color: myF.color(dark-grey);
+  font-size: 1.4rem;
+  letter-spacing: -.4px;
+  line-height: 1.25rem;
 }
 
 .about__copy--favorites {
-    margin: 0;
+  margin: 0;
+}
+
+.about__copy__widescreen {
+  padding-bottom: 0; /* will be in a container that gives a bottom whitespace area */
+}
+
+.limitButtonRowWidth {
+  max-width: 448px;
 }
 
 .about__link,
 .about__link:visited {
-    @extend %source-sans-semi-bold;
-    color: color(primary);
+  @include myGlobals.source-sans-semi-bold;
+  color: myF.color(primary);
 }
 
-.transcriptTextArea {
-    display: inline;
-}
-
-.shadowview {
-    width: 50%;
-    box-shadow: 2px 2px 5px rgba(0,0,0,0.75);
-    margin-top: 2px;
-    margin-bottom: 6px;
-}
-.storyduration {
-    text-align: center;
-    color: #1E1810;
-    font-size: 0.9em;
-    line-height: 0.95em;
-    margin-top: 0.4em;
-}
-.bumpUp {
-    margin-top: 0.0em;
-    margin-bottom: 0.3em;
-    margin-right: 0em;
-    margin-left: 0em;
-}
-
-input {
-    color: #1E1810;
-    font-family: 'Roboto', sans-serif;
-    font-weight: 300;
-    font-size: 1em;
-}
-
-.page-title {
-    @extend %oswald;
-    @extend %desktop-only;
-
-    color: color(dark-grey);
-    font-size: rem(18);
-    letter-spacing: -.5px;
-    text-transform: uppercase;
-
-    @media screen and (min-width: bp(medium)) {
-        font-size: rem(22);
-        letter-spacing: -.42px;
-    }
-
-    @media screen and (min-width: bp(large)) {
-        font-size: rem(26);
-        letter-spacing: -.5px;
-    }
-}
-
-.transcript {
-    display: none;
-    line-height: em(18);
-    font-size: rem(12);
-    margin-bottom: em(20);
-    margin-top: em(20);
-
-    @media screen and (min-width: bp(medium) + 1) {
-        background-color: color(light-grey);
-        border: 1px solid color(grey);
-        display: inherit;
-        line-height: em(22, 16);
-        font-size: rem(16);
-        padding: em(16, 16);
-        margin-bottom: em(20, 16);
-        margin-top: em(0);
-    }
-}
-
-.transcript--mobile-active {
-    display: inherit;
-}
-
-.back-button {
-    @extend %oswald;
-
-    align-items: center;
-    background-color: transparent;
-    color: color(primary);
-    display: inline-flex;
-    font-size: rem(18);
-    text-transform: uppercase;
-
-    &--mobile {
-        @extend %mobile-only;
-
-        margin-bottom: em(12, 18);
-    }
-
-    &--desktop {
-        @extend %desktop-only;
-    }
-}
-
-.back-button__chevron {
-    margin-right: em(5, 18);
-}
-
-.playlist-button {
-    @extend %source-sans-semi-bold;
-    @extend %desktop-only;
-
-    align-items: center;
-    background-color: color(secondary);
-    border-radius: 0;
-    color: #fff;
-    cursor: pointer;
-    display: inline-flex;
-    font-size: em(20, 16);
-    height: em(43, 16);
-    justify-content: center;
-    letter-spacing: .5px;
-    text-transform: uppercase;
-    transition: box-shadow .15s ease-in-out;
-    width: 100%;
-
-    @media screen and (min-width: bp(small)) {
-        font-size: em(16);
-        margin-left: em(10);
-        width: auto;
-    }
-
-    @media screen and (min-width: bp(large)) {
-        order: initial;
-    }
-
-    &:hover {
-        box-shadow: inset 0 0 5px rgba(51,51,51,.6);
-    }
-
-    &:disabled {
-        cursor: not-allowed;
-        opacity: .4;
-    }
-
-    &--mobile {
-        @extend %mobile-only;
-
-        margin-bottom: em(12, 18);
-    }
-
-    &--desktop {
-        @extend %desktop-only;
-    }
-
-    svg {
-        margin-left: em(8);
-        vertical-align: text-top;
-    }
-}
-
-.playlist {
-    @extend %desktop-only;
-
-    background-color: color(secondary);
-    color: #fff;
-    font-size: 1rem;
-    min-height: em(150);
-    padding: em(15);
-    width: 100%;
-}
-
-.playlist__title-row {
-    align-items: center;
-    display: flex;
-}
-
-.playlist__title {
-    @extend %oswald;
-
-    font-size: em(21);
-    letter-spacing: -.5px;
-    text-transform: uppercase;
-
-    @media screen and (min-width: bp(large)) {
-        font-size: em(22);
-    }
-}
-
-.playlist__link {
-    cursor: pointer;
-    margin-left: auto;
-}
-
-.playlist__total {
-    @extend %source-sans-semi-bold-italic;
-
-    color: #fff;
-    font-size: em(16);
-    margin-left: em(5);
-    margin-top: em(5);
-}
-
-.playlist__item {
-    display: flex;
-    margin-bottom: em(10);
-}
-
-.playlist__item-desc {
-    background-color: color(light-grey);
-    color: color(dark-grey);
-    flex: 1;
-    font-size: em(10);
-    padding: em(7,10) em(10,10);
-
-    @media screen and (min-width: bp(large)) {
-        font-size: em(12);
-        padding: em(7,12) em(10,12);
-    }
-}
-
-// Prev and Next Match Section
+/* Prev and Next Match Section */
 .match {
-    background-color: color(primary);
-    display: flex;
-    height: em(30);
-    position: relative;
+    background-color: myF.color(primary);
+    width: 100%;
+    max-width: myF.bp(max_video_width); /* NOTE: do not extend wider than video player */
+    height: 1.875rem;
 }
 
 .match__prev,
 .match__next {
     background-color: transparent;
     color: black;
-    display: flex;
 }
 
 .match__prev-button,
 .match__next-button {
-    @extend %source-sans;
+   @include myGlobals.source-sans;
 
-    align-items: center;
     background-color: transparent;
     color: #fff;
-    display: flex;
 }
 
 .match__prev-button .match__copy {
-    margin-left: 5px;
+    margin-left: 0.325rem; /* 5px where 1rem == 16px */
 }
 
 .match__next-button .match__copy {
-    margin-right: 5px;
+    margin-right: 0.325rem; /* 5px where 1rem == 16px */
 }
 
 .match__tick-line {
-    background-color: color(grey);
-    flex: 1;
-    position: relative;
-    height: 2px;
+    background-color: myF.color(ok-grey);
+    height: 0.125rem;
     margin: auto 0;
+    position: relative; /* needed to position match__tick properly on the line */
 }
 
 .match__tick {
     background-color: #fff;
-    height: em(15);
+    height: 0.875rem;
     margin: 0em 0em 0em 0em;
     padding: 0em 0em 0em 0em;
     position: absolute;
-    top: -7px;
-    width: 2px;
+    top: -0.4375rem; /* -7px where 1rem == 16px */
+    width: 0.125rem; /* 2px where 1rem == 16px */
 }
 
 .story-nav {
-    background-color: color(dark-grey);
-    display: flex;
-    height: em(30);
-    justify-content: space-between;
-
-    @media screen and (min-width: bp(medium) + 1) {
-        background-color: transparent;
-    }
+    background-color: black;
+    height: 1.875rem;
+    width: 100%;
+    max-width: myF.bp(max_video_width); /* NOTE: do not extend wider than video player */
 }
 
-.story-nav__prev,
-.story-nav__next {
-    display: flex;
-}
+.story-nav__prev-button {
+ @include myGlobals.source-sans;
 
-.story-nav__prev-button,
+  background-color: transparent;
+  color: #fff;
+}
 .story-nav__next-button {
-    @extend %source-sans;
+   @include myGlobals.source-sans;
 
-    align-items: center;
     background-color: transparent;
     color: #fff;
-    display: flex;
-
-    @media screen and (min-width: bp(medium) + 1) {
-        color: color(dark-grey);
-    }
 }
 
-.story-nav__prev-button .story-nav__copy {
-    margin-left: 5px;
+.story-nav__prev-button-icon {
+    margin-right: 0.325rem; /* 5px where 1rem == 16px */
 }
 
-.story-nav__next-button .story-nav__copy {
-    margin-right: 5px;
-}
-
-.wideScreen {
-    margin-bottom: 20px;
-    width: 100% !important;
-
-    .about {
-        display: none;
-    }
+.story-nav__next-button-icon {
+    margin-left: 0.325rem; /* 5px where 1rem == 16px */
 }
 
 .tabs {
-    @extend %mobile-only;
+  border-bottom: 1px solid myF.color(ok-grey);
+  font-size: 1.2rem;
+  margin: myF.gutter(thmda-medium) 0 0 0; /* top right bottom left */
 
-    align-items: center;
-    border-bottom: 1px solid color(grey);
-    display: flex;
-    font-size: rem(16);
-    margin: em(14, 16) em(15, 16) 0;
-
-    @media screen and (width: 768px) {
-        float: left;
-        margin: em(14, 16) 0 0;
-        width: 100%;
-    }
+  @media screen and (max-width: myF.bp(thmda_narrow_just_before)) {
+    font-size: 1rem;
+  }
 }
 
 .tabs__tab {
-    @extend %source-sans-bold;
+ @include myGlobals.source-sans-bold;
 
-    background-color: color(light-grey);
-    color: color(grey);
-    padding: em(13, 16) em(10, 16);
-    text-transform: uppercase;
+  background-color: myF.color(light-grey);
+  border-radius: 0;
+  color: myF.color(ok-grey);
+  font-size: 1.2rem;
+  height: myGlobals.$buttonHeight;
 
-    &:hover {
-        cursor: pointer;
-    }
+  &:hover {
+      cursor: pointer;
+  }
 
-    &--active {
-        background-color: color(secondary);
-        color: #fff;
-    }
+  &--active {
+      background-color: myF.color(secondary);
+      color: #fff;
+  }
+
 }
 
-.tabs__add-story {
-    margin-left: auto;
+.spaceForWordyLabel { /* hide on narrow views exactly the inverse of range for needTightLabel */
+  @media screen and (max-width: myF.bp(thmda_wideenough_just_before)) {
+    display: none !important;
+  }
 }
 
-.tabs__playlist-buttons { margin-left: auto; }
-
-.tabs__playlist-buttons {
-    align-items: center;
-    display: flex;
-    height: em(35);
-    justify-content: center;
-    position: relative;
-    width: em(35);
+.needTightLabel { /* hide on wide views exactly the inverse of range for spaceForWordyLabel */
+  @media screen and (min-width: myF.bp(thmda_wideenough)) {
+    display: none !important;
+  }
 }
 
-.tabs__tooltip {
-    font-size: rem(12);
-    position: absolute;
-    right: em(40, 12);
-    background: color(secondary);
-    color: white;
-    text-align: center;
-    padding: em(8, 12);
-    top: 0;
-    border-radius: em(3, 12);
-    white-space: nowrap;
-
-    &::before {
-        border-bottom: 5px solid transparent;
-        border-left: 5px solid color(secondary);
-        border-top: 5px solid transparent;
-        content: " ";
-        height: 0;
-        position: absolute;
-        right: - em(4, 12);
-        top: em(13, 12);
-        width: 0;
-        white-space: nowrap;
-    }
+.slight-gap-above {
+  margin-top: 0.4em;
 }
-

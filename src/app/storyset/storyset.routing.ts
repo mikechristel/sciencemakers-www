@@ -6,4 +6,4 @@ export const storysetRoutes: Routes = [
     { path: 'stories/:type', component: StorySetComponent }
 ];
 
-export const storysetRouting: ModuleWithProviders = RouterModule.forChild(storysetRoutes);
+export const storysetRouting: ModuleWithProviders<any> = RouterModule.forChild(storysetRoutes);

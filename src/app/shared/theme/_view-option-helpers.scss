@@ -1,0 +1,55 @@
+@use 'myF';
+
+/* Typical use: show options to change view to a visual stamp, a text grid, or a SVG map. */
+.view {
+  margin: 0;
+  max-width: 130px;
+  list-style: none;
+  padding: 0;
+}
+
+.view-rg-item:focus {
+  box-shadow: 0 0 0 3px myF.color(tertiary);
+  outline: 3px solid transparent; /* For Windows high contrast mode. */
+}
+
+.view-rg-item {
+  outline: 0;
+  margin: auto;
+  height: 1.875rem;
+  background: transparent;
+  color: myF.color(ok-grey);
+  border-right: 1px solid myF.color(ok-grey);
+
+  &:last-of-type {
+    border-right: 0px;
+  }
+}
+
+.view-rg-item.selected  {
+  color: myF.color(primary);
+  border-bottom: 2px ridge myF.color(primary);
+}
+
+.view-rg-item-contents-grid,
+.view-rg-item-contents-text  {
+
+  padding-left: 4px;
+  padding-top: 4px;
+  padding-bottom: 0;
+  transition: color .2s ease-in-out;
+
+  &:hover {
+      color: myF.color(secondary);
+  }
+}
+
+.view-rg-item-contents-grid {
+  height: 1.875rem;
+  width: 1.875rem;
+}
+
+.view-rg-item-contents-text {
+  height: 1.875rem;
+  width: 1.875rem;
+}

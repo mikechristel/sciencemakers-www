@@ -4,6 +4,5 @@ export class BiographySearchSortField {
         public value: string,
         public sortField: string,
         public sortInDescendingOrder: boolean,
-        public selected: boolean
     ) { }
 }

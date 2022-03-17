@@ -1,33 +1,76 @@
-@import '../shared/theme/base';
+@use '../shared/theme/myF';
+@use '../shared/theme/myGlobals';
+@use '../shared/theme/helpers';
+@use '../shared/theme/base';
 
-.page-title {
-    @extend %oswald;
+.help-heading {
+  color: myF.color(dark-grey);
+  font-size: 1.4rem;
+  margin: 0 0 0.3em;
+  padding: 0;
 
-    font-size: rem(20);
-    font-weight: 500;
-    line-height: em(22, 20);
-    margin-bottom: 15px;
-    margin-top: 0;
-    text-transform: uppercase;
+  @media screen and (min-width: myF.bp(afl_medium)) and (max-width: myF.bp(afl_large_just_before)) {
+    font-size: 1.6rem;
+  }
 
-    @media screen and (min-width: bp(medium)) {
-        font-size: rem(22);
-         margin-bottom: em(16); // was em(58,22);
-    }
+  @media screen and (min-width: myF.bp(afl_large)) {
+    font-size: 1.8rem;
+  }
 
-    @media screen and (min-width: bp(large)) {
-        font-size: rem(26);
-        margin-bottom: em(18); // was em(58,26);
-    }
 }
 
 .helptext {
-    line-height: em(18);
-    font-size: rem(14);
+    font-size: 1rem;
     color: black;
 
-    @media screen and (min-width: bp(medium)) {
-        line-height: em(22, 16);
-        font-size: rem(16);
+    @media screen and (min-width: myF.bp(afl_medium)) and (max-width: myF.bp(afl_large_just_before)) {
+      font-size: 1.2rem;
     }
+    @media screen and (min-width: myF.bp(afl_large)) {
+      font-size: 1.4rem;
+    }
+}
+
+.helptext-before-list { /* same as helptext but reduced margin-bottom */
+  font-size: 1rem;
+  color: black;
+  margin-bottom: myF.gutter(thmda-extremely_tiny);
+
+  @media screen and (min-width: myF.bp(afl_medium)) and (max-width: myF.bp(afl_large_just_before)) {
+    font-size: 1.2rem;
+  }
+  @media screen and (min-width: myF.bp(afl_large)) {
+    font-size: 1.4rem;
+  }
+}
+
+.helptext-no-nargin-top { /* same as helptext but zeroed out margin-top */
+  font-size: 1rem;
+  color: black;
+  margin-top: 0;
+
+  @media screen and (min-width: myF.bp(afl_medium)) and (max-width: myF.bp(afl_large_just_before)) {
+    font-size: 1.2rem;
+  }
+  @media screen and (min-width: myF.bp(afl_large)) {
+    font-size: 1.4rem;
+  }
+}
+
+.helpEmphasis {
+  font-weight: bold;
+}
+
+.help__img {
+  max-width: 100%;
+  height: auto;
+  border: myF.em(2) solid #ccc;
+  border-radius: myF.em(6);
+  padding: myF.gutter(thmda-tight);
+  margin: myF.gutter(thmda-tiny);
+
+  @media screen and (max-width: myF.bp(afl_small_just_before)) {
+    padding: myF.gutter(thmda-tiny);
+    margin: myF.gutter(thmda-extremely_tiny);
+  }
 }

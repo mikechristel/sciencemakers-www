@@ -11,33 +11,23 @@ import {
   HttpHandler,
   HttpEvent
 } from '@angular/common/http';
-import { Observable } from 'rxjs/Observable';
-import { environment } from '../../environments/environment';
+import { Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
+import { AuthManagerService } from './auth-manager.service';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
 
+  constructor(private authManagerService: AuthManagerService) {
+
+  }
+
   /**
-   * Intercepts all HTTPRequests and appends an Authorization header to the
-   * request object.  Checks for authorization errors on the corresponding
-   * response object and if found, redirects to the configured
+    * Handle all 403 (and 401) errors returned by reverse-proxy authentication server
    */
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-
-    if (environment.requireAuthentication) {
-      var token = localStorage.getItem('token');
-
-      if (token) {
-        console.log('Authorization: Bearer ' + token);
-        request = request.clone({
-          setHeaders: { Authorization: `Bearer ${localStorage.getItem('token')}`}
-        });
-      }
-    }
-
-    return next
-      .handle(request)
-      .do(
+    return next.handle(request).pipe(
+      tap(
         (event: HttpEvent<any>) => {
           if (event instanceof HttpResponse) {
             // Do stuff with response here if necessary
@@ -45,21 +35,14 @@ export class AuthInterceptor implements HttpInterceptor {
         },
         (err: any) => {
           if (err instanceof HttpErrorResponse) {
-            if (err.status === 401) {
-              // Redirect to the Login page
-              var url = err.headers.get("DA-Auth-Redirect");
-              url += "?return=" + window.location;
-              console.log(url);
-              window.location.assign(url);
-            }
-            if (err.status === 403) {
-              // Redirect to the Access Denied page
-              var url = err.headers.get("DA-Auth-Redirect");
-              console.log(url);
-              window.location.assign(url);
+            if (err.status === 401 || err.status === 403) {
+              // Formerly, tried a reload page to force reauthentication (window.location.reload()), BUT that could lead to infinite looping!!!
+              // So, instead, do a modal dialogue:
+              this.authManagerService.triggerConfirmReloadForm();
             }
           }
         }
-      );
+      ));
   }
+
 }

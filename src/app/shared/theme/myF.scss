@@ -1,0 +1,44 @@
+@use "sass:math"; /* for the division operator, which is no longer / but instead is math.div */
+@use 'myGlobals';
+
+@function color($key) {
+  @if map-has-key(myGlobals.$colors, $key) {
+    @return map-get(myGlobals.$colors, $key);
+  }
+
+  @warn "Unknown `#{$key}` key in $colors.";
+  @return null;
+}
+
+@function bp($key) {
+  @if map-has-key(myGlobals.$breakpoints, $key) {
+    @return map-get(myGlobals.$breakpoints, $key);
+  }
+
+  @warn "Unknown `#{$key}` key in $breakpoints.";
+  @return null;
+}
+
+@function gutter($key) {
+  @if map-has-key(myGlobals.$gutterSpace, $key) {
+    @return map-get(myGlobals.$gutterSpace, $key);
+  }
+
+  @warn "Unknown `#{$key}` key in $gutterSpace.";
+  @return null;
+}
+
+/* see also redundant definitions in myGlobals.scss */
+$browser-context: 14;
+
+@function em($pixels, $context: $browser-context) {
+  @if (unitless($pixels)) {
+    $pixels: $pixels * 1px;
+  }
+
+  @if (unitless($context)) {
+    $context: $context * 1px;
+  }
+
+  @return math.div($pixels, $context) * 1em;
+}

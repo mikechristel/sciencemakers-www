@@ -1,5 +1,6 @@
 ﻿import { Injectable, Inject, OnInit } from '@angular/core';
-import { Observable } from "rxjs/Observable";
+import { Observable, throwError } from "rxjs";
+import { catchError } from "rxjs/operators";
 import { HttpClient } from '@angular/common/http';
 
 import { DetailedStory } from './detailed-story';
@@ -9,6 +10,7 @@ import { environment } from '../../environments/environment';
 export class StoryDetailService {
     private storyDetailsURL = 'StoryDetails?storyID=';
     private storyDetailsQueryTermsArgument = '&queryTerms=';
+    private readonly WILDCARD_TO_MATCH_ALL = "*";
 
     constructor(private http: HttpClient) { }
 
@@ -19,9 +21,15 @@ export class StoryDetailService {
         // TODO: (!!!TBD!!!): Perhaps add in another argument to optionally limit the length of the timing pairs array returned in this call.
         // (Currently the service decides whether to truncate timing pairs.)
 
-        if (queryTerms != null && queryTerms.length > 0)
+        // NOTE: if query terms are just the wildcard to match everything, as in "*", then do not return matches to every single word:  too confusing to users.
+        if (queryTerms != null && queryTerms.length > 0 && queryTerms.trim() != this.WILDCARD_TO_MATCH_ALL)
             serviceURL += this.storyDetailsQueryTermsArgument + queryTerms;
 
-        return this.http.get<DetailedStory>(serviceURL);
+        return this.http.get<DetailedStory>(serviceURL).pipe(
+          catchError( err => {
+            // TODO: (!!!TBD!!!) Decide if we wish to log errors in any way or use console, e.g., console.log('error caught: ', err);
+            return throwError( err ); }
+          )
+        );
     }
 }
