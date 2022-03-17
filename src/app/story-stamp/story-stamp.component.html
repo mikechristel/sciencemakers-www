@@ -12,7 +12,7 @@ gate which is used by the overrideToH4Nesting flag. -->
     <div *ngIf="cardView" fxFlexFill class="card__info-overlay">
         <h3 *ngIf="!overrideToH4Nesting" class="card__story-title">{{truncatedAsNeeded(story.title)}}</h3>
         <h4 *ngIf="overrideToH4Nesting" class="card__story-title">{{truncatedAsNeeded(story.title)}}</h4>
-        <p class="card__story-duration" [attr.aria-label]="'length ' + convertToMMSS(story.duration)">
+        <p class="card__story-duration">
             {{convertToMMSS(story.duration)}}
         </p>
     </div>
