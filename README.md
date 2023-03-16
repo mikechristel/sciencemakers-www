@@ -14,13 +14,13 @@ The application build is handled by [Angular CLI](https://cli.angular.io/), refe
 
 **IMPORTANT: As of December 2020 the development environment requires a locally hosted API**
  
-All hosted versions of the Digital Archive API require authentication and are inaccessible to a locally hosted client, therefore the default development configuration requires the API to be locally hosted at https://localhost:44303/api. This is the default debug/development configuration for the .NET API.
+All hosted versions of the Digital Archive API require authentication and are inaccessible to a locally hosted client, therefore the default development configuration requires the API to be locally hosted at https://localhost:5001/api. This is the default debug/development configuration for the .NET API.
 
 There are two primary configuration environments as follows:
 
 | Environment | Build Command                         | Build Target       | Client URL                               | Configured serviceBase      | Configured mediaBase                                     |
 |:------------|:--------------------------------------|:-------------------|:-----------------------------------------|:----------------------------|:---------------------------------------------------------|
-| (default)   | `ng serve`                            | (development)      | http://localhost:4200/                   | https://localhost:44303/api | https://daproductionstorage.blob.core.windows.net/media/ |
+| (default)   | `ng serve`                            | (development)      | http://localhost:4200/                   | https://localhost:5001/api | https://daproductionstorage.blob.core.windows.net/media/ |
 | production  | `ng build --configuration=production` | sm-production-www  | https://sm.thehistorymakers.org          | api/                        | https://daproductionstorage.blob.core.windows.net/media/ |
 
 ### Deploying to Azure

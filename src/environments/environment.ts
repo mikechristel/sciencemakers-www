@@ -4,8 +4,8 @@
 // The list of which environment maps to which file can be found in `angular.json`.
 export const environment = {
   production: false,
-  // client configuruationn
-  serviceBase: "https://localhost:44303/api/",  // Locally hosted API
+  // client configuration
+  serviceBase: "https://localhost:5001/api/",  // Locally hosted API
   mediaBase: "https://daproductionstorage.blob.core.windows.net/media/",
   firstInterviewYear: 1993
 };

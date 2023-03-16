@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "digital-archive-www": {
+    "sciencemakers-www": {
       "root": "",
       "sourceRoot": "src",
       "projectType": "application",
@@ -125,24 +125,24 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "digital-archive-www:build"
+            "browserTarget": "sciencemakers-www:build"
           },
           "configurations": {
             "processing": {
-              "browserTarget": "digital-archive-www:build:processing"
+              "browserTarget": "sciencemakers-www:build:processing"
             },
             "production": {
-              "browserTarget": "digital-archive-www:build:production"
+              "browserTarget": "sciencemakers-www:build:production"
             },
             "staging": {
-              "browserTarget": "digital-archive-www:build:staging"
+              "browserTarget": "sciencemakers-www:build:staging"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "digital-archive-www:build"
+            "browserTarget": "sciencemakers-www:build"
           }
         },
         "test": {
@@ -163,7 +163,7 @@
         }
       }
     },
-    "digital-archive-www-e2e": {
+    "sciencemakers-www-e2e": {
       "root": "e2e",
       "sourceRoot": "e2e",
       "projectType": "application",
@@ -171,7 +171,7 @@
       }
     }
   },
-  "defaultProject": "digital-archive-www",
+  "defaultProject": "sciencemakers-www",
   "schematics": {
     "@schematics/angular:component": {
       "prefix": "app",

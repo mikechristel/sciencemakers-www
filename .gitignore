@@ -49,3 +49,4 @@ launch.json
 # Configuration files for development and production
 src/assets/config.*.json
 debug.log
+package-lock.json
