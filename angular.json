@@ -171,7 +171,6 @@
       }
     }
   },
-  "defaultProject": "sciencemakers-www",
   "schematics": {
     "@schematics/angular:component": {
       "prefix": "app",
