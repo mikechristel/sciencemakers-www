@@ -4,13 +4,17 @@
   <a routerLink="/settings" routerLinkActive="active">user settings page</a>.
 </p>
 <p class="helptext">
-    Auto-play immediately starts a loaded video to play. (This will not work on some mobile browsers, by design of those browsers' video players.)
+    Auto-play immediately starts a loaded video to play. (This may not work on some mobile browsers, by design of those browsers' video players.)
 </p>
 <p class="helptext">
     Auto-advance immediately loads the next video in a story sequence from a speaker.  This can be annoying if you are paying attention to the details of a particular story, because the next story will automatically load.
     You can use the browser back button to back up as needed (or turn off the auto-advance option).  If both auto-advance and auto-play are on, you can have a browser page in the background continue to play video, which can be annoying and is why some browsers have turned off auto-play.
 </p>
 <p class="helptext">These settings may not work on all browsers or platforms.  In particular, auto-play will not work on some mobile browsers.</p>
+<p class="helptext">Because auto-advance has been found to be useful, a change was made in the video player to better support it.
+  Rather than allow a user to fast forward or scroll to 100%, i.e., the end, of a story, which would auto-advance somewhat surprisingly to the next story,
+  instead both the fast forward button and video scroll area will only let the user seek to 99% of the story.  The last 1% can be played, which then will either
+  stop at the true end of the video, or auto-advance to the next.  Having this boundary at 99% helps make auto-advance work better, which is the choice of most patrons of this archive.</p>
 <p class="helptext">Try out these options when viewing people's stories and see what works best for you.  One common approach on desktops has been to
   leave both unchecked when doing a lot of querying and research.
   When you settle in on a specific person and want to chain through their stories for tens of minutes or longer, you can then navigate to the

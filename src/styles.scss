@@ -6,8 +6,6 @@
 */
 @use "../node_modules/@angular/cdk/overlay-prebuilt.css";
 @use "../node_modules/@angular/cdk/a11y-prebuilt.css";
-@import 'my-thmda-material-theme.css'; /* instead of:
-@import '@angular/material/prebuilt-themes/purple-green.css'; so that special Angular Material styling can be done (for use in video player, for example) */
 
 body {
   height:100vh;

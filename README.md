@@ -1,5 +1,5 @@
 # sciencemakers-www
-The ScienceMakers Digital Video Archive website is a web-based single page application (SPA) built with [Angular](https://angular.io/), [TypeScript](https://www.typescriptlang.org/), and Angular Flex Layout for responsive layout.
+The ScienceMakers Digital Video Archive is a web-based single page application (SPA) built with [Angular](https://angular.io/), [TypeScript](https://www.typescriptlang.org/), and Angular Flex Layout for responsive layout.
 
 ## Installation
 Run `npm install` in the root of the project directory to install the necessary build tools and depedencies.
@@ -33,20 +33,23 @@ This .NET API should be locked down to "ScienceMakers only" for this ScienceMake
 
 ## Browsers
 
+### Recommended
+We primarily develop using Chrome and as a result, it is the browser that is best supported.  We recommend using Chrome for the best user experience.
+
 ### Tested
 We actively test the latest versions of the Chrome and Safari browsers, with lesser testing of Edge and Firefox.  
 
-### Recommended
-We primarily develop using Chrome. As a result, we feel it is the browser we best support and is our recommendation for the best user experience.
-
 ## Known Issues
-* IE support has been retired in 2020.
+* IE support was retired in 2020.
 
 ## Resources 
 Font sizing has been implemented using rems and ems. For more information see: https://css-tricks.com/rems-ems/.
 
 ## Dependencies
-* [Angular](https://angular.io/) - Web application framework (version 9, from 2020)
+* [Angular](https://angular.io/) - Web application framework (version 15, from late 2022) (Angular Material is no longer needed)
+* [Angular Flex Layout](https://github.com/angular/flex-layout) - Used throughout to provide for responsive layout of elements
 * [Angular CLI](https://cli.angular.io/) - A command line interface for Angular
+* [angular-hmr](https://github.com/gdi2290/angular-hmr) - Angular Hot Module Replacement. Used by default when when running `ng serve`.
+
 
 
