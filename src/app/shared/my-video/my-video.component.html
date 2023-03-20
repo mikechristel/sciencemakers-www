@@ -3,7 +3,7 @@
 <!-- !!!TBD!!! NOTE: it is difficult to construct a control line that will resize in rem units while remaining on one line.
   Yet, it is both aesthetically desirable and offers expected video control behavior to keep the controls aligned closely
   to the video area itself, i.e., one line of controls, not multiple.  So, for the moment, sizing is done here with pixels
-  rather than rem units for the video control line, so one line of controls is kept for widths of 400px, i.e.,
+  rather than rem units for the video control line, so one line of controls is kept for widths of video_controls_one_line pixels, i.e.,
   myF.bp(video_controls_one_line), or greater.  -->
 <div #thmplayer class="videoplayer" [ngClass]="getOverlayClass('show-mouse', 'hide-mouse')">
   <video
@@ -24,16 +24,24 @@
 
   <!--   For typical views, controls will fit all on 1 line -->
   <div class="controls wider-video-controls-only" *ngIf="videoLoaded">
-    <div fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="calc(4px)" class="menu">
+    <div fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="calc(2px)" class="menu">
       <div fxFlex="1 1 calc(30px)" class="left">
+        <!-- NOTE: formerly tried to have a (EndOfMediaIssued)="actOnEndOfMedia()" on both uses of my-video-play-button, but see .ts file for why that was removed. -->
         <my-video-play-button (playChanged)="playing = $event" [video]="video" [keyboard]="keyboard"> </my-video-play-button>
       </div>
       <div fxFlex="1 1 calc(92px)">
           <p class="playtime">{{ video?.currentTime | secondsToTime }} / {{ video?.duration | secondsToTime }}</p>
       </div>
       <div fxFlex="grow">
-        <mat-slider aria-label="video progress bar" min="0" max="100" width="100%"
-          step="1" [value]="curTimePercent" (input)="notePercentIsInFlux()" (change)="newPositionAsPercent($event.value)" class="videoSlider"></mat-slider>
+          <!-- NOTE: only going to 99%, not 100%, to better support auto-chaining of video plays: if we went to 100%, that could auto-chain next
+          video unexpectedly, but by only going to 99%, we will require that last 1% to play out for the auto-chaining to trigger for a better
+          less surprising user experience -->
+          <input type="range" min="0" max="99" step="1" aria-label="video progress bar" min="0" max="99"
+            class="videoSlider" [value]="curTimePercent" (input)="notePercentIsInFlux()" (change)="newPositionAsPercent($event.target.value)"/>
+          <!-- NOTE: mat-slider is NOT staying within the size of its div container - with or without a width attribute.
+             As a result, we retired the use of mat-slider (or any Angular Material!) at all, starting with version 15, March 2023+.
+            <mat-slider aria-label="video progress bar" min="0" max="100" width="100%"
+            step="1" [value]="curTimePercent" (input)="notePercentIsInFlux()" (change)="newPositionAsPercent($event.value)" class="videoSlider"></mat-slider> -->
       </div>
       <div fxFlex="1 1 calc(32px)" class="right">
         <my-video-rewind-button (RewindIssued)="actOnRewind()"></my-video-rewind-button>
@@ -48,21 +56,29 @@
   </div>
   <!--   For very narrow views, controls will need to be on 2 lines -->
   <div class="controls-when-narrow narrow-video-controls-only" *ngIf="videoLoaded">
-    <div fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="calc(4px)" class="menu">
+    <div fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="calc(2px)" class="menu">
       <div fxFlex="1 1 calc(30px)" class="left">
+        <!-- NOTE: formerly tried to have a (EndOfMediaIssued)="actOnEndOfMedia()" on both uses of my-video-play-button, but see .ts file for why that was removed. -->
         <my-video-play-button (playChanged)="playing = $event" [video]="video" [keyboard]="keyboard"> </my-video-play-button>
       </div>
       <div fxFlex="1 1 calc(92px)">
           <p class="playtime">{{ video?.currentTime | secondsToTime }} / {{ video?.duration | secondsToTime }}</p>
       </div>
       <div fxFlex="grow">
-        <mat-slider aria-label="video progress bar" min="0" max="100" width="100%"
-          step="1" [value]="curTimePercent" (input)="notePercentIsInFlux()" (change)="newPositionAsPercent($event.value)" class="videoSlider"></mat-slider>
+          <!-- NOTE: only going to 99%, not 100%, to better support auto-chaining of video plays: if we went to 100%, that could auto-chain next
+          video unexpectedly, but by only going to 99%, we will require that last 1% to play out for the auto-chaining to trigger for a better
+          less surprising user experience -->
+          <input type="range" min="0" max="99" step="1" aria-label="video progress bar" min="0" max="99"
+            class="videoSlider" [value]="curTimePercent" (input)="notePercentIsInFlux()" (change)="newPositionAsPercent($event.target.value)"/>
+          <!-- NOTE: mat-slider is NOT staying within the size of its div container - with or without a width attribute.
+             As a result, we retired the use of mat-slider (or any Angular Material!) at all, starting with version 15, Feb. 2023+.
+            <mat-slider aria-label="video progress bar" min="0" max="100" width="100%"
+            step="1" [value]="curTimePercent" (input)="notePercentIsInFlux()" (change)="newPositionAsPercent($event.value)" class="videoSlider"></mat-slider> -->
       </div>
     </div>
   </div>
   <div class="controls-when-narrow narrow-video-controls-only" *ngIf="videoLoaded">
-    <div fxLayout="row" fxLayoutAlign="space-between right" fxLayoutGap="calc(4px)" class="menu">
+    <div fxLayout="row" fxLayoutAlign="space-between right" fxLayoutGap="calc(2px)" class="menu">
       <div fxFlex="1 1 calc(32px)" class="right">
         <my-video-rewind-button (RewindIssued)="actOnRewind()"></my-video-rewind-button>
       </div>

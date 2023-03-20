@@ -17,3 +17,9 @@
     /* NOTE: accessibility experts asked for this to be removed... outline: 3px solid transparent; -- For Windows high contrast mode */
   }
 }
+
+.myVideoPlayButton { /* differs from myVideoButton in that it will get pause/play icon symbol, so color is NOT used to signal blur/focus, just the symbol */
+  background-color: transparent;
+  border: 0;
+  color: #fff;
+}

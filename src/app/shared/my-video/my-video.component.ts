@@ -12,7 +12,6 @@
 // As a result, MediaStream is removed as a Interface option on the Input src variable, and argument Interface option for setVideoSrc function.  MediaSource remains viable.
 
 import {AfterViewInit, Component, ElementRef, EventEmitter, Input, OnChanges, OnDestroy, Output, Renderer2, SimpleChanges, ViewChild, OnInit} from "@angular/core";
-import { ThemePalette } from "@angular/material/core";
 
 import { EventHandler } from "./interfaces/event-handler.interface";
 import { EventService } from "./services/event.service";
@@ -33,18 +32,19 @@ export class MyVideoComponent implements OnInit, AfterViewInit, OnChanges, OnDes
 
   // communicates transcript time and end of video to parent component
   @Output() timeChange: EventEmitter<number> = new EventEmitter();
-  @Output() ended: EventEmitter<any> = new EventEmitter();
+  @Output() mediaEndIssued: EventEmitter<any> = new EventEmitter();
 
   @Input() src: string | MediaSource | Blob = null;
   @Input() urlToCCIndicator: string = null;
   @Input() poster: string = null;
 
-  @Input() color: ThemePalette = "primary"; // other options: accent, ....
   @Input() keyboard = true;
   @Input() muted = false;
   @Output() mutedChange = new EventEmitter<boolean>();
 
   private readonly OFFSET_FOR_FFWD_AND_REWIND:number = 5; // move in increments of 5% for rewind and fast-forward
+  private readonly MAX_PERCENT_FOR_VIDEO_TIME_USER_SETTING:number = 99; // do not allow user-positioning into beyond 99% of the media
+  // (so that auto-chaining of stories not accidentally/confusingly triggered by the user)
 
   @Input()
   get time() {
@@ -57,18 +57,22 @@ export class MyVideoComponent implements OnInit, AfterViewInit, OnChanges, OnDes
 
       const MEANINGFUL_TIME_DELTA = 0.0001; // ignore any jitters at values at or under this threshold
       const video: HTMLVideoElement = this.getVideoTag();
+      var endOfMediaReached: boolean = false;
+      var actualCurTimePercent: number;
+
       if (video) {
           const videoLength = video.duration;
-          if (val > videoLength) {
+          if (val >= videoLength - MEANINGFUL_TIME_DELTA) {
               val = videoLength;
+              endOfMediaReached = true;
           }
           if (val < 0) {
               val = 0;
           }
-          if (Math.abs(val - video.currentTime) > MEANINGFUL_TIME_DELTA) {
+          if (endOfMediaReached || Math.abs(val - video.currentTime) > MEANINGFUL_TIME_DELTA) {
               video.currentTime = val;
           }
-          if (Math.abs(this.lastTime - video.currentTime) > MEANINGFUL_TIME_DELTA) {
+          if (endOfMediaReached || Math.abs(this.lastTime - video.currentTime) > MEANINGFUL_TIME_DELTA) {
               setTimeout(() => this.timeChange.emit(video.currentTime), 0);
               this.lastTime = video.currentTime;
           }
@@ -76,8 +80,18 @@ export class MyVideoComponent implements OnInit, AfterViewInit, OnChanges, OnDes
               // since curTimePercent not updated in evTimeUpdate, always do so here UNLESS user is manipulating the slider,
               // signaled with isPercentInFlux; note that curTimePercent is rounded to the nearest integer for better accessibility
               // as this value is read for screen reader users.
-              this.curTimePercent = Math.round((val * 100) / videoLength);
+              if (endOfMediaReached)
+                  actualCurTimePercent = 100;
+              else
+                  actualCurTimePercent = Math.round((val * 100) / videoLength);
+              // NOTE: keep this.curTimePercent in range [0, 99] which is [0, this.MAX_PERCENT_FOR_VIDEO_TIME_USER_SETTING]
+              if (actualCurTimePercent <= this.MAX_PERCENT_FOR_VIDEO_TIME_USER_SETTING)
+                  this.curTimePercent = actualCurTimePercent;
+              else
+                  this.curTimePercent = this.MAX_PERCENT_FOR_VIDEO_TIME_USER_SETTING;
           }
+          if (endOfMediaReached)
+              this.actOnEndOfMedia();
       }
   }
 
@@ -145,12 +159,6 @@ export class MyVideoComponent implements OnInit, AfterViewInit, OnChanges, OnDes
         element: this.video.nativeElement,
         name: "timeupdate",
         callback: event => this.evTimeUpdate(event),
-        dispose: null
-      },
-      {
-        element: this.video.nativeElement,
-        name: "ended",
-        callback: event => this.ended.emit(),
         dispose: null
       },
       {
@@ -252,11 +260,26 @@ export class MyVideoComponent implements OnInit, AfterViewInit, OnChanges, OnDes
   }
 
   newPositionAsPercent(percentOffset: number) {
+      var newTime: number;
       this.isPercentInFlux = false; // signal that this.curTimePercent can again be updated when this.time is updated
-      if (percentOffset >= 0 && percentOffset <= 100 && percentOffset != this.curTimePercent) {
+      if (percentOffset >= 0 && percentOffset <= this.MAX_PERCENT_FOR_VIDEO_TIME_USER_SETTING && percentOffset != this.curTimePercent) {
           const video: HTMLVideoElement = this.getVideoTag();
           if (video)
-            this.time = video.duration * (percentOffset / 100);
+          {
+              newTime = video.duration * (percentOffset / 100);
+              if (percentOffset == this.MAX_PERCENT_FOR_VIDEO_TIME_USER_SETTING)
+              { // Protect against weird case when MAX_PERCENT_FOR_VIDEO_TIME_USER_SETTING < 100, say it's 99 so we only go to 99% --
+                // a playing video will cause this.curTimePercent to be 98, 99, then max out at 99 even though the time is past that.
+                // Rather than get into a potential cycle of the video position being after 99% and be pushed back to 99% with a potential
+                // jitter of playing 99%, after that -- seek back to 99% because of the position lock to 99%, etc., do not allow this call,
+                // newPositionAsPercent, to allow a roll-back of video from the range [99%, 100%] back to 99%.
+                // Always allow an advancement up to 99%.
+                  if (this.time < newTime)
+                      this.time = newTime;
+              }
+              else // proceed with updated time adjustment
+                  this.time = newTime;
+          }
       }
   }
 
@@ -280,13 +303,17 @@ export class MyVideoComponent implements OnInit, AfterViewInit, OnChanges, OnDes
 
   actOnFastForward() {
     var newPercentOffset = this.curTimePercent + this.OFFSET_FOR_FFWD_AND_REWIND;
-    if (newPercentOffset > 100)
-        newPercentOffset = 100;
+    if (newPercentOffset > this.MAX_PERCENT_FOR_VIDEO_TIME_USER_SETTING)
+        newPercentOffset = this.MAX_PERCENT_FOR_VIDEO_TIME_USER_SETTING;
     if (newPercentOffset > this.curTimePercent) {
         // Move ahead.
         this.isPercentInFlux = true;
         this.newPositionAsPercent(newPercentOffset);
     }
+  }
+
+  actOnEndOfMedia() {
+      setTimeout(() => this.mediaEndIssued.emit(), 0);
   }
 
   updateCCDisplayState(newState: boolean) {

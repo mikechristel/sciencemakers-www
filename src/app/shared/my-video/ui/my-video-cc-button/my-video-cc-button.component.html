@@ -1,5 +1,5 @@
 <button class="myVideoButton" (click)="toggleCCDisplay()">
-  <!-- NOTE: this is the filled and outlined CC icon from Angular Material icon, e.g., https://material.io/resources/icons/?icon=closed_caption&style=baseline -->
+  <!-- NOTE: this is the filled and outlined CC icon, e.g., https://material.io/resources/icons/?icon=closed_caption&style=baseline -->
   <span *ngIf="CCshown" class="sr-only">Hide closed captions</span>
   <!-- NOTE: accessibility experts noted svg can be aria-hidden since span gives the label for this control -->
   <svg *ngIf="CCshown" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24">

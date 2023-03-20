@@ -72,8 +72,8 @@
                         <my-video #myVideoPlayer
                                     src="{{myMediaBase}}story/video/{{myStory.storyID}}"
                                     [urlToCCIndicator]="calcVTTName(myStory.storyID)"
-                                    (timeChange)="adjustVideoCurrentTime($event)"
-                                    (ended)="autoAdvanceToNext()"
+                                    (timeChange)="adjustVideoCurrentTime()"
+                                    (mediaEndIssued)="autoAdvanceToNext()"
                                     poster="{{myMediaBase}}story/image/{{myStory.storyID}}">
                         </my-video>
                     </div>

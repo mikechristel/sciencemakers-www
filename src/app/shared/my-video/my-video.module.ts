@@ -1,9 +1,6 @@
 // CREDIT:  Strongly inspired by mat-video video player for Angular 9, https://github.com/nkoehler/mat-video
 import { CommonModule } from "@angular/common";
 import { NgModule } from "@angular/core";
-import { MatButtonModule } from "@angular/material/button";
-import { MatIconModule } from "@angular/material/icon";
-import { MatSliderModule } from "@angular/material/slider";
 
 import { MyVideoPlayButtonComponent } from "./ui/my-video-play-button/my-video-play-button.component";
 import { MyVideoClosedCaptionButtonComponent } from "./ui/my-video-cc-button/my-video-cc-button.component";
@@ -28,10 +25,7 @@ import { FlexLayoutModule } from '@angular/flex-layout'; // for flex layout
   ],
   imports: [
     CommonModule,
-    FlexLayoutModule,
-    MatIconModule,
-    MatButtonModule,
-    MatSliderModule
+    FlexLayoutModule
   ],
   exports: [MyVideoComponent],
   providers: [EventService]

@@ -16,6 +16,10 @@ export class MyVideoPlayButtonComponent implements AfterViewInit, OnDestroy {
   @Input() play = false;
 
   @Output() playChanged = new EventEmitter<boolean>();
+  // Feb. 2023 note: End of media is no longer event driven, given instability seen with early 2023 browser updates.
+  // Rather, it will be noted based on video time approaching/passing the duration.  Code commented out rather than
+  // deleted to note where we were on this issue (of chaining video stories when end was reached on prior to then load up the next).
+  // @Output() EndOfMediaIssued = new EventEmitter<boolean>();
 
   @Input() keyboard = true;
 
@@ -27,8 +31,8 @@ export class MyVideoPlayButtonComponent implements AfterViewInit, OnDestroy {
     this.events = [
       { element: this.video, name: "play", callback: event => this.setVideoPlayback(true), dispose: null },
       { element: this.video, name: "pause", callback: event => this.setVideoPlayback(false), dispose: null },
-      { element: this.video, name: "durationchange", callback: event => this.setVideoPlayback(false), dispose: null },
-      { element: this.video, name: "ended", callback: event => this.setVideoPlayback(false), dispose: null },
+      // no longer used: { element: this.video, name: "durationchange", callback: event => this.setVideoPlayback(false), dispose: null },
+      // no longer used: { element: this.video, name: "ended", callback: event => this.setVideoPlayback(false), dispose: null },
       { element: this.video, name: "click", callback: event => this.toggleVideoPlayback(), dispose: null }
     ];
 
@@ -38,6 +42,17 @@ export class MyVideoPlayButtonComponent implements AfterViewInit, OnDestroy {
   ngOnDestroy(): void {
     this.evt.removeEvents(this.events);
   }
+
+  /* No longer used: noteDurationChange() {
+      // Unclear why durationchange would fire, and having it is causing unusual behavior.  This was its action:
+      this.setVideoPlayback(false);
+  }
+
+  No longer used: noteEndOfMediaReached() {
+    this.play = false;
+    this.playChanged.emit(false); // play state is false upon reaching the end of the media; note this for listeners (e.g., state of play/pause button)
+    this.EndOfMediaIssued.emit(); // listeners may take special action on end of media
+  } */
 
   setVideoPlayback(value: boolean) {
     if (this.play !== value) {

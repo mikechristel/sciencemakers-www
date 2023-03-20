@@ -408,9 +408,7 @@ export class StoryComponent extends BaseComponent implements OnInit {
     autoAdvanceToNext() {
         // If the user setting to "autoadvance" is true, and there is a next story, automatically advance to it
         if (this.defaultAutoAdvance) {
-            if (this.myStory.nextStory != null && this.myStory.nextStory > 0) {
-                this.gotoNewStory(this.myStory.nextStory);
-            }
+            this.gotoNextStory();
         }
     }
 
@@ -422,7 +420,9 @@ export class StoryComponent extends BaseComponent implements OnInit {
 
     gotoNextStory() {
         if (this.myStory != null) {
-            this.gotoNewStory(this.myStory.nextStory);
+            if (this.myStory.nextStory != null && this.myStory.nextStory > 0) {
+                this.gotoNewStory(this.myStory.nextStory);
+            }
         }
     }
 
@@ -498,7 +498,7 @@ export class StoryComponent extends BaseComponent implements OnInit {
         }
     }
 
-    adjustVideoCurrentTime(eventArgs) {
+    adjustVideoCurrentTime() {
         var movieTimeInSecs: number = this.videoPlayerRef.time;
         this.videoPositionInSeconds = movieTimeInSecs;
     }
@@ -539,6 +539,7 @@ export class StoryComponent extends BaseComponent implements OnInit {
             while (this.myStory.timingPairs[i].offset <= this.myStory.matchTerms[matchIndex].startOffset &&
                 i <= maxTimingPairIndex)
                 i++;
+
             // Redundancy check: if this match overlaps with prior one - extend prior one.
             // If it is completely in prior one, do nothing.
             // Of course, if there is no prior one - we keep this match, as we do if it does not overlap with prior one.
