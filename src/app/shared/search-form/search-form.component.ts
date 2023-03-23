@@ -317,7 +317,7 @@ export class SearchFormComponent extends BaseComponent implements OnInit {
             // Non-empty query, so proceed with a "do search" action dependent on this.searchOptions.
             var moreOptions = [];
 
-            moreOptions['q'] = this.globalState.cleanedQueryRouterParameter(this.txtQuery);
+            moreOptions['q'] = this.globalState.cleanedQueryRouterParameter(this.globalState.removeEncodedSequences(this.txtQuery));
 
             // IMPORTANT:  use tracking for this search query (so set a 'ut' parameter in the route to flag it for tracking/logging)
             moreOptions['ut'] = "1";

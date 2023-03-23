@@ -434,7 +434,7 @@ export class StorySetComponent extends BaseComponent implements OnInit {
 
                 // NOTE:  q is expected; logic appears below to back out of text search if newCurrentQuery == ""
                 if (params['q'] !== undefined)
-                    newCurrentQuery = params['q'];
+                    newCurrentQuery = this.globalState.restorePlusAsNeeded(params['q']);
                 else
                     newCurrentQuery = "";
             }

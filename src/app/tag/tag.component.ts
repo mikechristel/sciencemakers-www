@@ -214,6 +214,8 @@ export class TagComponent extends BaseComponent implements OnInit, OnDestroy {
             // Only pursue showing story set for given tag query if a query is specified.
 
             var moreParams = [];
+            // NOTE: no need for this.globalState.restorePlusAsNeeded() here with
+            // this.tagChosenSetService.tagSpec as tags are "clean" and not typed by the user.
             moreParams['q'] = this.tagChosenSetService.tagSpec;
             // IMPORTANT:  use tracking for this search query (so set a 'ut' parameter in the route to flag it for tracking/logging)
             moreParams['ut'] = 1;

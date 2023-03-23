@@ -41,6 +41,7 @@ export class StoryComponent extends BaseComponent implements OnInit {
     readonly POSTER_NAME_DEFAULT: string = "./assets/320x180black.png";
 
     myStory: DetailedStory;
+    storyDetailLoadingFailed: boolean; // true only if a load was tried and failed, so false on no-load, false on successful-load
     backgroundPoster: string = this.POSTER_NAME_DEFAULT; // assume 16:9 unless overridden by content claiming 4:3 aspect ratio
     storyDetailsTitle: string;
     storyDetailsShortenedTitle: string;
@@ -139,6 +140,7 @@ export class StoryComponent extends BaseComponent implements OnInit {
             // Just in case, clear current interface while next one is loading,
             // e.g., this corrects the bug of clicking a My Clips item to load a new video:
             this.myStory = null;
+            this.storyDetailLoadingFailed = false;  // no load tried yet, so no load failed
             this.backgroundPoster = this.POSTER_NAME_DEFAULT;
 
             this.storyIsStarred = false;
@@ -153,12 +155,13 @@ export class StoryComponent extends BaseComponent implements OnInit {
             this.biographyDetailsReady = false;
 
             if (params['q'] !== undefined)
-                this.transcriptQuery = params['q'];
+                this.transcriptQuery = this.globalState.restorePlusAsNeeded(params['q']);
 
             var myStoryID: number = +params['ID']; // + prefix converts string into a number
             this.storyDetailService.getStorySpecifics(myStoryID, this.transcriptQuery).pipe(takeUntil(this.ngUnsubscribe))
                 .subscribe(
                   storyDetails => {
+                    this.storyDetailLoadingFailed = false;
                     this.storyDetailsTitle = storyDetails.title;
                     this.storyDetailsShortenedTitle = this.truncateAsNeeded(storyDetails.title);
 
@@ -218,6 +221,7 @@ export class StoryComponent extends BaseComponent implements OnInit {
                     // TODO: decide how specific to make error recovery.
                     // Right now this "network timeout" message could be a lie, so soften the message to "may have."
                     this.myStory = null;
+                    this.storyDetailLoadingFailed = true; // used so there can be some UI to this as well in story.component.html
                     this.interviewDateSuffix = null;
                     this.storyDetailsTitle = "Loading story details may have experienced a network timeout -- try again in a few minutes.";
                     this.storyDetailsShortenedTitle = this.storyDetailsTitle; // NOTE: with myStory == null there will be more display space for this long "shortened" title

@@ -344,7 +344,7 @@ export class HistoryMakersComponent extends BaseComponent implements OnInit, Aft
             else {
                 newBornThisTimeFilterFlag = false;
                 if (params['q'] !== undefined) {
-                    newCurrentQuery = params['q'];
+                    newCurrentQuery = this.globalState.restorePlusAsNeeded(params['q']);
                     if (newCurrentQuery.trim().length == 0)
                         newCurrentQuery = null; // up front throw out an all-whitespace query as a non-query signified by null
                 }

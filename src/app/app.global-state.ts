@@ -3,6 +3,7 @@ import { SearchResult } from './storyset/search-result';
 
 @Injectable()
 export class GlobalState {
+    private PLUS_CHAR_MARKER: string = "\"_\""; // this string "_" will replace + in queries; only used here in 2 helper routines
 
     NOTHING_CHOSEN: number = -1; // indicates a null choice, an empty choice, as "real" IDs will have values >= 0
     NO_ACCESSION_CHOSEN: string = ""; // indicates a null choice, an empty choice, as "real" accession IDs will be non-empty
@@ -257,7 +258,16 @@ export class GlobalState {
             .replace(/\;/gi, '');
     }
 
-    // See cleanedRouterParameter for some of the replacements.
+    // Reverse only the + for PLUS_CHAR_MARKER substitution of cleanedQueryRouterParameter
+    restorePlusAsNeeded(givenString: string): string {
+        var workStr: string = givenString;
+        if (workStr != null && workStr.indexOf(this.PLUS_CHAR_MARKER) >= 0) {
+            workStr = workStr.split(this.PLUS_CHAR_MARKER).join('+');
+        }
+        return workStr;
+    }
+
+    // See cleanedRouterParameter for some of the replacements, i.e., ? / ;
     // NOTE: June 2019 addition: iOS introduced "smart quotes" which interfered with strict ASCII straight quote interpretation on
     // matching a phrase, e.g., “hot pink” treated like hot pink matching tens of stories with both words rather than
     // treated like "hot pink" matching under ten stories having this exact two-word phrase.  Solve by replacing:
@@ -265,6 +275,11 @@ export class GlobalState {
     // ” to "
     // ‘ to '
     // ’ to '
+    // NOTE March 2023 addition: + was getting messed up both as + and as %2B on refresh and as a bookmark, e.g., this route
+    // https://sm.thehistorymakers.org/stories/2;q=ice%20%2B%20cream;ut=1;pg=1;pgS=30 could not reload.
+    // Mark + with PLUS_CHAR_MARKER instead.
+    // NOTE that new logic will handle cleaning up the "givenString" argument to this routine such that it should not have
+    // arguments such as %2B any further as entered by the user in search query input.  So, no replacement of any %# sequences takes place here.
     cleanedQueryRouterParameter(givenString: string): string {
         return givenString
             .replace(/\?/gi, '')
@@ -273,6 +288,32 @@ export class GlobalState {
             .replace(/”/gi, '"')
             .replace(/‘/gi, '\'')
             .replace(/’/gi, '\'')
-            .replace(/\;/gi, '');
+            .replace(/\;/gi, '')
+            .replace(/\+/gi, this.PLUS_CHAR_MARKER);
+    }
+
+    // The user could cause messes by putting in encoded versions of characters like %20, %2B, etc., as the query string.
+    // If the user wants to be messy, interpret such a mess more literally: replace all %# for # from 0 to 9 as just #.
+    // So, %20 will become just 20, etc.  Don't try to justify such goofy input.  Just be more literal with it so that it
+    // will not move forward into the API as a query, into cleanedQueryRouterParameter, etc. with pieces like %2B intact;
+    // rather %2B will become 2B.
+    removeEncodedSequences(givenString: string) : string {
+        var workStr: string = givenString;
+        if (workStr != null && workStr.indexOf("%") >= 0) {
+            // User perhaps wants to search % but may be just polluting search string with escape sequences.
+            // Undo that pollution by replacing all %# for # from 0 to 9 with just that numeral digit.
+            workStr = workStr
+            .replace(/\%0/gi, '0')
+            .replace(/\%1/gi, '1')
+            .replace(/\%2/gi, '2')
+            .replace(/\%3/gi, '3')
+            .replace(/\%4/gi, '4')
+            .replace(/\%5/gi, '5')
+            .replace(/\%6/gi, '6')
+            .replace(/\%7/gi, '7')
+            .replace(/\%8/gi, '8')
+            .replace(/\%9/gi, '9');
+        }
+        return workStr;
     }
 }
