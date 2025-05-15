@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges } from '@angular/core';
+import { Component, Input, OnChanges, inject } from '@angular/core';
 import { USMapDistribution } from './US-map-distribution';
 import { USMapKeyColorBlock } from './US-map-key-color-block';
 import { MapBucket } from './map-bucket';
@@ -6,16 +6,25 @@ import { GlobalState } from '../app.global-state';
 import { USMapManagerService } from './US-map-manager.service';
 import { FacetDetail } from '../historymakers/facet-detail';
 
+import { MyPanelComponent } from '../shared/my-panel/my-panel.component';
+
 @Component({
     selector: 'us-map',
-    templateUrl: './us-map.component.html',
-    styleUrls: ['./us-map.component.scss'],
+    templateUrl: './US-map.component.html',
+    styleUrls: ['./US-map.component.scss'],
+    imports: [MyPanelComponent]
 })
 
 // This class is used to present a United States map capable of having each of the 50 states plus D.C. color-coded (51 areas).
 // Furthermore, it can show a key to describe the color-coding in place.
 // See https://angular.io/guide/component-interaction as needed for more on component communication.
 export class USMapComponent implements OnChanges {
+    private globalState = inject(GlobalState);
+    private myUSMapManagerService = inject(USMapManagerService);
+
+    // TODO: Skipped for migration with "ng generate @angular/core:signal-input-migration" (March 2025) because:
+    //  This input is used in a control flow expression (e.g. `@if` or `*ngIf`)
+    //  and migrating would break narrowing currently.
     @Input() distributionToShow: USMapDistribution;
 
     public isMapInitialized: boolean = false;
@@ -49,7 +58,7 @@ export class USMapComponent implements OnChanges {
 
     private keyColorBlock:USMapKeyColorBlock[] = [];
 
-    constructor(private globalState: GlobalState, private myUSMapManagerService: USMapManagerService) {
+    constructor() {
         // Initialize fC and sC as being indexed from 1 to 51 with 0 saved for nothing/null/out-of-bounds,
         // and [1,51] mapping to state abbreviations ordered alphabetically for 50 states plus DC,
         // e.g., 1 is AK, 2 is AL, 3 is AR, ..., 8 is DC, ..., 35 is NY, ..., 51 is WY.

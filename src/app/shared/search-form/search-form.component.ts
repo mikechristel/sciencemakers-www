@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef, Pipe, PipeTransform, Inject, Input, EventEmitter, Output } from '@angular/core';
+import { Component, OnInit, ElementRef, Pipe, PipeTransform, EventEmitter, Output, inject, input, viewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { takeUntil } from "rxjs/operators";
 
@@ -14,12 +14,18 @@ import { environment } from '../../../environments/environment';
 import { BaseComponent } from '../base.component';
 import { ChosenBioSearchFieldInfo } from "./chosen-bio-search-field-info";
 import { UserSettingsManagerService } from '../../user-settings/user-settings-manager.service';
+import { FormsModule } from '@angular/forms';
+import { NgClass } from '@angular/common';
 
 @Component({
     selector: 'search-form',
     templateUrl: './search-form.component.html',
-    styleUrls: ['./search-form.component.scss']
+    styleUrls: ['./search-form.component.scss'],
+    imports: [FormsModule, NgClass]
 })
+
+// NOTE: As deployed from 2020+ through 2024, the code to change page size was commented out in HTML so there was no UI to change the page size.
+// Hence, code to show/modify the page size (showResultsPerPage, etc.) has been deleted with the 2024 update to the code base: it is irrelevant and never called.
 
 // NOTE:  this form is used for 3 similar but different types of searches, based on searchOptions settings:
 // (a) story search across everyone (this.searchOptions.searchingBiographies is false and this.searchOptions.biographyIDForLimitingSearch == this.globalState.NOTHING_CHOSEN)
@@ -29,13 +35,18 @@ import { UserSettingsManagerService } from '../../user-settings/user-settings-ma
 // and so story/biography search is optionally decorated with more advanced elements via showAdvancedStoryOptions and
 // showAdvancedBioChosenFields respectively.
 export class SearchFormComponent extends BaseComponent implements OnInit {
-    @ViewChild('queryInput') queryInputArea: ElementRef;
+    private router = inject(Router);
+    private globalState = inject(GlobalState);
+    private searchFormService = inject(SearchFormService);
+    private userSettingsManagerService = inject(UserSettingsManagerService);
+    private storyAdvancedSearchSettingsManagerService = inject(StoryAdvancedSearchSettingsManagerService);
 
-    @Input() showResultsPerPage: boolean = false;       // if true, show results per page UI element to adjust page size (else keep it out of UI)
-    @Input() showAdvancedSearchLink: boolean = false;   // if true, show link to advanced search UI element (else keep it out of UI)
-    @Input() showAdvancedBioChosenFields: boolean = false; // If true AND this.searchOptions.searchingBiographies is true, show more options for bio search
-    @Input() showAdvancedStoryOptions: boolean = false; // If true AND this.searchOptions.searchingBiographies is false, show more options for story search
-    @Input() showFieldOptions: boolean = false; // If true then show select UI to choose what field to search into
+    readonly queryInputArea = viewChild<ElementRef>('queryInput');
+
+    readonly showAdvancedSearchLink = input<boolean>(false);   // if true, show link to advanced search UI element (else keep it out of UI)
+    readonly showAdvancedBioChosenFields = input<boolean>(false); // If true AND this.searchOptions.searchingBiographies is true, show more options for bio search
+    readonly showAdvancedStoryOptions = input<boolean>(false); // If true AND this.searchOptions.searchingBiographies is false, show more options for story search
+    readonly showFieldOptions = input<boolean>(false); // If true then show select UI to choose what field to search into
 
     searchOptions: SearchFormOptions;
     possibleSearchableBioFields: ChosenBioSearchFieldInfo[];
@@ -48,8 +59,6 @@ export class SearchFormComponent extends BaseComponent implements OnInit {
     screenReaderLabel: string = ""; // screen reader description for what this form is all about (search stories or biographies or within 1 biography)
     inputPlaceholder: string = ""; // label for input
     advancedLinkText: string = ""; // label for advanced search
-
-    myModelledPageSize: number;
 
     searchTitleOnly: boolean;
     searchTranscriptOnly: boolean;
@@ -67,13 +76,12 @@ export class SearchFormComponent extends BaseComponent implements OnInit {
     interviewYears: number[];
     minYearAllowed: number;
 
-    constructor(private router: Router,
-                private globalState: GlobalState,
-                private searchFormService: SearchFormService,
-                private userSettingsManagerService:UserSettingsManagerService,
-                private storyAdvancedSearchSettingsManagerService: StoryAdvancedSearchSettingsManagerService) {
+    constructor() {
 
         super();
+        const searchFormService = this.searchFormService;
+        const storyAdvancedSearchSettingsManagerService = this.storyAdvancedSearchSettingsManagerService;
+
         storyAdvancedSearchSettingsManagerService.filterByInterviewDate$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((value) => {
           this.filterByInterviewDate = value;
         });
@@ -153,32 +161,27 @@ export class SearchFormComponent extends BaseComponent implements OnInit {
     }
 
     ngOnInit() {
-        if (this.searchOptions.searchingBiographies)
-            this.myModelledPageSize = this.globalState.BiographyPageSize;
-        else {
-            this.myModelledPageSize = this.globalState.StoryPageSize;
-            if (this.showAdvancedStoryOptions) {
-                // Also set up min/max year for interview year range for story search.
-                this.filterByInterviewDate = this.storyAdvancedSearchSettingsManagerService.currentFilterByInterviewDateSetting();
-                this.minYearForDateFilter = this.storyAdvancedSearchSettingsManagerService.currentMinYearForFilterByInterviewDate();
-                this.maxYearForDateFilter = this.storyAdvancedSearchSettingsManagerService.currentMaxYearForFilterByInterviewDate();
+        if (!this.searchOptions.searchingBiographies && this.showAdvancedStoryOptions()) {
+            // Also set up min/max year for interview year range for story search.
+            this.filterByInterviewDate = this.storyAdvancedSearchSettingsManagerService.currentFilterByInterviewDateSetting();
+            this.minYearForDateFilter = this.storyAdvancedSearchSettingsManagerService.currentMinYearForFilterByInterviewDate();
+            this.maxYearForDateFilter = this.storyAdvancedSearchSettingsManagerService.currentMaxYearForFilterByInterviewDate();
 
-                this.minYearAllowed = environment.firstInterviewYear;
-                var currentYear = new Date().getFullYear();
-                this.interviewYears = [];
-                for (var i = this.minYearAllowed; i <= currentYear; i++)
-                    this.interviewYears.push(i);
-                if (this.minYearForDateFilter == 0)
-                    this.earliestInterviewYear = this.minYearAllowed;
-                else
-                    this.earliestInterviewYear = this.minYearForDateFilter;
-                this.modelledEarliestYear = this.earliestInterviewYear;
-                if (this.maxYearForDateFilter == 0)
-                    this.latestInterviewYear = currentYear;
-                else
-                    this.latestInterviewYear = this.maxYearForDateFilter;
-                this.modelledLatestYear = this.latestInterviewYear;
-            }
+            this.minYearAllowed = environment.firstInterviewYear;
+            var currentYear = new Date().getFullYear();
+            this.interviewYears = [];
+            for (var i = this.minYearAllowed; i <= currentYear; i++)
+                this.interviewYears.push(i);
+            if (this.minYearForDateFilter == 0)
+                this.earliestInterviewYear = this.minYearAllowed;
+            else
+                this.earliestInterviewYear = this.minYearForDateFilter;
+            this.modelledEarliestYear = this.earliestInterviewYear;
+            if (this.maxYearForDateFilter == 0)
+                this.latestInterviewYear = currentYear;
+            else
+                this.latestInterviewYear = this.maxYearForDateFilter;
+            this.modelledLatestYear = this.latestInterviewYear;
         }
     }
 
@@ -393,22 +396,16 @@ export class SearchFormComponent extends BaseComponent implements OnInit {
           }
     }
 
-    setResultsPageSize() {
-        if (this.searchOptions.searchingBiographies)
-            this.globalState.BiographyPageSize = this.myModelledPageSize;
-        else
-            this.globalState.StoryPageSize = this.myModelledPageSize;
-    }
-
     setFocusToQueryInput() {
         // Set the focus to the query input area.
         // NOTE: this technique is discussed here: https://codeburst.io/focusing-on-form-elements-the-angular-way-e9a78725c04f
 
-        if (this.queryInputArea && this.queryInputArea.nativeElement)
+        const queryInputArea = this.queryInputArea();
+        if (queryInputArea && queryInputArea.nativeElement)
         {
             if (!this.initialFocusMade) {
                 this.initialFocusMade = true; // extra "guard" needed March 2020 to allow tab navigation in this component
-                this.queryInputArea.nativeElement.focus();
+                queryInputArea.nativeElement.focus();
             }
         }
     }

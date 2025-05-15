@@ -1,5 +1,5 @@
-﻿import { Component, ViewChild, ElementRef }       from '@angular/core';
-import { Router, NavigationEnd } from '@angular/router';
+﻿import { Component, ElementRef, inject, viewChild }       from '@angular/core';
+import { Router, NavigationEnd, RouterLinkActive, RouterLink } from '@angular/router';
 
 import { FeedbackService } from './feedback/feedback.service';
 import { AuthManagerService } from './auth/auth-manager.service';
@@ -17,18 +17,37 @@ import { RouterHistoryService } from './shared/services';
 import { BaseComponent } from './shared/base.component';
 import { UserSettingsManagerService } from './user-settings/user-settings-manager.service';
 
+import { StorySetType} from './storyset/storyset-type';
+
+import { AppContentsComponent } from './app-contents/app-contents.component';
+import { CdkTrapFocus } from '@angular/cdk/a11y';
+import { FormsModule } from '@angular/forms';
+import { CdkCopyToClipboard } from '@angular/cdk/clipboard';
+
 @Component({
     selector: 'my-app',
     templateUrl: './app.component.html',
-    styleUrls: ['./app.component.scss']
+    styleUrls: ['./app.component.scss'],
+    imports: [RouterLinkActive, RouterLink, AppContentsComponent, CdkTrapFocus, FormsModule, CdkCopyToClipboard]
 })
 
 export class AppComponent extends BaseComponent {
-    @ViewChild('feedbackInput') feedbackInputArea: ElementRef;
-    @ViewChild('myClipsTitleInput') myClipsTitleInputArea: ElementRef;
+    router = inject(Router);
+    private routerHistoryService = inject(RouterHistoryService);
+    private feedbackService = inject(FeedbackService);
+    private searchFormService = inject(SearchFormService);
+    private titleManagerService = inject(TitleManagerService);
+    private userSettingsManagerService = inject(UserSettingsManagerService);
+    private playlistManagerService = inject(PlaylistManagerService);
+    private authManagerService = inject(AuthManagerService);
+
+    readonly feedbackInputArea = viewChild<ElementRef>('feedbackInput');
+    readonly myClipsTitleInputArea = viewChild<ElementRef>('myClipsTitleInput');
+    readonly clipsListInputArea = viewChild<ElementRef>('clipsListInput');
 
     public givenFeedback: string = null;
     public optionalFeedbackEmail: string = null;
+    public givenLoadClips: string = null;
     public myClips: Playlist[];
     public myClipsWithCountMsg: string;
 
@@ -36,6 +55,8 @@ export class AppComponent extends BaseComponent {
     public showMyExportMyClipsModalForm: boolean = false;
     public showMyConfirmClearingMyClipsModalForm: boolean = false;
     public showMyConfirmReloadModalForm: boolean = false;
+    public showMyLoadClipsModalForm: boolean = false;
+
     public inSearchFormRoute: boolean = false;
     public inContentLinksRoute: boolean = false;
     public inShowingManyItemsRoute: boolean = false; // for any of biography set, story set, one biography story set
@@ -46,22 +67,17 @@ export class AppComponent extends BaseComponent {
     public myClipsTitleLengthHelper: string = "lengthLimitInfoForMyClipsTitle"; // ID for which char count in title is given
     public myClipsURLCopyActionFresh: boolean = false;
 
-    public hideTopicSearch: boolean = false; // value will be read and set from userSettingsManagerService
-
     // Via RouterHistoryService
     previousUrlViaRouterHistoryService$ = this.routerHistoryService.previousUrl$;
     currentUrlViaRouterHistoryService$ = this.routerHistoryService.currentUrl$;
 
-    constructor(public router: Router,
-        private routerHistoryService: RouterHistoryService,
-        private feedbackService: FeedbackService,
-        private searchFormService: SearchFormService,
-        private titleManagerService: TitleManagerService,
-        private userSettingsManagerService: UserSettingsManagerService,
-        private playlistManagerService: PlaylistManagerService,
-        private authManagerService: AuthManagerService) {
+    constructor() {
 
-        super(); // since this is a derived class from BaseComponent
+        super();  // since this is a derived class from BaseComponent
+        const feedbackService = this.feedbackService;
+        const userSettingsManagerService = this.userSettingsManagerService;
+        const playlistManagerService = this.playlistManagerService;
+        const authManagerService = this.authManagerService;
 
         // Get subscriptions tied in using best practice recommendation for how to unsubscribe, here and
         // below in this component wherever .subscribe is used:
@@ -73,6 +89,11 @@ export class AppComponent extends BaseComponent {
         playlistManagerService.presentMyClipsExportForm$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((value) => {
             if (value)
                 this.openMyExportMyClipsModalForm();
+        });
+
+        playlistManagerService.presentClipsLoadForm$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((value) => {
+            if (value)
+                this.openMyLoadClipsModalForm();
         });
 
         playlistManagerService.presentMyClipsConfirmClearingForm$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((value) => {
@@ -88,10 +109,6 @@ export class AppComponent extends BaseComponent {
         feedbackService.presentFeedbackInputForm$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((value) => {
             if (value)
                 this.openMyContactUsModalForm();
-        });
-
-        userSettingsManagerService.hideTopicSearch$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((value) => {
-            this.hideTopicSearch = value;
         });
 
         // Certain UI features toggle on/off in this component's html rendering based on settings like "are we in a search form" (advanced search decoration on), etc.
@@ -133,7 +150,6 @@ export class AppComponent extends BaseComponent {
     }
 
     ngOnInit() {
-        this.hideTopicSearch = this.userSettingsManagerService.currentHideTopicSearch();
         this.myClips = this.playlistManagerService.initializeMyClips();
         this.setMyClipsCountMessage();
     }
@@ -198,10 +214,6 @@ export class AppComponent extends BaseComponent {
     clearFeedback() {
         this.givenFeedback = null;
         this.optionalFeedbackEmail = null;
-        // Set the focus away from the Clear button, to the feedback input area.
-        // NOTE: this technique is discussed here: https://codeburst.io/focusing-on-form-elements-the-angular-way-e9a78725c04f
-        if (this.feedbackInputArea && this.feedbackInputArea.nativeElement)
-            this.feedbackInputArea.nativeElement.focus();
     }
 
     cancelFeedbackAndCloseMyModal() {
@@ -218,11 +230,11 @@ export class AppComponent extends BaseComponent {
         if (this.givenFeedback) {
             feedbackMessage = this.givenFeedback.trim();
             if (feedbackMessage.length > 0) {
-              if (this.optionalFeedbackEmail && this.optionalFeedbackEmail.trim().length > 0) {
-                  // Clean up given email.
-                  feedbackEmail = this.optionalFeedbackEmail.trim();
-              }
-              this.feedbackService.postFeedback(feedbackMessage, feedbackEmail);
+                if (this.optionalFeedbackEmail && this.optionalFeedbackEmail.trim().length > 0) {
+                    // Clean up given email.
+                    feedbackEmail = this.optionalFeedbackEmail.trim();
+                }
+                this.feedbackService.postFeedback(feedbackMessage, feedbackEmail);
             }
         }
         // Clear feedback after it is submitted:
@@ -230,6 +242,108 @@ export class AppComponent extends BaseComponent {
         this.optionalFeedbackEmail = null;
 
         this.closeMyContactUsModalForm();
+    }
+
+
+    openMyLoadClipsModalForm() {
+      this.cachedTitle = this.titleManagerService.getTitle();
+      this.titleManagerService.setTitle("Load Clips, ScienceMakers Digital Archive");
+      this.showMyLoadClipsModalForm = true;
+    }
+
+    closeMyLoadClipsModalForm() {
+        this.titleManagerService.setTitle(this.cachedTitle);
+        this.showMyLoadClipsModalForm = false;
+    }
+
+    clearLoadClips() {
+        this.givenLoadClips = null;
+    }
+
+  cancelLoadClipsAndCloseMyModal() {
+      this.givenLoadClips = null;
+
+      this.closeMyLoadClipsModalForm();
+  }
+
+  postLoadClipsAndCloseMyModal() {
+      var clipsListMessage: string;
+
+      if (this.givenLoadClips) {
+        clipsListMessage = this.givenLoadClips.trim();
+          if (clipsListMessage.length > 0) {
+              // Process the loading of the given clips if they parse properly.
+              // NOTE: %2C may be there instead of , -- do that substitution first.
+              clipsListMessage = clipsListMessage.replace(/\s\s+/g, ' '); // consecutive whitespace turned into single space
+              clipsListMessage = clipsListMessage.replace(/\%2C/gi, ',');
+              // Allow 3 forms of input:
+              // (a) just the comma-separated list of clip IDs (i.e., story IDs), e.g.: 192691,112044,39652,102297
+              // (b) allow a comma-separated list of clip IDs and a title with parameter specification "IDList=" first, as in: IDList=379332,284402,99364;ListTitle=stuff
+              // (c) allow ANY sort of formatted story set with "IDList=" as the first marker, as in: http://localhost:4200/stories/6;IDList=379332,284402,99364;ListTitle=stuff
+              var iWork: number = clipsListMessage.indexOf("IDList=");
+              var givenIDListString: string = "";
+              var givenClipSetTitle: string = "";
+              if (iWork >= 0) {
+                // Found it: get ID list which ends with end of string or at the ; before a suffix of ";ListTitle="
+                iWork += 7; // move past IDList= prefix (and any URI that preceded that as well)
+                var iTitle: number = clipsListMessage.indexOf(";ListTitle=", iWork);
+                if (iTitle >= 0)
+                {
+                  givenIDListString = clipsListMessage.substring(iWork, iTitle);
+                  // List title given, so make use of it
+                  givenClipSetTitle = clipsListMessage.substring(iTitle+11); // of course, 11 = string length of ";ListTitle="
+                }
+                else // assuming just the ID list:
+                  givenIDListString = clipsListMessage.substring(iWork);
+              }
+              else // if special ID List parameter marker is not there, assume the whole list is the ID list
+                givenIDListString = clipsListMessage;
+
+              // Now, check the list for at least one ID in an assumed comma-separated list format of #,#,# etc.
+              var givenIDs: string[] = givenIDListString.split(",");
+              if (givenIDs.length > 0)
+              {
+                  // (!!!TBD!!!) Later, return to this code to optimize as needed: make given list of IDs into numbers without any number duplicates.
+                  var keeperGivenIDs: number[] = [];
+                  var i: number;
+                  var properIDValue: number;
+                  var stringToConsider: string;
+                  var thinnedGivenIDListString: string = "";
+
+                  for (i = 0; i < givenIDs.length; i++)
+                  {
+                    stringToConsider = givenIDs[i];
+                    if (!isNaN(Number(stringToConsider)))
+                    { // value makes sense to consider (all proper IDs are numbers)
+                      properIDValue = Number(stringToConsider);
+                      if (keeperGivenIDs.indexOf(properIDValue) == -1) {
+                        // not seen as a duplicate, so keep it
+                        keeperGivenIDs.push(properIDValue);
+                        thinnedGivenIDListString += stringToConsider + ","; // making a comma-separated list of numbers without duplicates (don't worry about any "mess" like whitespace in the string ID, as it did parse)
+                      }
+                    }
+                  }
+                  if (thinnedGivenIDListString.length > 0)
+                  { // have at least one numeric ID in given list, so continue with the route navigation
+                      thinnedGivenIDListString = thinnedGivenIDListString.substring(0, thinnedGivenIDListString.length - 1); // take off extraneous comma at the end
+
+                      var moreParams = {};
+
+                      moreParams['IDList'] = thinnedGivenIDListString;
+                      if (givenClipSetTitle.length > 0)
+                        moreParams['ListTitle'] = givenClipSetTitle;
+
+                      // NOTE: Hidden assumption that we are never on a route of '/stories/' + StorySetType.GivenIDSet when launching this navigation
+                      // (in fact we are on the route of '/stories/' + StorySetType.MyClipsSet as only from My Clips do you get to load a given clips set).
+                      this.router.navigate(['/stories/' + StorySetType.GivenIDSet, moreParams]);
+                  }
+              }
+          }
+        }
+        // Clear clips list after it is submitted for loading:
+        this.givenLoadClips = null;
+
+        this.closeMyLoadClipsModalForm();
     }
 
     openMyConfirmReloadModalForm() {

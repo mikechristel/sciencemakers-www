@@ -1,27 +1,38 @@
-﻿import { Component, Input } from '@angular/core';
+﻿import { Component, Input, input } from '@angular/core';
+// NOTE: Input is original, input new but "ng generate @angular/core:signal-input-migration" (March 2025) could not fully remove Input: both needed from the core.
 
 import { StoryDocument } from '../storyset/story-document';
 import { StoryHighlight } from '../storyset/story-highlight';
 import { environment } from '../../environments/environment';
 
 import { BaseComponent } from '../shared/base.component';
+import { RouterLinkActive, RouterLink } from '@angular/router';
+import { NgClass } from '@angular/common';
+import { ScrollToMeDirective } from '../shared/scroll-to-me.directive';
 
 @Component({
     selector: 'thda-story',
     templateUrl: './story-stamp.component.html',
-    styleUrls: ['./story-stamp.component.scss']
+    styleUrls: ['./story-stamp.component.scss'],
+    imports: [RouterLinkActive, NgClass, RouterLink, ScrollToMeDirective]
 })
 
 // This class is used to present a single story in a presumed grid/list of stories.
 // It takes as input the story details in the form of a StoryDocument object, and the ID of whatever story might be
 // selected to appropriately focus the selected story in a grid/list.
 export class StoryStampComponent extends BaseComponent {
-    @Input() story: StoryDocument;
+    readonly story = input<StoryDocument>(undefined);
+    // TODO: Skipped for migration with "ng generate @angular/core:signal-input-migration" (March 2025) because:
+    //  This input is used in a control flow expression (e.g. `@if` or `*ngIf`)
+    //  and migrating would break narrowing currently.
     @Input() highlights: StoryHighlight;
-    @Input() hideInterviewDate:boolean = false;
-    @Input() overrideToH4Nesting:boolean = false;
-    @Input('selectedID') selectedStoryID: number;
-    @Input() cardView: boolean;
+    readonly hideInterviewDate = input<boolean>(false);
+    readonly overrideToH4Nesting = input<boolean>(false);
+    readonly selectedStoryID = input<number>(undefined, { alias: "selectedID" });
+    readonly cardView = input<boolean>(undefined);
+    // TODO: Skipped for migration with "ng generate @angular/core:signal-input-migration" (March 2025) because:
+    //  This input is used in a control flow expression (e.g. `@if` or `*ngIf`)
+    //  and migrating would break narrowing currently.
     @Input() queryForTranscript: string; // used to preserve query-into-transcript context for later match term lookup by a detailed story renderer
 
     public myMediaBase: string;
@@ -34,14 +45,15 @@ export class StoryStampComponent extends BaseComponent {
     }
 
     qualifiedRoute() : string {
-        if (this.story && this.story.storyID)
-            return '/story/' + this.story.storyID; // the correct route
+        const story = this.story();
+        if (story && story.storyID)
+            return '/story/' + story.storyID; // the correct route
         else
             return '/story/0'; // default bogus path
     }
 
     isSelected(oneStoryID: number) {
-        return oneStoryID == this.selectedStoryID;
+        return oneStoryID == this.selectedStoryID();
     }
 
     // Return a mm:ss format equivalent to the specified number of milliseconds, dropping out fractional part

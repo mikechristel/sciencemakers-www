@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef, AfterViewChecked } from '@angular/core';
+import { Component, OnInit, ElementRef, AfterViewChecked, inject, viewChild } from '@angular/core';
 import { takeUntil } from "rxjs/operators";
 
 import { ActivatedRoute, Router, Params } from '@angular/router';
@@ -13,13 +13,25 @@ import { BaseComponent } from '../shared/base.component';
 import {LiveAnnouncer} from '@angular/cdk/a11y'; // used to read changes to set title
 import { UserSettingsManagerService } from '../user-settings/user-settings-manager.service';
 
+
 @Component({
     selector: 'thda-content-links',
     templateUrl: './content-links.component.html',
-    styleUrls: ['./content-links.component.scss']
+    styleUrls: ['./content-links.component.scss'],
+    imports: []
 })
 export class ContentLinksComponent extends BaseComponent implements OnInit, AfterViewChecked {
-    @ViewChild('topBackButton') topBackItemElement: ElementRef;
+    private route = inject(ActivatedRoute);
+    private router = inject(Router);
+    private feedbackService = inject(FeedbackService);
+    private windowService = inject(WindowService);
+    private routerHistoryService = inject(RouterHistoryService);
+    private playlistManagerService = inject(PlaylistManagerService);
+    private userSettingsManagerService = inject(UserSettingsManagerService);
+    private titleManagerService = inject(TitleManagerService);
+    private liveAnnouncer = inject(LiveAnnouncer);
+
+    readonly topBackItemElement = viewChild<ElementRef>('topBackButton');
 
     contentLinksPageTitle: string;
     contentLinksPageTitleLong: string;
@@ -31,18 +43,12 @@ export class ContentLinksComponent extends BaseComponent implements OnInit, Afte
     priorRoute: string; // used to compute extraDetailsOnPriorRoute
     extraDetailsOnPriorRoute: string; // used to decorate further the "Back" button label
 
-    public hideTopicSearch: boolean = false; // value will be read and set from userSettingsManagerService
-
-    constructor(private route: ActivatedRoute,
-      private router: Router,
-      private feedbackService: FeedbackService,
-      private windowService: WindowService,
-      private routerHistoryService: RouterHistoryService,
-      private playlistManagerService: PlaylistManagerService,
-      private userSettingsManagerService: UserSettingsManagerService,
-      private titleManagerService: TitleManagerService, private liveAnnouncer: LiveAnnouncer) {
+    constructor() {
 
         super(); // for BaseComponent extension (brought in to cleanly unsubscribe from subscriptions)
+        const routerHistoryService = this.routerHistoryService;
+        const playlistManagerService = this.playlistManagerService;
+        const userSettingsManagerService = this.userSettingsManagerService;
 
         this.contentLinksPageTitle = "Content Links";
         this.contentLinksPageTitleLong = "Content Links, ScienceMakers Digital Archive";
@@ -54,10 +60,6 @@ export class ContentLinksComponent extends BaseComponent implements OnInit, Afte
         playlistManagerService.myClips$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((value) => {
             this.myClips = value;
             this.setMyClipsCountMessage();
-        });
-
-        userSettingsManagerService.hideTopicSearch$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((value) => {
-            this.hideTopicSearch = value;
         });
 
         routerHistoryService.previousUrl$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((value) => {
@@ -96,17 +98,17 @@ export class ContentLinksComponent extends BaseComponent implements OnInit, Afte
     }
 
     ngOnInit() {
-        this.hideTopicSearch = this.userSettingsManagerService.currentHideTopicSearch();
         this.myClips = this.playlistManagerService.initializeMyClips();
         this.setMyClipsCountMessage();
     }
 
     ngAfterViewChecked() {
         // NOTE: this technique is discussed here: https://codeburst.io/focusing-on-form-elements-the-angular-way-e9a78725c04f
-        if (this.topBackItemElement && this.topBackItemElement.nativeElement) {
+        const topBackItemElement = this.topBackItemElement();
+        if (topBackItemElement && topBackItemElement.nativeElement) {
           if (!this.initialFocusMade) {
               this.initialFocusMade = true; // extra "guard" needed March 2020 to allow tab navigation in this component
-              this.topBackItemElement.nativeElement.focus();
+              topBackItemElement.nativeElement.focus();
           }
         }
     }

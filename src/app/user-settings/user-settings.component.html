@@ -179,11 +179,3 @@
         </label>
     </li>
 </ul>
-
-<!-- NOTE: if we wish to validate the HTML, which *WILL* produce lots of errors for all the Angular directives like fxflex and _ngcontent... additions,
-we can do so with this link which checks the current page.  Hints on how to improve *Angular* HTML validation are at https://stackoverflow.com/questions/28150293/how-to-validate-angular-html-templates
-but that is not pursued here.  This code is from the bookmarklet provided by Steve Faulkner at https://validator.w3.org/nu/about.html
-
-<a href="javascript:(function(){function c(a,b){var c=document.createElement(&quot;textarea&quot;);c.name=a;c.value=b;d.appendChild(c)}var e=function(a){for(var b=&quot;&quot;,a=a.firstChild;a;){switch(a.nodeType){case Node.ELEMENT_NODE:b+=a.outerHTML;break;case Node.TEXT_NODE:b+=a.nodeValue;break;case Node.CDATA_SECTION_NODE:b+=&quot;<![CDATA[&quot;+a.nodeValue+&quot;]]\>&quot;;break;case Node.COMMENT_NODE:b+=&quot;<\!--&quot;+a.nodeValue+&quot;--\>&quot;;break;case Node.DOCUMENT_TYPE_NODE:b+=&quot;<!DOCTYPE &quot;+a.name+&quot;>\n&quot;}a=a.nextSibling}return b}(document),d=document.createElement(&quot;form&quot;);d.method=&quot;POST&quot;;d.action=&quot;https://validator.w3.org/nu/&quot;;d.enctype=&quot;multipart/form-data&quot;;d.target=&quot;_blank&quot;;d.acceptCharset=&quot;utf-8&quot;;c(&quot;showsource&quot;,&quot;yes&quot;);c(&quot;content&quot;,e);document.body.appendChild(d);d.submit()})();">Check serialized DOM of current page</a>
-
- -->

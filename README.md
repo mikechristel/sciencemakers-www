@@ -1,12 +1,8 @@
 # sciencemakers-www
-The ScienceMakers Digital Video Archive is a web-based single page application (SPA) built with [Angular](https://angular.io/), [TypeScript](https://www.typescriptlang.org/), and Angular Flex Layout for responsive layout.
+The ScienceMakers Digital Video Archive is a web-based single page application (SPA) built with [Angular](https://angular.io/) and [TypeScript](https://www.typescriptlang.org/).
 
 ## Installation
 Run `npm install` in the root of the project directory to install the necessary build tools and depedencies.
-
-## Build and Deploy
-
-> **NOTE: All of the build and deployment configurations have changed as of December 11, 2020.  Please read carefully.**
 
 ### Build Environments and Associated Resources
 
@@ -29,7 +25,7 @@ There are two primary configuration environments as follows:
 1) Continuous Deployment (CD) is not currently available; production archive must be updated manually.
 2) For authentication to work properly, the Angular application must be bundled and deployed together with the .NET API.
 This .NET API should be locked down to "ScienceMakers only" for this ScienceMakers Digital Archive.
-3) Deployment is handled by Visual Studio 2019, refer to the digital-archive-api documentation for publishing specifics.
+3) Deployment is handled by Visual Studio 2022, refer to the digital-archive-api documentation for publishing specifics.
 
 ## Browsers
 
@@ -37,7 +33,13 @@ This .NET API should be locked down to "ScienceMakers only" for this ScienceMake
 We primarily develop using Chrome and as a result, it is the browser that is best supported.  We recommend using Chrome for the best user experience.
 
 ### Tested
-We actively test the latest versions of the Chrome and Safari browsers, with lesser testing of Edge and Firefox.  
+We actively test the latest versions of the following browsers:
+
+- Chrome (must be version 90 or later; most recent two releases are best supported)
+- Safari (must be version 16 or later; most recent two releases are best supported)
+
+We occasionally test the following browser:
+- Edge  
 
 ## Known Issues
 * IE support was retired in 2020.
@@ -46,10 +48,7 @@ We actively test the latest versions of the Chrome and Safari browsers, with les
 Font sizing has been implemented using rems and ems. For more information see: https://css-tricks.com/rems-ems/.
 
 ## Dependencies
-* [Angular](https://angular.io/) - Web application framework (version 15, from late 2022) (Angular Material is no longer needed)
-* [Angular Flex Layout](https://github.com/angular/flex-layout) - Used throughout to provide for responsive layout of elements
+* [Angular](https://angular.io/) - Web application framework (version 19.2, from 2025) (Angular Material no longer needed)
 * [Angular CLI](https://cli.angular.io/) - A command line interface for Angular
 * [angular-hmr](https://github.com/gdi2290/angular-hmr) - Angular Hot Module Replacement. Used by default when when running `ng serve`.
-
-
 

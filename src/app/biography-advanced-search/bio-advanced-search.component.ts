@@ -1,4 +1,4 @@
-import { Component, ViewChild, OnInit, AfterViewChecked } from '@angular/core';
+import { Component, OnInit, AfterViewChecked, inject, viewChild } from '@angular/core';
 
 import { TitleManagerService } from '../shared/title-manager.service';
 
@@ -8,22 +8,28 @@ import { SearchFormComponent } from '../shared/search-form/search-form.component
 import { SearchFormService } from '../shared/search-form/search-form.service';
 import { SearchFormOptions } from '../shared/search-form/search-form-options';
 import { ThinBaseComponent }  from '../shared/thinbase.component';
-import {LiveAnnouncer} from '@angular/cdk/a11y'; // used to read changes to set title
+import {LiveAnnouncer} from '@angular/cdk/a11y';
+import { FocusMeDirective } from '../shared/focus-me.directive';
+import { RouterLink, RouterLinkActive } from '@angular/router'; // used to read changes to set title
 
 @Component({
     selector: 'thda-bio-advs',
     templateUrl: './bio-advanced-search.component.html',
-    styleUrls: ['./bio-advanced-search.component.scss']
+    styleUrls: ['./bio-advanced-search.component.scss'],
+    imports: [FocusMeDirective, SearchFormComponent, RouterLink, RouterLinkActive]
 })
 export class BiographyAdvancedSearchComponent extends ThinBaseComponent implements OnInit, AfterViewChecked {
-    @ViewChild('myBioSearchForm') mySearchFormElement: SearchFormComponent;
+    private titleManagerService = inject(TitleManagerService);
+    private searchFormService = inject(SearchFormService);
+    private globalState = inject(GlobalState);
+    private liveAnnouncer = inject(LiveAnnouncer);
+
+    readonly mySearchFormElement = viewChild<SearchFormComponent>('myBioSearchForm');
     bioAdvSearchPageTitle: string;
     bioAdvSearchPageTitleLong: string;
     signalFocusToTitle: boolean = false; // is used in html rendering of this component
 
-    constructor(private titleManagerService: TitleManagerService,
-      private searchFormService: SearchFormService,
-      private globalState: GlobalState, private liveAnnouncer: LiveAnnouncer) {
+    constructor() {
         super(); // for ThinBaseComponent extension (brought in for mouse event handler noMouseFocus)
         this.searchFormService.setSearchOptions(new SearchFormOptions(true, this.globalState.NOTHING_CHOSEN, this.globalState.NO_ACCESSION_CHOSEN, false));
     }
@@ -38,9 +44,10 @@ export class BiographyAdvancedSearchComponent extends ThinBaseComponent implemen
     ngAfterViewChecked() {
         var focusSetElsewhere: boolean = false;
         // Attempt focus to the query input element once everything is set up.
-        if (this.mySearchFormElement) {
+        const mySearchFormElement = this.mySearchFormElement();
+        if (mySearchFormElement) {
             focusSetElsewhere = true;
-            this.mySearchFormElement.setFocusToQueryInput();
+            mySearchFormElement.setFocusToQueryInput();
         }
 
         if (this.globalState.IsInternalRoutingWithinSPA) {

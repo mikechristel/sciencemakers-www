@@ -1,16 +1,18 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Subject }    from 'rxjs';
 import { SearchFormOptions } from './search-form-options';
 import { GlobalState } from '../../app.global-state';
 
 @Injectable()
 export class SearchFormService {
+  private globalState = inject(GlobalState);
+
   private _notsetyet: boolean = true;
   private localSearchOptions: SearchFormOptions;
   public searchOptions: Subject<SearchFormOptions> = new Subject<SearchFormOptions>();
   public searchOptions$ = this.searchOptions.asObservable();
 
-    constructor(private globalState: GlobalState) {
+    constructor() {
       if (this._notsetyet) {
           this._notsetyet = false;
           // Do initial set-up of the options (after this, all changes done with setSearchOptions since localSearchOptions will have a value).

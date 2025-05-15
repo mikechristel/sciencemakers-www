@@ -3,6 +3,7 @@ import { SearchResult } from './storyset/search-result';
 
 @Injectable()
 export class GlobalState {
+
     private PLUS_CHAR_MARKER: string = "\"_\""; // this string "_" will replace + in queries; only used here in 2 helper routines
 
     NOTHING_CHOSEN: number = -1; // indicates a null choice, an empty choice, as "real" IDs will have values >= 0
@@ -11,7 +12,7 @@ export class GlobalState {
     SearchTitleOnly: boolean = false; // if true, queries to stories will be targeted only to the story title field
     SearchTranscriptOnly: boolean = false; // if true, queries to stories will be targeted only to the transcript field
 
-    BiographyPageSize: number = 30;
+    BiographyPageSize: number = 100;
     StoryPageSize: number = 30;
 
     BiographySearchSortingPreference: number = 0;
@@ -276,10 +277,11 @@ export class GlobalState {
     // ‘ to '
     // ’ to '
     // NOTE March 2023 addition: + was getting messed up both as + and as %2B on refresh and as a bookmark, e.g., this route
-    // https://sm.thehistorymakers.org/stories/2;q=ice%20%2B%20cream;ut=1;pg=1;pgS=30 could not reload.
+    // https://da.thehistorymakers.org/stories/2;q=ice%20%2B%20cream;ut=1;pg=1;pgS=30 could not reload.
     // Mark + with PLUS_CHAR_MARKER instead.
     // NOTE that new logic will handle cleaning up the "givenString" argument to this routine such that it should not have
-    // arguments such as %2B any further as entered by the user in search query input.  So, no replacement of any %# sequences takes place here.
+    // arguments such as %2B any further as entered by the user in search query input.  So, no replacement of any %# sequences takes place here,
+    // except for the troublesome %2B which may be kept as a signal to have a + ...handle just that replacement out of extra care.
     cleanedQueryRouterParameter(givenString: string): string {
         return givenString
             .replace(/\?/gi, '')
@@ -289,6 +291,7 @@ export class GlobalState {
             .replace(/‘/gi, '\'')
             .replace(/’/gi, '\'')
             .replace(/\;/gi, '')
+            .replace(/\%2B/gi, this.PLUS_CHAR_MARKER)
             .replace(/\+/gi, this.PLUS_CHAR_MARKER);
     }
 

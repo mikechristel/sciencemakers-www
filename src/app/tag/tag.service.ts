@@ -1,4 +1,4 @@
-﻿import { Injectable, Inject, OnInit } from '@angular/core';
+﻿import { Injectable, OnInit, inject } from '@angular/core';
 import { Observable, of, throwError } from "rxjs";
 import { catchError, tap, mergeMap, map } from "rxjs/operators";
 import { HttpClient } from '@angular/common/http';
@@ -13,6 +13,9 @@ import { environment } from '../../environments/environment';
 
 @Injectable()
 export class TagService {
+    private http = inject(HttpClient);
+    private historyMakerService = inject(HistoryMakerService);
+
     private tagListURL = 'TagList';
     private tagSearchCountURL = 'TagSearchCount?csvTagList='; // require csvTagList. so it is already tacked on
     private tagSearchURL = 'TagSearch?csvTagList='; // require csvTagList. so it is already tacked on
@@ -22,7 +25,7 @@ export class TagService {
     // NOTE:  Tag tree has branches with UNIQUE identifiers: push this data into a cached dictionary.
     private tagMap: { [key: string]: string } = {};
 
-    constructor(private http: HttpClient, private historyMakerService: HistoryMakerService) {
+    constructor() {
         this.cachedTagTree = null;
     }
 
@@ -30,21 +33,21 @@ export class TagService {
         if (this.cachedTagTree != null)
             return of(this.cachedTagTree);
         else {
-          return this.http.get<TagTree>(environment.serviceBase + this.tagListURL).pipe(
-            tap(givenTagTree => {
-              this.cachedTagTree = givenTagTree;
-              var j: number;
-              for (var i = 0; i < this.cachedTagTree.branches.length; i++) {
-                  for (j = 0; j < this.cachedTagTree.branches[i].branchValues.length; j++) {
-                      this.tagMap[this.cachedTagTree.branches[i].branchValues[j].id] = this.cachedTagTree.branches[i].branchValues[j].label;
-                  }
-              }
-            }),
-            catchError( err => {
-              // TODO: (!!!TBD!!!) Decide if we wish to log errors in any way or use console, e.g., console.log('error caught: ', err);
-              return throwError( err ); }
-            )
-          );
+            return this.http.get<TagTree>(environment.serviceBase + this.tagListURL).pipe(
+              tap(givenTagTree => {
+                this.cachedTagTree = givenTagTree;
+                var j: number;
+                for (var i = 0; i < this.cachedTagTree.branches.length; i++) {
+                    for (j = 0; j < this.cachedTagTree.branches[i].branchValues.length; j++) {
+                        this.tagMap[this.cachedTagTree.branches[i].branchValues[j].id] = this.cachedTagTree.branches[i].branchValues[j].label;
+                    }
+                }
+              }),
+              catchError( err => {
+                // TODO: (!!!TBD!!!) Decide if we wish to log errors in any way or use console, e.g., console.log('error caught: ', err);
+                return throwError(() => err); }
+              )
+            );
         }
     }
 
@@ -86,7 +89,7 @@ export class TagService {
           mergeMap(fd => this.http.get<SearchResult>(environment.serviceBase + this.tagSearchURL + csvTagList + addedArgs).pipe(
             catchError( err => {
               // TODO: (!!!TBD!!!) Decide if we wish to log errors in any way or use console, e.g., console.log('error caught: ', err);
-              return throwError( err ); }
+              return throwError(() => err); }
             )
           ))
         );
@@ -102,7 +105,7 @@ export class TagService {
           return this.http.get<TagSearchResult>(environment.serviceBase + this.tagSearchCountURL + csvTagList).pipe(
               catchError( err => {
                 // TODO: (!!!TBD!!!) Decide if we wish to log errors in any way or use console, e.g., console.log('error caught: ', err);
-                return throwError( err ); }
+                return throwError(() => err); }
               )
           );
         }

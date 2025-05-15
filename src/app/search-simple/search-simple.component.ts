@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, AfterViewChecked } from '@angular/core';
+import { Component, OnInit, AfterViewChecked, inject, viewChild } from '@angular/core';
 import { takeUntil } from "rxjs/operators";
 
 import { ActivatedRoute, Params } from '@angular/router';
@@ -13,15 +13,25 @@ import { BiographyStorySetService } from '../biography-storyset/biography-storys
 import { HistoryMakerService } from '../historymakers/historymaker.service'; // needed for corpus details
 
 import { BaseComponent } from '../shared/base.component';
-import {LiveAnnouncer} from '@angular/cdk/a11y'; // used to read changes to set title
+import {LiveAnnouncer} from '@angular/cdk/a11y';
+import { FocusMeDirective } from '../shared/focus-me.directive'; // used to read changes to set title
 
 @Component({
     selector: 'thda-search-simple',
     templateUrl: './search-simple.component.html',
-    styleUrls: ['./search-simple.component.scss']
+    styleUrls: ['./search-simple.component.scss'],
+    imports: [FocusMeDirective, SearchFormComponent]
 })
 export class SearchSimpleComponent extends BaseComponent implements OnInit, AfterViewChecked {
-    @ViewChild('mySearchForm') mySearchFormElement: SearchFormComponent;
+    private route = inject(ActivatedRoute);
+    private globalState = inject(GlobalState);
+    private historyMakerService = inject(HistoryMakerService);
+    private searchFormService = inject(SearchFormService);
+    private biographyStorySetService = inject(BiographyStorySetService);
+    private titleManagerService = inject(TitleManagerService);
+    private liveAnnouncer = inject(LiveAnnouncer);
+
+    readonly mySearchFormElement = viewChild<SearchFormComponent>('mySearchForm');
 
     simpleSearchPageTitle: string;
     simpleSearchPageTitleLong: string;
@@ -33,12 +43,7 @@ export class SearchSimpleComponent extends BaseComponent implements OnInit, Afte
     private tailoredStorySearchMessage: string = "Search Stories";
     private tailoredBioSearchMessage: string = "Search ScienceMakers";
 
-    constructor(private route: ActivatedRoute,
-      private globalState: GlobalState,
-      private historyMakerService: HistoryMakerService,
-      private searchFormService: SearchFormService,
-      private biographyStorySetService: BiographyStorySetService,
-      private titleManagerService: TitleManagerService, private liveAnnouncer: LiveAnnouncer) {
+    constructor() {
 
         super(); // for BaseComponent extension (brought in to cleanly unsubscribe from subscriptions)
 
@@ -131,9 +136,10 @@ export class SearchSimpleComponent extends BaseComponent implements OnInit, Afte
         // Attempt focus to the query input element once everything is set up.
         var focusSetElsewhere: boolean = false;
 
-        if (this.mySearchFormElement) {
+        const mySearchFormElement = this.mySearchFormElement();
+        if (mySearchFormElement) {
             focusSetElsewhere = true;
-            this.mySearchFormElement.setFocusToQueryInput();
+            mySearchFormElement.setFocusToQueryInput();
         }
 
         if (this.globalState.IsInternalRoutingWithinSPA) {

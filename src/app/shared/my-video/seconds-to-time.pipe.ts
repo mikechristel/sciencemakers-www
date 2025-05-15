@@ -1,9 +1,7 @@
 // CREDIT: greatly inspired by mat-video project, which provided this pipe; see https://github.com/nkoehler/mat-video
 import { Pipe, PipeTransform } from "@angular/core";
 
-@Pipe({
-  name: "secondsToTime"
-})
+@Pipe({ name: "secondsToTime" })
 export class SecondsToTimePipe implements PipeTransform {
   times = {
     year: 31557600,

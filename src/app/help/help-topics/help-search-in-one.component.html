@@ -5,19 +5,23 @@
   You wish to search inside his stories for "physics" and can do so by using the controls on the top of the landing page.
 </p>
 
-<p class="helptext mobile-only">
-  For mobile (narrow width browsers), click the search icon (magnifying glass) and proceed to "Search this person's stories" entry area.
-  Type the word "physics" into the entry area and either also type the Enter/Return key or tap/click the "Search" (magnifying glass) button.
-</p>
-<div class="mobile-only" fxLayout="column" fxLayoutAlign="space-around center">
-  <img fxFlex="0 0 auto" class="help__img" src="assets/help-search-within-1m.jpg" alt="screen shot of one person's stories search area" />
+<div class="mobile-only">
+  <p class="helptext">
+    For mobile (narrow width browsers), click the search icon (magnifying glass) and proceed to "Search this person's stories" entry area.
+    Type the word "physics" into the entry area and either also type the Enter/Return key or tap/click the "Search" (magnifying glass) button.
+  </p>
+  <div class="help-centered-item">
+    <img class="help__img" src="assets/help-search-within-1m.jpg" alt="screen shot of one person's stories search area" />
+  </div>
 </div>
-<p class="helptext desktop-only">
-  For widescreen browsers, you will have a "Search this person's stories" entry box and can type there directly.
-  Type the word "physics" into the entry area and either also type the Enter/Return key or click/tap the "Search" (magnifying glass) button.
-</p>
-<div class="desktop-only" fxLayout="column" fxLayoutAlign="space-around center">
-  <img fxFlex="0 0 auto" class="help__img" src="assets/help-search-within-1.jpg" alt="screen shot of one person's stories search area" />
+<div class="desktop-only">
+  <p class="helptext">
+    For widescreen browsers, you will have a "Search this person's stories" entry box and can type there directly.
+    Type the word "physics" into the entry area and either also type the Enter/Return key or click/tap the "Search" (magnifying glass) button.
+  </p>
+  <div class="help-centered-item">
+    <img class="help__img" src="assets/help-search-within-1.jpg" alt="screen shot of one person's stories search area" />
+  </div>
 </div>
 <p class="helptext">
   You will get a set of stories from Walter E. Massey which mention "physics": <a [routerLink]="['/stories/2',  {q: 'physics', ip: '654', ia: 'A2002.023'}]" routerLinkActive="active">story results for "physics" query within just Walter E. Massey</a>.

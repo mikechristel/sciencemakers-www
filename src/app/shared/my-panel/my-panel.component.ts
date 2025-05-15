@@ -1,5 +1,7 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Output, EventEmitter, input } from '@angular/core';
 import { BaseComponent } from '../base.component';
+import { NgClass } from '@angular/common';
+import { FocusMeDirective } from '../focus-me.directive';
 
 // NOTE: thanks to https://training.fabiobiondi.io/2017/07/10/create-an-accordion-component-in-angular-parent-children-communication/
 // inspiring this "panel", to replace former reliance on Bootstrap 3 panel behavior via JS.
@@ -15,16 +17,17 @@ import { BaseComponent } from '../base.component';
 @Component({
     selector: 'my-panel',
     templateUrl: './my-panel.component.html',
-    styleUrls: ['./my-panel.component.scss']
+    styleUrls: ['./my-panel.component.scss'],
+    imports: [NgClass, FocusMeDirective]
 })
 
 export class MyPanelComponent extends BaseComponent {
-  @Input() opened:boolean = false;
-  @Input() title: string;
-  @Input() markAsGrandparent:boolean = false;
-  @Input() overrideToH4Nesting: boolean = false;
-  @Input() markAsReverse:boolean = false;
-  @Input() setFocusToButtonHoldingMenu:boolean = false;
+  readonly opened = input<boolean>(false);
+  readonly title = input<string>(undefined);
+  readonly markAsGrandparent = input<boolean>(false);
+  readonly overrideToH4Nesting = input<boolean>(false);
+  readonly markAsReverse = input<boolean>(false);
+  readonly setFocusToButtonHoldingMenu = input<boolean>(false);
 
   @Output() toggle: EventEmitter<any> = new EventEmitter<any>();
 

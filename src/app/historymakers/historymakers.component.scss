@@ -79,7 +79,7 @@
     color: #fff;
     font-size: 2rem;
     margin: myF.em(12) 0 myF.em(8) 0; /* top right bottom left */
-    padding: myF.em(8) myF.em(10);
+    padding: myF.em(8) myF.em(4);
     position: relative; /* needed to get descending triangle magic to work... */
 
     &:after { /* magic to draw descending triangle */
@@ -96,10 +96,23 @@
     }
 }
 
-.distinguishFilterPane {
+.distinguishFilterPanelNarrowFilter {
   background-color: myF.color(light-grey);
   border: 1px solid #ccc;
   padding: myF.gutter(thmda-medium);
+
+  /* fxFlex.lt-md="34%" fxFlex.gt-sm="0 0 calc(308px)" */
+  @media screen and (max-width: myF.bp(afl_medium_just_before))
+  {
+    flex: 1 1 100%;
+    max-width: calc(34%);
+  }
+  @media screen and (min-width: myF.bp(afl_medium)) {
+    flex: 0 0 308px;
+    width: 308px;
+  }
+  margin-right: 18px;
+
 }
 
 .biography-set__title {
@@ -130,4 +143,81 @@
       text-decoration: underline;
     }
 
+}
+
+.flexColumnChunk {
+  flex: 1 1 100%;
+  box-sizing: border-box;
+  max-height: 100%;
+}
+
+.unstyled-list-nowhitespace-rowlayout {
+  /* changing to (to match how biography-storyset does this):  fxFlex.lt-md="100%" fxLayout="row" fxLayoutAlign="space-between end" fxLayoutGap="10px" */
+  box-sizing: border-box;
+  display: flex !important;
+  flex-direction: row;
+  place-content: flex-end space-between; /* note: shorthand for align-content: flex-end; justify-content: space-between */
+  align-items: flex-end;
+  *:not(:last-child) {
+    margin-right: 10px;
+  }
+
+  @media screen and (max-width: myF.bp(afl_medium_just_before))
+  {
+    flex: 1 1 auto;
+  }
+
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.unstyled-list-nowhitespace-narrow-filter {
+  /* fxLayout="row wrap" fxLayoutAlign="space-between center" fxLayoutGap.lt-md="0" fxLayoutGap="calc(0.5em)" */
+  box-sizing: border-box;
+  display: flex !important;
+  flex-direction: row;
+  flex-flow: row wrap;
+  flex: 1 1 1e-9px;
+  place-content: center space-between; /* note: shorthand for align-content: center; justify-content: space-between */
+  align-items: center;
+
+  @media screen and (min-width: myF.bp(afl_medium))
+  {
+    *:not(:last-child) {
+      margin-right: calc(0.5em);
+    }
+  }
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.filter--alphabet {
+  flex: 0 0 auto; /* fxFlex="none" */
+  box-sizing: border-box;
+
+  border: 1px solid myF.color(ok-grey);
+  color: myF.color(dark-grey);
+  margin: myF.em(3);
+  height: myF.em(30);
+  width: myF.em(30);
+  padding-bottom: myF.em(4);
+  padding-top: myF.em(4);
+  text-align: center;
+  text-transform: uppercase;
+  transition: border .2s ease-in-out;
+
+  &:hover {
+      border: 1px solid myF.color(dark-grey);
+      color: myF.color(dark-grey);
+  }
+
+  @media screen and (max-width: myF.bp(afl_medium_just_before)) {
+    margin: myF.em(5);
+    height: myGlobals.$buttonHeight;
+    width: myGlobals.$buttonHeight;
+    padding-bottom: myF.em(10);
+    padding-top: myF.em(10);
+  }
 }

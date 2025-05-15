@@ -1,4 +1,4 @@
-﻿import { Component, ViewChild, ElementRef, OnInit, OnDestroy } from '@angular/core';
+﻿import { Component, ViewChild, ElementRef, OnInit, OnDestroy, inject } from '@angular/core';
 
 import { Router } from '@angular/router';
 import { takeUntil } from "rxjs/operators";
@@ -18,16 +18,29 @@ import { HistoryMakerService } from '../historymakers/historymaker.service'; // 
 
 import { UserSettingsManagerService } from '../user-settings/user-settings-manager.service';
 
-import {LiveAnnouncer} from '@angular/cdk/a11y'; // used to read changes to the number of items, e.g., instead of
+import {LiveAnnouncer} from '@angular/cdk/a11y';
+import { FocusMeDirective } from '../shared/focus-me.directive';
+import { NgClass } from '@angular/common';
+import { MyPanelComponent } from '../shared/my-panel/my-panel.component'; // used to read changes to the number of items, e.g., instead of
 // <h2 aria-live="polite" class="tagSummary">{{tagMatchSummary}} {{descForSubset}}</h2> ...which sometimes was double-read by screen readers.
 // Angular folks recognized this and added in a timer to take care of it in their LiveAnnouncer implementation.
 
 @Component({
     selector: 'thda-tag',
     templateUrl: './tag.component.html',
-    styleUrls: ['./tag.component.scss']
+    styleUrls: ['./tag.component.scss'],
+    imports: [FocusMeDirective, MyPanelComponent, NgClass]
 })
 export class TagComponent extends BaseComponent implements OnInit, OnDestroy {
+    private router = inject(Router);
+    private globalState = inject(GlobalState);
+    private titleManagerService = inject(TitleManagerService);
+    private historyMakerService = inject(HistoryMakerService);
+    private tagService = inject(TagService);
+    private tagChosenSetService = inject(TagChosenSetService);
+    private userSettingsManagerService = inject(UserSettingsManagerService);
+    private liveAnnouncer = inject(LiveAnnouncer);
+
     // NOTE: framework for tag tree is very much legacy work dating to 2009 and not changed since then; note that data is
     // expected in certain form via this constant and with comment at the head of the view for this work (i.e., tag.component.html):
     private EXPECTED_TAG_BRANCHES: number = 12;
@@ -47,11 +60,7 @@ export class TagComponent extends BaseComponent implements OnInit, OnDestroy {
     qualitiesGroupOpened: boolean = true;
     themesGroupOpened: boolean = true;
 
-    constructor(private router: Router, private globalState: GlobalState, private titleManagerService: TitleManagerService,
-        private historyMakerService: HistoryMakerService,
-        private tagService: TagService, private tagChosenSetService: TagChosenSetService,
-        private userSettingsManagerService: UserSettingsManagerService,
-        private liveAnnouncer: LiveAnnouncer) {
+    constructor() {
 
         super(); // for BaseComponent extension (brought in to cleanly unsubscribe from subscriptions)
 
@@ -130,13 +139,13 @@ export class TagComponent extends BaseComponent implements OnInit, OnDestroy {
           var limitForSmallSubsetExcuse: number = biographyCount / 4;
           if (taggedBiographyCount == 0)
               this.tagMatchOpeningExcuse = "None of the " + biographyCount +
-              " HistoryMakers have tagged stories.  So, no stories will be returned by the filters below.";
+              " ScienceMakers have tagged stories.  So, no stories will be returned by the filters below.";
           else if (taggedBiographyCount < limitForSmallSubsetExcuse)
               this.tagMatchOpeningExcuse = "A small subset, just " + taggedBiographyCount + " of " + biographyCount +
-              " HistoryMakers, have tagged stories.  You can explore this subset using the filters below.";
+              " ScienceMakers, have tagged stories.  You can explore this subset using the filters below.";
           else if (taggedBiographyCount < biographyCount - this.TWO_DOZEN_UNTAGGED_BIOS_LIMIT)
               this.tagMatchOpeningExcuse = "A subset, " + taggedBiographyCount + " of " + biographyCount +
-                " HistoryMakers, have tagged stories.  You can explore this subset using the filters below.";
+                " ScienceMakers, have tagged stories.  You can explore this subset using the filters below.";
           else // perhaps all bios are tagged, but at least "most" are (there are at most TWO_DOZEN_UNTAGGED_BIOS_LIMIT untagged) so don't bother with a "subset" message
               this.tagMatchOpeningExcuse = ""; // no need for an excuse when (nearly) the whole corpus is tagged
       }
@@ -254,30 +263,30 @@ export class TagComponent extends BaseComponent implements OnInit, OnDestroy {
             this.tagMatchSummary = "";
             this.tagChosenSetService.tagMatchInfo().pipe(takeUntil(this.ngUnsubscribe))
                 .subscribe(ans => {
-                  // NOTE: ans assumed to be full TagSearchResult
-                  var storyResultCount: number = 0; // use 0 for ill-defined results
-                  if (ans != null)
-                      storyResultCount = ans.count;
-                  var connector: string;
-                  if (!this.clearIsPending) {
-                      this.hasNoTagSpec = false;
-                      this.tagMatchCountForSummary = storyResultCount;
-                      if (storyResultCount != 1)
-                          connector = " stories have ";
-                      else
-                          connector = " story has ";
-                      if (this.tagChosenSetService.chosenTags.length == 1)
-                          this.tagMatchSummary = storyResultCount + connector + "this tag:";
-                      else
-                          this.tagMatchSummary = storyResultCount + connector + "all these tags:";
-                  }
-                  // else // this.clearIsPending: nothing really to do:
-                      // During the delay, user may have cleared out tag choices via "Clear" button or
-                      // unchecked all tags - in any case there is nothing left to show so do not update
-                      // either this.tagMatchCountForSummary or this.tagMatchSummary - keep them as "cleared."
-              },
-              error => { this.tagMatchSummary = ""; this.hasNoTagSpec = true; }
-            );
+                    // NOTE: ans assumed to be full TagSearchResult
+                    var storyResultCount: number = 0; // use 0 for ill-defined results
+                    if (ans != null)
+                        storyResultCount = ans.count;
+                    var connector: string;
+                    if (!this.clearIsPending) {
+                        this.hasNoTagSpec = false;
+                        this.tagMatchCountForSummary = storyResultCount;
+                        if (storyResultCount != 1)
+                            connector = " stories have ";
+                        else
+                            connector = " story has ";
+                        if (this.tagChosenSetService.chosenTags.length == 1)
+                            this.tagMatchSummary = storyResultCount + connector + "this tag:";
+                        else
+                            this.tagMatchSummary = storyResultCount + connector + "all these tags:";
+                    }
+                    // else // this.clearIsPending: nothing really to do:
+                        // During the delay, user may have cleared out tag choices via "Clear" button or
+                        // unchecked all tags - in any case there is nothing left to show so do not update
+                        // either this.tagMatchCountForSummary or this.tagMatchSummary - keep them as "cleared."
+                },
+                error => { this.tagMatchSummary = ""; this.hasNoTagSpec = true; }
+              );
             this.descForSubset = newTitle;
             this.liveAnnouncer.announce(this.tagMatchSummary + " " + this.descForSubset); // done here rather than via aria-live tag on h2 element in the rendering
         }

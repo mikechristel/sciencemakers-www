@@ -1,4 +1,4 @@
-﻿import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+﻿import { Component, OnInit, ElementRef, inject, viewChild } from '@angular/core';
 import { takeUntil } from "rxjs/operators";
 
 import { ActivatedRoute, Router, Params } from '@angular/router';
@@ -22,20 +22,40 @@ import { SearchResult } from '../storyset/search-result';
 import { USMapManagerService } from '../US-map/US-map-manager.service';
 import { WindowService } from '../shared/services';
 import { UserSettingsManagerService } from '../user-settings/user-settings-manager.service';
-import {LiveAnnouncer} from '@angular/cdk/a11y'; // used to read changes to set title
+import {LiveAnnouncer} from '@angular/cdk/a11y';
+import { NgClass } from '@angular/common';
+import { FocusMeDirective } from '../shared/focus-me.directive';
+import { MyPanelComponent } from '../shared/my-panel/my-panel.component';
+import { StoryStampComponent } from '../story-stamp/story-stamp.component';
+import { USMapComponent } from '../US-map/US-map.component';
+import { SearchFormComponent } from '../shared/search-form/search-form.component'; // used to read changes to set title
 
 @Component({
     selector: 'my-bio-storyset',
     templateUrl: './biography-storyset.component.html',
-    styleUrls: ['./biography-storyset.component.scss']
+    styleUrls: ['./biography-storyset.component.scss'],
+    imports: [FocusMeDirective, MyPanelComponent, NgClass, StoryStampComponent, USMapComponent, SearchFormComponent]
 })
 export class BiographyStorySetComponent extends BaseComponent implements OnInit {
-  @ViewChild('rg1Map') radioGroup1_Map: ElementRef;
-  @ViewChild('rg1Text') radioGroup1_Text: ElementRef;
-  @ViewChild('rg1Pic') radioGroup1_Pic: ElementRef;
-  @ViewChild('rg2Map') radioGroup2_Map: ElementRef;
-  @ViewChild('rg2Text') radioGroup2_Text: ElementRef;
-  @ViewChild('rg2Pic') radioGroup2_Pic: ElementRef;
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private globalState = inject(GlobalState);
+  private biographyStorySetService = inject(BiographyStorySetService);
+  private historyMakerService = inject(HistoryMakerService);
+  private textSearchService = inject(TextSearchService);
+  private titleManagerService = inject(TitleManagerService);
+  private myUSMapManagerService = inject(USMapManagerService);
+  private windowService = inject(WindowService);
+  private userSettingsManagerService = inject(UserSettingsManagerService);
+  private searchFormService = inject(SearchFormService);
+  private liveAnnouncer = inject(LiveAnnouncer);
+
+  readonly radioGroup1_Map = viewChild<ElementRef>('rg1Map');
+  readonly radioGroup1_Text = viewChild<ElementRef>('rg1Text');
+  readonly radioGroup1_Pic = viewChild<ElementRef>('rg1Pic');
+  readonly radioGroup2_Map = viewChild<ElementRef>('rg2Map');
+  readonly radioGroup2_Text = viewChild<ElementRef>('rg2Text');
+  readonly radioGroup2_Pic = viewChild<ElementRef>('rg2Pic');
 
     signalFocusToTitle: boolean; // is used in html rendering of this component
     signalFocusToStoryID: number; // ID of the story, if any, that is selected in the story list
@@ -67,7 +87,8 @@ export class BiographyStorySetComponent extends BaseComponent implements OnInit 
     tailoredBirthLocation: string;
     tailoredDeceasedDate: string;
     tailoredImage: string;
-    tailoredStoryCountInfo: string;
+    tailoredStorySummationNarrow: string;
+    tailoredStorySummationWide: string;
     biographyFavoriteColor: string;
     biographyFavoriteFood: string;
     biographyFavoriteTimeOfYear: string;
@@ -79,20 +100,10 @@ export class BiographyStorySetComponent extends BaseComponent implements OnInit 
 
     private myMediaBase: string;
 
-    constructor(
-        private route: ActivatedRoute,
-        private router: Router,
-        private globalState: GlobalState,
-        private biographyStorySetService: BiographyStorySetService,
-        private historyMakerService: HistoryMakerService,
-        private textSearchService: TextSearchService,
-        private titleManagerService: TitleManagerService,
-        private myUSMapManagerService: USMapManagerService,
-        private windowService: WindowService,
-        private userSettingsManagerService: UserSettingsManagerService,
-        private searchFormService: SearchFormService, private liveAnnouncer: LiveAnnouncer) {
+    constructor() {
 
-          super(); // for BaseComponent extension (brought in to cleanly unsubscribe from subscriptions)
+          super();  // for BaseComponent extension (brought in to cleanly unsubscribe from subscriptions)
+          const myUSMapManagerService = this.myUSMapManagerService;
 
           // Start off with an empty signal about what to focus on
           this.clearSignalsForCurrentFocusSetting();
@@ -238,6 +249,8 @@ export class BiographyStorySetComponent extends BaseComponent implements OnInit 
                     var oneTapeStoryList: StoryDocument[] = [];
                     var storyCount: number = 0;
                     var oneStoryDocument: StoryDocument;
+                    var oneStoryDuration: number;
+                    var totalMSecsDuration: number = 0;
                     for (i = 0; i < bioDetail.sessions.length; i++) {
                         oneSessionInterviewInfo = "Interviewed on " + this.globalState.cleanedMonthDayYear(bioDetail.sessions[i].interviewDate) + " by " +
                             bioDetail.sessions[i].interviewer + " at " + bioDetail.sessions[i].location + ", videographer " + bioDetail.sessions[i].videographer;
@@ -251,7 +264,9 @@ export class BiographyStorySetComponent extends BaseComponent implements OnInit 
                                 storyCount += bioDetail.sessions[i].tapes[j].stories.length;
                                 for (var k = 0; k < bioDetail.sessions[i].tapes[j].stories.length; k++) {
                                     oneStoryDocument = new StoryDocument();
-                                    oneStoryDocument.duration = bioDetail.sessions[i].tapes[j].stories[k].duration;
+                                    oneStoryDuration = bioDetail.sessions[i].tapes[j].stories[k].duration;
+                                    oneStoryDocument.duration = oneStoryDuration;
+                                    totalMSecsDuration += oneStoryDuration;
                                     oneStoryDocument.storyID = bioDetail.sessions[i].tapes[j].stories[k].storyID;
                                     oneStoryDocument.title = bioDetail.sessions[i].tapes[j].stories[k].title;
                                     oneStoryDocument.storyOrder = bioDetail.sessions[i].tapes[j].stories[k].storyOrder;
@@ -267,19 +282,29 @@ export class BiographyStorySetComponent extends BaseComponent implements OnInit 
                         }
                     }
                     var pendingTitle: string = bioDetail.preferredName;
-                    var fragment: string;
+                    var countFragment: string;
                     if (pendingTitle != null && pendingTitle.length > 0)
                         pendingTitle += ", ";
                     else
                         pendingTitle = "";
                     if (storyCount != 1) {
-                        fragment = storyCount + " Stories";
+                      countFragment = storyCount + " Stories";
                     }
                     else {
-                        fragment = "1 Story";
+                      countFragment = "1 Story";
                     }
-                    pendingTitle += fragment;
-                    this.tailoredStoryCountInfo = fragment;
+                    pendingTitle += countFragment; // NOTE: pending title will be name, # stories format (not the total duration as well as that is too much for the title)
+                    if (storyCount > 0) {
+                      var durationFragment: string = this.convertToHHMMSS(totalMSecsDuration);
+                      // NOTE: the summation will be of two forms: # Stories, hh:mm:ss and # Stories, total time hh:mm:ss
+                      this.tailoredStorySummationNarrow = countFragment + ", " + durationFragment;
+                      this.tailoredStorySummationWide = countFragment + ", total time " + durationFragment;
+                    }
+                    else {
+                      // Same format for summation, just 0 stories
+                      this.tailoredStorySummationNarrow = countFragment;
+                      this.tailoredStorySummationWide = countFragment;
+                    }
 
                     // !!!TBD!!! NOTE: Until the API is updated, US State information is NOT returned from the getStoriesInBiography service call
                     // for stories within a biography.  Make a separate call that will load up this information for the stories.  Also, this implies
@@ -327,6 +352,40 @@ export class BiographyStorySetComponent extends BaseComponent implements OnInit 
                 this.setInterfaceForEmptyStorySet("");
               }
             );
+    }
+
+    // Return a hh:mm:ss format equivalent to the specified number of milliseconds, dropping out fractional part
+    // and returning 0:ss for values under a minute.  Return 0:00 for negative values or 0, and
+    // impose a ceiling of 99:59:59 for huge values.
+    private convertToHHMMSS(givenVal: number): string {
+        const MAX_MILLISECS_SUPPORTED = 359999; // 99 hours and 59 minutes and 59 seconds, 99:59:59
+        var workVal = Math.floor(givenVal / 1000); // convert milliseconds to seconds
+        var fullString: string = "";
+
+        // Protect for goofy values:
+        if (workVal < 0)
+            workVal = 0;
+        else if (workVal > MAX_MILLISECS_SUPPORTED)
+            workVal = MAX_MILLISECS_SUPPORTED;
+        var hours = Math.floor(workVal / 3600);
+        workVal -= (hours * 3600);
+        var minutes = Math.floor(workVal / 60);
+        var seconds = workVal - (60 * minutes);
+        var hoursString: string = hours.toString();
+        var minutesString: string = minutes.toString();
+
+        var secondsString: string = seconds.toString();
+        if (secondsString.length == 1)
+            secondsString = "0" + secondsString;
+        if (hours == 0)
+          fullString = minutesString + ":" + secondsString;
+        else
+        {
+          if (minutesString.length == 1)
+            minutesString = "0" + minutesString;
+          fullString = hours + ":" + minutesString + ":" + secondsString;
+        }
+        return fullString;
     }
 
     private setFocusAsNeeded() {
@@ -587,31 +646,37 @@ export class BiographyStorySetComponent extends BaseComponent implements OnInit 
 
     private focusPicViewInNarrowContainer(settingPicStampFocus: boolean, settingTextStampFocus: boolean) {
         if (settingPicStampFocus) { // set focus to radioGroup1_Pic
-            if (this.radioGroup1_Pic && this.radioGroup1_Pic.nativeElement)
-                this.radioGroup1_Pic.nativeElement.focus();
+            const radioGroup1_Pic = this.radioGroup1_Pic();
+            if (radioGroup1_Pic && radioGroup1_Pic.nativeElement)
+                radioGroup1_Pic.nativeElement.focus();
         }
         else if (settingTextStampFocus) { // set focus to radioGroup1_Text
-            if (this.radioGroup1_Text && this.radioGroup1_Text.nativeElement)
-                this.radioGroup1_Text.nativeElement.focus();
+            const radioGroup1_Text = this.radioGroup1_Text();
+            if (radioGroup1_Text && radioGroup1_Text.nativeElement)
+                radioGroup1_Text.nativeElement.focus();
         }
         else { // set focus to radioGroup1_Map
-            if (this.radioGroup1_Map && this.radioGroup1_Map.nativeElement)
-                this.radioGroup1_Map.nativeElement.focus();
+            const radioGroup1_Map = this.radioGroup1_Map();
+            if (radioGroup1_Map && radioGroup1_Map.nativeElement)
+                radioGroup1_Map.nativeElement.focus();
         }
     }
 
     private focusPicViewOption(settingPicStampFocus: boolean, settingTextStampFocus: boolean) {
         if (settingPicStampFocus) { // set focus to radioGroup2_Pic
-            if (this.radioGroup2_Pic && this.radioGroup2_Pic.nativeElement)
-                this.radioGroup2_Pic.nativeElement.focus();
+            const radioGroup2_Pic = this.radioGroup2_Pic();
+            if (radioGroup2_Pic && radioGroup2_Pic.nativeElement)
+                radioGroup2_Pic.nativeElement.focus();
         }
         else if (settingTextStampFocus) { // set focus to radioGroup2_Text
-            if (this.radioGroup2_Text && this.radioGroup2_Text.nativeElement)
-                this.radioGroup2_Text.nativeElement.focus();
+            const radioGroup2_Text = this.radioGroup2_Text();
+            if (radioGroup2_Text && radioGroup2_Text.nativeElement)
+                radioGroup2_Text.nativeElement.focus();
         }
         else { // set focus to radioGroup2_Map
-            if (this.radioGroup2_Map && this.radioGroup2_Map.nativeElement)
-                this.radioGroup2_Map.nativeElement.focus();
+            const radioGroup2_Map = this.radioGroup2_Map();
+            if (radioGroup2_Map && radioGroup2_Map.nativeElement)
+                radioGroup2_Map.nativeElement.focus();
         }
     }
 }

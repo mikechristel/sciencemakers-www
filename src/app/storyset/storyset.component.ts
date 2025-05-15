@@ -1,4 +1,4 @@
-﻿import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+﻿import { Component, OnInit, ElementRef, inject, viewChild } from '@angular/core';
 import { takeUntil } from "rxjs/operators";
 
 import { ActivatedRoute, Router, Params } from '@angular/router';
@@ -32,27 +32,52 @@ import { BaseComponent } from '../shared/base.component';
 import { BiographyStorySetService } from '../biography-storyset/biography-storyset.service';
 import { USMapDistribution } from '../US-map/US-map-distribution';
 import { USMapManagerService } from '../US-map/US-map-manager.service';
-import {LiveAnnouncer} from '@angular/cdk/a11y'; // used to read changes to set title, e.g., instead of
+import {LiveAnnouncer} from '@angular/cdk/a11y';
+import { NgClass, NgPlural, NgPluralCase } from '@angular/common';
+import { FocusMeDirective } from '../shared/focus-me.directive';
+import { MyPanelComponent } from '../shared/my-panel/my-panel.component';
+import { FormsModule } from '@angular/forms';
+import { StoryStampComponent } from '../story-stamp/story-stamp.component';
+import { USMapComponent } from '../US-map/US-map.component';
+import { SearchFormComponent } from '../shared/search-form/search-form.component'; // used to read changes to set title, e.g., instead of
 // <h2 aria-live="assertive" aria-atomic="true" class="sr-only">{{whateverSetTitle}}</h2> ...which sometimes was double-read by screen readers.
 // Angular folks recognized this and added in a timer to take care of it in their LiveAnnouncer implementation.
 
 @Component({
     selector: 'my-storyset',
     templateUrl: './storyset.component.html',
-    styleUrls: ['./storyset.component.scss']
+    styleUrls: ['./storyset.component.scss'],
+    imports: [FocusMeDirective, MyPanelComponent, FormsModule, NgClass, StoryStampComponent, USMapComponent, NgPlural, NgPluralCase, SearchFormComponent]
 })
 export class StorySetComponent extends BaseComponent implements OnInit {
-  @ViewChild('rg1Map') radioGroup1_Map: ElementRef;
-  @ViewChild('rg1Text') radioGroup1_Text: ElementRef;
-  @ViewChild('rg1Pic') radioGroup1_Pic: ElementRef;
-  @ViewChild('rg2Map') radioGroup2_Map: ElementRef;
-  @ViewChild('rg2Text') radioGroup2_Text: ElementRef;
-  @ViewChild('rg2Pic') radioGroup2_Pic: ElementRef;
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  globalState = inject(GlobalState);
+  private historyMakerService = inject(HistoryMakerService);
+  private textSearchService = inject(TextSearchService);
+  private idSearchService = inject(IDSearchService);
+  private tagService = inject(TagService);
+  private titleManagerService = inject(TitleManagerService);
+  private userSettingsManagerService = inject(UserSettingsManagerService);
+  private searchFormService = inject(SearchFormService);
+  private biographyStorySetService = inject(BiographyStorySetService);
+  private liveAnnouncer = inject(LiveAnnouncer);
+  private myUSMapManagerService = inject(USMapManagerService);
+  private playlistManagerService = inject(PlaylistManagerService);
+
+  readonly radioGroup1_Map = viewChild<ElementRef>('rg1Map');
+  readonly radioGroup1_Text = viewChild<ElementRef>('rg1Text');
+  readonly radioGroup1_Pic = viewChild<ElementRef>('rg1Pic');
+  readonly radioGroup2_Map = viewChild<ElementRef>('rg2Map');
+  readonly radioGroup2_Text = viewChild<ElementRef>('rg2Text');
+  readonly radioGroup2_Pic = viewChild<ElementRef>('rg2Pic');
 
     readonly MAX_REGION_US_STATES_TO_SHOW_IN_FILTER_AREA:number = 10; // need data from all 50+DC for map view, but don't show all 51, just the top N
 
     titleForStorySet: string; // includes a count
     screenReaderSummaryTitle: string; // abbreviated form (no count, paging, etc., given in this summary)
+
+    allowIDSetCopy: boolean = false; // turn on additional UI if we have a story ID set to potentially copy
 
     cardView: boolean = true;
     textView: boolean = false;
@@ -109,9 +134,7 @@ export class StorySetComponent extends BaseComponent implements OnInit {
     needToggleDetails: boolean = false;
     showingFilterMenu: boolean = false; // changes the display of the page: filters on side with other items, or just filters in a menu
 
-    // NOTE:  terminology has not been updated in the code: the UI will make note of a specific saved set of stories as "My Clips" while code here
-    // still notes this as "Starred Stories" -- despite the UI changing from star to plus to add a story to My Clips.  Take note: starred means "my clips."
-    showingStarredSet: boolean = false; // needed to gate extra UI for starred stories, i.e., my clips marked set of stories
+    showingMyClipsSet: boolean = false; // needed to gate extra UI for "my clips" marked set of stories
 
     myClips: Playlist[];
 
@@ -125,13 +148,15 @@ export class StorySetComponent extends BaseComponent implements OnInit {
     facetFamilies: FacetFamilyContainer[] = []; // initialized once, in constructor, so there is entry for each of the StoryFilterFamilyType values
     activeFacets: StoryFacetWithFamily[] = [];
 
-    // TODO: Later consider whether to have each story set type (starred, etc.) in its own component,
+    // TODO: Later consider whether to have each story set type (my clips,  etc.) in its own component,
     // inheriting perhaps the base story set features of paging, titling, etc.  For now, all story sets except a single biography's story set
     // are here in this StorySet component.
 
     // Another "particular" set of features for given ID lists:
     givenIDList: string = "";
-    IDListTitle: string;
+
+    // Something just for given ID lists, an optional given title:
+    givenIDListTitle: string = "";
 
     // Sorting
     storySearchSortFields: StorySearchSortField[];
@@ -146,23 +171,12 @@ export class StorySetComponent extends BaseComponent implements OnInit {
     showStoryJobTypeFacetFilter: boolean;
     showStoryDecadeOfBirthFacetFilter: boolean;
 
-    constructor(
-        private route: ActivatedRoute,
-        private router: Router,
-        public globalState: GlobalState,
-        private historyMakerService: HistoryMakerService,
-        private textSearchService: TextSearchService,
-        private idSearchService: IDSearchService,
-        private tagService: TagService,
-        private titleManagerService: TitleManagerService,
-        private userSettingsManagerService: UserSettingsManagerService,
-        private searchFormService: SearchFormService,
-        private biographyStorySetService: BiographyStorySetService,
-        private liveAnnouncer: LiveAnnouncer,
-        private myUSMapManagerService: USMapManagerService,
-        private playlistManagerService: PlaylistManagerService) {
+    constructor() {
 
         super(); // since this is a derived class from BaseComponent
+        const userSettingsManagerService = this.userSettingsManagerService;
+        const myUSMapManagerService = this.myUSMapManagerService;
+        const playlistManagerService = this.playlistManagerService;
 
         // Set up data structure for facet families.
         this.initializeFacetFamilies();
@@ -208,7 +222,7 @@ export class StorySetComponent extends BaseComponent implements OnInit {
 
         playlistManagerService.myClips$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((value) => {
             this.myClips = value;
-            if (this.showingStarredSet) {
+            if (this.showingMyClipsSet) {
                 this.getIDListStoriesPage(this.playlistManagerService.MyClipsAsString(), this.myCurrentPage, this.myCurrentPageSize);
             }
         });
@@ -297,8 +311,8 @@ export class StorySetComponent extends BaseComponent implements OnInit {
     // ---
     // StorySetType.BiographyCollection: (formerly here, but now moved to its own component, biography-storyset as it held other info)
     // ---
-    // StorySetType.StarredSet:
-    // Needed:  A cached list of starred stories in a global state (see playlistManagerService).
+    // StorySetType.MyClipsSet:
+    // Needed:  A cached list of "my clips" stories in a global state (see playlistManagerService).
     // ---
     // StorySetType.GivenIDSet:
     // Needed:  Comma-separated ID list as parameter IDList required.
@@ -454,7 +468,7 @@ export class StorySetComponent extends BaseComponent implements OnInit {
                 // Update context in this... for query and page state and view (with sort order already updated and noted via sortOrderChanged)
                 this.myType = anticipatedType;
                 this.transcriptQueryContext = null;
-                this.showingStarredSet = (anticipatedType == StorySetType.StarredSet);
+                this.showingMyClipsSet = (anticipatedType == StorySetType.MyClipsSet);
                 this.myCurrentFilterSpec = newSpec;
 
                 this.myCurrentQuery = newCurrentQuery;
@@ -463,12 +477,13 @@ export class StorySetComponent extends BaseComponent implements OnInit {
                     this.cardView = false;
                 else
                     this.cardView = !anticipatedMapView;
+                this.allowIDSetCopy = false; // turned on rarely, when loading a nonzero set of potentially filtered StorySetType.GivenIDSet items that includes something not in My Clips already
 
-                if (anticipatedType == StorySetType.StarredSet || anticipatedType == StorySetType.GivenIDSet) {
-                    // If this.showingStarredSet, then ID list is via playlistManagerService.
+                if (anticipatedType == StorySetType.MyClipsSet || anticipatedType == StorySetType.GivenIDSet) {
+                    // If this.showingMyClipsSet, then ID list is via playlistManagerService.
                     // Else, ID list is via parameter IDList.
                     var IDListToLoad: string;
-                    if (this.showingStarredSet) {
+                    if (this.showingMyClipsSet) {
                         IDListToLoad = this.playlistManagerService.MyClipsAsString();
                     }
                     else {
@@ -480,9 +495,12 @@ export class StorySetComponent extends BaseComponent implements OnInit {
                     }
                     this.givenIDList = IDListToLoad;
                     if (params['ListTitle'] !== undefined)
-                        this.IDListTitle = decodeURIComponent(params['ListTitle']);
+                      this.givenIDListTitle = decodeURIComponent(params['ListTitle']);
+                    else
+                      this.givenIDListTitle = "";
+
                     // NOTE: for empty ID list, logic exists within getIDListStoriesPage to report "none yet" message;
-                    // it makes use of this.showingStarredSet:
+                    // it makes use of this.showingMyClipsSet:
                     this.getIDListStoriesPage(IDListToLoad, givenPageIndicator, givenPageSize);
                 }
                 else if (this.myType == StorySetType.TagSearch) {
@@ -656,31 +674,37 @@ export class StorySetComponent extends BaseComponent implements OnInit {
 
     private focusPicViewInFilterMenuOption(settingPicStampFocus: boolean, settingTextStampFocus: boolean) {
         if (settingPicStampFocus) { // set focus to radioGroup1_Pic
-            if (this.radioGroup1_Pic && this.radioGroup1_Pic.nativeElement)
-                this.radioGroup1_Pic.nativeElement.focus();
+            const radioGroup1_Pic = this.radioGroup1_Pic();
+            if (radioGroup1_Pic && radioGroup1_Pic.nativeElement)
+                radioGroup1_Pic.nativeElement.focus();
         }
         else if (settingTextStampFocus) { // set focus to radioGroup1_Text
-            if (this.radioGroup1_Text && this.radioGroup1_Text.nativeElement)
-                this.radioGroup1_Text.nativeElement.focus();
+            const radioGroup1_Text = this.radioGroup1_Text();
+            if (radioGroup1_Text && radioGroup1_Text.nativeElement)
+                radioGroup1_Text.nativeElement.focus();
         }
         else { // set focus to radioGroup1_Map
-            if (this.radioGroup1_Map && this.radioGroup1_Map.nativeElement)
-                this.radioGroup1_Map.nativeElement.focus();
+            const radioGroup1_Map = this.radioGroup1_Map();
+            if (radioGroup1_Map && radioGroup1_Map.nativeElement)
+                radioGroup1_Map.nativeElement.focus();
         }
     }
 
     private focusPicViewOption(settingPicStampFocus: boolean, settingTextStampFocus: boolean) {
         if (settingPicStampFocus) { // set focus to radioGroup2_Pic
-            if (this.radioGroup2_Pic && this.radioGroup2_Pic.nativeElement)
-                this.radioGroup2_Pic.nativeElement.focus();
+            const radioGroup2_Pic = this.radioGroup2_Pic();
+            if (radioGroup2_Pic && radioGroup2_Pic.nativeElement)
+                radioGroup2_Pic.nativeElement.focus();
         }
         else if (settingTextStampFocus) { // set focus to radioGroup2_Text
-            if (this.radioGroup2_Text && this.radioGroup2_Text.nativeElement)
-                this.radioGroup2_Text.nativeElement.focus();
+            const radioGroup2_Text = this.radioGroup2_Text();
+            if (radioGroup2_Text && radioGroup2_Text.nativeElement)
+                radioGroup2_Text.nativeElement.focus();
         }
         else { // set focus to radioGroup2_Map
-            if (this.radioGroup2_Map && this.radioGroup2_Map.nativeElement)
-                this.radioGroup2_Map.nativeElement.focus();
+            const radioGroup2_Map = this.radioGroup2_Map();
+            if (radioGroup2_Map && radioGroup2_Map.nativeElement)
+                radioGroup2_Map.nativeElement.focus();
         }
     }
 
@@ -696,30 +720,42 @@ export class StorySetComponent extends BaseComponent implements OnInit {
           this.playlistManagerService.triggerMyClipsConfirmClearingForm();
     }
 
+    openMyInputClipsModalForm() {
+      this.playlistManagerService.triggerClipsLoadForm();
+    }
+
+    reorderMyClips() {
+      // Make sure all signals are cleared regarding focus.  Any new focus decisions are made based on pending flags,
+      // not signal flags, so simplify bookkeeping and just have all signals cleared before routing.
+      this.clearSignalsForCurrentFocusSetting();
+      this.router.navigate(['/reorderMyClips']);
+    }
+
     private getIDListStoriesPage(IDListToLoad: string, givenPage: number, givenPageSize: number) {
-        // NOTE: assumes this.showingStarredSet is true iff id list is to be considered a "starred" set.
+        // NOTE: assumes this.showingMyClipsSet is true iff id list is to be considered a "my clips" set.
         // Override title if it is true.
-        if (this.showingStarredSet) {
-            this.titleForStorySet = "My Clips";
-            this.screenReaderSummaryTitle = "My Clips";
-        }
         if (IDListToLoad.length > 0) {
-            if (!this.showingStarredSet) {
+            if (this.showingMyClipsSet)
+                this.titleForStorySet = "My Clips... (in progress)";
+            else
                 this.titleForStorySet = "Searching... (in progress)";
-                this.screenReaderSummaryTitle = "HistoryMaker Story Set, Search Pending";
-            }
+            this.screenReaderSummaryTitle = "ScienceMaker Story Set, Search Pending";
 
             var titleLabelStoryModifier: string = "";
-            this.totalStoriesFound = 0; // typically is reassigned later with a service subscription
-
             var searchableFacetSpec: SearchableFacetSpecifier = this.computeFacetArguments(this.myCurrentFilterSpec);
             var addFilterPrefixToMapKey:boolean = this.nonEmptyFacetSpecification(searchableFacetSpec);
             if (addFilterPrefixToMapKey)
                 titleLabelStoryModifier = "filtered ";
-            if (this.showingStarredSet)
-                titleLabelStoryModifier += "\"My Clips\"";
-
+            if (this.showingMyClipsSet)
+              titleLabelStoryModifier += "\"My Clips\"";
+            else
+            {
+              if (this.givenIDListTitle.length == 0)
+                titleLabelStoryModifier += "\"Story Set\"";
+            }
             this.selectedStoryID = this.globalState.NOTHING_CHOSEN; // assume we have no stories so no selected stories
+            this.totalStoriesFound = 0; // typically is reassigned later with a service subscription
+
             this.idSearchService.getIDSearch(IDListToLoad, givenPage, givenPageSize,
                 searchableFacetSpec.genderFacetSpec, searchableFacetSpec.birthDecadeFacetSpec, searchableFacetSpec.makerFacetSpec,
                 searchableFacetSpec.jobFacetSpec, searchableFacetSpec.regionUSStateFacetSpec, searchableFacetSpec.organizationFacetSpec,
@@ -727,15 +763,42 @@ export class StorySetComponent extends BaseComponent implements OnInit {
                 .pipe(takeUntil(this.ngUnsubscribe)).subscribe(retSet => {
                     this.globalState.matchSetContext = null; // no match terms for matching on story IDs
                     this.isSortableSet = false; // no sorting on ID lists
+
                     this.myStoryList = this.thinToGivenPage(retSet.stories, givenPage, givenPageSize);
+
                     if (this.myStoryList != null) {
                         this.totalStoriesFound = retSet.count;
                     }
                     else {
                         this.totalStoriesFound = 0;
                     }
+                    if (!this.showingMyClipsSet) {
+                        if (this.totalStoriesFound > 0) {
+                            // Do some work needing the numeric IDs of My Clips:
+                            var allInMyClipsAlready: boolean = false;
+                            if (this.myClips)
+                            {
+                                var myClipsAsIDSet: number[] = this.playlistManagerService.MyClipsAsIDSet();
+                                allInMyClipsAlready = true; // assume all are in My Clips until proven otherwise
+                                // If there is at least one ID NOT in My Clips, allow a "Add to My Clips" UI option later in the route that will be navigated.
+                                for (var i: number = 0; i < retSet.stories.length && allInMyClipsAlready; i++) {
+                                    if (myClipsAsIDSet.indexOf(retSet.stories[i].document.storyID) == -1)
+                                        // Found something not in My Clips; mark that!
+                                        allInMyClipsAlready = false;
+                                }
+                            }
+                            this.allowIDSetCopy = !allInMyClipsAlready; // if we have something NOT in My Clips, then allow the ID set copy UI to show
+                        }
+                        // else this.allowIDSetCopy remains false
+                    }
+                    // else this.allowIDSetCopy remains false
+
+                    var titleSuffix: string = "";
+                    if (this.givenIDListTitle.length > 0)
+                      titleSuffix = ", " + this.givenIDListTitle;
+
                     this.initializeUSStateCounts(addFilterPrefixToMapKey);
-                    this.calcTitleAndEnablePaging(givenPage, givenPageSize, titleLabelStoryModifier, "");
+                    this.calcTitleAndEnablePaging(givenPage, givenPageSize, titleLabelStoryModifier, titleSuffix);
                     this.processFacetsFromService(this.totalStoriesFound, retSet.facets, searchableFacetSpec);
                     // Finally, focus can be set because we have our context and content.
                     this.setFocusAsNeeded();
@@ -746,8 +809,10 @@ export class StorySetComponent extends BaseComponent implements OnInit {
         }
         else {
             var msg: string;
-            if (this.showingStarredSet)
-                msg = '0 "My Clips" stories'; // make sure this is consistent with title string format used elsewhere with this.showingStarredSet
+            if (this.showingMyClipsSet) {
+                msg = '0 "My Clips" stories'; // make sure this is consistent with title string format used elsewhere with this.showingMyClipsSet
+                this.titleForStorySet = msg;
+            }
             else
                 msg = "No story IDs were given, so no stories shown."
             this.setInterfaceForEmptyStorySet(givenPageSize, msg);
@@ -941,7 +1006,6 @@ export class StorySetComponent extends BaseComponent implements OnInit {
         var addFilterPrefixToMapKey:boolean = this.nonEmptyFacetSpecification(searchableFacetSpec);
         if (addFilterPrefixToMapKey)
             titleLabelStoryModifier = "filtered";
-        this.IDListTitle = null;
 
         this.totalStoriesFound = 0; // typically is reassigned later with a service subscription
 
@@ -968,7 +1032,8 @@ export class StorySetComponent extends BaseComponent implements OnInit {
 
                 // Only bother with possibly setting a search context for non-empty results (even if filtering is why results are empty).
                 if (this.myCurrentSearchTranscriptOnlyFlag || !this.myCurrentSearchTitleOnlyFlag)
-                    this.transcriptQueryContext = this.myCurrentQuery; // search is not just to title, and so by definition (if both flags false) includes transcript
+                    // search is not just to title, and so by definition (if both flags false) includes transcript
+                    this.transcriptQueryContext = this.globalState.cleanedQueryRouterParameter(this.myCurrentQuery); // make sure + (or %2B) does not mess up the URI which will have this query piece listed
                 else
                     this.transcriptQueryContext = null;
             }
@@ -1239,7 +1304,7 @@ export class StorySetComponent extends BaseComponent implements OnInit {
         this.initializeUSStateCounts(false);
         this.processFacetsFromService(0, null, null);
 
-        if (!this.showingStarredSet) {
+        if (!this.showingMyClipsSet) {
             if (improvedTitle == null || improvedTitle.length == 0)
                 this.titleForStorySet = "No stories found.";
             else
@@ -1267,9 +1332,9 @@ export class StorySetComponent extends BaseComponent implements OnInit {
         // Two approaches for title: if cardView or textView, we look at a page of results only, so put page info in title.
         // But, for map, look at ALL the results, so do not put page info in title.
 
-        // Also, via accessibility review, simplify if this is My Clips (this.showingStarredSet).
+        // Also, via accessibility review, simplify if this is My Clips (this.showingMyClipsSet).
         if (!this.cardView && !this.textView) {
-            if (this.showingStarredSet) {
+            if (this.showingMyClipsSet) {
                 this.titleForStorySet = "Map view of My Clips";
                 this.screenReaderSummaryTitle = "Map view of My Clips";
             }
@@ -1293,44 +1358,35 @@ export class StorySetComponent extends BaseComponent implements OnInit {
 
             if (countReturned == 0) {
                 if (this.myCurrentPage != 1) {
-                    if (this.showingStarredSet)
+                    if (this.showingMyClipsSet)
                         this.titleForStorySet = "Nothing in My Clips for page " + this.myCurrentPage + " (" + this.myCurrentPageSize + " per page)";
                     else
                         this.titleForStorySet = "No stories for page " + this.myCurrentPage + " (" + this.myCurrentPageSize + " per page)";
                 }
                 else {
-                    if (this.showingStarredSet)
+                    if (this.showingMyClipsSet)
                         this.titleForStorySet = "My Clips";
                     else
                         this.titleForStorySet = "No results for " + this.fullResultSetTitleSuffix;
                 }
-                if (this.showingStarredSet)
+                if (this.showingMyClipsSet)
                     this.screenReaderSummaryTitle = "My Clips";
                 else
                     this.screenReaderSummaryTitle = "Empty HistoryMaker Story Set";
             }
             else {
                 if (this.totalStoriesFound > this.myCurrentPage * this.myCurrentPageSize) {
-                    if (this.showingStarredSet)
-                        this.titleForStorySet = "My Clips, page " + this.myCurrentPage + " of " + totalPages;
-                    else
-                        this.titleForStorySet = this.totalStoriesFound + " " + this.fullResultSetTitleSuffix + ", page " + this.myCurrentPage + " of " + totalPages;
+                    this.titleForStorySet = this.totalStoriesFound + " " + this.fullResultSetTitleSuffix + ", page " + this.myCurrentPage + " of " + totalPages;
                 } else {
                     // Perhaps everything fits on first page (count <= page size).  If so, don't tack on ", page 1 of 1"
                     if (this.myCurrentPage == 1) {
-                        if (this.showingStarredSet)
-                            this.titleForStorySet = "My Clips";
-                        else
-                            this.titleForStorySet = this.totalStoriesFound + " " + this.fullResultSetTitleSuffix;
+                        this.titleForStorySet = this.totalStoriesFound + " " + this.fullResultSetTitleSuffix;
                     }
                     else { // everything does NOT fit on last page of results, but it is true that there is no next page.  Show ", page X of Y"
-                        if (this.showingStarredSet)
-                            this.titleForStorySet = "My Clips, page " + this.myCurrentPage + " of " + totalPages;
-                        else
-                            this.titleForStorySet = this.totalStoriesFound + " " + this.fullResultSetTitleSuffix + ", page " + this.myCurrentPage + " of " + totalPages;
+                        this.titleForStorySet = this.totalStoriesFound + " " + this.fullResultSetTitleSuffix + ", page " + this.myCurrentPage + " of " + totalPages;
                     }
                 }
-                if (this.showingStarredSet)
+                if (this.showingMyClipsSet)
                     this.screenReaderSummaryTitle = "My Clips";
                 else
                     this.screenReaderSummaryTitle = "HistoryMaker Story Set";
@@ -1754,8 +1810,10 @@ export class StorySetComponent extends BaseComponent implements OnInit {
             else if (this.myType == StorySetType.GivenIDSet) {
                 if (this.givenIDList.length > 0)
                     moreParams['IDList'] = this.givenIDList;
+                if (this.givenIDListTitle.length > 0)
+                    moreParams['ListTitle'] = this.givenIDListTitle;
             }
-            // NOTE: for this.myType == StorySetType.StarredSet, make use of playlist-manager.service to restore the starred set.
+            // NOTE: for this.myType == StorySetType.MyClipsSet, make use of playlist-manager.service to restore the "my clips" set.
 
             if (this.myCurrentStorySearchSorting)
                 moreParams['so'] = this.myCurrentStorySearchSorting;

@@ -1,4 +1,4 @@
-﻿import { Injectable, Inject, OnInit } from '@angular/core';
+﻿import { Injectable, OnInit, inject } from '@angular/core';
 import { Observable, throwError } from "rxjs";
 import { catchError, mergeMap } from "rxjs/operators";
 import { HttpClient } from '@angular/common/http';
@@ -9,9 +9,10 @@ import { environment } from '../../environments/environment';
 
 @Injectable()
 export class IDSearchService {
-    private idSearchURL = 'StorySet?csvStoryIDs='; // require csv argument, so it is already tacked on
+    private http = inject(HttpClient);
+    private historyMakerService = inject(HistoryMakerService);
 
-    constructor(private http: HttpClient, private historyMakerService: HistoryMakerService) {}
+    private idSearchURL = 'StorySet?csvStoryIDs=';
 
     // NOTE: facet arguments are optional; if not given, then no filtering by facets will occur, i.e., no facet arguments passed into the service.
     getIDSearch(csvIDList: string, givenPage: number, givenPageSize: number, genderFacet?: string, yearFacets?: string,
@@ -44,7 +45,7 @@ export class IDSearchService {
           mergeMap(fd => this.http.get<SearchResult>(environment.serviceBase + this.idSearchURL + csvIDList + addedArgs).pipe(
             catchError( err => {
               // TODO: (!!!TBD!!!) Decide if we wish to log errors in any way or use console, e.g., console.log('error caught: ', err);
-              return throwError( err ); }
+              return throwError(() => err); }
             )
           ))
         );

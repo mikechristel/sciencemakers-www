@@ -2,30 +2,22 @@
  * HTTP Authentication Interceptor
  */
 import { APP_BASE_HREF, Location } from '@angular/common';
-import { Injectable } from '@angular/core';
-import {
-  HttpInterceptor,
-  HttpRequest,
-  HttpResponse,
-  HttpErrorResponse,
-  HttpHandler,
-  HttpEvent
-} from '@angular/common/http';
+import { Injectable, inject } from '@angular/core';
+import { HttpInterceptor, HttpRequest, HttpResponse, HttpErrorResponse, HttpHandler, HttpEvent } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { AuthManagerService } from './auth-manager.service';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
+  private authManagerService = inject(AuthManagerService);
 
-  constructor(private authManagerService: AuthManagerService) {
-
-  }
 
   /**
     * Handle all 403 (and 401) errors returned by reverse-proxy authentication server
    */
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+
     return next.handle(request).pipe(
       tap(
         (event: HttpEvent<any>) => {
@@ -44,5 +36,4 @@ export class AuthInterceptor implements HttpInterceptor {
         }
       ));
   }
-
 }

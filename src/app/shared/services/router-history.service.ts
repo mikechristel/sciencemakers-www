@@ -1,6 +1,6 @@
 // CREDIT: https://github.com/semanticbits/previous-url-example
 // See also: https://semanticbits.com/route-history-service-in-angular/
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { Router, NavigationStart, NavigationEnd } from '@angular/router';
 import { filter, scan } from 'rxjs/operators';
@@ -14,7 +14,10 @@ export class RouterHistoryService {
   previousUrl$ = new BehaviorSubject<string>(null);
   currentUrl$ = new BehaviorSubject<string>(null);
 
-  constructor(router: Router, globalState: GlobalState) {
+  constructor() {
+    const router = inject(Router);
+    const globalState = inject(GlobalState);
+
     router.events
       .pipe(
         // only include NavigationStart and NavigationEnd events

@@ -1,4 +1,4 @@
-﻿import { Component, OnInit, ViewChild, ViewChildren, ElementRef, QueryList, AfterViewChecked } from '@angular/core';
+﻿import { Component, OnInit, ElementRef, AfterViewChecked, inject, viewChild, viewChildren } from '@angular/core';
 import { takeUntil } from "rxjs/operators";
 
 import { BriefBio } from './brief-bio';
@@ -18,27 +18,46 @@ import { BaseComponent } from '../shared/base.component';
 import { USMapDistribution } from '../US-map/US-map-distribution';
 import { USMapManagerService } from '../US-map/US-map-manager.service';
 import { BioFilterFamilyType, BioFilterFamilyTypeCount, FacetWithFamily } from './biofilterfamily-type';
-import {LiveAnnouncer} from '@angular/cdk/a11y'; // used to read changes to set title, e.g., instead of
+import {LiveAnnouncer} from '@angular/cdk/a11y';
+import { NgClass } from '@angular/common';
+import { FocusMeDirective } from '../shared/focus-me.directive';
+import { MyPanelOfButtonsComponent } from '../shared/my-panel-of-buttons/my-panel-of-buttons.component';
+import { MyPanelComponent } from '../shared/my-panel/my-panel.component';
+import { FormsModule } from '@angular/forms';
+import { BiographyResultStampComponent } from '../biography-result-stamp/biography-result-stamp.component';
+import { USMapComponent } from '../US-map/US-map.component';
+import { SearchFormComponent } from '../shared/search-form/search-form.component'; // used to read changes to set title, e.g., instead of
 // <h2 aria-live="assertive" aria-atomic="true" class="sr-only">{{biographySetTitle}}</h2> ...which sometimes was double-read by screen readers.
 // Angular folks recognized this and added in a timer to take care of it in their LiveAnnouncer implementation.
 
 @Component({
     selector: 'my-historymakers',
     templateUrl: './historymakers.component.html',
-    styleUrls: ['./historymakers.component.scss']
+    styleUrls: ['./historymakers.component.scss'],
+    imports: [FocusMeDirective, MyPanelOfButtonsComponent, MyPanelComponent, FormsModule, NgClass, BiographyResultStampComponent, USMapComponent, SearchFormComponent]
 })
 
 export class HistoryMakersComponent extends BaseComponent implements OnInit, AfterViewChecked {
-  @ViewChild('rg1Map') radioGroup1_Map: ElementRef;
-  @ViewChild('rg1Text') radioGroup1_Text: ElementRef;
-  @ViewChild('rg1Pic') radioGroup1_Pic: ElementRef;
-  @ViewChild('rg2Map') radioGroup2_Map: ElementRef;
-  @ViewChild('rg2Text') radioGroup2_Text: ElementRef;
-  @ViewChild('rg2Pic') radioGroup2_Pic: ElementRef;s
-  @ViewChild('rgLastInitialParentInFilterMenu') lastInitialInFilterMenu_Parent: ElementRef;
-  @ViewChild('rgLastInitialParent') lastInitial_Parent: ElementRef;
-  @ViewChildren('rgLastInitialInFilterMenu') lastInitialItemsInFilterMenu: QueryList<ElementRef>;
-  @ViewChildren('rgLastInitial') lastInitialItems: QueryList<ElementRef>;
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  globalState = inject(GlobalState);
+  private historyMakerService = inject(HistoryMakerService);
+  private titleManagerService = inject(TitleManagerService);
+  private userSettingsManagerService = inject(UserSettingsManagerService);
+  private liveAnnouncer = inject(LiveAnnouncer);
+  private myUSMapManagerService = inject(USMapManagerService);
+  private searchFormService = inject(SearchFormService);
+
+  readonly radioGroup1_Map = viewChild<ElementRef>('rg1Map');
+  readonly radioGroup1_Text = viewChild<ElementRef>('rg1Text');
+  readonly radioGroup1_Pic = viewChild<ElementRef>('rg1Pic');
+  readonly radioGroup2_Map = viewChild<ElementRef>('rg2Map');
+  readonly radioGroup2_Text = viewChild<ElementRef>('rg2Text');
+  readonly radioGroup2_Pic = viewChild<ElementRef>('rg2Pic');s
+  readonly lastInitialInFilterMenu_Parent = viewChild<ElementRef>('rgLastInitialParentInFilterMenu');
+  readonly lastInitial_Parent = viewChild<ElementRef>('rgLastInitialParent');
+  readonly lastInitialItemsInFilterMenu = viewChildren<ElementRef>('rgLastInitialInFilterMenu');
+  readonly lastInitialItems = viewChildren<ElementRef>('rgLastInitial');
 
     readonly MAX_REGION_US_STATES_TO_SHOW_IN_FILTER_AREA:number = 10; // need data from all 50+DC for map view, but don't show all 51, just the top N
     readonly NO_US_BIRTHSTATE_FOR_SOME_LABEL_SUFFIX:string = " born outside the U.S. or with unrecorded birth location."; // of form: prefix # ScienceMaker(s) and this suffix
@@ -115,18 +134,11 @@ export class HistoryMakersComponent extends BaseComponent implements OnInit, Aft
 
     showingFilterMenu: boolean = false; // changes the display of the page: filters on side with other items, or just filters in a menu
 
-    constructor(
-        private route: ActivatedRoute,
-        private router: Router,
-        public globalState: GlobalState,
-        private historyMakerService: HistoryMakerService,
-        private titleManagerService: TitleManagerService,
-        private userSettingsManagerService: UserSettingsManagerService,
-        private liveAnnouncer: LiveAnnouncer,
-        private myUSMapManagerService: USMapManagerService,
-        private searchFormService: SearchFormService) {
+    constructor() {
 
         super(); // since this is a derived class from BaseComponent
+        const userSettingsManagerService = this.userSettingsManagerService;
+        const myUSMapManagerService = this.myUSMapManagerService;
 
         // Set up data structure for facet families.
         this.initializeFacetFamilies();
@@ -398,17 +410,19 @@ export class HistoryMakersComponent extends BaseComponent implements OnInit, Aft
         // Accessibility concerns on last initial set of buttons: when container for it "opens" then
         // focus to the first item within; when that set is escaped out, set focus to the container menu.
         if (this.signalFocusMoveToFirstLastInitial_FilterMenu) {
-            if (this.lastInitialItemsInFilterMenu.length > 0) {
-                let lastInitialOptionElements: ElementRef[] = this.lastInitialItemsInFilterMenu.toArray();
-                lastInitialOptionElements[0].nativeElement.focus();
+            if (this.lastInitialItemsInFilterMenu().length > 0) {
+                if (this.lastInitialItemsInFilterMenu[0].nativeElement)
+                    this.lastInitialItemsInFilterMenu[0].nativeElement.focus();
+
                 this.signalFocusMoveToFirstLastInitial_FilterMenu = false;
                 this.onFocusChangeLastInitialOptions(0, true);
             }
         }
         else if (this.signalFocusMoveToFirstLastInitial) {
-            if (this.lastInitialItems.length > 0) {
-                let lastInitialOptionElements: ElementRef[] = this.lastInitialItems.toArray();
-                lastInitialOptionElements[0].nativeElement.focus();
+            if (this.lastInitialItems().length > 0) {
+                if (this.lastInitialItems[0].nativeElement)
+                  this.lastInitialItems[0].nativeElement.focus();
+
                 this.signalFocusMoveToFirstLastInitial = false;
                 this.onFocusChangeLastInitialOptions(0, true);
             }
@@ -718,31 +732,37 @@ export class HistoryMakersComponent extends BaseComponent implements OnInit, Aft
 
     private focusPicViewInFilterMenuOption(settingPicStampFocus: boolean, settingTextStampFocus: boolean) {
         if (settingPicStampFocus) { // set focus to radioGroup1_Pic
-            if (this.radioGroup1_Pic && this.radioGroup1_Pic.nativeElement)
-                this.radioGroup1_Pic.nativeElement.focus();
+            const radioGroup1_Pic = this.radioGroup1_Pic();
+            if (radioGroup1_Pic && radioGroup1_Pic.nativeElement)
+                radioGroup1_Pic.nativeElement.focus();
         }
         else if (settingTextStampFocus) { // set focus to radioGroup1_Text
-            if (this.radioGroup1_Text && this.radioGroup1_Text.nativeElement)
-                this.radioGroup1_Text.nativeElement.focus();
+            const radioGroup1_Text = this.radioGroup1_Text();
+            if (radioGroup1_Text && radioGroup1_Text.nativeElement)
+                radioGroup1_Text.nativeElement.focus();
         }
         else { // set focus to radioGroup1_Map
-            if (this.radioGroup1_Map && this.radioGroup1_Map.nativeElement)
-                this.radioGroup1_Map.nativeElement.focus();
+            const radioGroup1_Map = this.radioGroup1_Map();
+            if (radioGroup1_Map && radioGroup1_Map.nativeElement)
+                radioGroup1_Map.nativeElement.focus();
         }
     }
 
     private focusPicViewOption(settingPicStampFocus: boolean, settingTextStampFocus: boolean) {
         if (settingPicStampFocus) { // set focus to radioGroup2_Pic
-            if (this.radioGroup2_Pic && this.radioGroup2_Pic.nativeElement)
-                this.radioGroup2_Pic.nativeElement.focus();
+            const radioGroup2_Pic = this.radioGroup2_Pic();
+            if (radioGroup2_Pic && radioGroup2_Pic.nativeElement)
+                radioGroup2_Pic.nativeElement.focus();
         }
         else if (settingTextStampFocus) { // set focus to radioGroup2_Text
-            if (this.radioGroup2_Text && this.radioGroup2_Text.nativeElement)
-                this.radioGroup2_Text.nativeElement.focus();
+            const radioGroup2_Text = this.radioGroup2_Text();
+            if (radioGroup2_Text && radioGroup2_Text.nativeElement)
+                radioGroup2_Text.nativeElement.focus();
         }
         else { // set focus to radioGroup2_Map
-            if (this.radioGroup2_Map && this.radioGroup2_Map.nativeElement)
-                this.radioGroup2_Map.nativeElement.focus();
+            const radioGroup2_Map = this.radioGroup2_Map();
+            if (radioGroup2_Map && radioGroup2_Map.nativeElement)
+                radioGroup2_Map.nativeElement.focus();
         }
     }
 
@@ -829,15 +849,15 @@ export class HistoryMakersComponent extends BaseComponent implements OnInit, Aft
             }
             if (nextIndex >= 0) {
                 if (isInFilterMenu) {
-                    if (nextIndex < this.lastInitialItemsInFilterMenu.length) {
-                        let lastInitialOptionElements: ElementRef[] = this.lastInitialItemsInFilterMenu.toArray();
-                        lastInitialOptionElements[nextIndex].nativeElement.focus();
+                    if (nextIndex < this.lastInitialItemsInFilterMenu().length) {
+                      if (this.lastInitialItemsInFilterMenu[nextIndex].nativeElement)
+                        this.lastInitialItemsInFilterMenu[nextIndex].nativeElement.focus();
                     }
                 }
                 else {
-                    if (nextIndex < this.lastInitialItems.length) {
-                        let lastInitialOptionElements: ElementRef[] = this.lastInitialItems.toArray();
-                        lastInitialOptionElements[nextIndex].nativeElement.focus();
+                    if (nextIndex < this.lastInitialItems().length) {
+                        if (this.lastInitialItems[nextIndex].nativeElement)
+                          this.lastInitialItems[nextIndex].nativeElement.focus();
                     }
                 }
             }
@@ -887,7 +907,7 @@ export class HistoryMakersComponent extends BaseComponent implements OnInit, Aft
                 }
                 else {
                     if (this.myBornThisTimeFilterFlag)
-                        this.biographySetTitle = "No ScienceMakers born this week."; // NOTE: here we assume "time" is a "week" rather than "this day"!!! see getHistoryMakersBornThisWeek
+                        this.biographySetTitle = "No ScienceMakers born this week."; // NOTE: here we assume "time" is a "week" rather than "this day"
                     else
                         this.biographySetTitle = "No results for " + this.fullResultSetTitleSuffix;
                 }

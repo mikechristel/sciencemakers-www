@@ -1,6 +1,6 @@
-﻿import { Injectable, Inject, OnInit } from '@angular/core';
-import { Observable, throwError } from "rxjs";
-import { catchError, mergeMap } from "rxjs/operators";
+﻿import { Injectable, OnInit, inject } from '@angular/core';
+import { Observable } from "rxjs";
+import { mergeMap } from "rxjs/operators";
 import { HttpClient } from '@angular/common/http';
 
 import { SearchResult } from '../storyset/search-result';
@@ -10,11 +10,11 @@ import { GlobalState } from '../app.global-state';
 
 @Injectable()
 export class TextSearchService {
-    private txtSearchURL = 'StorySearch?query='; // require query argument, so it is already tacked on
+    private http = inject(HttpClient);
+    private globalState = inject(GlobalState);
+    private historyMakerService = inject(HistoryMakerService);
 
-    constructor(
-      private http: HttpClient, private globalState: GlobalState,
-      private historyMakerService: HistoryMakerService) { }
+    private txtSearchURL = 'StorySearch?query=';
 
     getTextSearch(query: string, interviewYearFilter: string, parentBiographyForAllStories: number, matchTitleOnly: boolean, matchTranscriptOnly: boolean,
       givenPage: number, givenPageSize: number, genderFacet: string, birthDecadeFacets: string, makerFacets: string, jobFacets: string,

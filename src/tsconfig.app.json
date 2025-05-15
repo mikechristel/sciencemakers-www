@@ -6,9 +6,6 @@
     "typeRoots": [
       "node_modules/@types"
     ],
-    "types": [
-      "node"
-    ]
   },
   "files": [
     "main.ts",

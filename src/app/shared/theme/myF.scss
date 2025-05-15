@@ -1,5 +1,5 @@
 @use "sass:math"; /* for the division operator, which is no longer / but instead is math.div */
-@use 'myGlobals';
+@use '../theme/myGlobals';
 
 @function color($key) {
   @if map-has-key(myGlobals.$colors, $key) {

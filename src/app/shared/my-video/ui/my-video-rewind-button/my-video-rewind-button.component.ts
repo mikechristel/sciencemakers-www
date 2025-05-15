@@ -1,9 +1,9 @@
 import { Component, EventEmitter, Output } from "@angular/core";
 
 @Component({
-  selector: "my-video-rewind-button",
-  templateUrl: "./my-video-rewind-button.component.html",
-  styleUrls: ["./my-video-rewind-button.component.scss"]
+    selector: "my-video-rewind-button",
+    templateUrl: "./my-video-rewind-button.component.html",
+    styleUrls: ["./my-video-rewind-button.component.scss"]
 })
 
 export class MyVideoRewindButtonComponent {

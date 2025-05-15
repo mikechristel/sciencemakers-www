@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 
-import { ActivatedRoute, Router, Params } from '@angular/router';
+import { ActivatedRoute, Router, Params, RouterLink, RouterLinkActive } from '@angular/router';
 import { takeUntil } from "rxjs/operators";
 
 import { TitleManagerService } from '../shared/title-manager.service';
@@ -8,13 +8,23 @@ import { UserSettingsManagerService } from '../user-settings/user-settings-manag
 import { BaseComponent } from '../shared/base.component';
 import {LiveAnnouncer} from '@angular/cdk/a11y'; // used to read changes to set title
 import { GlobalState } from '../app.global-state';
+import { FocusMeDirective } from '../shared/focus-me.directive';
+import { FormsModule } from '@angular/forms';
 
 @Component({
     selector: 'thda-settings',
     templateUrl: './user-settings.component.html',
-    styleUrls: ['./user-settings.component.scss']
+    styleUrls: ['./user-settings.component.scss'],
+    imports: [FocusMeDirective, RouterLink, RouterLinkActive, FormsModule]
 })
 export class UserSettingsComponent extends BaseComponent implements OnInit {
+    private route = inject(ActivatedRoute);
+    private router = inject(Router);
+    private globalState = inject(GlobalState);
+    private titleManagerService = inject(TitleManagerService);
+    private userSettingsManagerService = inject(UserSettingsManagerService);
+    private liveAnnouncer = inject(LiveAnnouncer);
+
     settingsPageTitle: string;
     settingsPageTitleLong: string;
     signalFocusToTitle: boolean = false; // is used in html rendering of this component
@@ -31,25 +41,17 @@ export class UserSettingsComponent extends BaseComponent implements OnInit {
     showStoryYearFacetFilter: boolean;
     showStoryJobTypeFacetFilter: boolean;
     showStoryDecadeOfBirthFacetFilter: boolean;
-    defaultHideTopicSearch: boolean;
 
-    constructor(private route: ActivatedRoute,
-      private router: Router,
-      private globalState: GlobalState,
-      private titleManagerService: TitleManagerService,
-      private userSettingsManagerService: UserSettingsManagerService, private liveAnnouncer: LiveAnnouncer) {
+    constructor() {
 
-        super(); // for BaseComponent extension (brought in to cleanly unsubscribe from subscriptions)
+        super();  // for BaseComponent extension (brought in to cleanly unsubscribe from subscriptions)
+        const userSettingsManagerService = this.userSettingsManagerService;
+
         userSettingsManagerService.autoplayVideo$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((value) => {
           this.defaultAutoPlay = value;
         });
         userSettingsManagerService.autoadvanceVideo$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((value) => {
           this.defaultAutoAdvance = value;
-        });
-
-        // Settings related to optional experimental features: defaultHideTopicSearch
-        userSettingsManagerService.hideTopicSearch$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((value) => {
-          this.defaultHideTopicSearch = value;
         });
 
         // Settings related to visibility of certain filters for biography sets:
@@ -91,7 +93,6 @@ export class UserSettingsComponent extends BaseComponent implements OnInit {
 
         this.defaultAutoPlay = this.userSettingsManagerService.currentAutoplay();
         this.defaultAutoAdvance = this.userSettingsManagerService.currentAutoadvance();
-        this.defaultHideTopicSearch = this.userSettingsManagerService.currentHideTopicSearch();
 
         this.showBiographyBirthStateFacetFilter = this.userSettingsManagerService.currentShowBiographyBirthStateFacetFilter();
         this.showBiographyDecadeOfBirthFacetFilter = this.userSettingsManagerService.currentShowBiographyDecadeOfBirthFacetFilter();
@@ -123,10 +124,6 @@ export class UserSettingsComponent extends BaseComponent implements OnInit {
 
     onAutoAdvanceChange(isChecked: boolean) {
       this.userSettingsManagerService.updateAutoAdvance(isChecked);
-    }
-
-    onHideTopicSearchChange(isChecked: boolean) {
-      this.userSettingsManagerService.updateHideTopicSearch(isChecked);
     }
 
     onShowBiographyBirthStateFacetFilterChange(isChecked: boolean) {

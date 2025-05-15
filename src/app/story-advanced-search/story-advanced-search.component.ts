@@ -1,6 +1,6 @@
-import { Component, ViewChild, OnInit, AfterViewChecked } from '@angular/core';
+import { Component, OnInit, AfterViewChecked, inject, viewChild } from '@angular/core';
 
-import { ActivatedRoute, Params } from '@angular/router';
+import { ActivatedRoute, Params, RouterLink, RouterLinkActive } from '@angular/router';
 
 import { GlobalState } from '../app.global-state';
 import { TitleManagerService } from '../shared/title-manager.service';
@@ -10,15 +10,24 @@ import { SearchFormComponent } from '../shared/search-form/search-form.component
 
 import { SearchFormOptions } from '../shared/search-form/search-form-options';
 import { BaseComponent } from '../shared/base.component';
-import {LiveAnnouncer} from '@angular/cdk/a11y'; // used to read changes to set title
+import {LiveAnnouncer} from '@angular/cdk/a11y';
+import { FocusMeDirective } from '../shared/focus-me.directive';
+ // used to read changes to set title
 
 @Component({
     selector: 'thda-story-advs',
     templateUrl: './story-advanced-search.component.html',
-    styleUrls: ['./story-advanced-search.component.scss']
+    styleUrls: ['./story-advanced-search.component.scss'],
+    imports: [FocusMeDirective, SearchFormComponent, RouterLink, RouterLinkActive]
 })
 export class StoryAdvancedSearchComponent extends BaseComponent implements OnInit, AfterViewChecked {
-    @ViewChild('myStorySearchForm') mySearchFormElement: SearchFormComponent;
+    private route = inject(ActivatedRoute);
+    private globalState = inject(GlobalState);
+    private searchFormService = inject(SearchFormService);
+    private titleManagerService = inject(TitleManagerService);
+    private liveAnnouncer = inject(LiveAnnouncer);
+
+    readonly mySearchFormElement = viewChild<SearchFormComponent>('myStorySearchForm');
 
     public biographyIDForLimitingSearch: number = null; // used to modify UI in associated html (hence public)
 
@@ -26,11 +35,7 @@ export class StoryAdvancedSearchComponent extends BaseComponent implements OnIni
     storyAdvSearchPageTitleLong: string;
     signalFocusToTitle: boolean = false; // is used in html rendering of this component
 
-    constructor(
-        private route: ActivatedRoute,
-        private globalState: GlobalState,
-        private searchFormService: SearchFormService,
-        private titleManagerService: TitleManagerService, private liveAnnouncer: LiveAnnouncer) {
+    constructor() {
 
         super(); // for BaseComponent extension (brought in to cleanly unsubscribe from subscriptions)
 
@@ -62,9 +67,10 @@ export class StoryAdvancedSearchComponent extends BaseComponent implements OnIni
         // Attempt focus to the query input element once everything is set up.
         var focusSetElsewhere: boolean = false;
 
-        if (this.mySearchFormElement) {
+        const mySearchFormElement = this.mySearchFormElement();
+        if (mySearchFormElement) {
             focusSetElsewhere = true;
-            this.mySearchFormElement.setFocusToQueryInput();
+            mySearchFormElement.setFocusToQueryInput();
         }
 
         if (this.globalState.IsInternalRoutingWithinSPA) {

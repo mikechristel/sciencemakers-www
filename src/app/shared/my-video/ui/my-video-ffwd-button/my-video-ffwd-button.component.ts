@@ -1,9 +1,9 @@
 import { Component, EventEmitter, Output } from "@angular/core";
 
 @Component({
-  selector: "my-video-ffwd-button",
-  templateUrl: "./my-video-ffwd-button.component.html",
-  styleUrls: ["./my-video-ffwd-button.component.scss"]
+    selector: "my-video-ffwd-button",
+    templateUrl: "./my-video-ffwd-button.component.html",
+    styleUrls: ["./my-video-ffwd-button.component.scss"]
 })
 
 export class MyVideoFastForwardButtonComponent {

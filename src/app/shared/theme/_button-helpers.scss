@@ -1,5 +1,5 @@
-@use 'myGlobals';
-@use 'myF';
+@use '../theme/myGlobals';
+@use '../theme/myF';
 
 .my-app-button {
   @include myGlobals.source-sans-semi-bold;
@@ -33,6 +33,13 @@
 .my-app-button-shorter {
   @include myGlobals.source-sans-semi-bold;
 
+  /* fxLayout="row" fxLayoutAlign="center center"  */
+  box-sizing: border-box;
+  display: flex !important;
+  flex-direction: row;
+  place-content: center;
+  align-items: center;
+
   background-color: myF.color(primary);
   border: 1px solid myF.color(primary); /* note: added for accessibility, to provide a button border in high contrast mode */
   border-radius: 0;
@@ -59,121 +66,8 @@
   }
 }
 
-.myclips-add-delete-low-key-video-line { /* height of 2rem, no margin nor narrow width media query */
-  @include myGlobals.oswald;
-
-  background-color: myF.color(primary);
-  border: 1px solid myF.color(primary); /* note: added for accessibility, to provide a button border in high contrast mode */
-  border-radius: 0;
-  color: #fff;
-  cursor: pointer;
-  font-size: 1.2rem;
-  height: myGlobals.$buttonHeight;
-  margin: 0;
-  padding: 0 10px;
-  text-align: center;
-
-  transition: box-shadow .15s ease-in-out;
-  width: 100%; /* note: subtle difference with search__submit style for search button */
-
-  &:hover,
-  &:focus {
-    box-shadow: inset 0 0 5px rgba(51,51,51,.6);
-    background-color: myF.color(secondary);
-  }
-
-  &:disabled {
-      cursor: not-allowed;
-      opacity: .4;
-  }
-}
-
-.back-button-low-key { /* similar to my-app-button but shorter, with smaller font too */
-  @include myGlobals.oswald;
-
-  background-color: myF.color(primary);
-  border: 1px solid myF.color(primary); /* note: added for accessibility, to provide a button border in high contrast mode */
-  border-radius: 0;
-  color: #fff;
-  cursor: pointer;
-  font-size: 1.2rem;
-  height: myGlobals.$buttonHeight;
-  padding: 0 12px;
-  white-space: nowrap;
-  transition: box-shadow .15s ease-in-out;
-  width: auto; /* note: subtle difference with search__submit style for search button */
-
-  &:hover,
-  &:focus {
-      box-shadow: inset 0 0 5px rgba(51,51,51,.6);
-      background-color: myF.color(secondary);
-  }
-
-  &:disabled {
-      cursor: not-allowed;
-      opacity: .4;
-  }
-}
-
-.back-button-low-key-video-line { /* just like back-button-low-key but no margin and height change */
-  @include myGlobals.oswald;
-
-  background-color: myF.color(secondary);
-  border: 1px solid myF.color(secondary); /* note: added for accessibility, to provide a button border in high contrast mode */
-  border-radius: 0;
-  color: #fff;
-  cursor: pointer;
-  font-size: 1.2rem;
-  height: myGlobals.$buttonHeight;
-  padding: 0 10px;
-  white-space: nowrap;
-  transition: box-shadow .15s ease-in-out;
-  width: auto; /* note: subtle difference with search__submit style for search button */
-  margin: 0;
-
-  &:hover,
-  &:focus {
-      box-shadow: inset 0 0 5px rgba(51,51,51,.6);
-      background-color: myF.color(primary);
-  }
-
-  &:disabled {
-      cursor: not-allowed;
-      opacity: .4;
-  }
-}
-
-.back-button-for-story {
-  @include myGlobals.oswald;
-
-  background-color: myF.color(primary);
-  border: 1px solid myF.color(primary); /* note: added for accessibility, to provide a button border in high contrast mode */
-  border-radius: 0;
-  color: #fff;
-  cursor: pointer;
-  font-size: 1.2rem;
-  height: myGlobals.$buttonHeight;
-  min-height: myGlobals.$buttonHeight;
-  max-width: 12.5rem; /* note: difference from back-button-low-key */
-  padding: 0 12px;
-  white-space: nowrap;
-  transition: box-shadow .15s ease-in-out;
-  width: auto; /* note: subtle difference with search__submit style for search button */
-
-  &:hover,
-  &:focus {
-      box-shadow: inset 0 0 5px rgba(51,51,51,.6);
-      background-color: myF.color(secondary);
-  }
-
-  &:disabled {
-      cursor: not-allowed;
-      opacity: .4;
-  }
-}
-
 .button-low-key { /* similar to back-button-low-key but with larger width */
- @include myGlobals.source-sans;
+  @include myGlobals.source-sans;
 
   background-color: myF.color(primary);
   border: 1px solid myF.color(primary); /* note: added for accessibility, to provide a button border in high contrast mode */
@@ -258,10 +152,10 @@
 }
 
 .back-chevron-icon {
-  height: 1rem;
+  flex-basis:12px;
+  max-width:12px;
+  min-width:12px;
+
+  height: 1rem; /* !!!TBD!!! took away width="12px" height="16px" from the outer element where this class was applied - just define sizing here! Test!!! */
   margin-right: 0.375rem;
-}
-.myclips-add-delete-icon {
-  height: 1rem;
-  margin-left: 0.5rem;
 }

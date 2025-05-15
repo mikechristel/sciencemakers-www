@@ -1,5 +1,92 @@
-@use 'myGlobals';
-@use 'myF';
+@use '../theme/myGlobals';
+@use '../theme/myF';
+
+/* common styling for CSS Flexbox use (replacing retired angular-flex-layout in 2024 update) */
+.myFlexRowContainer {
+  box-sizing: border-box;
+  display: flex !important;
+  flex-direction: row;
+  place-content: stretch flex-start;
+  align-items: stretch;
+}
+
+.myFlexChild {
+  flex-basis: calc(800px);
+  flex-shrink: 1;
+  box-sizing:border-box;
+}
+
+.myFlexRowStart {
+  /* fxLayout="row" fxLayoutAlign="start start" */
+  box-sizing: border-box;
+  display: flex !important;
+  flex-direction: row;
+  place-content: flex-start;
+  align-items: flex-start;
+}
+
+.myDesktopFlexColumnContainer {
+  /* NOTE: see desktop-only definition as well as that is co-mingled here with the display: none vs. display: flex */
+  @media screen and (max-width: myF.bp(afl_small_just_before)) { /* this is the desktop-only media query piece */
+    display: none !important;
+  }
+
+  @media screen and (min-width: myF.bp(afl_small))
+  {
+    /*  fxLayout="column" fxLayoutAlign="space-between stretch"  */
+    box-sizing: border-box;
+    display: flex !important;
+    flex-direction: column;
+    place-content: stretch space-between;
+    align-items: stretch;
+
+    max-width: 100%;
+  }
+}
+
+.myMobileFlexColumnContainer {
+  /* NOTE: see mobile-only definition as well as that is co-mingled here with the display: none vs. display: flex */
+  @media screen and (max-width: myF.bp(afl_small_just_before)) { /* this is the desktop-only media query piece */
+    /*  fxLayout="column" fxLayoutAlign="space-between stretch"  */
+    box-sizing: border-box;
+    display: flex !important;
+    flex-direction: column;
+    place-content: stretch space-between;
+    align-items: stretch;
+  }
+
+  @media screen and (min-width: myF.bp(afl_small)) {
+    display: none !important;
+  }
+}
+
+.myFlexChildGrow {
+  /* used where we formerly had fxFlex="auto" (same as fxFlex="1 1 auto") which means we only need flex-grow: 1 as flex-shrink defaults to 1 */
+  flex-grow: 1;
+}
+
+.flexGrow {
+  /* used where we formerly had fxFlex="grow" */
+  flex-grow: 1;
+}
+
+.flexPlainAuto {
+  flex: 0 0 auto;
+}
+
+.flex100Basis {
+  flex-basis: 100%;
+}
+
+.noSpacingFlexGrow {
+  /* used where we formerly had fxFlex="grow" class="noSpacing" as in the app.component html */
+  flex: 1 1 100%;
+  box-sizing: border-box;
+  max-width: 100%;
+
+  margin: 0;
+  padding: 0;
+}
 
 /* common styling, e.g., for title/main heading of the page/route */
 .page-title {
@@ -150,10 +237,36 @@ top: -3px;
 white-space: nowrap;
 }
 
-.unstyled-list-nowhitespace {
-  list-style: none;
-  margin: 0;
-  padding: 0;
+ul.list-unstyled-flex-row {
+  /* a "merge" of ul.list-unstyled and former flex-layout's fxLayout="row wrap" fxLayoutAlign="space-between center";
+     used sparingly so perhaps not belonging in this base.scss except for easy contrast with ul.list-unstyled */
+  padding: 0 0.05em 0;
+  box-sizing: border-box;
+  display: flex !important;
+  flex-direction: row;
+  flex-wrap: wrap;
+  place-content: center space-between; /* note: shorthand for align-content: center; justify-content: space-between */
+  align-items: center;
+
+  li {
+      list-style: none;
+  }
+
+  label {
+      @include myGlobals.source-sans;
+      font-size: 1rem;
+      cursor: pointer;
+      color: black;
+
+      &:hover,
+      &:focus {
+          color: myF.color(secondary);
+      }
+
+      @media screen and (min-width: myF.bp(afl_small)) {
+          font-size: 1.1rem;
+      }
+  }
 }
 
 ul.list-unstyled {

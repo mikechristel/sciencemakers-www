@@ -1,4 +1,4 @@
-﻿import { Injectable } from '@angular/core';
+﻿import { Injectable, inject } from '@angular/core';
 import { TagService } from './tag.service';
 import { Observable } from "rxjs";
 import { ChosenTagInfo } from './chosen-tag-info';
@@ -6,6 +6,8 @@ import { TagSearchResult } from '../tag/tag-search-result';
 
 @Injectable()
 export class TagChosenSetService {
+    private tagService = inject(TagService);
+
     // Internal record of the chosen tag set:
     private thdaChosenTags: ChosenTagInfo[];
 
@@ -18,7 +20,7 @@ export class TagChosenSetService {
     // Indicator that the set of items in the tag set changed
     private refreshNeededForTags: boolean;
 
-    constructor(private tagService: TagService) {
+    constructor() {
         this.thdaChosenTags = [];
 
         this.clear(); // initially everything is in cleared out state

@@ -1,23 +1,25 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 
-import { ActivatedRoute, Router, Params } from '@angular/router';
+import { ActivatedRoute, Router, Params, RouterLink, RouterLinkActive } from '@angular/router';
 
 import { TitleManagerService } from '../shared/title-manager.service';
 import { ThinBaseComponent }  from '../shared/thinbase.component';
-import {LiveAnnouncer} from '@angular/cdk/a11y'; // used to read changes to set title
+import {LiveAnnouncer} from '@angular/cdk/a11y';
+import { FocusMeDirective } from '../shared/focus-me.directive'; // used to read changes to set title
 
 @Component({
     selector: 'thda-not-found',
     templateUrl: './not-found.component.html',
-    styleUrls: ['./home.component.scss']
+    styleUrls: ['./home.component.scss'],
+    imports: [FocusMeDirective, RouterLink, RouterLinkActive]
 })
 export class RouteNotFoundComponent extends ThinBaseComponent implements OnInit {
-    signalFocusToTitle: boolean = false; // is used in html rendering of this component
-    constructor(private route: ActivatedRoute,
-        private router: Router,
-        private titleManagerService: TitleManagerService, private liveAnnouncer: LiveAnnouncer) {
-          super(); // for ThinBaseComponent extension (brought in for mouse event handler noMouseFocus)
-    }
+    private route = inject(ActivatedRoute);
+    private router = inject(Router);
+    private titleManagerService = inject(TitleManagerService);
+    private liveAnnouncer = inject(LiveAnnouncer);
+
+    signalFocusToTitle: boolean = false;
 
     ngOnInit() {
         var title: string = "Page Not Found, ScienceMakers Digital Archive";

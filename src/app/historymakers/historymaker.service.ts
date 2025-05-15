@@ -1,4 +1,4 @@
-﻿import { Injectable, Inject, OnInit } from '@angular/core';
+﻿import { Injectable, OnInit, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of, throwError } from "rxjs";
 import { catchError, tap, mergeMap, map } from "rxjs/operators";
@@ -15,6 +15,9 @@ import { GlobalState } from '../app.global-state';
 
 @Injectable()
 export class HistoryMakerService {
+    private http = inject(HttpClient);
+    private globalState = inject(GlobalState);
+
     private corpusSpecificsURL = 'CorpusInfo';
     private peopleURL = 'BiographySearch';
     // not used, private peopleBornThisDayURL = 'PeopleBornThisDay';
@@ -29,9 +32,6 @@ export class HistoryMakerService {
     private cachedOccupationTypes = new Map<string, string>();
     private cachedOrganizationNames = new Map<string, string>();
     private cachedCorpusSpecifics: CorpusSpecifics = null;
-
-    constructor( private http: HttpClient,
-      private globalState: GlobalState) {}
 
     private storeCorpusSpecifics(givenSpecifics: CorpusSpecifics) {
         if (this.cachedCorpusSpecifics != null)
@@ -95,13 +95,13 @@ export class HistoryMakerService {
         if (this.cachedBiographyFacetDetails != null)
             return of(this.cachedBiographyFacetDetails);
         else {
-          return this.http.get<BiographySearchFacetsDetails>(environment.serviceBase + this.biographySearchFacetsURL).pipe(
-            tap(fd => this.storeBiographyFacetDetails(fd)),
-            catchError( err => {
-              // TODO: (!!!TBD!!!) Decide if we wish to log errors in any way or use console, e.g., console.log('error caught: ', err);
-              return throwError( err ); }
-            )
-          );
+            return this.http.get<BiographySearchFacetsDetails>(environment.serviceBase + this.biographySearchFacetsURL).pipe(
+              tap(fd => this.storeBiographyFacetDetails(fd)),
+              catchError( err => {
+                // TODO: (!!!TBD!!!) Decide if we wish to log errors in any way or use console, e.g., console.log('error caught: ', err);
+                return throwError(() => err); }
+              )
+            );
         }
     }
 
@@ -109,13 +109,13 @@ export class HistoryMakerService {
         if (this.cachedStoryFacetDetails != null)
             return of(this.cachedStoryFacetDetails);
         else {
-          return this.http.get<StorySearchFacetsDetails>(environment.serviceBase + this.storySearchFacetsURL).pipe(
-            tap(fd => this.storeStoryFacetDetails(fd)),
-            catchError( err => {
-              // TODO: (!!!TBD!!!) Decide if we wish to log errors in any way or use console, e.g., console.log('error caught: ', err);
-              return throwError( err ); }
-            )
-          );
+            return this.http.get<StorySearchFacetsDetails>(environment.serviceBase + this.storySearchFacetsURL).pipe(
+              tap(fd => this.storeStoryFacetDetails(fd)),
+              catchError( err => {
+                // TODO: (!!!TBD!!!) Decide if we wish to log errors in any way or use console, e.g., console.log('error caught: ', err);
+                return throwError(() => err); }
+              )
+            );
         }
     }
 
@@ -129,7 +129,7 @@ export class HistoryMakerService {
               mergeMap(fd => this.http.get<CorpusSpecifics>(environment.serviceBase + this.corpusSpecificsURL).pipe(
                 catchError( err => {
                   // TODO: (!!!TBD!!!) Decide if we wish to log errors in any way or use console, e.g., console.log('error caught: ', err);
-                  return throwError( err ); }
+                  return throwError(() => err); }
                 )
               )),
               tap(cs => this.storeCorpusSpecifics(cs))
@@ -171,7 +171,7 @@ export class HistoryMakerService {
           mergeMap(fd => this.http.get<TableOfContents>(environment.serviceBase + this.peopleBornThisWeekURL + addedArgs).pipe(
             catchError( err => {
               // TODO: (!!!TBD!!!) Decide if we wish to log errors in any way or use console, e.g., console.log('error caught: ', err);
-              return throwError( err ); }
+              return throwError(() => err); }
             )
           ))
         );
@@ -226,11 +226,10 @@ export class HistoryMakerService {
           mergeMap(fd => this.http.get<TableOfContents>(environment.serviceBase + this.peopleURL + "?" + queryArg + addedArgs).pipe(
             catchError( err => {
               // TODO: (!!!TBD!!!) Decide if we wish to log errors in any way or use console, e.g., console.log('error caught: ', err);
-              return throwError( err ); }
+              return throwError(() => err); }
             )
           ))
         );
-
     }
 
     private searchFieldsForBiographySearch(givenSearchFieldsMask: number, justLastName: boolean, justPreferredName: boolean): string {

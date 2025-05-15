@@ -1,8 +1,12 @@
-@use 'myGlobals';
+@use 'myGlobals'; /* for %source-sans placeholder selector */
 @use 'myF';
 
 .input-preface-label {
- @include myGlobals.source-sans;
+  @include myGlobals.source-sans;
+
+  /* Retired flex-layout had flex="auto" i.e. flex="1 1 auto" so need a flex-grow */
+  flex-grow: 1;
+
   font-weight: normal;
   color:black;
   font-size: 1rem;
@@ -12,7 +16,7 @@
 }
 
 .select-preface-label {
- @include myGlobals.source-sans;
+  @include myGlobals.source-sans;
   font-weight: normal;
   color:black;
   font-size: 1rem;
@@ -23,7 +27,7 @@
 }
 
 .select-parent {
- @include myGlobals.source-sans;
+  @include myGlobals.source-sans;
 
   background-color: #f2f2f2;
   border-radius: 0;

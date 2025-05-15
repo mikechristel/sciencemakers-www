@@ -1,4 +1,4 @@
-﻿import { Injectable, Inject, OnInit } from '@angular/core';
+﻿import { Injectable, OnInit, inject } from '@angular/core';
 import { Observable, throwError } from "rxjs";
 import { catchError } from "rxjs/operators";
 import { HttpClient } from '@angular/common/http';
@@ -8,11 +8,11 @@ import { environment } from '../../environments/environment';
 
 @Injectable()
 export class StoryDetailService {
+    private http = inject(HttpClient);
+
     private storyDetailsURL = 'StoryDetails?storyID=';
     private storyDetailsQueryTermsArgument = '&queryTerms=';
     private readonly WILDCARD_TO_MATCH_ALL = "*";
-
-    constructor(private http: HttpClient) { }
 
     getStorySpecifics(ID: number, queryTerms: string): Observable<DetailedStory> {
         // NOTE: If ID not found in the data set, then null is returned to caller

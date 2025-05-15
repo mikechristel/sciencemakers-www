@@ -2,10 +2,10 @@
 <h1 id="dmainHeader" [thdaIsFocused]="signalFocusToTitle" tabindex="-1" class="page-title desktop-only" (mousedown)="noMouseFocus($event)">{{bioAdvSearchPageTitleLong}}</h1>
 
 <!-- Search Form (shown in all views, mobile and desktop) -->
-<div fxLayout="row" fxLayoutAlign="start">
-  <div fxFlex="0 1 calc(800px)">
-      <!-- Search Form (capped at 800px width via fxflex line in container div) -->
-      <search-form #myBioSearchForm [showResultsPerPage]="true" [showAdvancedSearchLink]="false" [showFieldOptions]="true"
+<div class="myFlexRowContainer">
+  <div class="myFlexChild">
+      <!-- Search Form (capped at a max width in container div) -->
+      <search-form #myBioSearchForm [showAdvancedSearchLink]="false" [showFieldOptions]="true"
          [showAdvancedBioChosenFields]="true"></search-form>
   </div>
 </div>

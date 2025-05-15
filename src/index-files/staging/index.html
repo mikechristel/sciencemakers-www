@@ -1,5 +1,6 @@
 ﻿<!doctype html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8">
   <title>ScienceMakers Digital Archive (STAGING)</title>
@@ -8,8 +9,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="shortcut icon" href="assets/THM_favicon.png" type="image/png" />
 </head>
+
 <body>
-  <my-app >Loading...</my-app>
+  <my-app>Loading...</my-app>
   <script>
     // Flag indicates if all preflight checks pass
     var _browserTestsPassed = false;
@@ -50,7 +52,7 @@
       ////////////////////////////////////////////////////////////
       // CHECK IF COOKIES ENABLED
       if (!cookiesEnabled) {
-        myapp.innerHTML = '<h2>ScienceMakers Digital Archive Requires Cookies</h2';
+        myapp.innerHTML = '<h2>ScienceMakers Digital Archive Requires Cookies</h2>';
         myapp.innerHTML += '<p>Please enable cookies if you wish to use this application.</p>';
         myapp.innerHTML += '<a href="https://www.whatismybrowser.com/guides/how-to-enable-cookies/auto">How to Enable Cookies provided by WhatIsMyBrowser.com</a>';
         return;
@@ -58,7 +60,7 @@
 
       // CHECK FOR IFRAME WITHOUT COOKIE
       if (iframeDetected && cookieMissing) {
-        myapp.innerHTML = '<h2>ScienceMakers Digital Archive Will Not Run Inside an IFrame</h2';
+        myapp.innerHTML = '<h2>ScienceMakers Digital Archive Will Not Run Inside an IFrame</h2>';
         myapp.innerHTML += '<p>Click the link below to open the application in a separate browser tab/window.</p>';
         myapp.innerHTML += `<a href="${window.location.href}" target="_blank">${window.location.href}</a>`;
         return;
@@ -66,7 +68,7 @@
 
       // CHECK IF COOKIE IS MISSING
       if (cookieMissing) {
-        myapp.innerHTML = '<h2>ScienceMakers Digital Archive Session Cookie Is Missing</h2';
+        myapp.innerHTML = '<h2>ScienceMakers Digital Archive Session Cookie Is Missing</h2>';
         myapp.innerHTML += '<p>A valid session cookie could not be found, please click the link below to reload the application.</p>';
         myapp.innerHTML += `<a href="${window.location.href}">${window.location.href}</a>`;
         return;
@@ -78,4 +80,5 @@
     })();
   </script>
 </body>
+
 </html>

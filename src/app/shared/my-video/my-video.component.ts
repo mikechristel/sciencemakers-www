@@ -11,7 +11,10 @@
 //   and should use HTMLMediaElement.srcObject instead.
 // As a result, MediaStream is removed as a Interface option on the Input src variable, and argument Interface option for setVideoSrc function.  MediaSource remains viable.
 
-import {AfterViewInit, Component, ElementRef, EventEmitter, Input, OnChanges, OnDestroy, Output, Renderer2, SimpleChanges, ViewChild, OnInit} from "@angular/core";
+// Dec. 2023 update: let the parent component know the first time a video play initiates, i.e., the first time "playing" updates within this component from false to true.
+// This is done for COUNTER logging of events: that first "play" action is something to be logged.
+
+import { AfterViewInit, Component, ElementRef, EventEmitter, Input, OnChanges, OnDestroy, Output, Renderer2, SimpleChanges, ViewChild, OnInit, inject, input } from "@angular/core";
 
 import { EventHandler } from "./interfaces/event-handler.interface";
 import { EventService } from "./services/event.service";
@@ -20,13 +23,30 @@ import { UserSettingsManagerService } from '../../user-settings/user-settings-ma
 import {LiveAnnouncer} from '@angular/cdk/a11y'; // used to read changes to closed captioning, as asked for by accessibility experts
 import { GlobalState }          from '../../app.global-state';
 
+import { of } from 'rxjs';
+import { delay } from 'rxjs/operators';
+import { NgClass } from "@angular/common";
+import { MyVideoPlayButtonComponent } from "./ui/my-video-play-button/my-video-play-button.component";
+import { MyVideoRewindButtonComponent } from "./ui/my-video-rewind-button/my-video-rewind-button.component";
+import { MyVideoFastForwardButtonComponent } from "./ui/my-video-ffwd-button/my-video-ffwd-button.component";
+import { MyVideoClosedCaptionButtonComponent } from "./ui/my-video-cc-button/my-video-cc-button.component";
+import { MyVideoSpinnerComponent } from "./ui/my-video-spinner/my-video-spinner.component";
+import { SecondsToTimePipe } from "./seconds-to-time.pipe";
+
 @Component({
-  selector: 'my-video',
-  templateUrl: './my-video.component.html',
-  styleUrls: ['./my-video.component.scss']
+    selector: 'my-video',
+    templateUrl: './my-video.component.html',
+    styleUrls: ['./my-video.component.scss'],
+    imports: [NgClass, MyVideoPlayButtonComponent, MyVideoRewindButtonComponent, MyVideoFastForwardButtonComponent, MyVideoClosedCaptionButtonComponent, MyVideoSpinnerComponent, SecondsToTimePipe]
 })
 
 export class MyVideoComponent implements OnInit, AfterViewInit, OnChanges, OnDestroy {
+  private _renderer = inject(Renderer2);
+  private evt = inject(EventService);
+  private globalState = inject(GlobalState);
+  private liveAnnouncer = inject(LiveAnnouncer);
+  private userSettingsManagerService = inject(UserSettingsManagerService);
+
   @ViewChild('thmplayer', { static: false }) player: ElementRef;
   @ViewChild('video', { static: false }) video: ElementRef;
 
@@ -34,18 +54,30 @@ export class MyVideoComponent implements OnInit, AfterViewInit, OnChanges, OnDes
   @Output() timeChange: EventEmitter<number> = new EventEmitter();
   @Output() mediaEndIssued: EventEmitter<any> = new EventEmitter();
 
-  @Input() src: string | MediaSource | Blob = null;
+  readonly src = input<string | MediaSource | Blob>(null);
+  // TODO: Skipped for migration with "ng generate @angular/core:signal-input-migration" (March 2025) because:
+  //  This input is used in a control flow expression (e.g. `@if` or `*ngIf`)
+  //  and migrating would break narrowing currently.
   @Input() urlToCCIndicator: string = null;
+  // TODO: Skipped for migration with "ng generate @angular/core:signal-input-migration" (March 2025) because:
+  //  This input is used in a control flow expression (e.g. `@if` or `*ngIf`)
+  //  and migrating would break narrowing currently.
   @Input() poster: string = null;
+  readonly initialSeek = input<number>(0); // if greater than zero, seek to this as currentTime (seconds) when first loaded
 
-  @Input() keyboard = true;
-  @Input() muted = false;
+  readonly keyboard = input(true);
+  readonly muted = input(false);
   @Output() mutedChange = new EventEmitter<boolean>();
+
+  // communicate the first time "playing" is set to true, much like mediaEndIssued communicates when media end is reached
+  @Output() playStartedFirstTime: EventEmitter<any> = new EventEmitter();
+  firstPlayInitiated:boolean = false;
 
   private readonly OFFSET_FOR_FFWD_AND_REWIND:number = 5; // move in increments of 5% for rewind and fast-forward
   private readonly MAX_PERCENT_FOR_VIDEO_TIME_USER_SETTING:number = 99; // do not allow user-positioning into beyond 99% of the media
-  // (so that auto-chaining of stories not accidentally/confusingly triggered by the user)
-
+                                                                        // (so that auto-chaining of stories not accidentally/confusingly triggered by the user)
+  // TODO: Skipped for migration with "ng generate @angular/core:signal-input-migration" (March 2025) because:
+  //  Accessor inputs cannot be migrated as they are too complex.
   @Input()
   get time() {
     return this.getVideoTag().currentTime;
@@ -108,8 +140,10 @@ export class MyVideoComponent implements OnInit, AfterViewInit, OnChanges, OnDes
 
   private srcObjectURL: string;
 
+  // NOTE: With migration to Angular 17, NodeJS.Timer was causing "cannot find namespace issues" which led to a Google search that
+  // brought in AI advice to use RxJS delay operator instead. That is done here.
   private isMouseMoving = false;
-  private isMouseMovingTimer: NodeJS.Timer;
+  // private isMouseMovingTimer: NodeJS.Timer; (retired in late 2024 with Angular 17 migration)
   private isMouseMovingTimeout = 2000;
 
   private events: EventHandler[];
@@ -119,10 +153,6 @@ export class MyVideoComponent implements OnInit, AfterViewInit, OnChanges, OnDes
   defaultAutoPlay: boolean;
 
   currentCCDisplayState: boolean;
-
-  constructor(private _renderer: Renderer2, private evt: EventService,
-    private globalState: GlobalState, private liveAnnouncer: LiveAnnouncer,
-    private userSettingsManagerService: UserSettingsManagerService) {}
 
   ngOnInit(): void {
     this.defaultAutoPlay = this.userSettingsManagerService.currentAutoplay();
@@ -173,12 +203,12 @@ export class MyVideoComponent implements OnInit, AfterViewInit, OnChanges, OnDes
 
     this.evt.addEvents(this._renderer, this.events);
 
-    this.setVideoSrc(this.src);
+    this.setVideoSrc(this.src());
   }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes.src) {
-      this.setVideoSrc(this.src);
+      this.setVideoSrc(this.src());
     }
   }
 
@@ -207,14 +237,19 @@ export class MyVideoComponent implements OnInit, AfterViewInit, OnChanges, OnDes
     this.videoWidth = this.video.nativeElement.videoWidth;
     this.videoHeight = this.video.nativeElement.videoHeight;
     this.evLoadStatusChange(true);
+    if (this.initialSeek() > 0)
+      this.time = this.initialSeek();
   }
 
   evMouseMove(event: any): void {
-    this.isMouseMoving = true;
-    clearTimeout(this.isMouseMovingTimer);
-    this.isMouseMovingTimer = setTimeout(() => {
-      this.isMouseMoving = false;
-    }, this.isMouseMovingTimeout);
+    if (!this.isMouseMoving)
+    {
+      this.isMouseMoving = true;
+      of(null).pipe(delay(this.isMouseMovingTimeout)).subscribe(() => {
+        // Code to be executed after this.isMouseMovingTimeout milliseconds
+        this.isMouseMoving = false;
+      });
+    }
   }
 
   evTimeUpdate(event: any): void {
@@ -256,7 +291,7 @@ export class MyVideoComponent implements OnInit, AfterViewInit, OnChanges, OnDes
       this.video.nativeElement.src = this.srcObjectURL;
     }
 
-    this.video.nativeElement.muted = this.muted;
+    this.video.nativeElement.muted = this.muted();
   }
 
   newPositionAsPercent(percentOffset: number) {
@@ -314,6 +349,15 @@ export class MyVideoComponent implements OnInit, AfterViewInit, OnChanges, OnDes
 
   actOnEndOfMedia() {
       setTimeout(() => this.mediaEndIssued.emit(), 0);
+  }
+
+  updatePlayingState(newState: boolean) {
+    this.playing = newState;
+    if (newState && !this.firstPlayInitiated)
+    {
+      this.firstPlayInitiated = true;
+      setTimeout(() => this.playStartedFirstTime.emit(), 0);
+    }
   }
 
   updateCCDisplayState(newState: boolean) {

@@ -1,18 +1,25 @@
-import { AfterViewInit, Component, EventEmitter, HostListener, Input, OnDestroy, Output, Renderer2 } from "@angular/core";
+import { AfterViewInit, Component, EventEmitter, HostListener, Input, OnDestroy, Output, Renderer2, inject, input } from "@angular/core";
 
 import { EventHandler } from "../../interfaces/event-handler.interface";
 import { EventService } from "../../services/event.service";
 
+
 // CREDIT: strongly inspired by mat-video: https://github.com/nkoehler/mat-video
 @Component({
-  selector: "my-video-play-button",
-  templateUrl: "./my-video-play-button.component.html",
-  styleUrls: ["./my-video-play-button.component.scss"]
+    selector: "my-video-play-button",
+    templateUrl: "./my-video-play-button.component.html",
+    styleUrls: ["./my-video-play-button.component.scss"],
+    imports: []
 })
 
 export class MyVideoPlayButtonComponent implements AfterViewInit, OnDestroy {
-  @Input() video: HTMLVideoElement;
+  private renderer = inject(Renderer2);
+  private evt = inject(EventService);
 
+  readonly video = input<HTMLVideoElement>(undefined);
+
+  // TODO: Skipped for migration with "ng generate @angular/core:signal-input-migration" (March 2025) because:
+  //  Your application code writes to the input. This prevents migration.
   @Input() play = false;
 
   @Output() playChanged = new EventEmitter<boolean>();
@@ -21,19 +28,17 @@ export class MyVideoPlayButtonComponent implements AfterViewInit, OnDestroy {
   // deleted to note where we were on this issue (of chaining video stories when end was reached on prior to then load up the next).
   // @Output() EndOfMediaIssued = new EventEmitter<boolean>();
 
-  @Input() keyboard = true;
+  readonly keyboard = input(true);
 
   private events: EventHandler[];
 
-  constructor(private renderer: Renderer2, private evt: EventService) {}
-
   ngAfterViewInit(): void {
     this.events = [
-      { element: this.video, name: "play", callback: event => this.setVideoPlayback(true), dispose: null },
-      { element: this.video, name: "pause", callback: event => this.setVideoPlayback(false), dispose: null },
-      // no longer used: { element: this.video, name: "durationchange", callback: event => this.setVideoPlayback(false), dispose: null },
-      // no longer used: { element: this.video, name: "ended", callback: event => this.setVideoPlayback(false), dispose: null },
-      { element: this.video, name: "click", callback: event => this.toggleVideoPlayback(), dispose: null }
+      { element: this.video(), name: "play", callback: event => this.setVideoPlayback(true), dispose: null },
+      { element: this.video(), name: "pause", callback: event => this.setVideoPlayback(false), dispose: null },
+      // no longer used: { element: this.video, name: "durationchange", callback: event => this.noteDurationChange(), dispose: null },
+      // no longer used: { element: this.video, name: "ended", callback: event => this.noteEndOfMediaReached(), dispose: null },
+      { element: this.video(), name: "click", callback: event => this.toggleVideoPlayback(), dispose: null }
     ];
 
     this.evt.addEvents(this.renderer, this.events);
@@ -66,13 +71,13 @@ export class MyVideoPlayButtonComponent implements AfterViewInit, OnDestroy {
   }
 
   updateVideoPlayback(): void {
-    this.play ? this.video.play() : this.video.pause();
+    this.play ? this.video().play() : this.video().pause();
     this.playChanged.emit(this.play);
   }
 
   @HostListener("document:keyup.space", ["$event"])
   onPlayKey(event: KeyboardEvent) {
-    if (this.keyboard) {
+    if (this.keyboard()) {
       this.toggleVideoPlayback();
       event.preventDefault();
     }

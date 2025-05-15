@@ -40,3 +40,9 @@
 .extra-gap-above {
     margin-top: 0.5em;
 }
+
+.growElement {
+  flex: 1 1 100%;
+  box-sizing: border-box;
+  max-width: 100%;
+}

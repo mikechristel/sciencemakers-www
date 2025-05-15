@@ -6,11 +6,17 @@
 /* NOTE: with Spring 2019 push for greater accessibility, making use of angular/CDK (e.g., for
    drop-down menu box overlay that traps focus such as to choose which fields to search)
    Useful walkthrough: blog.angularindepth.com/creating-a-toast-service-with-angular-cdk-a0d35fd8cc12
-   NOTE: in updating to Angular 10..11..12..13  the @import became @use at 12 to 13 update.
+   NOTE: in updating to Angular 10..11..12..13  the @use in all .scss became @use at 12 to 13 update.
 */
 @use "../../node_modules/@angular/cdk/overlay";
 
 .mymodal {
+  display: flex !important;
+  flex-direction: column;
+  box-sizing: border-box;
+  place-content: stretch space-between; /* note: shorthand for align-content: stretch; justify-content: space-between */
+  align-items: stretch;
+
   /* detach from rest of the document */
   position: fixed;
   max-width: myF.bp(thmda_maxwidth);
@@ -63,6 +69,13 @@
   }
 
   .mymodal-header {
+    display: flex !important;
+    flex-direction: row;
+    box-sizing: border-box;
+    place-content: flex-start space-between; /* note: shorthand for align-content: flex-start; justify-content: space-between */
+    align-items: flex-start;
+    flex: 1 1 100%;
+
     border-bottom: 0;
     padding: 0 0 myF.em(22);
   }
@@ -84,6 +97,13 @@
     }
   }
 
+  .mymodal-buttonline {
+    flex-basis: 28px;
+    flex-grow: 1;
+    box-sizing: border-box;
+    min-width: 28px;
+  }
+
   button.close {
     color: #fff;
     background-color: myF.color(primary);
@@ -98,11 +118,24 @@
   }
 
   .mymodal-body {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    min-width: 100%;
+    min-height: 100%;
+
+    /*  fxLayout="column" fxLayoutAlign="space-between stretch" */
+    display: flex !important;
+    flex-direction: column;
+    box-sizing: border-box;
+    place-content: stretch space-between; /* note: shorthand for align-content: stretch; justify-content: space-between */
+    align-items: stretch;
+
     padding: myF.em(2) myF.em(4) myF.em(2); /* top, right and left, bottom */
 
     textarea,
     textarea:focus {
-     @include myGlobals.source-sans;
+      @include myGlobals.source-sans;
       width: 100%;
       height: auto;
       background-color: #fff;
@@ -140,7 +173,7 @@
   }
 
   .email_input {
-   @include myGlobals.source-sans;
+    @include myGlobals.source-sans;
     width: 100%;
     height: auto;
     color: myF.color(dark-grey);
@@ -167,70 +200,20 @@
     border-top: 0;
     padding-bottom: 6px;
 
-    button {
-      @include myGlobals.oswald;
-      background: myF.color(primary);
-      border: 1px solid myF.color(primary); /* note: added for accessibility, to provide a button border in high contrast mode */
-      border-radius: 0;
-      color: #fff;
-      font-size: 1.2rem;
-      height: myGlobals.$buttonHeight;
-      min-width: 3.125rem;
-      max-width: 6.25rem;
-      letter-spacing: .5px;
-      transition: box-shadow .15s ease-in-out;
-
-      &:hover,
-      &:focus {
-          box-shadow: inset 0 0 5px rgba(51,51,51,.6);
-          background-color: myF.color(secondary);
-      }
-
-      &:disabled {
-          cursor: not-allowed;
-          opacity: .4;
-      }
-
-      @media screen and (min-width: myF.bp(afl_medium)) and (max-width: myF.bp(afl_large_just_before)) {
-        font-size: 1.4rem;
-      }
-
-      @media screen and (min-width: myF.bp(afl_large)) {
-        font-size: 1.6rem;
-      }
+    display: flex !important;
+    flex-direction: row;
+    box-sizing: border-box;
+    place-content: center space-evenly; /* note: shorthand for align-content: center; justify-content: space-evenly */
+    align-items: center;
+    flex-grow: 1;
+    *:not(:last-child) {
+      margin-right: calc(2em);
     }
 
-    .button-secondary {
-      @include myGlobals.oswald;
-      background: myF.color(secondary);
-      border: 1px solid myF.color(secondary); /* note: added for accessibility, to provide a button border in high contrast mode */
-      border-radius: 0;
-      color: #fff;
-      font-size: 1.2rem;
-      height: myGlobals.$buttonHeight;
-      min-width: 3.125rem;
-      max-width: 6.25rem;
-      letter-spacing: .5px;
-      transition: box-shadow .15s ease-in-out;
-
-      &:hover,
-      &:focus {
-          box-shadow: inset 0 0 5px rgba(51,51,51,.6);
-          background-color: myF.color(primary);
-      }
-
-      @media screen and (min-width: myF.bp(afl_medium)) and (max-width: myF.bp(afl_large_just_before)) {
-        font-size: 1.4rem;
-      }
-
-      @media screen and (min-width: myF.bp(afl_large)) {
-        font-size: 1.6rem;
-      }
-    }
   }
 
   .modal-warning {
-   @include myGlobals.source-sans-bold;
+    @include myGlobals.source-sans-bold;
 
     color: myF.color(tertiary);
 
@@ -260,7 +243,7 @@
 }
 
 .mymodal-overlay {
-    /* See comment in https:stackoverflow.com/questions/43533463/how-to-create-a-modal-popup-that-is-compatible-with-angular-4
+    /* See comment in stackoverflow.com/questions/43533463/how-to-create-a-modal-popup-that-is-compatible-with-angular-4
        for origins of this approach to modal dialog presentation. */
 
     /* detach from document */
@@ -282,6 +265,8 @@
 
 .nav-across-width { /* only use for desktop, not mobile; mobile shows hamburger menu via header__menu-icon instead */
   @extend %desktop-only; /* counters the extend %mobile-only for header__menu-icon */
+  flex-grow: 1;
+
   color: myF.color(dark-grey);
   font-size: 1rem;
   width: 100%;
@@ -298,12 +283,18 @@
   @media screen and (min-width: myF.bp(afl_medium)) and (max-width: myF.bp(afl_large_just_before)) {
     padding-bottom: myF.em(12);
   }
-
 }
 
 .nav__links {
   @extend %list-without-styles;
   @include myGlobals.oswald;
+
+  /* fxLayout="row" fxLayoutAlign="space-between center" */
+  display: flex;
+  box-sizing: border-box;
+  flex-direction: row;
+  place-content: center space-between; /* note: shorthand for align-content: center; justify-content: space-between */
+  align-items: center;
 
   margin: 0;
   width: 100%;
@@ -385,11 +376,38 @@
 
 .appHeaderPlusContents {
     margin: 0;
+    width: 100%;
+    height: 100%;
+    min-width: 100%;
+    min-height: 100%;
+
+    display: flex !important;
+    flex-direction: column;
+    box-sizing: border-box;
+
     padding: 0;
     max-width: myF.bp(thmda_maxwidth);
 }
 
 .header {
+  @media screen and (max-width: myF.bp(afl_small_just_before))
+  {
+    min-width: 5rem;
+    flex: 1 1 5rem;
+  }
+  @media screen and (min-width: myF.bp(afl_small)) and (max-width: myF.bp(afl_medium_just_before)) {
+    min-width: 8.8rem;
+    flex: 1 1 8.8rem;
+  }
+  @media screen and (min-width: myF.bp(afl_medium)) and (max-width: myF.bp(afl_large_just_before)) {
+    min-width: 9.15rem;
+    flex: 1 1 9.15rem;
+  }
+  @media screen and (min-width: myF.bp(afl_large)) {
+    min-width: 9.2rem;
+    flex: 1 1 9.2rem;
+  }
+
   background-color: myF.color(light-grey);
   border-bottom: 1px solid #ccc;
   box-shadow: 0 0 10px rgba(0,0,0,.15);
@@ -406,6 +424,10 @@
 }
 
 .header__content-container {
+  display: flex;
+  box-sizing: border-box;
+  flex-direction: column;
+
   margin: 0 auto;
   @media screen and (min-width: myF.bp(thmda_maxwidth)) {
       max-width: myF.bp(thmda_maxwidth);
@@ -413,6 +435,10 @@
 }
 
 .imposeMaxContentsWidth {
+  flex: 1 1 100%;
+  box-sizing: border-box;
+  max-height: 100%;
+
   margin: 0;
   @media screen and (max-width: myF.bp(thmda_maxwidth_just_before)) {
     margin: 0 auto;
@@ -430,10 +456,36 @@
 }
 
 .header__top-flex-row {
-  padding: myF.gutter(thmda-big) 0; /* top and bottom, right and left */
+  /*  fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="calc(4px)" */
+  display: flex;
+  box-sizing: border-box;
+  flex-direction: row;
+  place-content: center space-between; /* note: shorthand for align-content: center; justify-content: space-between */
+  align-items: center;
+
+  padding: myF.gutter(thmda-big) 0; /* top, left and right, bottom */
 
   @media screen and (max-width: myF.bp(thmda_wideenough_just_before)) {
     padding-top: 0;
+  }
+
+  *:not(:last-child) {
+    margin-right: 4px;
+  }
+}
+
+.header__logoContainer {
+  display: flex;
+  box-sizing: border-box;
+  flex-direction: row;
+  place-content: stretch flex-start; /* note: shorthand for align-content: stretch; justify-content: flex-start */
+  align-items: stretch;
+  @media screen and (max-width: myF.bp(afl_small_just_before)) {
+    min-width: 60%;
+    flex: 1 1 60%;
+  }
+  @media screen and (min-width: myF.bp(afl_small)) {
+    flex: 3 3 calc(17em);
   }
 }
 
@@ -451,10 +503,26 @@
 
 .desktop-top-row-tagline-area {
   @extend %desktop-only;
+  min-width: 40%;
+  flex: 1 1 40%;
 }
 
 .mobile-top-row-icon-area {
   @extend %mobile-only;
+
+  display: flex;
+  box-sizing: border-box;
+  flex-direction: row;
+  flex: 1 1 auto;
+}
+
+class .mobile-top-row-icon-container {
+  display: flex;
+  box-sizing: border-box;
+  flex-direction: row;
+  place-content: stretch flex-end;
+  align-items: stretch;
+  flex: 1 1 auto;
 }
 
 .header__icon {
@@ -464,7 +532,7 @@
 }
 
 .header__tagline {
-   @include myGlobals.source-sans-bold-italic;
+    @include myGlobals.source-sans-bold-italic;
     color: myF.color(dark-grey);
     font-size: 0.85rem;
     line-height: 1.125rem;
@@ -489,7 +557,7 @@ a.skip:focus {
 	position:absolute;
 	left:0px;
 	top:0px;
-	background:color(nav-highlight-shade);
+	background:myF.color(nav-highlight-shade);
 	outline:0;
   transition: top .1s ease-in, background .5s linear;
 }
@@ -541,14 +609,100 @@ a.skip:focus {
   display: none;
 }
 
-@media screen and (max-width: myF.bp(afl_medium_just_before)) {
-  .copy_URI_verbose {
-    display: none !important;
+.footer-button-primary {
+  @include myGlobals.oswald;
+  background: myF.color(primary);
+  border: 1px solid myF.color(primary); /* note: added for accessibility, to provide a button border in high contrast mode */
+  border-radius: 0;
+  color: #fff;
+  font-size: 1.2rem;
+  height: myGlobals.$buttonHeight;
+  min-width: 3.125rem;
+  // max-width: 6.25rem;
+  letter-spacing: .5px;
+  transition: box-shadow .15s ease-in-out;
+
+  flex-grow: 1;
+  flex: 1 1 100%;
+  place-content: center;
+  align-items: center;
+
+  &:hover,
+  &:focus {
+      box-shadow: inset 0 0 5px rgba(51,51,51,.6);
+      background-color: myF.color(secondary);
+  }
+
+  &:disabled {
+      cursor: not-allowed;
+      opacity: .4;
+  }
+
+  @media screen and (min-width: myF.bp(afl_medium)) and (max-width: myF.bp(afl_large_just_before)) {
+    font-size: 1.4rem;
+  }
+
+  @media screen and (min-width: myF.bp(afl_large)) {
+    font-size: 1.6rem;
   }
 }
 
-@media screen and (min-width: myF.bp(afl_medium)) {
-  .copy_URI_terse {
+.footer-button-secondary {
+  @include myGlobals.oswald;
+
+  flex-grow: 1;
+  flex: 1 1 100%;
+  place-content: center;
+  align-items: center;
+
+  background: myF.color(secondary);
+  border: 1px solid myF.color(secondary); /* note: added for accessibility, to provide a button border in high contrast mode */
+  border-radius: 0;
+  color: #fff;
+  font-size: 1.2rem;
+  height: myGlobals.$buttonHeight;
+  min-width: 3.125rem;
+  // max-width: 6.25rem;
+  letter-spacing: .5px;
+  transition: box-shadow .15s ease-in-out;
+
+  &:hover,
+  &:focus {
+      box-shadow: inset 0 0 5px rgba(51,51,51,.6);
+      background-color: myF.color(primary);
+  }
+
+  @media screen and (min-width: myF.bp(afl_medium)) and (max-width: myF.bp(afl_large_just_before)) {
+    font-size: 1.4rem;
+  }
+
+  @media screen and (min-width: myF.bp(afl_large)) {
+    font-size: 1.6rem;
+  }
+}
+
+.copy_URI_verbose {
+  @media screen and (max-width: myF.bp(afl_medium_just_before)) {
+    display: none !important;
+  }
+  @media screen and (min-width: myF.bp(afl_medium)) {
+    display: flex !important;
+    box-sizing: border-box;
+    flex: 1 1 100%;
+    flex-grow: 1;
+    max-width: 100%;
+  }
+}
+
+.copy_URI_terse {
+  @media screen and (max-width: myF.bp(afl_medium_just_before)) {
+    display: flex !important;
+    box-sizing: border-box;
+    flex: 1 1 100%;
+    flex-grow: 1;
+    max-width: 100%;
+  }
+  @media screen and (min-width: myF.bp(afl_medium)) {
     display: none !important;
   }
 }

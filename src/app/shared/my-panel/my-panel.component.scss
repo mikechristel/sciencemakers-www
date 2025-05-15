@@ -1,7 +1,7 @@
-@use '../theme/myF';
 @use '../theme/myGlobals';
 @use '../theme/helpers';
 @use '../theme/base';
+@use '../theme/myF';
 
 .panel-parent {
   margin-bottom: myF.em(8, 14);
@@ -9,15 +9,24 @@
   box-shadow: none;
   border: 1px solid myF.color(primary);
   box-sizing: border-box;
-}
+} /* End of .panel-parent */
 
 .panel-title-item {
+  flex: 1 1 100%;
+
   @include myGlobals.oswald;
   font-size: 1.2rem;
   margin: auto;
 }
 
 .panel-open-close {
+  /* fxLayout="row" fxLayoutAlign="space-between center" */
+  display: flex;
+  box-sizing: border-box;
+  flex-direction: row;
+  place-content: center space-between;
+  align-items: center;
+
   padding: 0;
 
   background-color: myF.color(primary);
@@ -62,6 +71,8 @@
 }
 
 .panel-reverse-title-item {
+  flex: 1 1 100%;
+
   @include myGlobals.oswald;
   font-size: 1.2rem;
   margin: auto;
@@ -72,6 +83,13 @@
 }
 
 .panel-reverse-open-close {
+  /* fxLayout="row" fxLayoutAlign="space-between center" */
+  display: flex;
+  box-sizing: border-box;
+  flex-direction: row;
+  place-content: center space-between;
+  align-items: center;
+
   padding: 0;
 
   background-color: myF.color(secondary);
@@ -126,7 +144,9 @@
 }
 
 .panel-GRANDparent-title-item {
- @include myGlobals.source-sans;
+  flex: 1 1 100%;
+
+  @include myGlobals.source-sans;
   font-size: 1rem;
   font-style: italic;
   margin: auto;
@@ -137,6 +157,13 @@
 }
 
 .panel-GRANDparent-open-close {
+  /* fxLayout="row" fxLayoutAlign="space-between center" */
+  display: flex;
+  box-sizing: border-box;
+  flex-direction: row;
+  place-content: center space-between;
+  align-items: center;
+
   padding: 0;
 
   background-color: myF.color(black);
@@ -183,6 +210,7 @@
 }
 
 .opened-caret {
+  flex: 0 1 auto; /* !!!TBD needed? esp. with inline-block?!? */
   display: inline-block;
   width: 0;
   max-width: 8px;
@@ -196,6 +224,7 @@
 }
 
 .closed-caret {
+  flex: 0 1 auto; /* !!!TBD needed? esp. with inline-block?!? */
   display: inline-block;
   width: 0;
   max-width: 8px;

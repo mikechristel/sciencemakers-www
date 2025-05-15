@@ -1,9 +1,10 @@
 /* Helper classes
    --------------------------------------------------
    Classes to use for small, common tasks. If used in conjunction
-   with other styles, please create a class and extend the placeholder. */
-@use 'myGlobals';
-@use 'myF';
+   with other styles, please create a class and extend the placeholder.
+*/
+@use '../theme/myGlobals';
+@use '../theme/myF';
 
 .bold,
 %bold { font-weight: 700; }

@@ -6,10 +6,8 @@ import { AppComponent } from './app.component';
 describe('App: AngularClient', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        AppComponent
-      ],
-    });
+    imports: [AppComponent],
+});
   });
 
   it('should create the app', waitForAsync(() => {

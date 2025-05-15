@@ -59,13 +59,46 @@
   }
 }
 
-.controls .menu .left {
+.play-Container {
+  flex: 0 0 30px;
+  min-width: 30px;
+  max-width: 30px;
+  box-sizing: border-box;
   justify-content: flex-start;
 }
 
-.controls .menu .right {
+.playtime-Container {
+  flex: 0 0 92px;
+  min-width: 92px;
+  max-width: 92px;
+  box-sizing: border-box;
+}
+
+.rewind-or-ffd-Container {
+  flex: 0 0 32px;
+  min-width: 32px;
+  max-width: 32px;
+  box-sizing: border-box;
   justify-content: flex-end;
 }
+
+.cc-Container {
+  flex: 0 0 40px;
+  min-width: 40px;
+  max-width: 40px;
+  box-sizing: border-box;
+  justify-content: flex-end;
+}
+
+/* peeled away what I need from these? !!!TBD!!! check video controls across various widths!
+.controls .menu {
+  justify-content: flex-start;
+}
+
+.controls .menu {
+  justify-content: flex-end;
+}
+*/
 
 .show-mouse {
   cursor: default;
@@ -93,6 +126,19 @@ video::cue(v[voice="S2"]) {
 .videoSlider {
   width: 100%;
   color: white;
+}
+
+.flexControlContainer {
+  /* fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="calc(2px)" */
+  display: flex;
+  box-sizing: border-box;
+  flex-direction: row;
+  place-content: center space-between;
+  align-items: center;
+
+  *:not(:last-child) {
+    margin-right: calc(2px);
+  }
 }
 
 /* Note: sliders, i.e., HTML5 input type="range" elements, are notoriously hard to style across browsers.
@@ -167,4 +213,3 @@ input[type="range"]:focus::-moz-range-thumb {
   outline: 6px solid rgba(48, 48, 112, 0.4);
   /* outline-offset: 0.125rem; uncomment this if you want a ring rather than tinted expansion (and reduce outline to 3px too) */
  }
-

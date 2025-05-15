@@ -1,19 +1,18 @@
-﻿@use '../shared/theme/myF';
-@use '../shared/theme/myGlobals';
+﻿@use '../shared/theme/myGlobals';
 @use '../shared/theme/helpers';
 @use '../shared/theme/base';
 @use '../shared/theme/search-helpers';
 @use '../shared/theme/filter-helpers';
 @use '../shared/theme/view-option-helpers';
 @use '../shared/theme/pagination-helpers';
+@use '../shared/theme/myF';
 
 .tapes {
   list-style: none;
   padding: 0;
   display: grid;
   /* Default of 2 per row */
-  grid-template-columns: repeat(2, 1fr); /* the "1fr" makes all rows equal height;
-       e.g., see  stackoverflow.com/questions/44488357/equal-height-rows-in-css-grid-layout */
+  grid-template-columns: repeat(2, 1fr); /* the "1fr" makes all rows equal height; e.g., see stackoverflow.com/questions/44488357/equal-height-rows-in-css-grid-layout */
   grid-auto-rows: 1fr;
   gap: myF.gutter(thmda-tight);
 
@@ -26,8 +25,10 @@
      afl_small        600px       400       3
      thmda_wideenough 768px       ~512      3 (4 could fit but less readable short text, so leaving wider at 3 per row)
      afl_medium       960         640       4
-    afl_large        1280        944       7
-  */
+     afl_large        1280        944       7
+     afl_xlarge (retired, not used)       1920        1584      12
+     xlarge  (retired, not used)          2400        2064      16 */
+
 
   /* For widths between afl_medium and afl_large, be 4 per row: */
   @media screen and (min-width: myF.bp(afl_medium)) and (max-width: myF.bp(afl_large_just_before)) {
@@ -35,7 +36,7 @@
     gap: myF.gutter(thmda-medium);
   }
 
-  /* New!  With maximum of thmda_maxwidth, afl_large < thmda_maxwidth < afl_xlarge < xlarge, simply max out now at afl_large or greater...
+  /* With maximum of thmda_maxwidth, afl_large < thmda_maxwidth < afl_xlarge < xlarge, simply max out now at afl_large or greater...
      For widths of afl_large or greater, be 7 per row: */
   @media screen and (min-width: myF.bp(afl_large)) {
     grid-template-columns: repeat(4, 1fr);
@@ -60,7 +61,7 @@
 
 /* My Clips */
 .welcome-paragraph {
- @include myGlobals.source-sans-bold;
+  @include myGlobals.source-sans-bold;
 
   background: myF.color(primary);
   color: #fff;
@@ -83,10 +84,23 @@
   }
 }
 
-.distinguishFilterPane {
+.distinguishFilterPanelNarrowFilter {
   background-color: myF.color(light-grey);
   border: 1px solid #ccc;
   padding: myF.gutter(thmda-medium);
+
+  /* fxFlex.lt-md="34%" fxFlex.gt-sm="0 0 calc(308px)" */
+  @media screen and (max-width: myF.bp(afl_medium_just_before))
+  {
+    flex: 1 1 100%;
+    max-width: calc(34%);
+  }
+  @media screen and (min-width: myF.bp(afl_medium)) {
+    flex: 0 0 308px;
+    width: 308px;
+  }
+  margin-right: 18px;
+
 }
 
 .story-set__title {
@@ -126,7 +140,7 @@
     margin-bottom: myF.em(12);
 }
 
-.my-clips-action-button { /* note similarity with launch-filter-menu-button */
+.my-clips-action-button-no-flex { /* similar to my-clips-action-button */
   @include myGlobals.oswald;
 
   background-color: myF.color(primary);
@@ -145,25 +159,150 @@
   }
 }
 
-.my-clips-action-button__inverse {
+.my-clips-action-button { /* note similarity with launch-filter-menu-button */
   @include myGlobals.oswald;
 
-  background-color: myF.color(secondary);
-  border: 1px solid myF.color(secondary); /* note: added for accessibility, to provide a button border in high contrast mode */
+  /* fxLayout="row" fxLayoutAlign="space-around center" fxLayoutGap="calc(0.2em)" */
+  box-sizing: border-box;
+  display: flex !important;
+  flex-direction: row;
+  place-content: center space-around;
+  align-items: center;
+  *:not(:last-child) {
+    margin-right: calc(0.2em);
+  }
+
+  background-color: myF.color(primary);
+  border: 1px solid myF.color(primary); /* note: added for accessibility, to provide a button border in high contrast mode */
   border-radius: 0;
   cursor: pointer;
-  margin: myF.gutter(thmda-tight) 0 myF.gutter(thmda-tiny) 0; /* top right bottom left */
-  padding: myF.em(4) myF.em(12);
-  font-size: 1.2rem;
-  height: myGlobals.$buttonHeight;
+  margin-top: myF.gutter(thmda-tiny);
 
   &:hover,
   &:focus {
       box-shadow: inset 0 0 5px rgba(51,51,51,.6);
-      background-color: myF.color(primary);
+      background-color: myF.color(secondary);
   }
+
+  @media screen and (max-width: myF.bp(afl_medium_just_before)) {
+    padding: myF.em(2) myF.em(6);
+    font-size: 1rem;
+    height: myGlobals.$shorterButtonHeight;
+    margin-bottom: myF.gutter(thmda-tiny);
+  }
+
+  @media screen and (min-width: myF.bp(afl_medium)) {
+    padding: myF.em(4) myF.em(12);
+    font-size: 1.2rem;
+    height: myGlobals.$buttonHeight;
+    margin-bottom: myF.gutter(thmda-tight);
+  }
+
 }
 
 .action-button-top-gap {
   margin-top: myF.em(6);
+}
+
+.unstyled-list-nowhitespace-rowlayout {
+  /* changing to (to match how biography-storyset does this):  fxFlex.lt-md="100%" fxLayout="row" fxLayoutAlign="space-between end" fxLayoutGap="10px" */
+  box-sizing: border-box;
+  display: flex !important;
+  flex-direction: row;
+  place-content: flex-end space-between; /* note: shorthand for align-content: flex-end; justify-content: space-between */
+  align-items: flex-end;
+  *:not(:last-child) {
+    margin-right: 10px;
+  }
+
+  @media screen and (max-width: myF.bp(afl_medium_just_before))
+  {
+    flex: 1 1 auto;
+  }
+
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.flexColumnChunk {
+  flex: 1 1 100%;
+  box-sizing: border-box;
+  max-height: 100%;
+}
+
+.unstyled-list-nowhitespace-narrow-filter {
+  /* fxLayout="row wrap" fxLayoutAlign="space-between center" fxLayoutGap.lt-md="0" fxLayoutGap="calc(0.5em)" */
+  box-sizing: border-box;
+  display: flex !important;
+  flex-direction: row;
+  flex-flow: row wrap;
+  flex: 1 1 1e-9px;
+  place-content: center space-between; /* note: shorthand for align-content: center; justify-content: space-between */
+  align-items: center;
+
+  @media screen and (min-width: myF.bp(afl_medium))
+  {
+    *:not(:last-child) {
+      margin-right: calc(0.5em);
+    }
+  }
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.container-for-storyset {
+  /* fxLayout="column" fxLayoutAlign="space-between stretch" */
+  display: flex !important;
+  flex-direction: column;
+  box-sizing: border-box;
+  place-content: stretch space-between; /* note: shorthand for align-content: stretch; justify-content: space-between */
+  align-items: stretch;
+}
+
+.storyset-btn-container {
+  flex: 0 0 auto;
+}
+
+.flexClearMyClips {
+  flex: 0 0 17px;
+  min-width: 17px;
+  max-width: 17px;
+}
+
+.flexShareMyClips {
+  flex: 0 0 21px;
+  min-width: 21px;
+  max-width: 21px;
+}
+
+.flexClipOps { /* used for clip operation svg parts of width 21 */
+  flex: 0 0 21px;
+  min-width: 21px;
+  max-width: 21px;
+}
+
+.storyset-btn-row {
+  box-sizing: border-box;
+  display: flex !important;
+  flex-direction: row;
+  flex-flow: row wrap;
+  place-content: flex-start;
+  align-items: flex-start;
+
+  margin: 0;
+  padding: 0;
+
+  *:not(:last-child) {
+    margin-right: 10px;
+  }
+
+  margin-bottom: myF.em(12);
+
+    /* For widths up to thmda_wideenough - have max width of the row at 280px; otherwise, don't worry. */
+    @media screen and (max-width: myF.bp(thmda_wideenough_just_before)) {
+      width: 280px;
+      max-width: 280px;
+    }
 }

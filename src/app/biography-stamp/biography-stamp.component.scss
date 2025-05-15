@@ -3,17 +3,23 @@
 @use '../shared/theme/helpers';
 @use '../shared/theme/base';
 
-/* For biographies, the mockup for home page born this time (week or day) showed a card width of up to 284 (height 272 for the image part).
+/* For biographies, the mockup for home page born this day showed a card width of up to 284 (height 272 for the image part).
    For HistoryMakers biography searches, we don't want to go that tall of image height (or wide), so that we can show more
    results in limited space; hence a different class of biography-result-stamp was born (which also has a list view option). */
 
 .card {
+  display: flex !important;
+  flex-direction: column;
+  box-sizing: border-box;
+  place-content: stretch space-between; /* note: shorthand for align-content: stretch; justify-content: space-between */
+  align-items: stretch;
+
   border: 1px solid myF.color(ok-grey);
   color: myF.color(dark-grey);
   background-color: myF.color(light-grey);
   text-decoration: none;
   overflow: hidden; /* necessary to hide any overflow of image for narrow card widths */
-  height: 100%; /* needed to fill all of the allocated flex layout or grid space */
+  height: 100%; /* needed to fill all of the allocated grid space */
 
   &:focus {
       /* Accessibility review noted:
@@ -38,6 +44,10 @@
 }
 
 .card_img-backdrop {
+  flex: 1 1 240px;
+  box-sizing: border-box;
+  min-height: 240px;
+
   padding: 0;
   margin: 0;
   text-align: center;
@@ -49,7 +59,7 @@
   transition: filter .2s ease-in-out;
   width: 100%;
   max-width: 280px;
-  height: 240px; /* (fills the 240px allocated for image area in fxFlex in html rendering well) */
+  height: 240px; /* (fills the 240px allocated for image area in html rendering well) */
   &:hover,
   &:focus {
     filter: grayscale(100%);
@@ -60,6 +70,11 @@
 }
 
 .card__info-overlay {
+  width: 100%;
+  height: 100%;
+  min-width: 100%;
+  min-height: 100%;
+
   padding: 0;
   margin: 0;
   text-align: center;

@@ -15,11 +15,12 @@ export class PlaylistManagerService {
   public presentMyClipsExportForm$ = this.presentMyClipsExportForm.asObservable();
   public presentMyClipsConfirmClearingForm: Subject<boolean> = new Subject<boolean>();
   public presentMyClipsConfirmClearingForm$ = this.presentMyClipsConfirmClearingForm.asObservable();
+  public presentClipsLoadForm: Subject<boolean> = new Subject<boolean>();
+  public presentClipsLoadForm$ = this.presentClipsLoadForm.asObservable();
 
   public localMyClips: Playlist[] = [];
 
   private SCIENCEMAKERS_PLAYLIST: string = "sm-playlist";
-
   constructor() {
       this.localMyClips = JSON.parse(localStorage.getItem(this.SCIENCEMAKERS_PLAYLIST) || "[]");
       this.myClips.next(this.localMyClips);
@@ -34,14 +35,12 @@ export class PlaylistManagerService {
       return this.localMyClips;
   }
 
-  // !!!TODO: NOTE: UI to allow re-ordering of My Clips was retired rather than made fully accessible to keyboard-only users
-  // (it formerly used a drag and drop interface brought in from elsewhere which was mouse-only driven), and so for
-  // now this call is not used anywhere and hence is commented out:
-  //updateMyClips(newMyClipsOrder: Playlist[]) {
-  //    localStorage.setItem(this.SCIENCEMAKERS_PLAYLIST, JSON.stringify(newMyClipsOrder));
-  //    this.localMyClips = newMyClipsOrder;
-  //    this.myClips.next(this.localMyClips);
-  //}
+  // Added in Spring 2025: a UI to allow re-ordering of My Clips that is fully accessible to keyboard-only users as well as having mouse drag-and-drop support.
+  updateMyClips(newMyClipsOrder: Playlist[]) {
+    localStorage.setItem(this.SCIENCEMAKERS_PLAYLIST, JSON.stringify(newMyClipsOrder));
+    this.localMyClips = newMyClipsOrder;
+    this.myClips.next(this.localMyClips);
+  }
 
   clearMyClips() { // NOTE: ideally any caller to this first confirms with user before taking this clearing action
       localStorage.setItem(this.SCIENCEMAKERS_PLAYLIST, "[]");
@@ -59,6 +58,12 @@ export class PlaylistManagerService {
       // NOTE: Relying on a listener to changes in presentMyClipsConfirmClearingForm to actually do the (modal) confirm-clear form display.
       // Here we just signal it.
       this.presentMyClipsConfirmClearingForm.next(true);
+  }
+
+  triggerClipsLoadForm() {
+      // NOTE: Relying on a listener to changes in presentClipsLoadForm to actually do the (modal) export form display.
+      // Here we just signal it.
+      this.presentClipsLoadForm.next(true);
   }
 
   toggleAddToMyClips(story) {
@@ -117,4 +122,16 @@ export class PlaylistManagerService {
       return retVal;
   }
 
+  MyClipsAsIDSet(): number[] {
+    var retVal: number[] = [];
+    var itemsInIDSet: number = 0;
+    if (this.localMyClips)
+      itemsInIDSet = this.localMyClips.length;
+    if (itemsInIDSet > 0)
+    {
+      for (var i:number = 0; i < itemsInIDSet; i++)
+        retVal.push(this.localMyClips[i].storyID);
+    }
+    return retVal;
+  }
 }

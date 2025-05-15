@@ -1,4 +1,4 @@
-﻿import { Injectable, Inject, OnInit } from '@angular/core';
+﻿import { Injectable, OnInit, inject } from '@angular/core';
 import { Subject }    from 'rxjs';
 import { takeUntil } from "rxjs/operators";
 
@@ -12,15 +12,12 @@ declare var _aname: any; // Declaration of js variable holding account name (or 
 
 @Injectable()
 export class FeedbackService extends BaseComponent {
+    private http = inject(HttpClient);
+
     public presentFeedbackInputForm: Subject<boolean> = new Subject<boolean>();
     public presentFeedbackInputForm$ = this.presentFeedbackInputForm.asObservable();
 
     private postFeedbackURL = 'Feedback';
-
-
-    constructor(private http: HttpClient) {
-        super(); // for BaseComponent extension (brought in to cleanly unsubscribe from subscriptions)
-    }
 
     triggerFeedbackInputForm() {
         // NOTE: Relying on a listener to changes in presentFeedbackInputForm to actually do the (modal) feedback input form display.
@@ -36,6 +33,7 @@ export class FeedbackService extends BaseComponent {
             if (window.innerWidth != null && window.innerHeight != null)
                 resolutionInfo = window.innerWidth + "x" + window.innerHeight;
         }
+
         var myURL: string = null;
         if (window != null && window.location != null && window.location.href != null) {
           var currentURL = window.location.href;

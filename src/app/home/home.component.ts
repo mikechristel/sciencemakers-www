@@ -1,4 +1,4 @@
-﻿import { Component, OnInit } from '@angular/core';
+﻿import { Component, OnInit, inject } from '@angular/core';
 import { takeUntil } from "rxjs/operators";
 
 import { HistoryMakerService } from '../historymakers/historymaker.service';
@@ -14,14 +14,25 @@ import { BriefBio } from '../historymakers/brief-bio';
 import { SearchFormOptions } from '../shared/search-form/search-form-options';
 import { BaseComponent } from '../shared/base.component';
 import { UserSettingsManagerService } from '../user-settings/user-settings-manager.service';
-import {LiveAnnouncer} from '@angular/cdk/a11y'; // used to read changes to set title
+import {LiveAnnouncer} from '@angular/cdk/a11y';
+import { FocusMeDirective } from '../shared/focus-me.directive';
+import { SearchFormComponent } from '../shared/search-form/search-form.component';
+import { BiographyStampComponent } from '../biography-stamp/biography-stamp.component';
 
 @Component({
     selector: 'thda-home',
     templateUrl: './home.component.html',
-    styleUrls: ['./home.component.scss']
+    styleUrls: ['./home.component.scss'],
+    imports: [FocusMeDirective, SearchFormComponent, BiographyStampComponent]
 })
 export class HomeComponent extends BaseComponent implements OnInit {
+    private globalState = inject(GlobalState);
+    private historyMakerService = inject(HistoryMakerService);
+    private userSettingsManagerService = inject(UserSettingsManagerService);
+    private titleManagerService = inject(TitleManagerService);
+    private searchFormService = inject(SearchFormService);
+    private liveAnnouncer = inject(LiveAnnouncer);
+
     txtQuery: string = ""; // this is the query string as edited by the user
 
     scienceMakersStoryCount: string;
@@ -39,14 +50,10 @@ export class HomeComponent extends BaseComponent implements OnInit {
     signalFocusToTitle: boolean;
     public myMediaBase: string;
 
-    constructor(
-        private globalState: GlobalState,
-        private historyMakerService: HistoryMakerService,
-        private userSettingsManagerService: UserSettingsManagerService,
-        private titleManagerService: TitleManagerService,
-        private searchFormService: SearchFormService, private liveAnnouncer: LiveAnnouncer) {
+    constructor() {
 
         super(); // for BaseComponent extension (brought in to cleanly unsubscribe from subscriptions)
+        const userSettingsManagerService = this.userSettingsManagerService;
 
         // Start off with an empty signal about what to focus on
         this.clearSignalsForCurrentFocusSetting();
@@ -57,26 +64,26 @@ export class HomeComponent extends BaseComponent implements OnInit {
     }
 
     ngOnInit() {
-        this.titleManagerService.setTitle("ScienceMakers Digital Archive (March 23, 2023)");
+        this.titleManagerService.setTitle("ScienceMakers Digital Archive (May 19, 2025)");
         this.liveAnnouncer.announce("ScienceMakers Digital Archive"); // NOTE: using LiveAnnouncer to eliminate possible double-speak
 
         this.historyMakerService.getCorpusSpecifics().pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(corpusDetails => {
-                this.fullStoryCount = corpusDetails.stories.all.toLocaleString();
-              // NOTE: when testing, we may not have specific ScienceMakers counts, as that is a "special" API that might not be in the testing infrastructure.
-              // So, do not presume the existence of these counts.
-              if (corpusDetails.biographies.scienceMakerCount)
-                  this.scienceMakersBiographyCount = corpusDetails.biographies.scienceMakerCount.toLocaleString();
-              if (corpusDetails.stories.scienceMakerCount)
-                  this.scienceMakersStoryCount = corpusDetails.stories.scienceMakerCount.toLocaleString();
-              var lastUpdateDateString:string = corpusDetails.lastUpdated;
-              if (lastUpdateDateString && lastUpdateDateString.length > 0) {
-                  var lastUpdateDate: Date = new Date(lastUpdateDateString);
-                  this.lastUpdateDatePhrase = "as of " +
-                    this.globalState.cleanedMonthDayYearFromNumbers(lastUpdateDate.getMonth(), lastUpdateDate.getDate(),
-                      lastUpdateDate.getFullYear());
-              }
-              this.fullBiographyCount = corpusDetails.biographies.all.toLocaleString();
+              this.fullStoryCount = corpusDetails.stories.all.toLocaleString();
+			  // NOTE: when testing, we may not have specific ScienceMakers counts, as that is a "special" API that might not be in the testing infrastructure.
+			  // So, do not presume the existence of these counts.
+			  if (corpusDetails.biographies.scienceMakerCount)
+				  this.scienceMakersBiographyCount = corpusDetails.biographies.scienceMakerCount.toLocaleString();
+			  if (corpusDetails.stories.scienceMakerCount)
+				  this.scienceMakersStoryCount = corpusDetails.stories.scienceMakerCount.toLocaleString();
+			  var lastUpdateDateString:string = corpusDetails.lastUpdated;
+			  if (lastUpdateDateString && lastUpdateDateString.length > 0) {
+				  var lastUpdateDate: Date = new Date(lastUpdateDateString);
+				  this.lastUpdateDatePhrase = "as of " +
+					this.globalState.cleanedMonthDayYearFromNumbers(lastUpdateDate.getMonth(), lastUpdateDate.getDate(),
+					  lastUpdateDate.getFullYear());
+			  }
+			  this.fullBiographyCount = corpusDetails.biographies.all.toLocaleString();
             });
 
         // Do not qualify the people born this week in any way (i.e., no filtering, no paging): just get them all (hence null filtering/paging parameters):

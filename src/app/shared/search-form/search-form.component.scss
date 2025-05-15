@@ -5,12 +5,43 @@
 @use '../theme/search-helpers';
 
 .search-form-container {
-   @include myGlobals.source-sans;
+    @include myGlobals.source-sans;
+
+    /* formerly relied on flex-layout for fxLayout="column" fxLayoutAlign="space-between stretch" fxLayoutGap="calc(.2em)"
+    ...replacement styling below courtesy Community advice at https://github.com/angular/flex-layout/issues/1426... */
+    flex-direction: column !important;
+
+    *:not(:last-child) {
+      margin-right: unset;
+      margin-bottom: calc(.2em);
+    }
+    place-content: stretch space-between;
+    align-items: stretch;
 
     font-size: 1rem;
     @media screen and (min-width: myF.bp(afl_medium)) {
         font-size: 1.2rem;
     }
+}
+
+.search-form-start-flex-row {
+  display: flex;
+  box-sizing: border-box;
+  flex-direction: row;
+  place-content: stretch flex-start;
+  align-items: stretch;
+}
+
+.list-item-in-flex-row {
+  flex-shrink: 0;
+  /* default: flex-grow: 0, so left unstated */
+  @media screen and (max-width: myF.bp(afl_small_just_before)) {
+    width: 200px;
+  }
+  @media screen and (min-width: myF.bp(afl_small)) {
+    width: 250px;
+  }
+  /* retired: fxFlex.xs="0 0 200px" fxFlex.gt-xs="0 0 250px" */
 }
 
 .search__advanced {
@@ -24,7 +55,7 @@
 }
 
 .search__routerLink {
-  @include myGlobals.source-sans;
+@include myGlobals.source-sans;
     cursor: pointer;
     font-size: 1rem;
 }
@@ -57,6 +88,16 @@
 .search__submit {
   @include myGlobals.source-sans-semi-bold;
 
+  /* Extra styling dropped in to support: fxFlex.lt-md="1 0 30%" fxFlex.gt-sm="1 0 25%"
+          fxLayout="row" fxLayoutAlign="center center" */
+  box-sizing: border-box;
+  display: flex !important;
+  flex-direction: row;
+  flex-grow: 1;
+  flex-shrink: 0;
+  place-content: center;
+  align-items: center;
+
   background-color: myF.color(primary);
   border:1px myF.color(primary); /* defined for accessibility, so that a border is rendered in the Windows High Contrast mode */
   border-radius: 0;
@@ -70,7 +111,13 @@
 
   @media screen and (max-width: myF.bp(afl_medium_just_before)) {
     margin-bottom: myF.gutter(thmda-big);
-    margin-top: 0;
+    margin-top: 0; /* some narrow views will wrap this into a different line, needing a margin for better layout */
+    flex-basis: calc(30%); /* when too narrow, less than medium, let it be 30% of the space as we won't get other item(s) on this narrow row. */
+    min-width: calc(30%);
+  }
+  @media screen and (min-width: myF.bp(afl_medium)) {
+    flex-basis: calc(25%); /* when wider, at medium or more, let it be 25% of the space as that will be adequate */
+    min-width: calc(25%);
   }
 
   &:hover,
@@ -84,6 +131,16 @@
 .search__submit__disabled {
   @include myGlobals.source-sans-semi-bold;
 
+  /* Extra styling dropped in to support: fxFlex.lt-md="1 0 30%" fxFlex.gt-sm="1 0 25%"
+  fxLayout="row" fxLayoutAlign="center center" */
+  box-sizing: border-box;
+  display: flex !important;
+  flex-direction: row;
+  flex-grow: 1;
+  flex-shrink: 0;
+  place-content: center;
+  align-items: center;
+
   background-color: myF.color(primary);
   border:1px myF.color(primary); /* defined for accessibility, so that a border is rendered in the Windows High Contrast mode */
   border-radius: 0;
@@ -96,6 +153,12 @@
   @media screen and (max-width: myF.bp(afl_medium_just_before)) {
     margin-top: 0; /* some narrow views will wrap this into a different line, needing a margin for better layout */
     margin-bottom: myF.gutter(thmda-big);
+    flex-basis: calc(30%); /* when too narrow, less than medium, let it be 30% of the space as we won't get other item(s) on this narrow row. */
+    min-width: calc(30%);
+  }
+  @media screen and (min-width: myF.bp(afl_medium)) {
+    flex-basis: calc(25%); /* when wider, at medium or more, let it be 25% of the space as that will be adequate */
+    min-width: calc(25%);
   }
 
   /* adjust look for "disabled" */
@@ -108,25 +171,22 @@
   margin: 0;
   margin-top: myF.em(10);
   margin-bottom: myF.em(10);
-}
 
-.search__rpp-container {
-  margin: auto;
-  width: auto;
-  max-width: myF.em(290);
-
-  @media screen and (max-width: myF.bp(thmda_narrow_just_before)) {
-    margin-top: myF.em(8); /* some narrow views will wrap this into a different line, needing a margin for better layout */
-  }
+  /* Retired flex-layout had flex="auto" i.e. flex="1 1 auto" so need a flex-grow */
+  flex-grow: 1;
 }
 
 .search__submit-icon {
+  flex-shrink: 0;
+  flex-grow: 0;
+  width: 20px; /* precise size */
+
   height: 2rem;
   margin-right: 0.5rem;
 }
 
 .search__input {
- @include myGlobals.source-sans;
+  @include myGlobals.source-sans;
 
   border: 1px solid myF.color(dark-grey);
   border-radius: 0;
@@ -135,6 +195,9 @@
   margin-bottom: myF.em(10);
   padding-left: 0.5em;
   width: 100%;
+
+  /* Retired flex-layout had flex="auto" i.e. flex="1 1 auto" so need a flex-grow */
+  flex-grow: 1;
 
   @media screen and (min-width: myF.bp(afl_medium)) {
       font-size: 1.2rem;
@@ -150,7 +213,7 @@
 }
 
 .search-field-select {
- @include myGlobals.source-sans;
+  @include myGlobals.source-sans;
 
   background-color: #fff;
   border: 1px solid myF.color(ok-grey);
@@ -181,10 +244,21 @@
 .search__links-container {
   margin-bottom: myF.em(5);
   width: 100%;
+  flex-grow: 1;
+  box-sizing: border-box;
 
-  &--no-rpp {
-    width: auto;
+  /* !!!TBD!!! NOTE: fxFlex.lt-md="1 0 calc(70% - 0.2em)" fxFlex.gt-sm="1 0 calc(33% - 0.2em)"
+     Intent, I think: narrow lt-md	'screen and (max-width: 959px)', links (this container) on one row, button on next so feel free to go up to near 70%,
+     BUT, for gt-sm	'screen and (min-width: 960px)', links, button on same row so use at most a tad less than 33%. */
+  @media screen and (max-width: myF.bp(afl_medium_just_before)) {
+    flex-basis: calc(70% - 0.2em);
+    min-width: calc(70% - 0.2em); /* when too narrow, less than medium, let it be 70% of the space (almost) as we won't get other item(s) on this narrow row. */
   }
+  @media screen and (min-width: myF.bp(afl_medium)) {
+    flex-basis: calc(33% - 0.2em);
+    min-width: calc(33% - 0.2em); /* when wider, at medium or more, let it be 33% of the space (almost) as we can get more onto this wider row */
+  }
+
 }
 
 .helptext {
@@ -221,16 +295,14 @@ input {
   font-size: 1.2rem;
 }
 
-/* Courtesy of stackoverflow.com/questions/306252/how-to-align-checkboxes-and-their-labels-consistently-cross-browsers
-*/
+/* Courtesy of stackoverflow.com/questions/306252/how-to-align-checkboxes-and-their-labels-consistently-cross-browsers */
 input[type=checkbox] {
 vertical-align: middle;
 position: relative;
 top: -3px;
 }
 
-/* Use noBreak class on outer label enclosing a checkbox to keep label and checkbox on same line.
-*/
+/* Use noBreak class on outer label enclosing a checkbox to keep label and checkbox on same line. */
 .noBreak {
 white-space: nowrap;
 font-size: 1.2rem;
@@ -239,20 +311,64 @@ color: #1E1810;
 }
 
 .interview_date_panel {
+  flex-direction: column !important;
+  box-sizing: border-box;
+  display: flex;
+  place-content: center;
+  align-items: center;
+  flex-basis: calc(800px);
+  flex-shrink: 1;
+
+  *:not(:last-child) {
+      margin-right: unset;
+      margin-bottom: calc(.1em);
+  }
+  max-width: 800px;
+
   background-color: myF.color(secondary);
   border-radius: 0;
   border: 1px solid myF.color(ok-grey);
   box-shadow: none;
   /* leave height out of style; figured out based on need for space for the min/max date when checked "on" */
-  margin: myF.em(8) 0 myF.em(12); /* top, left and right, bottom */
+  margin-top: myF.em(8);
+  margin-left: 0;
+  /* !!!TBD!!! resolve conflict of margin-bottom of myF.em(12) but also a container fxLayoutGap="calc(.1em)"  !!! */
   padding: 0.2em 0.2em 0.2em 0.2em;
   width: 90%;
 
-.date-panel-piece {
-  min-width: 280px;
-  padding: 0;
-  margin-bottom: 0.3em;
+  .date-panel-piece {
+    flex: 1 1 50%;
+    box-sizing: border-box;
+    max-width: 50%;
+
+    min-width: 280px;
+    padding: 0;
+    margin-bottom: 0.3em;
+  }
+
+  .interview_date_panel_chunk {
+    flex-flow: wrap;
+    box-sizing: border-box;
+    display: flex;
+    place-content: center;
+    align-items: center;
+    flex: 1 1 auto;
+  }
 }
+
+.search-input-final-row {
+  /* container with fxFlex="auto" fxLayout="row wrap" fxLayoutAlign="space-between center" fxLayoutGap="calc(0.2em)" which may not make sense,
+     so implementing fxLayout="row wrap" fxLayoutAlign="center center" fxLayoutGap="calc(0.2em)" first... */
+  flex-flow: row wrap;
+  box-sizing: border-box;
+  display: flex;
+  place-content: center space-between;
+  align-items: center;
+  flex: 1 1 auto;
+
+  *:not(:last-child) {
+    margin-right: calc(0.2em);
+  }
 }
 
 .interview_date_area_terse {

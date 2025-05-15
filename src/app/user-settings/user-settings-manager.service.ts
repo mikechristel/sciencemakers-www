@@ -1,12 +1,16 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Subject }    from 'rxjs';
 import { GlobalState } from '../app.global-state';
 
 // The purpose of this service is to retrieve and store in localStorage the autoplay and autoadvance user settings.
 // NOTE: for ScienceMakers, Topic Search is never shown; also there is no UI to turn these following facets on, i.e., they are always hidden:
 // showStoryJobTypeFacetFilter, showBiographyJobTypeFacetFilter (furthermore, Category is always off instead of always on as is seen in parent The HistoryMakers Digital Archive)
+// NOTE: ScienceMakers also has no mixtape user setting or UI or data.
+
 @Injectable()
 export class UserSettingsManagerService {
+    private globalState = inject(GlobalState);
+
     public autoplayVideo: Subject<boolean> = new Subject<boolean>();
     public autoplayVideo$ = this.autoplayVideo.asObservable();
 
@@ -15,9 +19,6 @@ export class UserSettingsManagerService {
 
     public showCCText: Subject<boolean> = new Subject<boolean>();
     public showCCText$ = this.showCCText.asObservable();
-
-    public hideTopicSearch: Subject<boolean> = new Subject<boolean>();
-    public hideTopicSearch$ = this.hideTopicSearch.asObservable();
 
     public bioSearchFieldsMask: Subject<number> = new Subject<number>();
     public bioSearchFieldsMask$ = this.bioSearchFieldsMask.asObservable();
@@ -51,10 +52,9 @@ export class UserSettingsManagerService {
     private AUTOPLAY_SETTING_NAME: string = "sm-autoplay";
     private AUTOADVANCE_SETTING_NAME: string = "sm-autoadvance";
     private CCTEXT_SETTING_NAME: string = "sm-cctext";
-    private HIDE_TOPIC_SEARCH_SETTING_NAME: string = "sm-hidetopicsearch";
     private BIO_SEARCH_FIELDS_MASK_NAME: string = "sm-biosearchfieldsmask";
     private SHOWBIOGRAPHY_LASTNAME_FACETFILTER: string = "sm-biolastnamefilter";
-    private SHOWBIOGRAPHY_BIRTHDECADE_FACETFILTER: string = "sm-biobirthdecadefilter";
+    private SHOWBIOGRAPHY_BIRTHDECADE_FACETFILTER: string = "sm-sm-biobirthdecadefilter";
     private SHOWBIOGRAPHY_BIRTHSTATE_FACETFILTER: string = "sm-biobirthstatefilter";
     private SHOWSTORY_STATE_FACETFILTER: string = "sm-storystatefilter";
     private SHOWSTORY_ORG_FACETFILTER: string = "sm-storyorgfilter";
@@ -65,12 +65,12 @@ export class UserSettingsManagerService {
     private BIO_ID_TO_FOCUS: string = "sm-bioIDToFocus";
     private STORY_ID_TO_FOCUS: string = "sm-storyIDToFocus";
 
+    private REORDER_VIA_KEYBOARD: string = "sm-kbdreorder";
+
     private localAutoplay: boolean = false;
     private localAutoadvance: boolean = false;
     private localCCText: boolean = false;
     private localBioSearchMask: number = 0;
-
-    private localHideTopicSearch: boolean = false;
 
     private localShowBiographyLastNameFacetFilter: boolean = false;
     private localShowBiographyDecadeOfBirthFacetFilter: boolean = false;
@@ -86,7 +86,9 @@ export class UserSettingsManagerService {
     private localBioIDToFocus: string;
     private localStoryIDToFocus: number;
 
-    constructor(private globalState: GlobalState) {
+    private currentReorderViaKeyboardSetting: boolean = true; // will be set in constructor, but default setting is "1" (true) so signal that here with default setting of true...
+
+    constructor() {
         var temp: string;
         temp = JSON.parse(localStorage.getItem(this.AUTOPLAY_SETTING_NAME) || "0");
         this.localAutoplay = (temp == "1");
@@ -97,9 +99,6 @@ export class UserSettingsManagerService {
         temp = JSON.parse(localStorage.getItem(this.CCTEXT_SETTING_NAME) || "0");
         this.localCCText = (temp == "1");
         this.showCCText.next(this.localCCText);
-
-        this.localHideTopicSearch = true; // NOTE: for ScienceMakers, this is always true (revisit if we consider "Great Story" to be reflecting a ScienceMaker's perspective, etc.)
-        this.hideTopicSearch.next(this.localHideTopicSearch);
 
         temp = JSON.parse(localStorage.getItem(this.BIO_SEARCH_FIELDS_MASK_NAME) || "0");
         var tryAsNumber = +temp;
@@ -144,6 +143,9 @@ export class UserSettingsManagerService {
         this.localShowStoryDecadeOfBirthFacetFilter = (temp == "1");
         this.showStoryDecadeOfBirthFacetFilter.next(this.localShowStoryDecadeOfBirthFacetFilter);
 
+        temp = JSON.parse(localStorage.getItem(this.REORDER_VIA_KEYBOARD) || "1"); // default is yes, reorder via keyboard, a more accessible interface
+        this.currentReorderViaKeyboardSetting = (temp == "1");
+
         this.localBioIDToFocus = this.globalState.NO_ACCESSION_CHOSEN;
         this.bioIDToFocus.next(this.localBioIDToFocus);
         this.localStoryIDToFocus = this.globalState.NOTHING_CHOSEN;
@@ -155,7 +157,6 @@ export class UserSettingsManagerService {
         this.autoadvanceVideo.next(this.localAutoadvance);
         this.showCCText.next(this.localCCText);
         this.bioSearchFieldsMask.next(this.localBioSearchMask);
-        this.hideTopicSearch.next(this.localHideTopicSearch);
 
         this.showBiographyLastNameFacetFilter.next(this.localShowBiographyLastNameFacetFilter);
         this.showBiographyDecadeOfBirthFacetFilter.next(this.localShowBiographyDecadeOfBirthFacetFilter);
@@ -186,10 +187,6 @@ export class UserSettingsManagerService {
 
     public currentBioSearchFieldsMask(): number {
         return this.localBioSearchMask;
-    }
-
-    public currentHideTopicSearch(): boolean {
-        return this.localHideTopicSearch;
     }
 
     public defaultBioSearchFieldsMask(): number {
@@ -265,21 +262,7 @@ export class UserSettingsManagerService {
         }
     }
 
-    public updateHideTopicSearch(newSetting: boolean) {
-      var temp: string;
-      if (newSetting)
-        temp = "1";
-      else
-        temp = "0";
-      var newBooleanSetting: boolean = (temp == "1");
-      if (this.localHideTopicSearch != newBooleanSetting) {
-          localStorage.setItem(this.HIDE_TOPIC_SEARCH_SETTING_NAME, temp);
-          this.localHideTopicSearch = newBooleanSetting;
-          this.hideTopicSearch.next(this.localHideTopicSearch);
-      }
-  }
-
-  public updateShowBiographyBirthStateFacetFilter(newSetting: boolean) {
+    public updateShowBiographyBirthStateFacetFilter(newSetting: boolean) {
         var temp: string;
         if (newSetting)
           temp = "1";
@@ -418,6 +401,25 @@ export class UserSettingsManagerService {
         }
     }
 
+    // NOTE: unlike most other settings, the UI to change the reorderViaKeyboard boolean is within the reorder-myclips component, not in a settings page.
+    // Furthermore, there is no event for this setting - the UI in reorderViaKeyboard assumes all control over it without listening in.
+    public currentReorderByKeyboard(): boolean {
+        return this.currentReorderViaKeyboardSetting;
+    }
+    public updateReorderByKeyboard(newSetting: boolean) {
+        var temp: string;
+        if (newSetting)
+          temp = "1";
+        else
+          temp = "0";
+        var newBooleanSetting: boolean = (temp == "1");
+        if (this.currentReorderViaKeyboardSetting != newBooleanSetting) {
+            localStorage.setItem(this.REORDER_VIA_KEYBOARD, temp);
+            this.currentReorderViaKeyboardSetting = newBooleanSetting;
+        }
+    }
+
+
     public currentBioIDToFocus(): string {
         return this.localBioIDToFocus;
     }
@@ -443,4 +445,5 @@ export class UserSettingsManagerService {
             this.storyIDToFocus.next(this.localStoryIDToFocus);
         }
     }
+
 }

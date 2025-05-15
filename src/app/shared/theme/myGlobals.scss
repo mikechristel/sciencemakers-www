@@ -23,11 +23,11 @@ $myG-browser-context: 14;
   @return math.div($pixels, $context) * 1em;
 }
 
-$breakpoints: (
+$breakpoints: ( /* Values historically chosen to correspond to Angular Flex Layout (afl) - since retired with css flex used instead throughout. */
   thmda_extreme_narrow: 344px, /* take some drastic reductions in padding, etc., when view is very narrow */
   thmda_narrow: 392px, /* somewhat arbitrary breakpoint at which 3 instead of 2 stamps can be shown in a row and font size might change */
   video_controls_one_line: 359px, /* under this limit and video controls must be on two lines rather than one */
-  afl_small: 600px, /* Angular Flex Layout (afl) sm, i.e., small; see  github.com/angular/flex-layout/wiki/Responsive-API
+  afl_small: 600px, /* Historically: Angular Flex Layout (afl) sm, i.e., small; see  github.com/angular/flex-layout/wiki/Responsive-API
                        where lt-sm is 'screen and (max-width: 599px)' and
                         is 'screen and (min-width: 600px)' with afl_small likely to be used as gt-xs is
                        e.g., %desktop-only becomes min-width: myF.bp(afl_small) */
@@ -87,6 +87,7 @@ $gutterSpace: (
 );
 
 $buttonHeight: 42px;
+$shorterButtonHeight: 36px;
 
 /* font mixins */
 

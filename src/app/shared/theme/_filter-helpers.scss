@@ -1,8 +1,18 @@
-@use 'myGlobals';
+@use 'myGlobals'; /* note: needed for $buttonHeight */
 @use 'myF';
 
 .launch-filter-menu-button {
- @include myGlobals.source-sans;
+  @include myGlobals.source-sans;
+
+  /* fxLayout="row" fxLayoutAlign="space-around center" fxLayoutGap="calc(0.5em)" */
+  box-sizing: border-box;
+  display: flex !important;
+  flex-direction: row;
+  place-content: center space-around;
+  align-items: center;
+  *:not(:last-child) {
+    margin-right: calc(0.5em);
+  }
 
   background-color: myF.color(primary);
   border: 1px solid myF.color(primary); /* note: added for accessibility, to provide a button border in high contrast mode */
@@ -30,6 +40,12 @@
   }
 }
 
+.fixed-size-in-filter-menu {
+  /* fxFlex="0 0 calc(24px)" */
+  flex: 0 0 24px;
+  width: 24px;
+}
+
 .filters__title {
   @include myGlobals.oswald;
 
@@ -39,8 +55,20 @@
   margin-bottom: myF.em(10, 20);
 }
 
+.filter-results-header {
+  box-sizing: border-box;
+  display: flex !important;
+  flex-direction: row;
+  place-content: center; /* note: shorthand for align-content: center; justify-content: center */
+  align-items: center;
+}
+
 /* Filter menu styles */
 .filter-menu {
+  flex: 0 1 599px;
+  box-sizing: border-box;
+  max-width: 599px;
+
   border: 0;
   font-size: 1.2rem;
   padding: 0;
@@ -54,13 +82,15 @@
   .filter-menu-header-title {
       @include myGlobals.oswald;
 
+      flex-grow: 1;
+
       font-size: 1.4rem;
       letter-spacing: myF.em(.5, 18);
       text-align: center; /* center text within its flex container */
 
       @media screen and (max-width: myF.bp(thmda_wideenough_just_before)) {
           font-size: 1.6rem;
-          text-align: left;
+          /* text-align: left; */
       }
 
       &:focus {
@@ -107,9 +137,11 @@
     }
   }
 
+  /* concern: no need for this extra gap spacing if we do gaps well...
   .filter-menu-top-level-button.button-secondary {
     margin-right: myF.em(32);
   }
+*/
 
   .button-secondary {
     background: myF.color(secondary);
@@ -159,11 +191,51 @@
 }
 
 .pad-top-a-bit {
+  flex: 0 0 22px;
   padding-top: 0.2em;
+}
+
+.filter-section-rg-item-constrained {
+  @include myGlobals.oswald;
+
+  /* fxFlex.lt-md="100%" fxFlex="calc(30% - 0.5em)" */
+  @media screen and (max-width: myF.bp(afl_medium_just_before))
+  {
+    flex: 1 1 100%;
+    max-width: 100%;
+  }
+  @media screen and (min-width: myF.bp(afl_medium))
+  {
+
+    flex: 1 1 calc(30% - 0.5em);
+    max-width: calc(30% - 0.5em);
+  }
+  background-color: #fff;
+  border: 1px solid myF.color(primary);
+  color: myF.color(primary);
+  padding: myF.em(3) myF.em(3);
+  text-transform: capitalize;
+  font-size: 1.2rem;
+  width: 100%;
+
+  @media screen and (max-width: myF.bp(afl_medium_just_before)) {
+    margin-bottom: myF.em(5);
+  }
+
+  &:hover {
+    border: 1px solid myF.color(primary);
+    background-color:  #fff;
+    color: myF.color(secondary);
+  }
 }
 
 .filter-section-rg-item {
   @include myGlobals.oswald;
+
+  flex-grow: 1;
+  flex: 1 1 100%;
+  max-width: 100%;
+
   background-color: #fff;
   border: 1px solid myF.color(primary);
   color: myF.color(primary);
@@ -194,6 +266,17 @@
   outline: 3px solid transparent; /* For Windows high contrast mode. */
 }
 
+.filter-section-rg-item-constrained.selected  {
+  background-color: myF.color(primary);
+  border: 1px solid myF.color(primary);
+  color: #fff;
+}
+
+.filter-section-rg-item-constrained:focus {
+box-shadow: 0 0 0 3px myF.color(tertiary);
+outline: 3px solid transparent; /* For Windows high contrast mode. */
+}
+
 /* This style applies to both wide and narrow screens */
 .filter-section-title {
   @include myGlobals.oswald;
@@ -201,6 +284,18 @@
   color: myF.color(dark-grey);
   font-size: 1.4rem;
   margin-bottom: myF.em(6, 16);
+}
+
+.icon-and-text {
+  /* fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="calc(0.6em)" */
+  box-sizing: border-box;
+  display: flex !important;
+  flex-direction: row;
+  place-content: center;
+  align-items: center;
+  *:not(:last-child) {
+    margin-right: calc(0.6em);
+  }
 }
 
 .filter-select-parent {
@@ -258,6 +353,19 @@
   padding: 0;
 }
 
+.filter-choice-set-packed {
+  /*  fxLayout="row wrap" fxLayoutAlign="start center" */
+  flex-flow: wrap;
+  box-sizing: border-box;
+  display: flex !important;
+  place-content: center flex-start;
+  align-items: center;
+
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
 .filter-choices {
   margin: myF.em(5);
   padding: 0;
@@ -295,7 +403,18 @@
 }
 
 .field-list-parent {
- @include myGlobals.source-sans;
+  @include myGlobals.source-sans;
+
+  /* fxLayout="row" fxLayoutAlign="start start" fxLayoutGap="calc(0.8em)"  */
+  box-sizing: border-box;
+  display: flex !important;
+  flex-direction: row;
+  place-content: flex-start; /* note: shorthand for align-content: flex-start; justify-content: flex-start */
+  align-items: flex-start;
+  *:not(:last-child) {
+    margin-right: calc(0.8em);
+  }
+
   font-size: 1rem; /* must stay small because filters often squeezed into narrow filter panes */
   text-align: center;
 
@@ -315,30 +434,16 @@
   }
 }
 
-.filter--alphabet {
-  border: 1px solid myF.color(ok-grey);
-  color: myF.color(dark-grey);
-  margin: myF.em(3);
-  height: myF.em(30);
-  width: myF.em(30);
-  padding-bottom: myF.em(4);
-  padding-top: myF.em(4);
-  text-align: center;
-  text-transform: uppercase;
-  transition: border .2s ease-in-out;
+.field-list-label {
+  flex: 1 1 100%;
+  box-sizing: border-box;
+  max-width: 100%;
+}
 
-  &:hover {
-      border: 1px solid myF.color(dark-grey);
-      color: myF.color(dark-grey);
-  }
-
-  @media screen and (max-width: myF.bp(afl_medium_just_before)) {
-    margin: myF.em(5);
-    height: myGlobals.$buttonHeight;
-    width: myGlobals.$buttonHeight;
-    padding-bottom: myF.em(10);
-    padding-top: myF.em(10);
-  }
+.field-list-applied-indicator {
+  flex: 0 0 12px;
+  box-sizing: border-box;
+  max-width: 12px;
 }
 
 .filters-applied {
@@ -389,15 +494,43 @@
   .filter-remove-button:focus {
       color: myF.color(secondary);
       box-shadow: 0 0 0 3px myF.color(tertiary);
-      /* NOTE: accessibility experts asked for this to be removed... outline: 3px solid transparent; -- For Windows high contrast mode */
+      /* NOTE: accessibility experts asked for this to be removed in 2018/2019 restyling... outline: 3px solid transparent; */
   }
 
   .applied-field-list-parent {
     @include myGlobals.source-sans-semi-bold;
+
+    /* fxLayout="row" fxLayoutAlign="start start" */
+    box-sizing: border-box;
+    display: flex !important;
+    flex-direction: row;
+    place-content: flex-start; /* note: shorthand for align-content: flex-start; justify-content: flex-start */
+    align-items: flex-start;
+
     font-size: 1rem; /* must stay small because filters often squeezed into narrow filter panes */
 
     margin: auto;
     vertical-align: middle;
+  }
+
+  .applied-field-list-remove-indicator {
+    box-sizing: border-box;
+
+    @media screen and (max-width: myF.bp(afl_large_just_before))
+    {
+      flex: 0 0 calc(2em);
+      max-width: calc(2em);
+    }
+    @media screen and (min-width: myF.bp(afl_large)) {
+      flex: 0 0 calc(3em);
+      max-width: calc(3em);
+    }
+  }
+
+  .applied-field-list-remove-indicator-narrow {
+    flex: 0 0 calc(1.5em);
+    box-sizing: border-box;
+    max-width: calc(1.5em);
   }
 
   .remove-icon {
@@ -409,4 +542,70 @@
     }
   }
 }
+
+.myFlexRowInFilterColumnGap {
+  /*  fxLayout="row" fxLayoutAlign="space-between stretch" fxLayoutGap="18px" */
+  box-sizing: border-box;
+  display: flex !important;
+  flex-direction: row;
+  place-content: stretch space-between;
+  align-items: stretch;
+  max-height: 100%;
+
+  *:not(:last-child) {
+    margin-right: calc(18px);
+  }
+}
+
+.myFlexRowInFilterColumnNoGap {
+  /*  fxLayout="row" fxLayoutAlign="space-between stretch" */
+  box-sizing: border-box;
+  display: flex !important;
+  flex-direction: row;
+  place-content: stretch space-between;
+  align-items: stretch;
+  max-height: 100%;
+}
+
+
+.filterTextHeadingArea {
+  /* fxFlex.lt-md="40%" fxFlex.md="40%" fxFlex.gt-sm="0 0 calc(500px)" reduced to: fxFlex.lt-md="40%" fxFlex.gt-sm="0 0 calc(500px)" */
+  @media screen and (max-width: myF.bp(afl_medium_just_before))
+  {
+    width: 40%;
+  }
+  @media screen and (min-width: myF.bp(afl_medium)) {
+    flex: 0 0 500px;
+    width: 500px;
+  }
+}
+
+.filterSearchFormArea {
+  /* fxFlex.lt-md="calc(60% - 18px)" fxFlex.md="50%" fxFlex.gt-md="0 0 calc(600px)"  */
+  @media screen and (max-width: myF.bp(afl_medium_just_before))
+  {
+    width: calc(60% - 18px);
+  }
+  @media screen and (min-width: myF.bp(afl_medium)) and (max-width: myF.bp(afl_large_just_before)) {
+    flex: 50%;
+    width: 50%;
+  }
+
+  @media screen and (min-width: myF.bp(afl_large)) {
+    flex: 0 0 600px;
+    width: 600px;
+  }
+}
+
+.filterResultsArea {
+  /* fxFlex.lt-md="calc(66% - 18px)" fxFlex.gt-sm="calc(100% - 336px)" */
+  @media screen and (max-width: myF.bp(afl_medium_just_before))
+  {
+    width: calc(66% - 18px);
+  }
+  @media screen and (min-width: myF.bp(afl_medium)) {
+    width: calc(100% - 336px);
+  }
+}
+
 /* End of filters-applied */

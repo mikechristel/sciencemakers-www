@@ -1,26 +1,27 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 
-import { ActivatedRoute, Router, Params } from '@angular/router';
+import { ActivatedRoute, Router, Params, RouterLink, RouterLinkActive } from '@angular/router';
 
 import { TitleManagerService } from '../../shared/title-manager.service';
 import { ThinBaseComponent }  from '../../shared/thinbase.component';
 import {LiveAnnouncer} from '@angular/cdk/a11y'; // used to read changes to set title
 import { GlobalState } from '../../app.global-state';
+import { FocusMeDirective } from '../../shared/focus-me.directive';
 
 @Component({
     selector: 'thda-help-privacy',
     templateUrl: './help-privacy.component.html',
-    styleUrls: ['../help.component.scss']
+    styleUrls: ['../help.component.scss'],
+    imports: [FocusMeDirective, RouterLink, RouterLinkActive]
 })
 export class HelpPrivacyComponent extends ThinBaseComponent implements OnInit {
-    signalFocusToTitle: boolean = false; // is used in html rendering of this component
+    private route = inject(ActivatedRoute);
+    private router = inject(Router);
+    private globalState = inject(GlobalState);
+    private titleManagerService = inject(TitleManagerService);
+    private liveAnnouncer = inject(LiveAnnouncer);
 
-    constructor(private route: ActivatedRoute,
-        private router: Router,
-        private globalState: GlobalState,
-        private titleManagerService: TitleManagerService, private liveAnnouncer: LiveAnnouncer) {
-          super(); // for ThinBaseComponent extension (brought in for mouse event handler noMouseFocus)
-    }
+    signalFocusToTitle: boolean = false;
 
     ngOnInit() {
         var leadingPiece: string = "Help Page, Privacy Statement";

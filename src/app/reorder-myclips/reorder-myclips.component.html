@@ -1,0 +1,66 @@
+<h1 id="mmainHeader" [thdaIsFocused]="signalFocusToTitle" tabindex="-1" class="page-title mobile-only" (mousedown)="noMouseFocus($event)">{{reorderMyClipsPageTitle}}</h1>
+<h1 id="dmainHeader" [thdaIsFocused]="signalFocusToTitle" tabindex="-1" class="page-title desktop-only" (mousedown)="noMouseFocus($event)">{{reorderMyClipsPageTitleLong}}</h1>
+@if (dragDropUIForKeyboardShown) {
+  <div class="flex100Basis">
+    @if (droppedTargetIndex == -1) {
+      <p>Use Tab and shift-Tab keys to focus through the list, and Enter or space to select that focused item to move.</p>
+    }
+    @if (droppedTargetIndex == -1) {
+      <p>If interested in a drag-and-drop interface,
+        <a href="javascript:void(0)" tabindex="0" role="link" class="linkToChangeDragDropUI" (click)="toggleDragDropUI()">click here</a>.</p>
+      }
+      @if (droppedTargetIndex == -1) {
+        <p>To toggle showing the keyboard action announcement,
+          <a href="javascript:void(0)" tabindex="0" role="link" class="linkToChangeDragDropUI" (click)="toggleShowingKeyboardAction()">click here</a>.</p>
+        }
+        @if (droppedTargetIndex != -1) {
+          <p>Use the arrow keys to reorder the list. Press Enter to confirm, or Esc (escape) to cancel the reordering.</p>
+        }
+        <!-- The div shows at times for user; but always announce the other one with sr-only (screen-reader only) style -->
+        @if (showKeyboardActionDescription && reorderStatus.length > 0) {
+          <div class="actionDesc">
+            <span aria-hidden="true">Action:&nbsp;</span><span>{{reorderStatus}}</span>
+          </div>
+        }
+        <p id="srReorderStatusMsg" class="sr-only">{{reorderStatus}}</p>
+        <ul class="clips-set-packed" aria-describedby="srReorderStatusMsg">
+          @for (oneStory of clipSet; track oneStory.storyID; let i = $index) {
+            <li #clipSetToReorder class="one-clip-info"
+              [class.selected]="clipIsSelected[i]" tabindex="0" (click)="processClick(i)" (keydown)="setClipArranging($event.key, i)"
+              (focus)="clipItemFocused(i)">
+              @if (droppedTargetIndex == i) {
+                <span class="flexReorderClipOps">
+                  <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="21" height="18" viewBox="0 0 21 21">
+                    <g fill="none" fill-rule="evenodd" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" transform="translate(2 8)">
+                      <polyline points="7.327 1.669 7.327 7.326 1.673 7.328" transform="scale(1 -1) rotate(45 15.36 0)"/>
+                      <line x1="4.5" x2="4.5" y1=".5" y2="12.5"/>
+                      <g transform="translate(8)">
+                        <polyline points="7.291 5.687 7.366 11.419 1.634 11.344" transform="scale(-1 1) rotate(45 0 -2.31)"/>
+                        <line x1="4.5" x2="4.5" y1=".5" y2="12.5"/>
+                      </g>
+                    </g>
+                  </svg>
+                </span>
+              }
+              <span aria-hidden="true">
+                {{i+1}}.&nbsp;{{oneStory.title}}
+              </span>
+              <span class="sr-only">Item {{i+1}}</span>
+            </li>
+          }
+        </ul>
+      </div>
+    }
+    @if (!dragDropUIForKeyboardShown) {
+      <div>
+        <p id="mouseOtherUIHelp">This is a traditional drag-and-drop interface. If interested in keyboard drag and drop,
+          <a href="javascript:void(0)" tabindex="0" role="link" class="linkToChangeDragDropUI" (click)="toggleDragDropUI()">click here</a>.</p>
+          <div cdkDropListGroup class="clips-container">
+            <div cdkDropList [cdkDropListData]="clipSet" class="clips-list" (cdkDropListDropped)="dropInClipsList($event)">
+              @for (oneStory of clipSet; track oneStory.storyID) {
+                <div cdkDrag class="oneClip">{{oneStory.title}}</div>
+              }
+            </div>
+          </div>
+        </div>
+      }

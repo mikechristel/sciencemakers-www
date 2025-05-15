@@ -1,29 +1,34 @@
-﻿import { Component, OnInit } from '@angular/core';
+﻿import { Component, OnInit, inject } from '@angular/core';
 
-import { ActivatedRoute, Router, Params } from '@angular/router';
+import { ActivatedRoute, Router, Params, RouterLink, RouterLinkActive } from '@angular/router';
 
 import { TitleManagerService } from '../shared/title-manager.service';
 import { SearchFormService } from '../shared/search-form/search-form.service';
 import { SearchFormOptions } from '../shared/search-form/search-form-options';
 import { GlobalState } from '../app.global-state';
 import { ThinBaseComponent } from '../shared/thinbase.component';
-import {LiveAnnouncer} from '@angular/cdk/a11y'; // used to read changes to set title
+import {LiveAnnouncer} from '@angular/cdk/a11y';
+import { FocusMeDirective } from '../shared/focus-me.directive'; // used to read changes to set title
 
 @Component({
     selector: 'thda-help',
     templateUrl: './help.component.html',
-    styleUrls: ['./help.component.scss']
+    styleUrls: ['./help.component.scss'],
+    imports: [FocusMeDirective, RouterLink, RouterLinkActive]
 })
 export class HelpComponent extends ThinBaseComponent implements OnInit {
+    private route = inject(ActivatedRoute);
+    private router = inject(Router);
+    private globalState = inject(GlobalState);
+    private titleManagerService = inject(TitleManagerService);
+    private searchFormService = inject(SearchFormService);
+    private liveAnnouncer = inject(LiveAnnouncer);
+
     helpPageTitle: string;
     helpPageTitleLong: string;
     signalFocusToTitle: boolean = false; // is used in html rendering of this component
 
-    constructor(private route: ActivatedRoute,
-        private router: Router,
-        private globalState: GlobalState,
-        private titleManagerService: TitleManagerService,
-        private searchFormService: SearchFormService, private liveAnnouncer: LiveAnnouncer) {
+    constructor() {
           super(); // for ThinBaseComponent extension (brought in for mouse event handler noMouseFocus)
 
         this.searchFormService.setSearchOptions(new SearchFormOptions(false, this.globalState.NOTHING_CHOSEN, this.globalState.NO_ACCESSION_CHOSEN, false));

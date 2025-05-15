@@ -5,15 +5,175 @@
 @use '../shared/theme/button-helpers';
 @use '../shared/theme/view-option-helpers';
 
+.myFlexRowWrap {
+  /* fxLayout="row wrap" */
+  box-sizing: border-box;
+  display: flex !important;
+  flex-direction: row;
+  flex-flow: row wrap;
+  flex: 1 1 1e-9px;
+}
+
+.storyPresentationOptionsArea {
+  /* fxFlex="100%" fxLayout="row" fxLayoutAlign="space-between center" */
+  box-sizing: border-box;
+  display: flex !important;
+  flex-direction: row;
+  flex: 1 1 100%;
+  max-height: 100%;
+  place-content: center space-between; /* note: shorthand for align-content: center; justify-content: space-between */
+  align-items: center;
+}
+
+.bioProfileWideScreen { /* NOTE: see desktop-only definition as well as that is co-mingled here with the display: none vs. display: flex */
+  @media screen and (max-width: myF.bp(afl_small_just_before)) { /* this is the desktop-only media query piece */
+    display: none !important;
+  }
+
+  /* fxLayout="row wrap" fxLayoutAlign="space-between flex-start" */
+  @media screen and (min-width: myF.bp(afl_small))
+  {
+    box-sizing: border-box;
+    display: flex !important;
+    flex-direction: row;
+    flex-flow: row wrap;
+    place-content: flex-start space-between; /* note: shorthand for align-content: flex-start; justify-content: space-between */
+    align-items: flex-start;
+    width: 100%; /* desktop-only */
+  }
+}
+
+.bioProfileColumn {
+  /*  fxFlex="calc(30% - 20px)" fxLayout="column" fxLayoutAlign="space-between stretch" */
+  box-sizing: border-box;
+  display: flex !important;
+  flex-direction: column;
+  place-content: stretch space-between;
+  align-items: stretch;
+  flex: 1 1 calc(30% - 20px);
+  min-width: calc(30% - 20px);
+  margin-right: 20px;
+}
+
+.bioMainAreaWide {
+  /* fxFlex="calc(70% - 20px)" fxLayout="column" fxLayoutAlign="space-between stretch" */
+  box-sizing: border-box;
+  display: flex !important;
+  flex-direction: column;
+  place-content: stretch space-between;
+  align-items: stretch;
+  flex: 1 1 calc(70% - 20px);
+  min-width: calc(70% - 20px);
+}
+
+.bioSearchAreaWide {
+  /* fxFlex="grow" fxLayout="row" fxLayoutAlign="end" */
+  box-sizing: border-box;
+  display: flex !important;
+  flex-direction: row;
+  place-content: flex-end;
+  align-items: flex-end;
+  flex-grow: 1;
+}
+
+.bioSearchFormAreaWide {
+  flex: 0 1 800px;
+  /* fxFlex="0 1 calc(800px)" */
+}
+
+.bio-filter-section-desktop-only {
+
+  @media screen and (max-width: myF.bp(afl_small_just_before)) { /* this is the desktop-only media query piece */
+    display: none !important;
+  }
+
+  @media screen and (min-width: myF.bp(afl_small))
+  {
+    /* fxFlex="100%" fxLayout="row wrap" fxLayoutAlign="space-around center" */
+    box-sizing: border-box;
+    display: flex !important;
+    flex-flow: row wrap;
+    place-content: center space-around;
+    align-items: center;
+    flex: 1 1 100%;
+    max-height: 100%;
+
+    width: 100%; /* desktop-only */
+    min-height: myGlobals.$buttonHeight;
+    margin-bottom: myF.em(10, 16);
+  }
+}
+
+.bio-story-pres-options-area {
+  /* fxFlex.lt-md="100%" fxFlex="50%" fxLayout="row" fxLayoutGap="20px" */
+  box-sizing: border-box;
+  display: flex !important;
+  flex-direction: row;
+  *:not(:last-child) {
+    margin-right: 20px;
+  }
+
+  @media screen and (max-width: myF.bp(afl_medium_just_before))
+  {
+    flex: 1 1 100%;
+    max-width: 100%;
+  }
+  @media screen and (min-width: myF.bp(afl_medium))
+  {
+    flex: 1 1 50%;
+    max-width: 50%;
+  }
+}
+
+.back-button-low-key { /* similar to button-helpers' my-app-button but shorter, with smaller font too; also, flex containment added */
+  @include myGlobals.oswald;
+
+  /* fxLayout="row" fxLayoutAlign="center center"  */
+  box-sizing: border-box;
+  display: flex !important;
+  flex-direction: row;
+  place-content: center;
+  align-items: center;
+
+  background-color: myF.color(primary);
+  border: 1px solid myF.color(primary); /* note: added for accessibility, to provide a button border in high contrast mode */
+  border-radius: 0;
+  color: #fff;
+  cursor: pointer;
+  font-size: 1.2rem;
+  height: myGlobals.$buttonHeight;
+  padding: 0 12px;
+  white-space: nowrap;
+  transition: box-shadow .15s ease-in-out;
+  width: auto; /* note: subtle difference with search__submit style for search button */
+
+  &:hover,
+  &:focus {
+      box-shadow: inset 0 0 5px rgba(51,51,51,.6);
+      background-color: myF.color(secondary);
+  }
+
+  &:disabled {
+      cursor: not-allowed;
+      opacity: .4;
+  }
+}
+
 /* FILTER-PIECE The styles in this portion are the same as styles in shared/theme/filter-helpers, but
    rather than bring in that relatively large style helper file via an import, only repeat those that are
-   actually used by biography-storyset. */
+   actually used by biography-storyset.  This lets us stay within the 16KB "budget" for styles on components
+   which is a default build setting check. */
 .pad-top-a-bit {
+  flex: 0 0 22px;
   padding-top: 0.2em;
 }
 
 .filter-section-rg-item {
   @include myGlobals.oswald;
+
+  flex: 1 1 100%;
+  max-width: 100%;
+
   background-color: #fff;
   border: 1px solid myF.color(primary);
   color: myF.color(primary);
@@ -44,15 +204,29 @@
   outline: 3px solid transparent; /* For Windows high contrast mode. */
 }
 
-.filter-section {
-  min-height: myGlobals.$buttonHeight;
-  margin-bottom: myF.em(10, 16);
+.icon-and-text {
+  /* fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="calc(0.6em)" */
+  box-sizing: border-box;
+  display: flex !important;
+  flex-direction: row;
+  place-content: center;
+  align-items: center;
+  *:not(:last-child) {
+    margin-right: calc(0.6em);
+  }
 }
 
 /* FILTER-PIECE End of the filter-helpers section. */
 
 .tapes-and-filters {
-    margin-top: myF.em(20);
+  /* fxFlex="100%" fxLayout="column" fxLayoutAlign="space-between start" fxLayoutGap="0" */
+  box-sizing: border-box;
+  display: flex !important;
+  flex-direction: column;
+  place-content: flex-start space-between;
+  align-items: flex-start;
+
+  margin-top: myF.em(20);
 }
 
 .row--top {
@@ -62,12 +236,28 @@
 }
 
 .headshot__container_narrow {
-    margin-bottom: myF.em(2);
-    min-height: 332px;
-    overflow: hidden;
+  /* fxFlex="100%" fxLayout="row" fxLayoutAlign="center center"  */
+  box-sizing: border-box;
+  display: flex !important;
+  flex-direction: row;
+  place-content: center;
+  align-items: center;
+  flex-basis: 100%;
+
+  margin-bottom: myF.em(2);
+  min-height: 332px;
+  overflow: hidden;
 }
 
 .headshot__container {
+    /* fxFlex="100%" fxLayout="column" fxLayoutAlign="center center"  */
+    box-sizing: border-box;
+    display: flex !important;
+    flex-direction: column;
+    place-content: center;
+    align-items: center;
+    flex-basis: 100%;
+
     padding: 0;
     margin: 0;
     overflow: hidden;
@@ -77,6 +267,11 @@
   padding: 0;
   margin: 0;
   text-align: center;
+}
+
+.headshot_img-backdrop-narrow {
+  flex: 1 0 210px;
+  min-width: 210px;
 }
 
 .headshot__img__as_is {
@@ -132,7 +327,7 @@
 }
 
 .bio-details__item {
-   @include myGlobals.source-sans;
+    @include myGlobals.source-sans;
     font-size: 1rem;
     padding: 0 myF.em(2);
     margin: 0;
@@ -149,7 +344,7 @@
 }
 
 .bio-details__def { /* very close to bio-details__item */
- @include myGlobals.source-sans;
+  @include myGlobals.source-sans;
   font-size: 1rem;
   padding: 0 myF.em(4) myF.em(4);
   margin: 0;
@@ -168,7 +363,7 @@
 }
 
 .bio-details__interview {
-   @include myGlobals.source-sans;
+    @include myGlobals.source-sans;
     font-size: 1rem;
     padding: 0 myF.em(9) myF.em(20);
     margin-top: myF.em(10);
@@ -184,7 +379,7 @@
 }
 
 .biography__abstract {
-   @include myGlobals.source-sans;
+    @include myGlobals.source-sans;
     color: black;
     font-size: 1rem;
     margin: myF.em(8) 0;
@@ -223,7 +418,7 @@
   color: myF.color(dark-grey);
   font-size: 1.5rem;
   letter-spacing: -.5px;
-  margin: myF.em(4) 0 myF.em(4) 0;
+  margin: myF.em(12) 0 myF.em(4) 0;
   padding: 0 myF.em(2) 0 myF.em(2); /* top right bottom left */
 
   &:focus {
@@ -233,8 +428,27 @@
 }
 
 .mobile-controls-line {
+    /* fxFlex="grow" fxLayout="row wrap" */
+    box-sizing: border-box;
+    display: flex !important;
+    flex-direction: row;
+    flex-flow: row wrap;
+    flex: 1 1 1e-9px;
+    flex-grow: 1;
+
     margin: myF.em(2) 0 myF.em(16) 0; /* top right bottom left */
     padding: myF.em(2) 0 myF.em(12) 0; /* top right bottom left */
+}
+
+.mobile-controls-row-container {
+  /* fxFlex="100%" fxLayout="row" fxLayoutGap="10px" */
+  box-sizing: border-box;
+  display: flex !important;
+  flex-direction: row;
+  flex-basis: 100%;
+  *:not(:last-child) {
+    margin-right: 10px;
+  }
 }
 
 .tapes__title {
@@ -255,6 +469,12 @@
 }
 
 .page-view-option-piece {
+  /* fxFlex="100%" fxLayout="row" */
+  box-sizing: border-box;
+  display: flex !important;
+  flex-direction: row;
+  flex-basis: 100%;
+
   margin: 0; /* top right bottom left */
   padding: 0 0 myF.em(12);
 }
@@ -264,8 +484,7 @@
   padding: 0;
   display: grid;
   /* Default of 2 per row */
-  grid-template-columns: repeat(2, 1fr); /* the "1fr" makes all rows equal height;
-     e.g., see stackoverflow.com/questions/44488357/equal-height-rows-in-css-grid-layout */
+  grid-template-columns: repeat(2, 1fr); /* the "1fr" makes all rows equal height; e.g., see stackoverflow.com/questions/44488357/equal-height-rows-in-css-grid-layout */
   grid-auto-rows: 1fr;
   gap: myF.gutter(thmda-tight);
 
@@ -279,16 +498,15 @@
      thmda_wideenough 768px       537       4
      afl_medium       960         672       5 (not 4 as perhaps used elsewhere when just 66% and not 70% saved for stamp area)
      afl_large        1280        896       7 (not 6 as perhaps used elsewhere when just 66% and not 70% saved for stamp area)
-     afl_xlarge       1920        1344      10
-     xlarge           2400        1680      12
+     afl_xlarge (retired, not used)       1920        1344      10
+     xlarge  (retired, not used)          2400        1680      12
 
      Client was not happy with so much squeezing, so relax to:
      thmda_wideenough 768px       537       3
      afl_medium       960         672       4
      afl_large        1280        896       5
      But then on Aug. 11, 2020 accessibility experts liked the original layout better.  Reverted back to it
-     relaxing only the maximum from 7 to 6 (4, 5, 6).
-  */
+     relaxing only the maximum from 7 to 6 (4, 5, 6). */
 
   /* For widths between afl_medium and afl_large, be 5 per row with gap increase: */
   @media screen and (min-width: myF.bp(afl_medium)) and (max-width: myF.bp(afl_large_just_before)) {
@@ -296,7 +514,7 @@
     gap:  myF.gutter(thmda-medium);
   }
 
-  /* New!  With maximum of thmda_maxwidth, afl_large < thmda_maxwidth < afl_xlarge < xlarge, simply max out now at afl_large or greater...
+  /* With maximum of thmda_maxwidth, afl_large < thmda_maxwidth < afl_xlarge < xlarge, simply max out now at afl_large or greater...
      For widths of afl_large or greater, be 6 per row: */
   @media screen and (min-width: myF.bp(afl_large)) {
     grid-template-columns: repeat(4, 1fr);
@@ -316,5 +534,71 @@
 
 .tapes-as-list {
   list-style: none;
+  padding: 0;
+}
+
+.unstyled-list-nowhitespace {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.unstyled-list-nowhitespace-row2ndlayout {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+
+  /*  fxFlex.lt-md="100%" fxLayout="row" fxLayoutAlign="space-between end" fxLayoutGap="10px" */
+  box-sizing: border-box;
+  display: flex !important;
+  flex-direction: row;
+  place-content: flex-end space-between; /* note: shorthand for align-content: flex-end; justify-content: space-between */
+  align-items: flex-end;
+  *:not(:last-child) {
+    margin-right: 10px;
+  }
+
+  @media screen and (max-width: myF.bp(afl_medium_just_before))
+  {
+    flex: 1 1 auto;
+  }
+
+}
+
+.unstyled-list-nowhitespace-row3rdlayout {
+  /*  fxFlex.lt-md="100%" fxFlex="50%" fxLayout="row" fxLayoutAlign="space-between end" fxLayoutGap.gt-xs="10px" fxLayoutGap.lt-sm="20px" */
+  box-sizing: border-box;
+  display: flex !important;
+  flex-direction: row;
+  place-content: flex-end space-between; /* note: shorthand for align-content: flex-end; justify-content: space-between */
+  align-items: flex-end;
+
+  @media screen and (max-width: myF.bp(afl_small_just_before))
+  {
+    flex: 1 1 100%;
+    max-width: 100%;
+    *:not(:last-child) {
+      margin-right: 20px;
+    }
+  }
+  @media screen and (min-width: myF.bp(afl_small)) and (max-width: myF.bp(afl_medium_just_before))
+  {
+    flex: 1 1 100%;
+    max-width: 100%;
+    *:not(:last-child) {
+      margin-right: 10px;
+    }
+  }
+  @media screen and (min-width: myF.bp(afl_medium))
+  {
+    flex: 1 1 50%;
+    max-width: 50%;
+    *:not(:last-child) {
+      margin-right: 10px;
+    }
+  }
+
+  list-style: none;
+  margin: 0;
   padding: 0;
 }

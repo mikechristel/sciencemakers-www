@@ -1,7 +1,8 @@
-﻿import { Component, Input, OnInit, ElementRef, ViewChild, ChangeDetectorRef, ViewChildren, QueryList} from '@angular/core';
-import { ActivatedRoute, Params, Router } from '@angular/router';
+﻿import { Component, OnInit, ElementRef, ChangeDetectorRef, inject, viewChild } from '@angular/core';
+import { ActivatedRoute, Params, Router, RouterLinkActive, RouterLink } from '@angular/router';
 import { takeUntil } from "rxjs/operators";
 
+import { StoryPlayLogService } from '../story-play-log/story-play-log.service';
 import { HistoryMakerService } from '../historymakers/historymaker.service';
 import { TitleManagerService } from '../shared/title-manager.service';
 import { StoryDetailService } from './story-detail.service';
@@ -22,16 +23,34 @@ import { WindowService } from '../shared/services';
 import { BaseComponent } from '../shared/base.component';
 import { LiveAnnouncer } from '@angular/cdk/a11y'; // used to read adding/removing from My Clips
 
-import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout'; // used to get Hide/Show Transcript to align correctly with transcript area
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
+
+import { FocusMeDirective } from '../shared/focus-me.directive';
+import { MyVideoComponent } from '../shared/my-video/my-video.component'; // used to get Hide/Show Transcript to align correctly with transcript area
 
 @Component({
     selector: 'thmda-story',
     templateUrl: './story.component.html',
     styleUrls: ['./story.component.scss'],
+    imports: [FocusMeDirective, MyVideoComponent, RouterLinkActive, RouterLink]
 })
 export class StoryComponent extends BaseComponent implements OnInit {
-    @ViewChild('myVideoArea') videoPlayerAndControlsAreaRef: ElementRef;
-    @ViewChild('myVideoPlayer') videoPlayerRef: any;
+    private _cdr = inject(ChangeDetectorRef);
+    private route = inject(ActivatedRoute);
+    private router = inject(Router);
+    private globalState = inject(GlobalState);
+    private titleManagerService = inject(TitleManagerService);
+    private historyMakerService = inject(HistoryMakerService);
+    private storyPlayLogService = inject(StoryPlayLogService);
+    private storyDetailService = inject(StoryDetailService);
+    private playlistManagerService = inject(PlaylistManagerService);
+    private userSettingsManagerService = inject(UserSettingsManagerService);
+    private liveAnnouncer = inject(LiveAnnouncer);
+    private windowService = inject(WindowService);
+    private breakpointObserver = inject(BreakpointObserver);
+
+    readonly videoPlayerAndControlsAreaRef = viewChild<ElementRef>('myVideoArea');
+    readonly videoPlayerRef = viewChild<any>('myVideoPlayer');
 
     mobileDetails: boolean = true; // NOTE: used in the html rendering of this component
 
@@ -46,9 +65,9 @@ export class StoryComponent extends BaseComponent implements OnInit {
     storyDetailsTitle: string;
     storyDetailsShortenedTitle: string;
     storyHasMatches: boolean;
-    storyIsStarred: boolean;
     storyInMyClips: boolean;
     interviewDateSuffix: string;
+    initialSeekInSeconds: number = 0; // used to seek to the story video -- negative values and zero ignored; no data check on positive values; units are seconds (fractions OK of course)
 
     // Support interfaces for transcript hiding and scrolling
     isTranscriptShowing: boolean = true;
@@ -83,21 +102,9 @@ export class StoryComponent extends BaseComponent implements OnInit {
 
     private haveEvidenceOfTranscriptInNarrowView: boolean = false;
 
-    constructor(
-        private _cdr: ChangeDetectorRef,
-        private route: ActivatedRoute,
-        private router: Router,
-        private globalState: GlobalState,
-        private titleManagerService: TitleManagerService,
-        private historyMakerService: HistoryMakerService,
-        private storyDetailService: StoryDetailService,
-        private playlistManagerService: PlaylistManagerService,
-        private userSettingsManagerService: UserSettingsManagerService,
-        private liveAnnouncer: LiveAnnouncer,
-        private windowService: WindowService,
-        private breakpointObserver: BreakpointObserver
-    ) {
+    constructor() {
         super(); // for BaseComponent extension (brought in to cleanly unsubscribe from subscriptions)
+        const userSettingsManagerService = this.userSettingsManagerService;
 
         // Start off with an empty signal about what to focus on
         this.clearSignalsForCurrentFocusSetting();
@@ -116,6 +123,7 @@ export class StoryComponent extends BaseComponent implements OnInit {
         // When at 600+ pixels, if this evidence is there, then if the transcript is on, turn it off so that it will show
         // only a Hide Transcript button and on toggle to Show transcript, Angular Flex layout will position correctly
         // button over rather than next to the transcript area.
+        // NOTE that Flex layout was retired with 2024/2025 code updates, but this styling left in place as it works.
         this.breakpointObserver.observe([
           '(min-width: 600px)'
             ]).pipe(takeUntil(this.ngUnsubscribe)).subscribe((result) => {
@@ -140,10 +148,10 @@ export class StoryComponent extends BaseComponent implements OnInit {
             // Just in case, clear current interface while next one is loading,
             // e.g., this corrects the bug of clicking a My Clips item to load a new video:
             this.myStory = null;
+            this.initialSeekInSeconds = 0;
             this.storyDetailLoadingFailed = false;  // no load tried yet, so no load failed
             this.backgroundPoster = this.POSTER_NAME_DEFAULT;
 
-            this.storyIsStarred = false;
             this.transcriptTextBlock = "";
 
             // Query context might get set via Params on route, which will allow match information to be returned via getStorySpecifics():
@@ -155,13 +163,25 @@ export class StoryComponent extends BaseComponent implements OnInit {
             this.biographyDetailsReady = false;
 
             if (params['q'] !== undefined)
-                this.transcriptQuery = this.globalState.restorePlusAsNeeded(params['q']);
+              this.transcriptQuery = this.globalState.restorePlusAsNeeded(params['q']);
+
+            if (params['t'] !== undefined)
+            {
+              var candidateFirstSeek: number = +params['t'];
+              if (candidateFirstSeek > 0)
+                  this.initialSeekInSeconds = candidateFirstSeek; // ignoring negative values and zero
+              else
+                  this.initialSeekInSeconds = 0;
+            }
+            else
+                this.initialSeekInSeconds = 0;
 
             var myStoryID: number = +params['ID']; // + prefix converts string into a number
             this.storyDetailService.getStorySpecifics(myStoryID, this.transcriptQuery).pipe(takeUntil(this.ngUnsubscribe))
                 .subscribe(
                   storyDetails => {
                     this.storyDetailLoadingFailed = false;
+
                     this.storyDetailsTitle = storyDetails.title;
                     this.storyDetailsShortenedTitle = this.truncateAsNeeded(storyDetails.title);
 
@@ -185,10 +205,10 @@ export class StoryComponent extends BaseComponent implements OnInit {
                         else
                             this.backgroundPoster = this.POSTER_NAME_DEFAULT;
 
-                        // Update it as a "starred" story if it is so marked by being in the favorites set:
+                        // Update it as being in "My Clips" if it is so marked by being in the "My Clips" set:
                         this.storyInMyClips = (this.myClips.findIndex(x => x.storyID == this.myStory.storyID) >=0 );
 
-                        this.storyCitation = this.ComposedCitationForStory(storyDetails.citation.preferredName, storyDetails.citation.accession,
+                        this.storyCitation = this.ComposeCitation(storyDetails.citation.preferredName, storyDetails.citation.accession,
                             storyDetails.citation.interviewer, storyDetails.citation.interviewDate, storyDetails.citation.sessionOrder, storyDetails.citation.tapeOrder,
                             storyDetails.storyOrder, storyDetails.title);
 
@@ -220,8 +240,8 @@ export class StoryComponent extends BaseComponent implements OnInit {
                   error => {
                     // TODO: decide how specific to make error recovery.
                     // Right now this "network timeout" message could be a lie, so soften the message to "may have."
-                    this.myStory = null;
                     this.storyDetailLoadingFailed = true; // used so there can be some UI to this as well in story.component.html
+                    this.myStory = null;
                     this.interviewDateSuffix = null;
                     this.storyDetailsTitle = "Loading story details may have experienced a network timeout -- try again in a few minutes.";
                     this.storyDetailsShortenedTitle = this.storyDetailsTitle; // NOTE: with myStory == null there will be more display space for this long "shortened" title
@@ -282,10 +302,10 @@ export class StoryComponent extends BaseComponent implements OnInit {
         return retVal;
     }
 
-    private ComposedCitationForStory(bioPreferredName: string, bioAccessionNumber: string, interviewer: string, interviewDate: string,
+    private ComposeCitation(bioPreferredName: string, bioAccessionNumber: string, interviewer: string, interviewDate: string,
         sessionNumber: number, tapeNumber: number, storyNumber: number, storyTitle: string): string {
-        var citation: string = "";
 
+        var citationStr: string = "";
         // NOTE: format for citation is:
         // Biography preferred name (The HistoryMakers accession_name), interviewed by ___, interview date,
         // The HistoryMakers Digital Archive. Session #, tape #, story #, story title.
@@ -293,11 +313,11 @@ export class StoryComponent extends BaseComponent implements OnInit {
         // Eddie Jenkins, Jr. (The HistoryMakers A2007.068), interviewed by Larry Crowe, February 14, 2007,
         // The HistoryMakers Digital Archive. Session 1, tape 4, story 9, Eddie Jenkins, Jr.
         // recalls the early days of weight training in the NFL.
-
-        citation = bioPreferredName + " (The HistoryMakers " + bioAccessionNumber + "), interviewed by " + interviewer + ", " +
+        citationStr = bioPreferredName + " (The HistoryMakers " + bioAccessionNumber + "), interviewed by " + interviewer + ", " +
           this.globalState.cleanedMonthDayYear(interviewDate) + ", The HistoryMakers Digital Archive. Session " +
             sessionNumber + ", tape " + tapeNumber + ", story " + storyNumber + ", " + storyTitle;
-        return citation;
+
+        return citationStr;
     }
 
     // Helper function to show match time offsets on a play bar by initializing this.videoMatches
@@ -409,6 +429,12 @@ export class StoryComponent extends BaseComponent implements OnInit {
         this.transcriptTextBlock = textWithBoldedMatches.replace(re,'<br>');
     }
 
+    logStoryPlay() {
+      // Log that this story is being played.
+      this.storyPlayLogService.postStoryPlayEvent(this.myStory.storyID.toString(), this.myStory.citation.accession,
+        this.myStory.citation.sessionOrder, this.myStory.citation.tapeOrder, this.myStory.storyOrder, this.myStory.title);
+    }
+
     autoAdvanceToNext() {
         // If the user setting to "autoadvance" is true, and there is a next story, automatically advance to it
         if (this.defaultAutoAdvance) {
@@ -470,11 +496,12 @@ export class StoryComponent extends BaseComponent implements OnInit {
     }
 
     setPosition(newValInSecs: number) {
-        if (this.videoPlayerRef) {
+        const videoPlayerRef = this.videoPlayerRef();
+        if (videoPlayerRef) {
             if (this.videoPositionInSeconds != newValInSecs) {
                 // If prior to start, will go to 0; if past end, will go to end.
-                this.videoPlayerRef.time = newValInSecs;
-                this.videoPositionInSeconds = this.videoPlayerRef.time; // note: might not be newValInSecs if pushed into [0,end] range
+                videoPlayerRef.time = newValInSecs;
+                this.videoPositionInSeconds = videoPlayerRef.time; // note: might not be newValInSecs if pushed into [0,end] range
             }
         }
     }
@@ -494,7 +521,7 @@ export class StoryComponent extends BaseComponent implements OnInit {
             if (this.transcriptQuery && this.transcriptQuery.length > 0) {
                 // NOTE: Story ID is *REQUIRED* and so is part of router.navigate path below (along with /story) rather than in moreQueryParams.
                 var moreQueryParams = [];
-                moreQueryParams['q'] = this.transcriptQuery;
+                moreQueryParams['q'] = this.globalState.cleanedQueryRouterParameter(this.transcriptQuery); // bug fix of April 2025 - must be sure no + character is in the query, for example
                 this.router.navigate(['/story', givenNewStoryID, moreQueryParams]);
             }
             else
@@ -503,7 +530,7 @@ export class StoryComponent extends BaseComponent implements OnInit {
     }
 
     adjustVideoCurrentTime() {
-        var movieTimeInSecs: number = this.videoPlayerRef.time;
+        var movieTimeInSecs: number = this.videoPlayerRef().time;
         this.videoPositionInSeconds = movieTimeInSecs;
     }
 
