@@ -35,8 +35,8 @@ We primarily develop using Chrome and as a result, it is the browser that is bes
 ### Tested
 We actively test the latest versions of the following browsers:
 
-- Chrome (must be version 90 or later; most recent two releases are best supported)
-- Safari (must be version 16 or later; most recent two releases are best supported)
+- Chrome (most recent two releases are best supported)
+- Safari (most recent two releases are best supported)
 
 We occasionally test the following browser:
 - Edge  
@@ -48,7 +48,7 @@ We occasionally test the following browser:
 Font sizing has been implemented using rems and ems. For more information see: https://css-tricks.com/rems-ems/.
 
 ## Dependencies
-* [Angular](https://angular.io/) - Web application framework (version 19.2, from 2025) (Angular Material no longer needed)
+* [Angular](https://angular.io/) - Web application framework (version 20.3.9, from October 2025) (Angular Material no longer needed)
 * [Angular CLI](https://cli.angular.io/) - A command line interface for Angular
 * [angular-hmr](https://github.com/gdi2290/angular-hmr) - Angular Hot Module Replacement. Used by default when when running `ng serve`.
 
