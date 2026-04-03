@@ -48,7 +48,7 @@ We occasionally test the following browser:
 Font sizing has been implemented using rems and ems. For more information see: https://css-tricks.com/rems-ems/.
 
 ## Dependencies
-* [Angular](https://angular.io/) - Web application framework (version 20.3.9, from October 2025) (Angular Material no longer needed)
+* [Angular](https://angular.io/) - Web application framework (version 21.2.7, from April 2026)
 * [Angular CLI](https://cli.angular.io/) - A command line interface for Angular
 * [angular-hmr](https://github.com/gdi2290/angular-hmr) - Angular Hot Module Replacement. Used by default when when running `ng serve`.
 
