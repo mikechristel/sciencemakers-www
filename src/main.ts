@@ -1,4 +1,3 @@
-import 'zone.js'; // Included with Angular CLI
 import { enableProdMode, importProvidersFrom } from '@angular/core';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { provideRouter } from '@angular/router';
