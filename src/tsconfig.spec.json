@@ -4,9 +4,6 @@
     "outDir": "../out-tsc/spec",
     "baseUrl": ""
   },
-  "files": [
-    "test.ts"
-  ],
   "include": [
     "**/*.spec.ts",
     "**/*.d.ts"
