@@ -1,4 +1,4 @@
-import { enableProdMode, importProvidersFrom, provideZoneChangeDetection } from '@angular/core';
+import { enableProdMode, importProvidersFrom } from '@angular/core';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { provideRouter } from '@angular/router';
 
@@ -47,7 +47,7 @@ if (_browserTestsPassed) {
 
   bootstrapApplication(AppComponent, {
     providers: [
-        provideZoneChangeDetection(),importProvidersFrom(BrowserModule, FormsModule, CdkTableModule, A11yModule, BidiModule, OverlayModule, PlatformModule, ObserversModule,
+        importProvidersFrom(BrowserModule, FormsModule, CdkTableModule, A11yModule, BidiModule, OverlayModule, PlatformModule, ObserversModule,
           PortalModule, CdkStepperModule, ClipboardModule
         ),
         provideRouter([
