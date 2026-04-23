@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewChecked, inject, viewChild } from '@angular/core';
+import { Component, OnInit, AfterViewChecked, inject, viewChild, ChangeDetectorRef } from '@angular/core';
 import { takeUntil } from "rxjs/operators";
 
 import { ActivatedRoute, Params } from '@angular/router';
@@ -31,6 +31,8 @@ export class SearchSimpleComponent extends BaseComponent implements OnInit, Afte
     private titleManagerService = inject(TitleManagerService);
     private liveAnnouncer = inject(LiveAnnouncer);
 
+    private changeDetectorRef = inject(ChangeDetectorRef);
+
     readonly mySearchFormElement = viewChild<SearchFormComponent>('mySearchForm');
 
     simpleSearchPageTitle: string;
@@ -62,6 +64,7 @@ export class SearchSimpleComponent extends BaseComponent implements OnInit, Afte
         this.historyMakerService.getCorpusSpecifics().pipe(takeUntil(this.ngUnsubscribe))
         .subscribe(corpusDetails => {
             this.updateTailoredSearchMessages(corpusDetails.biographies.all, corpusDetails.stories.all);
+            this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
         });
 
         this.route.params.forEach((params: Params) => {
@@ -109,6 +112,7 @@ export class SearchSimpleComponent extends BaseComponent implements OnInit, Afte
                               this.searchFormService.setSearchOptions(new SearchFormOptions(confirmedIsBioSearch, confirmedBioIDForSearch,
                                 confirmedBioAccession, confirmedUseOfAdvancedStorySearching));
                           }
+                          this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
                         },
                         error => {
                           // No biography details retrievable, so back out to searching all stories
@@ -117,6 +121,7 @@ export class SearchSimpleComponent extends BaseComponent implements OnInit, Afte
                           this.UpdatePageTitle(this.tailoredStorySearchMessage);
                           this.searchFormService.setSearchOptions(new SearchFormOptions(confirmedIsBioSearch, confirmedBioIDForSearch,
                             confirmedBioAccession, confirmedUseOfAdvancedStorySearching));
+                          this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
                         }
                     );
                 }

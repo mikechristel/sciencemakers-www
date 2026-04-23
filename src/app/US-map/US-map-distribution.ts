@@ -9,6 +9,6 @@ export class USMapDistribution {
     public verbLeadIn: string; // used in constructing a detailed text form of the map visualization, e.g., "discuss" or "are born in"
     public verbLeadInSingular: string; // special case for 1, e.g., "discusses" and "is born in"
     public verbPhrase: string; // used in constructing a detailed text form of the map visualization, e.g., "Discussed in" or "Birthplace of"
-    public exceptionDescription: string; // used to describe unplotted data, e.g., "NOTE: 89 HistoryMakers born outside the U.S. or have unrecorded birth location.""
+    public exceptionDescription: string | null; // used to describe unplotted data, e.g., "NOTE: 89 HistoryMakers born outside the U.S. or have unrecorded birth location.""
     public regionIDsAlreadyInFilter: string; // comma-separated IDs of states already in filter, e.g., if this is "AZ,HI" then Arizona and Hawaii already in filter
 }

@@ -1,4 +1,4 @@
-﻿import { Component, OnInit, ElementRef, AfterViewChecked, inject, viewChild, viewChildren } from '@angular/core';
+﻿import { Component, OnInit, ElementRef, AfterViewChecked, inject, viewChild, viewChildren, ChangeDetectorRef } from '@angular/core';
 import { takeUntil } from "rxjs/operators";
 
 import { BriefBio } from './brief-bio';
@@ -47,6 +47,8 @@ export class HistoryMakersComponent extends BaseComponent implements OnInit, Aft
   private liveAnnouncer = inject(LiveAnnouncer);
   private myUSMapManagerService = inject(USMapManagerService);
   private searchFormService = inject(SearchFormService);
+
+  private changeDetectorRef = inject(ChangeDetectorRef);
 
   readonly radioGroup1_Map = viewChild<ElementRef>('rg1Map');
   readonly radioGroup1_Text = viewChild<ElementRef>('rg1Text');
@@ -160,23 +162,29 @@ export class HistoryMakersComponent extends BaseComponent implements OnInit, Aft
 
         myUSMapManagerService.clickedRegionID$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((value) => {
             this.filterOnUSMapRegion(value);
+            this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
         });
 
         // NOTE: these pipes assume this.facetFamilies already initialized (via this.initializeFacetFamilies()).
         userSettingsManagerService.showBiographyBirthStateFacetFilter$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((value) => {
             this.facetFamilies[BioFilterFamilyType.BirthState].isAllowedToBeShown = value;
+            this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
         });
         userSettingsManagerService.showBiographyDecadeOfBirthFacetFilter$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((value) => {
             this.facetFamilies[BioFilterFamilyType.BirthDecade].isAllowedToBeShown = value;
+            this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
         });
         userSettingsManagerService.showBiographyJobTypeFacetFilter$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((value) => {
             this.facetFamilies[BioFilterFamilyType.JobType].isAllowedToBeShown = value;
+            this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
         });
         userSettingsManagerService.showBiographyLastNameFacetFilter$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((value) => {
             this.facetFamilies[BioFilterFamilyType.LastNameInitial].isAllowedToBeShown = value;
+            this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
         });
         userSettingsManagerService.bioSearchFieldsMask$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((value) => {
           this.bioSearchFieldsMask = value;
+          this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
         });
     }
 
@@ -500,6 +508,7 @@ export class HistoryMakersComponent extends BaseComponent implements OnInit, Aft
 
                 // Finally, focus can be set because we have our context and content.
                 this.setFocusAsNeeded();
+                this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
             });
         }
         else {
@@ -520,6 +529,7 @@ export class HistoryMakersComponent extends BaseComponent implements OnInit, Aft
 
                 // Finally, focus can be set because we have our context and content.
                 this.setFocusAsNeeded();
+                this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
             });
         }
     }

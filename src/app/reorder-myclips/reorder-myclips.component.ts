@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChildren, AfterViewInit, QueryList, ElementRef, inject } from '@angular/core';
+import { Component, OnInit, ViewChildren, QueryList, ElementRef, inject, ChangeDetectorRef } from '@angular/core';
 
 import { ActivatedRoute, Router } from '@angular/router';
 import { takeUntil } from "rxjs/operators";
@@ -23,7 +23,7 @@ import { FocusMeDirective } from '../shared/focus-me.directive';
     styleUrls: ['./reorder-myclips.component.scss'],
     imports: [FocusMeDirective, CdkDropListGroup, CdkDropList, CdkDrag]
 })
-export class ReorderMyClipsComponent extends BaseComponent implements OnInit, AfterViewInit {
+export class ReorderMyClipsComponent extends BaseComponent implements OnInit {
     private route = inject(ActivatedRoute);
     private router = inject(Router);
     private globalState = inject(GlobalState);
@@ -32,6 +32,8 @@ export class ReorderMyClipsComponent extends BaseComponent implements OnInit, Af
     private userSettingsManagerService = inject(UserSettingsManagerService);
     private playlistManagerService = inject(PlaylistManagerService);
     private idSearchService = inject(IDSearchService);
+
+    private changeDetectorRef = inject(ChangeDetectorRef);
 
     @ViewChildren('clipSetToReorder') clipItems!: QueryList<ElementRef>; // the tag #clipSetToReorder is in the html for all clip items
 
@@ -69,13 +71,13 @@ export class ReorderMyClipsComponent extends BaseComponent implements OnInit, Af
         this.grabbedClipIndex = -1; // start with no clip selected as "grabbed" to be moved around as with arrow keys
     }
 
-    ngAfterViewInit() {
-      this.clipItems.changes.subscribe((elements) => {
-        elements.forEach(element => {
-          // no need to log, but left here in case debugging later a concern for this widget... console.log(element.nativeElement);
-        });
-      });
-    }
+    //ngAfterViewInit() {
+    //  this.clipItems.changes.subscribe((elements) => {
+    //    elements.forEach(element => {
+    //      // no need to log, but left here in case debugging later a concern for this widget... console.log(element.nativeElement);
+    //    });
+    //  });
+    //}
 
     getNthElement(index: number): ElementRef | undefined {
       return this.clipItems.toArray()[index];
@@ -95,11 +97,13 @@ export class ReorderMyClipsComponent extends BaseComponent implements OnInit, Af
                   this.clipSet.push(oneClipToReorder);
                   this.clipIsSelected.push(false); // with pushing of a clip, also push that it starts off as not being selected in the key input UI
                 }
+                this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
             },
             error => {
                 // TODO: Decide if further error logging/analytics is desired on fail-to-load cases like this
                 this.clipSet = [];
                 this.clipIsSelected = [];
+                this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
             });
         }
     }

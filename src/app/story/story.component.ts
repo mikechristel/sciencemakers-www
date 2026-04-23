@@ -1,4 +1,4 @@
-﻿import { Component, OnInit, ElementRef, ChangeDetectorRef, inject, viewChild } from '@angular/core';
+﻿import { Component, OnInit, ElementRef, inject, viewChild, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, Params, Router, RouterLinkActive, RouterLink } from '@angular/router';
 import { takeUntil } from "rxjs/operators";
 
@@ -35,7 +35,6 @@ import { MyVideoComponent } from '../shared/my-video/my-video.component'; // use
     imports: [FocusMeDirective, MyVideoComponent, RouterLinkActive, RouterLink]
 })
 export class StoryComponent extends BaseComponent implements OnInit {
-    private _cdr = inject(ChangeDetectorRef);
     private route = inject(ActivatedRoute);
     private router = inject(Router);
     private globalState = inject(GlobalState);
@@ -48,6 +47,8 @@ export class StoryComponent extends BaseComponent implements OnInit {
     private liveAnnouncer = inject(LiveAnnouncer);
     private windowService = inject(WindowService);
     private breakpointObserver = inject(BreakpointObserver);
+
+    private changeDetectorRef = inject(ChangeDetectorRef);
 
     readonly videoPlayerAndControlsAreaRef = viewChild<ElementRef>('myVideoArea');
     readonly videoPlayerRef = viewChild<any>('myVideoPlayer');
@@ -132,6 +133,7 @@ export class StoryComponent extends BaseComponent implements OnInit {
                       if (this.isTranscriptShowing) // problem is only when transcript is "on" - if so, turn it off
                           this.toggleTranscriptDisplay();
                       this.haveEvidenceOfTranscriptInNarrowView = false; // back to wide view
+                      this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
                   }
               }
             });
@@ -236,6 +238,7 @@ export class StoryComponent extends BaseComponent implements OnInit {
                         this.storyCitation = null;
                         this.setFocusAsNeeded(); // manipulate focus with empty context
                     }
+                    this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
                   },
                   error => {
                     // TODO: decide how specific to make error recovery.
@@ -249,6 +252,7 @@ export class StoryComponent extends BaseComponent implements OnInit {
                     this.liveAnnouncer.announce("No Story Details Found"); // NOTE: using LiveAnnouncer to eliminate possible double-speak
                     this.storyCitation = null;
                     this.setFocusAsNeeded(); // manipulate focus with empty context
+                    this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
                   }
                 );
         });

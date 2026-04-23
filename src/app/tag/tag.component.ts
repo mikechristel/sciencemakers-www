@@ -1,4 +1,4 @@
-﻿import { Component, ViewChild, ElementRef, OnInit, OnDestroy, inject } from '@angular/core';
+﻿import { Component, ViewChild, ElementRef, OnInit, OnDestroy, inject, ChangeDetectorRef, signal } from '@angular/core';
 
 import { Router } from '@angular/router';
 import { takeUntil } from "rxjs/operators";
@@ -41,12 +41,15 @@ export class TagComponent extends BaseComponent implements OnInit, OnDestroy {
     private userSettingsManagerService = inject(UserSettingsManagerService);
     private liveAnnouncer = inject(LiveAnnouncer);
 
+    private changeDetectorRef = inject(ChangeDetectorRef);
+
     // NOTE: framework for tag tree is very much legacy work dating to 2009 and not changed since then; note that data is
     // expected in certain form via this constant and with comment at the head of the view for this work (i.e., tag.component.html):
     private EXPECTED_TAG_BRANCHES: number = 12;
     private TWO_DOZEN_UNTAGGED_BIOS_LIMIT: number = 24;
 
-    signalFocusToTitle: boolean = false;
+    // Angular 21 update: moved from boolean variable to a signal<boolean>
+    signalFocusToTitle = signal(false);
 
     tagMatchCountForSummary: number = 0;
     tagMatchOpeningExcuse: string = "";
@@ -84,6 +87,7 @@ export class TagComponent extends BaseComponent implements OnInit, OnDestroy {
         this.historyMakerService.getCorpusSpecifics().pipe(takeUntil(this.ngUnsubscribe))
         .subscribe(corpusDetails => {
             this.updateTagExcuse(corpusDetails.biographies.tagged, corpusDetails.biographies.all);
+            this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
         });
 
         // NOTE: unlike other components, for the moment this one does not have router parameters
@@ -124,11 +128,13 @@ export class TagComponent extends BaseComponent implements OnInit, OnDestroy {
                     this.initInterfaceToMatchTagState();
                     this.UpdateSubsetTitle();
                     this.setFocusAsNeeded(); // set focus now that context and content are loaded
+                    this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
                 }
                 else {
                     this.tagMatchSummary = "Tag tree could not be loaded.  Tag search is not possible at this time.";
                     this.hasNoTagSpec = true;
                     this.setFocusAsNeeded(); // set focus now that empty context is loaded
+                    this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
                 }
             });
     }
@@ -183,12 +189,12 @@ export class TagComponent extends BaseComponent implements OnInit, OnDestroy {
             // Set default focus to the title for this route, since we did internally route
             // in the SPA (single page application)
             // (as it is the target for skip-to-main content as well)
-            this.signalFocusToTitle = true;
+            this.signalFocusToTitle.set(true);
         }
     }
 
     private clearSignalsForCurrentFocusSetting() {
-        this.signalFocusToTitle = false;
+        this.signalFocusToTitle.set(false);
     }
 
     toggleGivenTag(branchIndex: number, leafIndex: number) {
@@ -243,9 +249,9 @@ export class TagComponent extends BaseComponent implements OnInit, OnDestroy {
         }
         this.UpdateSubsetTitle();
         // Set the focus away from the Clear button, to the tag selection area.
-        this.signalFocusToTitle = false; // make sure a change will be signalled
+        this.signalFocusToTitle.set(false); // make sure a change will be signalled
         setTimeout(() => {
-          this.signalFocusToTitle = true; // this will signal the need to focus on the title (as there is no non-disabled Clear button)
+          this.signalFocusToTitle.set(true); // this will signal the need to focus on the title (as there is no non-disabled Clear button)
         });
     }
 
@@ -279,6 +285,8 @@ export class TagComponent extends BaseComponent implements OnInit, OnDestroy {
                             this.tagMatchSummary = storyResultCount + connector + "this tag:";
                         else
                             this.tagMatchSummary = storyResultCount + connector + "all these tags:";
+
+                        this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
                     }
                     // else // this.clearIsPending: nothing really to do:
                         // During the delay, user may have cleared out tag choices via "Clear" button or

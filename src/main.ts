@@ -1,4 +1,4 @@
-import { enableProdMode, importProvidersFrom } from '@angular/core';
+import { enableProdMode, importProvidersFrom, provideBrowserGlobalErrorListeners, provideCheckNoChangesConfig } from '@angular/core';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { provideRouter } from '@angular/router';
 
@@ -100,7 +100,9 @@ if (_browserTestsPassed) {
         USMapManagerService,
         StoryPlayLogService,
         GlobalState,
-        provideHttpClient(withInterceptorsFromDi())
+        provideHttpClient(withInterceptorsFromDi()),
+        provideBrowserGlobalErrorListeners(),
+        provideCheckNoChangesConfig({exhaustive: true, interval: 5000})
     ]
 })
     .catch(err => console.log(err));

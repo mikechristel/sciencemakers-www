@@ -6,7 +6,7 @@ import { HttpClient } from '@angular/common/http';
 import { SearchResult } from '../storyset/search-result';
 import { HistoryMakerService } from '../historymakers/historymaker.service';
 import { environment } from '../../environments/environment';
-import { GlobalState } from '../app.global-state';
+import { GlobalState, Nullable } from '../app.global-state';
 
 @Injectable()
 export class TextSearchService {
@@ -16,10 +16,11 @@ export class TextSearchService {
 
     private txtSearchURL = 'StorySearch?query=';
 
-    getTextSearch(query: string, interviewYearFilter: string, parentBiographyForAllStories: number, matchTitleOnly: boolean, matchTranscriptOnly: boolean,
-      givenPage: number, givenPageSize: number, genderFacet: string, birthDecadeFacets: string, makerFacets: string, jobFacets: string,
-      regionUSStateFacets: string, organizationFacets: string, namedDecadeFacets:string, namedYearFacets: string,
-      sortField: string, sortInDescendingOrder: boolean): Observable<SearchResult> {
+    getTextSearch(query: string, interviewYearFilter: Nullable<string>, parentBiographyForAllStories: Nullable<number>, matchTitleOnly: boolean, matchTranscriptOnly: boolean,
+      givenPage: Nullable<number>, givenPageSize: Nullable<number>, genderFacet: Nullable<string>, birthDecadeFacets: Nullable<string>, 
+      makerFacets: Nullable<string>, jobFacets: Nullable<string>, regionUSStateFacets: Nullable<string>, 
+      organizationFacets: Nullable<string>, namedDecadeFacets:Nullable<string>, namedYearFacets: Nullable<string>,
+      sortField: Nullable<string>, sortInDescendingOrder: boolean): Observable<SearchResult> {
         var addedArgs: string = "";
         if (parentBiographyForAllStories != this.globalState.NOTHING_CHOSEN)
             addedArgs = addedArgs + "&parentBiographyID=" + parentBiographyForAllStories;

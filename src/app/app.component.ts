@@ -1,4 +1,4 @@
-﻿import { Component, ElementRef, inject, viewChild }       from '@angular/core';
+﻿import { Component, ElementRef, inject, viewChild, ChangeDetectorRef }       from '@angular/core';
 import { Router, NavigationEnd, RouterLinkActive, RouterLink } from '@angular/router';
 
 import { FeedbackService } from './feedback/feedback.service';
@@ -40,6 +40,8 @@ export class AppComponent extends BaseComponent {
     private userSettingsManagerService = inject(UserSettingsManagerService);
     private playlistManagerService = inject(PlaylistManagerService);
     private authManagerService = inject(AuthManagerService);
+
+    private changeDetectorRef = inject(ChangeDetectorRef);
 
     readonly feedbackInputArea = viewChild<ElementRef>('feedbackInput');
     readonly myClipsTitleInputArea = viewChild<ElementRef>('myClipsTitleInput');
@@ -84,6 +86,7 @@ export class AppComponent extends BaseComponent {
         playlistManagerService.myClips$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((value) => {
             this.myClips = value;
             this.setMyClipsCountMessage();
+            this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
         });
 
         playlistManagerService.presentMyClipsExportForm$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((value) => {
@@ -115,24 +118,37 @@ export class AppComponent extends BaseComponent {
         this.router.events.pipe(takeUntil(this.ngUnsubscribe)).subscribe(event => {
           if (event instanceof NavigationEnd) {
 
+            var somethingChanged: boolean = false;
             var inspectedURL: string = event.urlAfterRedirects;
+            var updated_inSearchFormRoute: boolean;
+            var updated_inContentLinksRoute: boolean = this.inContentLinksRoute;
+            var updated_inShowingManyItemsRoute: boolean = this.inShowingManyItemsRoute;
 
-            this.inSearchFormRoute = (inspectedURL.startsWith("/search") || inspectedURL.startsWith("/storyadvs")
+            updated_inSearchFormRoute = (inspectedURL.startsWith("/search") || inspectedURL.startsWith("/storyadvs")
                                        || inspectedURL.startsWith("/bioadvs") || inspectedURL.startsWith("/tag")); // NOTE: considering tag/topic search route a search form, too
-            if (this.inSearchFormRoute) {
+            if (updated_inSearchFormRoute) {
               this.inContentLinksRoute = false;
               this.inShowingManyItemsRoute = false;
             }
             else
             {
-              this.inShowingManyItemsRoute = (inspectedURL.startsWith("/all") || inspectedURL.startsWith("/stories/")
+              updated_inShowingManyItemsRoute = (inspectedURL.startsWith("/all") || inspectedURL.startsWith("/stories/")
                 || inspectedURL.startsWith("/storiesForBio"));
-              if (this.inShowingManyItemsRoute) {
-                this.inContentLinksRoute = false;
+              if (updated_inShowingManyItemsRoute) {
+                updated_inContentLinksRoute = false;
               }
               else {
-                this.inContentLinksRoute = inspectedURL.startsWith("/contentlinks");
+                updated_inContentLinksRoute = inspectedURL.startsWith("/contentlinks");
               }
+            }
+            somethingChanged = (updated_inSearchFormRoute != this.inSearchFormRoute) || (updated_inContentLinksRoute != this.inContentLinksRoute) || 
+              (updated_inShowingManyItemsRoute != this.inShowingManyItemsRoute);
+
+            if (somethingChanged) {
+                this.inSearchFormRoute = updated_inSearchFormRoute;
+                this.inContentLinksRoute = updated_inContentLinksRoute;
+                this.inShowingManyItemsRoute = updated_inShowingManyItemsRoute;
+                this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
             }
           }
         });
@@ -166,6 +182,7 @@ export class AppComponent extends BaseComponent {
             if (anchor) {
                 anchor.focus();
                 anchor.scrollIntoView();
+                this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
             }
         });
     }
@@ -446,7 +463,10 @@ export class AppComponent extends BaseComponent {
     private handleMyClipsTitleInputBlur() {
         // Used to help label the characters left in the given myClips title in a modal form according to accessibility expert advice.
         // On "blur", restore the described by attribute for the textarea input element (bound to myClipsTitleLengthHelper)
-        setTimeout(() => this.myClipsTitleLengthHelper = "lengthLimitInfoForMyClipsTitle", 0);
+        setTimeout(() => {
+            this.myClipsTitleLengthHelper = "lengthLimitInfoForMyClipsTitle";
+            this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
+        }, 0);
     }
     private thinToLegalMyClipsTitleKeyUp() {
         // Purpose: thin out characters just like titledMyClipsAsURL behaves, i.e.,

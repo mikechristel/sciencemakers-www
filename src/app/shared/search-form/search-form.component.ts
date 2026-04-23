@@ -1,4 +1,4 @@
-import { Component, OnInit, ElementRef, Pipe, PipeTransform, EventEmitter, Output, inject, input, viewChild } from '@angular/core';
+import { Component, OnInit, ElementRef, Pipe, PipeTransform, EventEmitter, Output, inject, input, viewChild, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { takeUntil } from "rxjs/operators";
 
@@ -40,6 +40,8 @@ export class SearchFormComponent extends BaseComponent implements OnInit {
     private searchFormService = inject(SearchFormService);
     private userSettingsManagerService = inject(UserSettingsManagerService);
     private storyAdvancedSearchSettingsManagerService = inject(StoryAdvancedSearchSettingsManagerService);
+
+    private changeDetectorRef = inject(ChangeDetectorRef);
 
     readonly queryInputArea = viewChild<ElementRef>('queryInput');
 
@@ -84,14 +86,17 @@ export class SearchFormComponent extends BaseComponent implements OnInit {
 
         storyAdvancedSearchSettingsManagerService.filterByInterviewDate$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((value) => {
           this.filterByInterviewDate = value;
+          this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
         });
 
         storyAdvancedSearchSettingsManagerService.minYear$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((value) => {
           this.minYearForDateFilter = value;
+          this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
         });
 
         storyAdvancedSearchSettingsManagerService.maxYear$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((value) => {
           this.maxYearForDateFilter = value;
+          this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
         });
 
         // Set default options to current state of things:
@@ -104,6 +109,7 @@ export class SearchFormComponent extends BaseComponent implements OnInit {
         searchFormService.searchOptions$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((value) => {
             this.searchOptions = value;
             this.initInterfaceForOptions();
+            this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
         });
     }
 

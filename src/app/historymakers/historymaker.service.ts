@@ -11,7 +11,7 @@ import { CorpusSpecifics } from './corpus-specifics';
 import { BiographySearchFacetsDetails, StorySearchFacetsDetails } from './search-facets-details';
 
 import { environment } from '../../environments/environment';
-import { GlobalState } from '../app.global-state';
+import { GlobalState, Nullable } from '../app.global-state';
 
 @Injectable()
 export class HistoryMakerService {
@@ -137,9 +137,9 @@ export class HistoryMakerService {
         }
     }
 
-    getHistoryMakersBornThisWeek(givenPage: number, givenPageSize: number,
-      genderFacet: string, birthDecadeFacet: string, makerFacets: string, jobFacets: string,
-      lastInitialFacetSpec: string, regionUSStateFacetSpec: string): Observable<TableOfContents> {
+    getHistoryMakersBornThisWeek(givenPage: Nullable<number>, givenPageSize: Nullable<number>,
+      genderFacet: Nullable<string>, birthDecadeFacet: Nullable<string>, makerFacets: Nullable<string>, jobFacets: Nullable<string>,
+      lastInitialFacetSpec: Nullable<string>, regionUSStateFacetSpec: Nullable<string>): Observable<TableOfContents> {
         var addedArgs: string = "";
         if (givenPage != null && givenPage > 0)
             addedArgs = addedArgs + "&currentPage=" + givenPage;

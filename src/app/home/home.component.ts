@@ -1,4 +1,4 @@
-﻿import { Component, OnInit, inject } from '@angular/core';
+﻿import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { takeUntil } from "rxjs/operators";
 
 import { HistoryMakerService } from '../historymakers/historymaker.service';
@@ -33,6 +33,8 @@ export class HomeComponent extends BaseComponent implements OnInit {
     private searchFormService = inject(SearchFormService);
     private liveAnnouncer = inject(LiveAnnouncer);
 
+    private changeDetectorRef = inject(ChangeDetectorRef);
+
     txtQuery: string = ""; // this is the query string as edited by the user
 
     scienceMakersStoryCount: string;
@@ -64,7 +66,7 @@ export class HomeComponent extends BaseComponent implements OnInit {
     }
 
     ngOnInit() {
-        this.titleManagerService.setTitle("ScienceMakers Digital Archive (April 3, 2026)");
+        this.titleManagerService.setTitle("ScienceMakers Digital Archive (April 23, 2026)");
         this.liveAnnouncer.announce("ScienceMakers Digital Archive"); // NOTE: using LiveAnnouncer to eliminate possible double-speak
 
         this.historyMakerService.getCorpusSpecifics().pipe(takeUntil(this.ngUnsubscribe))
@@ -84,6 +86,7 @@ export class HomeComponent extends BaseComponent implements OnInit {
 					  lastUpdateDate.getFullYear());
 			  }
 			  this.fullBiographyCount = corpusDetails.biographies.all.toLocaleString();
+              this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
             });
 
         // Do not qualify the people born this week in any way (i.e., no filtering, no paging): just get them all (hence null filtering/paging parameters):
@@ -94,6 +97,7 @@ export class HomeComponent extends BaseComponent implements OnInit {
                     this.confirmedNoBirthdays = true;
                 }
                 this.setFocusAsNeeded(); // with contents fully loaded - set the focus
+                this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
             });
     }
 

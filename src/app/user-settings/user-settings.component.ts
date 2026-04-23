@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 
 import { ActivatedRoute, Router, Params, RouterLink, RouterLinkActive } from '@angular/router';
 import { takeUntil } from "rxjs/operators";
@@ -25,6 +25,8 @@ export class UserSettingsComponent extends BaseComponent implements OnInit {
     private userSettingsManagerService = inject(UserSettingsManagerService);
     private liveAnnouncer = inject(LiveAnnouncer);
 
+    private changeDetectorRef = inject(ChangeDetectorRef);
+
     settingsPageTitle: string;
     settingsPageTitleLong: string;
     signalFocusToTitle: boolean = false; // is used in html rendering of this component
@@ -49,43 +51,55 @@ export class UserSettingsComponent extends BaseComponent implements OnInit {
 
         userSettingsManagerService.autoplayVideo$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((value) => {
           this.defaultAutoPlay = value;
+          this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
         });
         userSettingsManagerService.autoadvanceVideo$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((value) => {
           this.defaultAutoAdvance = value;
+          this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
         });
 
         // Settings related to visibility of certain filters for biography sets:
         userSettingsManagerService.showBiographyBirthStateFacetFilter$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((value) => {
           this.showBiographyBirthStateFacetFilter = value;
+          this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
         });
         userSettingsManagerService.showBiographyDecadeOfBirthFacetFilter$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((value) => {
           this.showBiographyDecadeOfBirthFacetFilter = value;
+          this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
         });
         userSettingsManagerService.showBiographyJobTypeFacetFilter$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((value) => {
           this.showBiographyJobTypeFacetFilter = value;
+          this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
         });
         userSettingsManagerService.showBiographyLastNameFacetFilter$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((value) => {
           this.showBiographyLastNameFacetFilter = value;
+          this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
         });
 
         // Settings related to visibility of certain filters for story sets:
         userSettingsManagerService.showStoryUSStateFacetFilter$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((value) => {
           this.showStoryUSStateFacetFilter = value;
+          this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
         });
         userSettingsManagerService.showStoryOrganizationFacetFilter$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((value) => {
           this.showStoryOrganizationFacetFilter = value;
+          this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
         });
         userSettingsManagerService.showStoryDecadeFacetFilter$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((value) => {
           this.showStoryDecadeFacetFilter = value;
+          this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
         });
         userSettingsManagerService.showStoryYearFacetFilter$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((value) => {
           this.showStoryYearFacetFilter = value;
+          this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
         });
         userSettingsManagerService.showStoryJobTypeFacetFilter$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((value) => {
           this.showStoryJobTypeFacetFilter = value;
+          this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
         });
         userSettingsManagerService.showStoryDecadeOfBirthFacetFilter$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((value) => {
           this.showStoryDecadeOfBirthFacetFilter = value;
+          this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
         });
     }
 

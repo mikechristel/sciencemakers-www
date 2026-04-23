@@ -1,4 +1,4 @@
-﻿import { Component, OnInit, ElementRef, inject, viewChild } from '@angular/core';
+﻿import { Component, OnInit, ElementRef, inject, viewChild, ChangeDetectorRef } from '@angular/core';
 import { takeUntil } from "rxjs/operators";
 
 import { ActivatedRoute, Router, Params } from '@angular/router';
@@ -64,6 +64,8 @@ export class StorySetComponent extends BaseComponent implements OnInit {
   private liveAnnouncer = inject(LiveAnnouncer);
   private myUSMapManagerService = inject(USMapManagerService);
   private playlistManagerService = inject(PlaylistManagerService);
+
+  private changeDetectorRef = inject(ChangeDetectorRef);
 
   readonly radioGroup1_Map = viewChild<ElementRef>('rg1Map');
   readonly radioGroup1_Text = viewChild<ElementRef>('rg1Text');
@@ -194,26 +196,33 @@ export class StorySetComponent extends BaseComponent implements OnInit {
 
         myUSMapManagerService.clickedRegionID$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((value) => {
             this.filterOnUSMapRegion(value);
+            this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
         });
 
         // NOTE: these pipes assume this.facetFamilies already initialized (via this.initializeFacetFamilies()).
         userSettingsManagerService.showStoryDecadeFacetFilter$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((value) => {
             this.facetFamilies[StoryFilterFamilyType.DecadeInStory].isAllowedToBeShown = value;
+            this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
         });
         userSettingsManagerService.showStoryYearFacetFilter$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((value) => {
             this.facetFamilies[StoryFilterFamilyType.YearInStory].isAllowedToBeShown = value;
+            this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
         });
         userSettingsManagerService.showStoryUSStateFacetFilter$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((value) => {
             this.facetFamilies[StoryFilterFamilyType.StateInStory].isAllowedToBeShown = value;
+            this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
         });
         userSettingsManagerService.showStoryOrganizationFacetFilter$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((value) => {
             this.facetFamilies[StoryFilterFamilyType.Organization].isAllowedToBeShown = value;
+            this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
         });
         userSettingsManagerService.showStoryJobTypeFacetFilter$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((value) => {
             this.facetFamilies[StoryFilterFamilyType.JobType].isAllowedToBeShown = value;
+            this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
         });
         userSettingsManagerService.showStoryDecadeOfBirthFacetFilter$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((value) => {
             this.facetFamilies[StoryFilterFamilyType.DecadeOfBirth].isAllowedToBeShown = value;
+            this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
         });
 
         this.minYearAllowed = environment.firstInterviewYear;
@@ -225,6 +234,7 @@ export class StorySetComponent extends BaseComponent implements OnInit {
             if (this.showingMyClipsSet) {
                 this.getIDListStoriesPage(this.playlistManagerService.MyClipsAsString(), this.myCurrentPage, this.myCurrentPageSize);
             }
+            this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
         });
     }
 
@@ -538,10 +548,12 @@ export class StorySetComponent extends BaseComponent implements OnInit {
                                       // No biography details available, so leave as is with generic "one person" used when this.myCurrentSearchParentPreferredName == ""
                                       this.myCurrentSearchParentPreferredName = "";
                                   }
+                                  this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
                                 },
                                 error => {
                                   // No biography details retrievable, so back out of getting a better label
                                   this.myCurrentSearchParentPreferredName = "";
+                                  this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
                                 }
                             );
                         }
@@ -802,9 +814,11 @@ export class StorySetComponent extends BaseComponent implements OnInit {
                     this.processFacetsFromService(this.totalStoriesFound, retSet.facets, searchableFacetSpec);
                     // Finally, focus can be set because we have our context and content.
                     this.setFocusAsNeeded();
+                    this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
                 },
                 error => { // give up
                     this.setInterfaceForEmptyStorySet(givenPageSize, "");
+                    this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
                 });
         }
         else {
@@ -816,6 +830,7 @@ export class StorySetComponent extends BaseComponent implements OnInit {
             else
                 msg = "No story IDs were given, so no stories shown."
             this.setInterfaceForEmptyStorySet(givenPageSize, msg);
+            this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
         }
     }
 
@@ -1053,10 +1068,12 @@ export class StorySetComponent extends BaseComponent implements OnInit {
             this.myCurrentTitleForTextSearchPending = false;
             // Finally, focus can be set because we have our context and content.
             this.setFocusAsNeeded();
+            this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
           },
           error => {
               // TODO: Decide if further error logging/analytics is desired on fail-to-load cases like this
               this.setInterfaceForEmptyStorySet(givenPageSize, "");
+              this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
         });
     }
 
@@ -1280,21 +1297,25 @@ export class StorySetComponent extends BaseComponent implements OnInit {
                             this.processFacetsFromService(this.totalStoriesFound, retSet.facets, searchableFacetSpec);
                             // Finally, focus can be set because we have our context and content.
                             this.setFocusAsNeeded();
+                            this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
                         },
                         error => {
                             // TODO: Decide if further error logging/analytics is desired on fail-to-load cases like this
                             this.setInterfaceForEmptyStorySet(givenPageSize, "");
+                            this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
                         });
 
                 }
                 else {
                     this.myCurrentQuery = null;
                     this.setInterfaceForEmptyStorySet(givenPageSize, "No stories found (unknown tag IDs).");
+                    this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
                 }
             },
             error => {
                 // TODO: Decide if further error logging/analytics is desired on fail-to-load cases like this
                 this.setInterfaceForEmptyStorySet(givenPageSize, "");
+                this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
             });
     }
 

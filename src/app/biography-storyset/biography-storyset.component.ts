@@ -1,4 +1,4 @@
-﻿import { Component, OnInit, ElementRef, inject, viewChild } from '@angular/core';
+﻿import { Component, OnInit, ElementRef, inject, viewChild, ChangeDetectorRef } from '@angular/core';
 import { takeUntil } from "rxjs/operators";
 
 import { ActivatedRoute, Router, Params } from '@angular/router';
@@ -37,25 +37,27 @@ import { SearchFormComponent } from '../shared/search-form/search-form.component
     imports: [FocusMeDirective, MyPanelComponent, NgClass, StoryStampComponent, USMapComponent, SearchFormComponent]
 })
 export class BiographyStorySetComponent extends BaseComponent implements OnInit {
-  private route = inject(ActivatedRoute);
-  private router = inject(Router);
-  private globalState = inject(GlobalState);
-  private biographyStorySetService = inject(BiographyStorySetService);
-  private historyMakerService = inject(HistoryMakerService);
-  private textSearchService = inject(TextSearchService);
-  private titleManagerService = inject(TitleManagerService);
-  private myUSMapManagerService = inject(USMapManagerService);
-  private windowService = inject(WindowService);
-  private userSettingsManagerService = inject(UserSettingsManagerService);
-  private searchFormService = inject(SearchFormService);
-  private liveAnnouncer = inject(LiveAnnouncer);
+    private route = inject(ActivatedRoute);
+    private router = inject(Router);
+    private globalState = inject(GlobalState);
+    private biographyStorySetService = inject(BiographyStorySetService);
+    private historyMakerService = inject(HistoryMakerService);
+    private textSearchService = inject(TextSearchService);
+    private titleManagerService = inject(TitleManagerService);
+    private myUSMapManagerService = inject(USMapManagerService);
+    private windowService = inject(WindowService);
+    private userSettingsManagerService = inject(UserSettingsManagerService);
+    private searchFormService = inject(SearchFormService);
+    private liveAnnouncer = inject(LiveAnnouncer);
 
-  readonly radioGroup1_Map = viewChild<ElementRef>('rg1Map');
-  readonly radioGroup1_Text = viewChild<ElementRef>('rg1Text');
-  readonly radioGroup1_Pic = viewChild<ElementRef>('rg1Pic');
-  readonly radioGroup2_Map = viewChild<ElementRef>('rg2Map');
-  readonly radioGroup2_Text = viewChild<ElementRef>('rg2Text');
-  readonly radioGroup2_Pic = viewChild<ElementRef>('rg2Pic');
+    private changeDetectorRef = inject(ChangeDetectorRef);
+
+    readonly radioGroup1_Map = viewChild<ElementRef>('rg1Map');
+    readonly radioGroup1_Text = viewChild<ElementRef>('rg1Text');
+    readonly radioGroup1_Pic = viewChild<ElementRef>('rg1Pic');
+    readonly radioGroup2_Map = viewChild<ElementRef>('rg2Map');
+    readonly radioGroup2_Text = viewChild<ElementRef>('rg2Text');
+    readonly radioGroup2_Pic = viewChild<ElementRef>('rg2Pic');
 
     signalFocusToTitle: boolean; // is used in html rendering of this component
     signalFocusToStoryID: number; // ID of the story, if any, that is selected in the story list
@@ -112,6 +114,7 @@ export class BiographyStorySetComponent extends BaseComponent implements OnInit 
 
           myUSMapManagerService.clickedRegionID$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((value) => {
               this.filterOnUSMapRegion(value);
+              this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
           });
 
           this.searchFormService.setSearchOptions(new SearchFormOptions(false, this.globalState.NOTHING_CHOSEN, this.globalState.NO_ACCESSION_CHOSEN, false)); // note: will likely be called again with a chosen bio ID
@@ -210,6 +213,7 @@ export class BiographyStorySetComponent extends BaseComponent implements OnInit 
                     this.historyMakerService.getJobFamilyList(facetIndicators).pipe(takeUntil(this.ngUnsubscribe))
                       .subscribe(bioDetailJobList => {
                         this.tailoredJobFamilyList = bioDetailJobList;
+                        this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
                     });
                     facetIndicators = [];
                     for (i = 0; i < bioDetail.makerCategories.length; i++) {
@@ -220,6 +224,7 @@ export class BiographyStorySetComponent extends BaseComponent implements OnInit 
                     this.historyMakerService.getMakerGroupList(facetIndicators).pipe(takeUntil(this.ngUnsubscribe))
                       .subscribe(bioDetailMakerGroupList => {
                         this.tailoredMakerGroupList = bioDetailMakerGroupList;
+                        this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
                     });
 
                     var oneStringFacet: string;
@@ -318,9 +323,11 @@ export class BiographyStorySetComponent extends BaseComponent implements OnInit 
                         this.textSearchService.getTextSearch("*", "", bioDetail.biographyID, false, false, null, null, null, null, null, null, null, null, null, null, null, false)
                           .pipe(takeUntil(this.ngUnsubscribe)).subscribe(retSet => {
                             this.initializeUSStateCounts(bioDetail.preferredName, retSet); // harvest and use the entities/states facet to populate the US state region counts
+                            this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
                         },
                         error => { // give up on finding additional map information for the story set
                             this.initializeUSStateCounts(bioDetail.preferredName, null); // effectively empties the map view of any story information
+                            this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
                         });
                     }
 
@@ -333,6 +340,7 @@ export class BiographyStorySetComponent extends BaseComponent implements OnInit 
                     this.toggleDetailsLabel = "Hide Summaries";
                     this.tapeSummariesShown = true; // default to showing them once loaded
                     this.setFocusAsNeeded(); // set focus once context and content fully loaded
+                    this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
                 }
                 else {
                     // No biography details available
@@ -345,11 +353,13 @@ export class BiographyStorySetComponent extends BaseComponent implements OnInit 
                     this.isNonemptyContent = false;
                     this.tapeSummariesShown = false;
                     this.ClearFavoritesBlock();
+                    this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
                 }
               },
               error => {
                 // TODO: perhaps add in more careful error processing with logging/analytics as needed
                 this.setInterfaceForEmptyStorySet("");
+                this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
               }
             );
     }

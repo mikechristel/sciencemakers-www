@@ -1,4 +1,4 @@
-import { Component, OnInit, ElementRef, AfterViewChecked, inject, viewChild } from '@angular/core';
+import { Component, OnInit, ElementRef, AfterViewChecked, inject, viewChild, ChangeDetectorRef } from '@angular/core';
 import { takeUntil } from "rxjs/operators";
 
 import { ActivatedRoute, Router, Params } from '@angular/router';
@@ -31,6 +31,8 @@ export class ContentLinksComponent extends BaseComponent implements OnInit, Afte
     private titleManagerService = inject(TitleManagerService);
     private liveAnnouncer = inject(LiveAnnouncer);
 
+    private changeDetectorRef = inject(ChangeDetectorRef);
+
     readonly topBackItemElement = viewChild<ElementRef>('topBackButton');
 
     contentLinksPageTitle: string;
@@ -60,11 +62,13 @@ export class ContentLinksComponent extends BaseComponent implements OnInit, Afte
         playlistManagerService.myClips$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((value) => {
             this.myClips = value;
             this.setMyClipsCountMessage();
+            this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
         });
 
         routerHistoryService.previousUrl$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((value) => {
             this.priorRoute = value;
             this.setBackButtonDetail();
+            this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
         });
     }
 
