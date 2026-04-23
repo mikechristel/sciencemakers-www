@@ -225,6 +225,29 @@
   padding: 0;
 }
 
+.radiogroup-nowhitespace-rowlayout {
+  box-sizing: border-box;
+  display: flex !important;
+  flex-direction: row;
+  place-content: flex-end space-between; /* note: shorthand for align-content: flex-end; justify-content: space-between */
+  align-items: flex-end;
+  *:not(:last-child) {
+    margin-right: 10px;
+  }
+
+  @media screen and (max-width: myF.bp(afl_medium_just_before))
+  {
+    flex: 1 1 auto;
+  }
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.radiogroup-nowhitespace-rowlayout:focus {
+  outline: none;
+}
+
 .flexColumnChunk {
   flex: 1 1 100%;
   box-sizing: border-box;

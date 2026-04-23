@@ -4,6 +4,12 @@ import { SearchResult } from './storyset/search-result';
 // Allow parameters to be null if "not set/used" via Nullable type
 export type Nullable<T> = T | null;
 
+export enum ViewState {
+    AsGrid = 1,
+    AsText = 2,
+    AsMap = 3
+}
+
 @Injectable()
 export class GlobalState {
 

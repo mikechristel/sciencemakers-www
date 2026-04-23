@@ -7,6 +7,12 @@ don't do it, stop at 599px wide -->
 <!-- Variable note: facetFamilies[number] is used with number indices of 1, 2, 3, 4, 5, 6, 7, 8 which correspond to
 Category, Gender, StateInStory, Organization, DecadeInStory, YearInStory, JobType, DecadeOfBirth respectively
 (see storyfilterfamily-type.ts) - index 0 is reserved. -->
+
+@let currentView = viewStateSignal();
+@let isGrid = currentView === MyViewState.AsGrid;
+@let isText = currentView === MyViewState.AsText;
+@let isMap = currentView === MyViewState.AsMap;
+
 @if (showingFilterMenu) {
   <section aria-label="Filter Results" class="filter-menu">
     <!-- Special Filter Menu options only, no real content... -->

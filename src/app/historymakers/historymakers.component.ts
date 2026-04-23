@@ -55,7 +55,7 @@ export class HistoryMakersComponent extends BaseComponent implements OnInit, Aft
   readonly radioGroup1_Pic = viewChild<ElementRef>('rg1Pic');
   readonly radioGroup2_Map = viewChild<ElementRef>('rg2Map');
   readonly radioGroup2_Text = viewChild<ElementRef>('rg2Text');
-  readonly radioGroup2_Pic = viewChild<ElementRef>('rg2Pic');s
+  readonly radioGroup2_Pic = viewChild<ElementRef>('rg2Pic');
   readonly lastInitialInFilterMenu_Parent = viewChild<ElementRef>('rgLastInitialParentInFilterMenu');
   readonly lastInitial_Parent = viewChild<ElementRef>('rgLastInitialParent');
   readonly lastInitialItemsInFilterMenu = viewChildren<ElementRef>('rgLastInitialInFilterMenu');

@@ -1,4 +1,8 @@
-﻿import { Component, OnInit, ElementRef, inject, viewChild, ChangeDetectorRef } from '@angular/core';
+﻿﻿// 2026 NOTE with Angular 21 update and especially update of Grid/List/Map to a radiogroup for accessibility improvement:
+// instead of two booleans, cardView and textView, now have one viewStateSignal that is one of AsGrid, AsList, AsMap.
+
+import { Component, OnInit, ElementRef, inject, viewChild, ChangeDetectorRef, signal } from '@angular/core';
+
 import { takeUntil } from "rxjs/operators";
 
 import { ActivatedRoute, Router, Params } from '@angular/router';
@@ -20,7 +24,7 @@ import { Facets } from '../historymakers/facets';
 import { FacetDetail, FacetFamilyContainer } from '../historymakers/facet-detail';
 import { StoryFilterFamilyType, StoryFilterFamilyTypeCount, StoryFacetWithFamily } from './storyfilterfamily-type';
 
-import { GlobalState } from '../app.global-state';
+import { GlobalState, ViewState } from '../app.global-state';
 import { environment } from '../../environments/environment';
 import { Playlist } from '../playlist-manager/playlist';
 
@@ -50,6 +54,10 @@ import { SearchFormComponent } from '../shared/search-form/search-form.component
     imports: [FocusMeDirective, MyPanelComponent, FormsModule, NgClass, StoryStampComponent, USMapComponent, NgPlural, NgPluralCase, SearchFormComponent]
 })
 export class StorySetComponent extends BaseComponent implements OnInit {
+
+  // Assign enum ViewState to a property to make it accessible in the html template (e.g., to use AsGrid, AsText, AsMap instead of 1, 2, 3 in the html)
+  protected readonly MyViewState = ViewState;
+
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   globalState = inject(GlobalState);
@@ -81,8 +89,7 @@ export class StorySetComponent extends BaseComponent implements OnInit {
 
     allowIDSetCopy: boolean = false; // turn on additional UI if we have a story ID set to potentially copy
 
-    cardView: boolean = true;
-    textView: boolean = false;
+    viewStateSignal = signal<ViewState>(ViewState.AsGrid); // defaults to grid view; never is undefined (all view states mean something)
 
     signalFocusToStoryID: number = -1;
     signalFocusToRemoveFilterButtonIndicator: number = -1;
@@ -386,8 +393,8 @@ export class StorySetComponent extends BaseComponent implements OnInit {
             var searchStoryTitleOnlyFlag: boolean = this.globalState.SearchTitleOnly;
             var searchStoryTranscriptOnlyFlag: boolean = this.globalState.SearchTranscriptOnly;
             var interviewYearFilterToUse: string = "";
-            var anticipatedMapView: boolean = !this.cardView; // NOTE: doing it this way so that this.cardView = true will be a default state
-            var anticipatedTextView: boolean = this.textView;
+            var anticipatedView: ViewState = this.viewStateSignal();
+
             var anticipatedParentBiographyIDForSearch: number = this.globalState.NOTHING_CHOSEN;
             var anticipatedParentAccessionForSearch = this.globalState.NO_ACCESSION_CHOSEN;
             var newSpec: string = "";
@@ -400,17 +407,14 @@ export class StorySetComponent extends BaseComponent implements OnInit {
             // else newSpec remains ""
 
             if (params['mv'] != undefined && params['mv'] == "1") {
-                anticipatedMapView = true;
-                anticipatedTextView = false;
+                anticipatedView = ViewState.AsMap;
             }
             else {
-                anticipatedMapView = false;
-
                 if (params['tv'] != undefined && params['tv'] == "1") {
-                    anticipatedTextView = true;
+                    anticipatedView = ViewState.AsText;
                 }
-                else {
-                    anticipatedTextView = false;
+                else { // no specific parameters defining a view defaults to AsGrid (i.e., "cards")
+                    anticipatedView = ViewState.AsGrid;
                 }
             }
 
@@ -482,11 +486,9 @@ export class StorySetComponent extends BaseComponent implements OnInit {
                 this.myCurrentFilterSpec = newSpec;
 
                 this.myCurrentQuery = newCurrentQuery;
-                this.textView = anticipatedTextView;
-                if (anticipatedTextView)
-                    this.cardView = false;
-                else
-                    this.cardView = !anticipatedMapView;
+                if (this.viewStateSignal() != anticipatedView)
+                    this.viewStateSignal.set(anticipatedView);
+
                 this.allowIDSetCopy = false; // turned on rarely, when loading a nonzero set of potentially filtered StorySetType.GivenIDSet items that includes something not in My Clips already
 
                 if (anticipatedType == StorySetType.MyClipsSet || anticipatedType == StorySetType.GivenIDSet) {
@@ -562,9 +564,9 @@ export class StorySetComponent extends BaseComponent implements OnInit {
                     }
                 }
             }
-            else if (this.textView != anticipatedTextView || (!this.textView && (this.cardView == anticipatedMapView))) {
-                // Either text view should be toggled, or it is off and the card view should be toggled (which also toggles the map view since text view is off)
-                this.updateViewOptions(!anticipatedMapView, anticipatedTextView); // changes titling, etc., based on changed view
+            else if (this.viewStateSignal() != anticipatedView) {
+                // Change view (e.g., grid/text/map)
+                this.updateViewOptions(anticipatedView, true); // changes titling, etc., based on changed view -- note that the check to viewStateSignal() already been done
             }
             else {
                 // Contents and context in hand already: check if there is any pending focus signalling to follow
@@ -615,11 +617,10 @@ export class StorySetComponent extends BaseComponent implements OnInit {
         return retSet;
     }
 
-    public updateViewOptions(newPicOptionSetting: boolean, newTextOptionSetting: boolean) {
-        if (this.cardView != newPicOptionSetting || this.textView != newTextOptionSetting) {
-            this.cardView = newPicOptionSetting;
-            this.textView = newTextOptionSetting;
-            // Update title, which is dependent on this.cardView and this.textView:
+    public updateViewOptions(anticipatedView: ViewState, isCheckAlreadyDone: boolean) {
+        if (isCheckAlreadyDone || anticipatedView != this.viewStateSignal()) {
+            this.viewStateSignal.set(anticipatedView);
+            // Update title, which is dependent on the view state:
             this.initTitleForPage();
         }
     }
@@ -632,7 +633,7 @@ export class StorySetComponent extends BaseComponent implements OnInit {
             else if (eventCode == "ArrowUp" || eventCode == "ArrowLeft")
                 this.focusPicViewInFilterMenuOption(false, false); // set "map"
             else if (eventCode == " " || eventCode == "Enter")
-                this.updateViewOptions(true, false);
+                this.updateViewOptions(ViewState.AsGrid, false);
         }
         else if (comingFromTextOption) {
             // Next is map, back is pic, current is text.
@@ -641,7 +642,7 @@ export class StorySetComponent extends BaseComponent implements OnInit {
             else if (eventCode == "ArrowUp" || eventCode == "ArrowLeft")
                 this.focusPicViewInFilterMenuOption(true, false); // set "pic"
             else if (eventCode == " " || eventCode == "Enter")
-                this.updateViewOptions(false, true);
+                this.updateViewOptions(ViewState.AsText, true);
         }
         else {
             // Next is pic, back is text, current is map.
@@ -650,7 +651,7 @@ export class StorySetComponent extends BaseComponent implements OnInit {
             else if (eventCode == "ArrowUp" || eventCode == "ArrowLeft")
                 this.focusPicViewInFilterMenuOption(false, true); // set "text"
             else if (eventCode == " " || eventCode == "Enter")
-                this.updateViewOptions(false, false);
+                this.updateViewOptions(ViewState.AsMap, false);
         }
     }
 
@@ -662,7 +663,7 @@ export class StorySetComponent extends BaseComponent implements OnInit {
             else if (eventCode == "ArrowUp" || eventCode == "ArrowLeft")
                 this.focusPicViewOption(false, false); // set "map"
             else if (eventCode == " " || eventCode == "Enter")
-                this.updateViewOptions(true, false);
+                this.updateViewOptions(ViewState.AsGrid, false);
         }
         else if (comingFromTextOption) {
             // Next is map, back is pic, current is text.
@@ -671,7 +672,7 @@ export class StorySetComponent extends BaseComponent implements OnInit {
             else if (eventCode == "ArrowUp" || eventCode == "ArrowLeft")
                 this.focusPicViewOption(true, false); // set "pic"
             else if (eventCode == " " || eventCode == "Enter")
-                this.updateViewOptions(false, true);
+                this.updateViewOptions(ViewState.AsText, true);
         }
         else {
             // Next is pic, back is text, current is map.
@@ -680,7 +681,7 @@ export class StorySetComponent extends BaseComponent implements OnInit {
             else if (eventCode == "ArrowUp" || eventCode == "ArrowLeft")
                 this.focusPicViewOption(false, true); // set "text"
             else if (eventCode == " " || eventCode == "Enter")
-                this.updateViewOptions(false, false);
+                this.updateViewOptions(ViewState.AsMap, false);
         }
     }
 
@@ -1349,12 +1350,12 @@ export class StorySetComponent extends BaseComponent implements OnInit {
 
     private initTitleForPage() {
         // Helper function to assign to this.titleForStorySet and this.screenReaderSummaryTitle when paging info is to be reported,
-        // i.e., it is assumed that either cardView or textView is true so that paging matters.
-        // Two approaches for title: if cardView or textView, we look at a page of results only, so put page info in title.
+        // i.e., it is assumed that this.viewStateSignal() != ViewState.AsMap so that paging matters.
+        // Two approaches for title: if paging matters, we look at a page of results only, so put page info in title.
         // But, for map, look at ALL the results, so do not put page info in title.
 
         // Also, via accessibility review, simplify if this is My Clips (this.showingMyClipsSet).
-        if (!this.cardView && !this.textView) {
+        if (this.viewStateSignal() == ViewState.AsMap) {
             if (this.showingMyClipsSet) {
                 this.titleForStorySet = "Map view of My Clips";
                 this.screenReaderSummaryTitle = "Map view of My Clips";
@@ -1769,14 +1770,13 @@ export class StorySetComponent extends BaseComponent implements OnInit {
         this.needNextPage = goFwdPageOK;
     }
 
-    private navigationParametersForContext(isFilterForcedUpdate: boolean, pageToLoad: number, pageSize: number): any[] {
-        var moreParams = [];
-
+    private navigationParametersForContext(isFilterForcedUpdate: boolean, pageToLoad: number, pageSize: number): Record<string, string | number> {
+        var moreParams: Record<string, string | number> = {};
 
         // NOTE: filter-forced-update, ffu, is a new parameter added to force a contents refresh because the filter changed contents or
         // became empty and so regardless of any other changes, a contents refresh is demanded (by setting the ffu parameter).
         if (isFilterForcedUpdate)
-        moreParams['ffu'] = "1";
+            moreParams['ffu'] = "1";
 
         // Take care of some other typical arguments like page, page size, etc.
         moreParams['pg'] = pageToLoad;
@@ -1794,10 +1794,12 @@ export class StorySetComponent extends BaseComponent implements OnInit {
         if (this.showingFilterMenu)
             moreParams['menu'] = "1";
 
-        if (this.textView)
+        var currentView: ViewState = this.viewStateSignal();
+        if (currentView == ViewState.AsText)
             moreParams['tv'] = "1";
-        else if (!this.cardView)
-            moreParams['mv'] = "1"; // NOTE: !textView && !cardView means it is map view, i.e., 'mv'
+        else if (currentView == ViewState.AsMap)
+            moreParams['mv'] = "1";
+        // else no parameters for the default of AsGrid view 
 
         // Based on this.myType and other context variables, set parameters used for routing/navigation.
         if (this.myType != null) {
@@ -1918,8 +1920,8 @@ export class StorySetComponent extends BaseComponent implements OnInit {
     }
 
     private routeToPage(newPageIdentifier: number, filterPageSortPageSizeEtcForcedUpdate: boolean) {
-        if (this.cardView || this.textView) {
-            // Only if we are in cardView or textView will page fetching actually take place.
+        if (this.viewStateSignal() != ViewState.AsMap) {
+            // Only if we are NOT in AsMap (map view) will page fetching actually take place.
             this.titleForStorySet = "Fetching Page " + newPageIdentifier + "... (in progress)";
             this.screenReaderSummaryTitle = "HistoryMaker Story Set, Page Fetch Pending";
             this.titleManagerService.setTitle(this.screenReaderSummaryTitle);
@@ -1956,7 +1958,7 @@ export class StorySetComponent extends BaseComponent implements OnInit {
             this.pending_removeFilterButtonIndicator = -1; // signal not relevant because of !isClearActionFromRemoveFilterButton
 
         // NOTE: within navigationParametersForContext is where this.specStringFromActiveFacets() is called to set a spec value:
-        var moreOptions = this.navigationParametersForContext(isFilterForcedUpdate, pageToLoad, pageSize);
+        var moreOptions:Record<string, string | number> = this.navigationParametersForContext(isFilterForcedUpdate, pageToLoad, pageSize);
 
         // Make sure all signals are cleared regarding focus.  Any new focus decisions are made based on pending flags,
         // not signal flags, so simplify bookkeeping and just have all signals cleared before routing.

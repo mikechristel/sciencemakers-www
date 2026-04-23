@@ -118,7 +118,7 @@ targeting a paragraph on total segment count rather than a non-existent top-leve
             </button>
           </div>
           @if (isNonemptyContent) {
-            <ul class="unstyled-list-nowhitespace-row2ndlayout" aria-labelledby="rg1_label">
+            <ul class="radiogroup-nowhitespace-row2ndlayout" aria-labelledby="rg1_label">
               <li #rg1Pic class="filter-section-rg-item" [class.selected]="cardView"
                 [attr.tabindex]="cardView ? 0 : -1" role="button" [attr.aria-pressed]="cardView"
                 (click)="cardView = true; textView = false" (keydown)="setViewOptionsInNarrowContainer($event.key, true, false)">
@@ -324,7 +324,7 @@ targeting a paragraph on total segment count rather than a non-existent top-leve
               </button>
             </div>
             @if (isNonemptyContent) {
-              <ul class="unstyled-list-nowhitespace-row3rdlayout" aria-labelledby="rg2_label">
+              <ul class="radiogroup-nowhitespace-row3rdlayout" aria-labelledby="rg2_label">
                 <li #rg2Pic class="filter-section-rg-item" [class.selected]="cardView"
                   [attr.tabindex]="cardView ? 0 : -1" role="button" [attr.aria-pressed]="cardView"
                   (click)="cardView = true; textView = false" (keydown)="setViewOptions($event.key, true, false)">

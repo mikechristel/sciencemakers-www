@@ -34,6 +34,7 @@ $breakpoints: ( /* Values historically chosen to correspond to Angular Flex Layo
   required_video_in_column: 600px, /* at less than this width, video is no longer in a column but is full width narrow/mobile 1
                        column view; more rewriting of video layout in story.component needed if this value is anything else
                        besides the same as afl_small which is the Angular Flex Layout (afl) sm breakpoint */
+  needed_width_for_button_icons: 680px, /* below this width, display buttons like grid/list/map without icon supplements */
   max_video_width: 720px, /* somewhat arbitrary maximum width for video player (and controls tied to video player) */
   thmda_wideenough: 768px, /* somewhat arbitrary breakpoint at which 4 instead of 3 stamps can be shown in a row for 66% or 70% columns */
   afl_medium: 960px,    /* Corresponds to the Angular Flex Layout md, i.e., medium */
@@ -54,6 +55,7 @@ $breakpoints: ( /* Values historically chosen to correspond to Angular Flex Layo
   video_controls_one_line_just_before: 358.94px,
   afl_small_just_before: 599.94px,
   required_video_in_column_just_before: 599.94px,
+  needed_width_for_button_icons_just_before: 679.94px,
   max_video_width_just_before: 719.94px,
   thmda_wideenough_just_before: 767.94px,
   afl_medium_just_before: 959.94px,
