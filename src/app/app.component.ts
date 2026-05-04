@@ -12,7 +12,7 @@ import { SearchFormOptions } from './shared/search-form/search-form-options';
 
 import { TitleManagerService } from './shared/title-manager.service';
 
-import { RouterHistoryService } from './shared/services';
+import { RouterHistoryService } from './shared/services/router-history.service';
 
 import { BaseComponent } from './shared/base.component';
 import { UserSettingsManagerService } from './user-settings/user-settings-manager.service';
@@ -23,6 +23,7 @@ import { AppContentsComponent } from './app-contents/app-contents.component';
 import { CdkTrapFocus } from '@angular/cdk/a11y';
 import { FormsModule } from '@angular/forms';
 import { CdkCopyToClipboard } from '@angular/cdk/clipboard';
+import { Nullable } from './app.global-state'; // for Nullable type
 
 @Component({
     selector: 'my-app',
@@ -47,11 +48,11 @@ export class AppComponent extends BaseComponent {
     readonly myClipsTitleInputArea = viewChild<ElementRef>('myClipsTitleInput');
     readonly clipsListInputArea = viewChild<ElementRef>('clipsListInput');
 
-    public givenFeedback: string = null;
-    public optionalFeedbackEmail: string = null;
-    public givenLoadClips: string = null;
-    public myClips: Playlist[];
-    public myClipsWithCountMsg: string;
+    public givenFeedback: Nullable<string> = null;
+    public optionalFeedbackEmail: Nullable<string> = null;
+    public givenLoadClips: Nullable<string> = null;
+    public myClips!: Playlist[]; // initialized via service playlistManagerService
+    public myClipsWithCountMsg!: string;
 
     public showMyContactUsModalForm: boolean = false;
     public showMyExportMyClipsModalForm: boolean = false;
@@ -63,8 +64,8 @@ export class AppComponent extends BaseComponent {
     public inContentLinksRoute: boolean = false;
     public inShowingManyItemsRoute: boolean = false; // for any of biography set, story set, one biography story set
 
-    public cachedTitle: string;
-    public myClipsTitleCandidate: string;
+    public cachedTitle: string = "";;
+    public myClipsTitleCandidate: string = "";;
     public myClipsTitleMaxLength: number = 140;
     public myClipsTitleLengthHelper: string = "lengthLimitInfoForMyClipsTitle"; // ID for which char count in title is given
     public myClipsURLCopyActionFresh: boolean = false;
@@ -127,8 +128,8 @@ export class AppComponent extends BaseComponent {
             updated_inSearchFormRoute = (inspectedURL.startsWith("/search") || inspectedURL.startsWith("/storyadvs")
                                        || inspectedURL.startsWith("/bioadvs") || inspectedURL.startsWith("/tag")); // NOTE: considering tag/topic search route a search form, too
             if (updated_inSearchFormRoute) {
-              this.inContentLinksRoute = false;
-              this.inShowingManyItemsRoute = false;
+              updated_inContentLinksRoute = false;
+              updated_inShowingManyItemsRoute = false;
             }
             else
             {
@@ -188,7 +189,7 @@ export class AppComponent extends BaseComponent {
     }
 
     isRouteActive(routeToCheck: string): boolean {
-        return (this.router && this.router.url && this.router.url == routeToCheck);
+        return (this.router && this.router.url.length > 0 && this.router.url == routeToCheck);
     }
 
     setNavChoice(newRoute: string) {
@@ -203,7 +204,7 @@ export class AppComponent extends BaseComponent {
         // This search takes different forms, depending on the status of the search form service.
         // Pass the form in router parameters so that on a series of browser "go back" operations the
         // appropriate state of the search will be returned to (e.g., search stories, or just one person's stories, etc.).
-        var moreNavigationParams = {};
+        var moreNavigationParams: Record<string, string> = {};
         var currentSearchOptions: SearchFormOptions = this.searchFormService.currentSearchOptions();
 
         if (currentSearchOptions.searchingBiographies)
@@ -242,7 +243,7 @@ export class AppComponent extends BaseComponent {
 
     postFeedbackAndCloseMyModal() {
         var feedbackMessage: string;
-        var feedbackEmail: string = null;
+        var feedbackEmail: Nullable<string> = null;
 
         if (this.givenFeedback) {
             feedbackMessage = this.givenFeedback.trim();
@@ -344,7 +345,7 @@ export class AppComponent extends BaseComponent {
                   { // have at least one numeric ID in given list, so continue with the route navigation
                       thinnedGivenIDListString = thinnedGivenIDListString.substring(0, thinnedGivenIDListString.length - 1); // take off extraneous comma at the end
 
-                      var moreParams = {};
+                      var moreParams: Record<string, string> = {};
 
                       moreParams['IDList'] = thinnedGivenIDListString;
                       if (givenClipSetTitle.length > 0)

@@ -9,7 +9,7 @@ import { StoryDetailService } from './story-detail.service';
 import { PlaylistManagerService } from '../playlist-manager/playlist-manager.service';
 import { DetailedStory } from './detailed-story';
 
-import { GlobalState } from '../app.global-state';
+import { GlobalState, Nullable } from '../app.global-state';
 import { environment } from '../../environments/environment';
 import { VideoMatchLine } from './video-match-line';
 
@@ -18,7 +18,7 @@ import { TimedTextMatch } from './timed-text-match';
 import { Playlist } from '../playlist-manager/playlist';
 
 import { UserSettingsManagerService } from '../user-settings/user-settings-manager.service';
-import { WindowService } from '../shared/services';
+import { WindowService } from '../shared/services/window.service';
 
 import { BaseComponent } from '../shared/base.component';
 import { LiveAnnouncer } from '@angular/cdk/a11y'; // used to read adding/removing from My Clips
@@ -55,49 +55,47 @@ export class StoryComponent extends BaseComponent implements OnInit {
 
     mobileDetails: boolean = true; // NOTE: used in the html rendering of this component
 
-    signalFocusToTitle: boolean; // is used in html rendering of this component
+    signalFocusToTitle!: boolean; // is used in html rendering of this component
 
     readonly POSTER_NAME_4x3: string = "./assets/320x240black.png";
     readonly POSTER_NAME_DEFAULT: string = "./assets/320x180black.png";
 
-    myStory: DetailedStory;
-    storyDetailLoadingFailed: boolean; // true only if a load was tried and failed, so false on no-load, false on successful-load
+    myStory: Nullable<DetailedStory> = null; // holds the detailed information about the story
+    storyDetailLoadingFailed: boolean = false; // true only if a load was tried and failed, so false on no-load, false on successful-load
     backgroundPoster: string = this.POSTER_NAME_DEFAULT; // assume 16:9 unless overridden by content claiming 4:3 aspect ratio
-    storyDetailsTitle: string;
-    storyDetailsShortenedTitle: string;
-    storyHasMatches: boolean;
-    storyInMyClips: boolean;
-    interviewDateSuffix: string;
+    storyDetailsTitle!: string;
+    storyDetailsShortenedTitle!: string;
+    storyHasMatches!: boolean;
+    storyInMyClips!: boolean;
+    interviewDateSuffix!: string;
     initialSeekInSeconds: number = 0; // used to seek to the story video -- negative values and zero ignored; no data check on positive values; units are seconds (fractions OK of course)
 
     // Support interfaces for transcript hiding and scrolling
     isTranscriptShowing: boolean = true;
     toggleTranscriptLabel: string = "Hide Transcript";
-    transcriptTextBlock: string;
+    transcriptTextBlock: string = "";
 
     // Support interface for video playbar match ticks
-    videoMatches: VideoMatchLine[];
+    videoMatches!: VideoMatchLine[];
     videoPositionInSeconds: number = 0;
     videoDurationInSeconds: number = 0;
 
     biographyDetailsReady: boolean = false;
-    biographyAbstract: string;
-    biographyPreferredName: string;
-    biographyAccession: string;
-    storyCitation: string;
+    biographyAbstract: string = "";
+    biographyPreferredName: string = "";
+    biographyAccession: string = "";
+    storyCitation: string = "";
 
-    defaultAutoAdvance: boolean;
+    defaultAutoAdvance!: boolean;
 
-    // TODO: Revisit how best to preserve state for getting query terms for transcript matches (used in story rendering) - for now done with
-    // a routing parameter
-    transcriptQuery: string; // may be filled in via originating route
+    transcriptQuery: Nullable<string> = null; // may be filled in via originating route
 
     // TODO: we may refactor how match context details are shared; for now just use one object
-    myMatchContext: TimedTextMatch[];
+    myMatchContext!: TimedTextMatch[];
 
-    makerCategories = [];
-    occupations = [];
-    myClips: Playlist[];
+    makerCategories: string[] = [];
+    occupations: string[] = [];
+    myClips!: Playlist[];
 
     private myMediaBase: string;
 
@@ -208,7 +206,7 @@ export class StoryComponent extends BaseComponent implements OnInit {
                             this.backgroundPoster = this.POSTER_NAME_DEFAULT;
 
                         // Update it as being in "My Clips" if it is so marked by being in the "My Clips" set:
-                        this.storyInMyClips = (this.myClips.findIndex(x => x.storyID == this.myStory.storyID) >=0 );
+                        this.storyInMyClips = (this.myClips.findIndex(x => x.storyID == storyDetails.storyID) >=0 );
 
                         this.storyCitation = this.ComposeCitation(storyDetails.citation.preferredName, storyDetails.citation.accession,
                             storyDetails.citation.interviewer, storyDetails.citation.interviewDate, storyDetails.citation.sessionOrder, storyDetails.citation.tapeOrder,
@@ -231,28 +229,15 @@ export class StoryComponent extends BaseComponent implements OnInit {
                         this.DecorateVideoPlaybarWithMatches(); // show any match time offsets on play bar
                         this.ComputeTranscriptWithMatches(); // after matches loaded, dress up transcript
                         this.setFocusAsNeeded(); // context loaded successfully so manipulate focus
+                        this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
                     }
                     else {
                         this.titleManagerService.setTitle("ScienceMakers - No Story Details Found");
                         this.liveAnnouncer.announce("No Story Details Found"); // NOTE: using LiveAnnouncer to eliminate possible double-speak
-                        this.storyCitation = null;
+                        this.storyCitation = "";
                         this.setFocusAsNeeded(); // manipulate focus with empty context
+                        this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
                     }
-                    this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
-                  },
-                  error => {
-                    // TODO: decide how specific to make error recovery.
-                    // Right now this "network timeout" message could be a lie, so soften the message to "may have."
-                    this.storyDetailLoadingFailed = true; // used so there can be some UI to this as well in story.component.html
-                    this.myStory = null;
-                    this.interviewDateSuffix = null;
-                    this.storyDetailsTitle = "Loading story details may have experienced a network timeout -- try again in a few minutes.";
-                    this.storyDetailsShortenedTitle = this.storyDetailsTitle; // NOTE: with myStory == null there will be more display space for this long "shortened" title
-                    this.titleManagerService.setTitle("ScienceMakers - No Story Details Found");
-                    this.liveAnnouncer.announce("No Story Details Found"); // NOTE: using LiveAnnouncer to eliminate possible double-speak
-                    this.storyCitation = null;
-                    this.setFocusAsNeeded(); // manipulate focus with empty context
-                    this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
                   }
                 );
         });
@@ -334,8 +319,6 @@ export class StoryComponent extends BaseComponent implements OnInit {
         for (var iMatch: number = 0; iMatch < this.myMatchContext.length; iMatch++) {
             if (this.myMatchContext[iMatch].time > lastMatchTimeProcessed) {
                 lastMatchTimeProcessed = this.myMatchContext[iMatch].time;
-                matchLine = new VideoMatchLine();
-                matchLine.time = lastMatchTimeProcessed;
                 // NOTE: time is in milliseconds in this.myMatchContext; but videoDuration is in seconds
                 // The integral percentage (i.e., 50 is halfway) based on milliseconds for time T,
                 // duration D is (T * 100) / (D * 1000) which we simplify to T / (D * 10)
@@ -345,7 +328,7 @@ export class StoryComponent extends BaseComponent implements OnInit {
                     percentValue = 0;
                 else if (percentValue > 100)
                     percentValue = 100;
-                matchLine.percentOffset = percentValue;
+                matchLine = new VideoMatchLine(percentValue, lastMatchTimeProcessed);
                 this.videoMatches.push(matchLine);
             }
         }
@@ -359,9 +342,9 @@ export class StoryComponent extends BaseComponent implements OnInit {
         var outOfBoundsOffset: number;
         var timingIndexToCheckFirst: number;
 
-        if (this.myStory.transcript == null || this.myStory.transcript.length == 0) {
+        if (this.myStory == null || this.myStory.transcript == null || this.myStory.transcript.length == 0) {
             this.transcriptTextBlock = "";
-            return; // give up if there is no transcript
+            return; // give up if there is no story or there is no transcript
         }
 
         // NOTE: assumes this.myStory.timing.length >= 1
@@ -435,8 +418,9 @@ export class StoryComponent extends BaseComponent implements OnInit {
 
     logStoryPlay() {
       // Log that this story is being played.
-      this.storyPlayLogService.postStoryPlayEvent(this.myStory.storyID.toString(), this.myStory.citation.accession,
-        this.myStory.citation.sessionOrder, this.myStory.citation.tapeOrder, this.myStory.storyOrder, this.myStory.title);
+      if (this.myStory != null)
+        this.storyPlayLogService.postStoryPlayEvent(this.myStory.storyID.toString(), this.myStory.citation.accession,
+          this.myStory.citation.sessionOrder, this.myStory.citation.tapeOrder, this.myStory.storyOrder, this.myStory.title);
     }
 
     autoAdvanceToNext() {
@@ -521,11 +505,13 @@ export class StoryComponent extends BaseComponent implements OnInit {
             this.storyDetailsShortenedTitle = "";
             this.myStory = null;
 
+            var cleanedQueryRouterParam:Nullable<string> = this.globalState.cleanedQueryRouterParameter(this.transcriptQuery); // bug fix of April 2025 - must be sure no + character is in the query, for example;
+
             // If there is a transcript query context, pass that along so new story can also show matches to this query context.
-            if (this.transcriptQuery && this.transcriptQuery.length > 0) {
+            if (cleanedQueryRouterParam != null) {
                 // NOTE: Story ID is *REQUIRED* and so is part of router.navigate path below (along with /story) rather than in moreQueryParams.
-                var moreQueryParams = [];
-                moreQueryParams['q'] = this.globalState.cleanedQueryRouterParameter(this.transcriptQuery); // bug fix of April 2025 - must be sure no + character is in the query, for example
+                var moreQueryParams: Record<string, string> = {};
+                moreQueryParams['q'] = cleanedQueryRouterParam;
                 this.router.navigate(['/story', givenNewStoryID, moreQueryParams]);
             }
             else
@@ -546,6 +532,10 @@ export class StoryComponent extends BaseComponent implements OnInit {
         var givenMatchesCount: number;
         var newEntry: TimedTextMatch;
         var redundantEntry: boolean = false;
+        var timeValForEntry: number;
+
+        if (this.myStory == null)
+            return; // give up early
 
         if (this.myStory.timingPairs == null)
             maxTimingPairIndex = -1;
@@ -594,14 +584,12 @@ export class StoryComponent extends BaseComponent implements OnInit {
               // Offset at matchIndex lines up in time slot at i-1 (using 0 if i-1 == -1);
               // set the time attribute for matchInfo[] based on the stored offset value already there,
               // adjusting the time based on this.myStory.timingPairs.
-              newEntry = new TimedTextMatch();
-              newEntry.startOffset = this.myStory.matchTerms[matchIndex].startOffset;
-              newEntry.endOffset = this.myStory.matchTerms[matchIndex].endOffset;
-
               if (i == 0)
-                  newEntry.time = this.myStory.timingPairs[0].time;
+                  timeValForEntry = this.myStory.timingPairs[0].time;
               else
-                  newEntry.time = this.myStory.timingPairs[i - 1].time;
+                  timeValForEntry = this.myStory.timingPairs[i - 1].time;
+              newEntry = new TimedTextMatch(timeValForEntry, this.myStory.matchTerms[matchIndex].startOffset, this.myStory.matchTerms[matchIndex].endOffset);
+
               this.myMatchContext.push(newEntry);
             }
             matchIndex++; // Note: service puts matches in order, so this.myStory.timingPairs[N+1].startOffset >= this.myStory.timingPairs[N].startOffset
@@ -609,12 +597,11 @@ export class StoryComponent extends BaseComponent implements OnInit {
     }
 
     toggleAddToMyClips() {
-        this.playlistManagerService.toggleAddToMyClips(this.myStory);
-        this.storyInMyClips = (this.myClips.findIndex(x => x.storyID == this.myStory.storyID) >=0 );
-        if (this.storyInMyClips)
-            this.liveAnnouncer.announce("Added to play list"); // NOTE: using LiveAnnouncer rather than aria-live tag
-        else
-            this.liveAnnouncer.announce("Removed from play list"); // NOTE: using LiveAnnouncer rather than aria-live tag
+        if (this.myStory != null) {
+            var myActualStory:DetailedStory = this.myStory;
+            this.playlistManagerService.toggleAddToMyClips(myActualStory);
+            this.storyInMyClips = (this.myClips.findIndex(x => x.storyID == myActualStory.storyID) >=0 );
+        }
     }
 
     toggleTranscriptDisplay() {

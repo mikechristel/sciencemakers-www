@@ -1,10 +1,11 @@
-import { Component, Input, OnChanges, inject } from '@angular/core';
+import { Component, Input, input, OnChanges, inject, signal } from '@angular/core';
 import { USMapDistribution } from './US-map-distribution';
 import { USMapKeyColorBlock } from './US-map-key-color-block';
 import { MapBucket } from './map-bucket';
 import { GlobalState } from '../app.global-state';
 import { USMapManagerService } from './US-map-manager.service';
 import { FacetDetail } from '../historymakers/facet-detail';
+import { FocusMeDirective } from '../shared/focus-me.directive';
 
 import { MyPanelComponent } from '../shared/my-panel/my-panel.component';
 
@@ -12,22 +13,29 @@ import { MyPanelComponent } from '../shared/my-panel/my-panel.component';
     selector: 'us-map',
     templateUrl: './US-map.component.html',
     styleUrls: ['./US-map.component.scss'],
-    imports: [MyPanelComponent]
+    imports: [FocusMeDirective, MyPanelComponent]
 })
 
 // This class is used to present a United States map capable of having each of the 50 states plus D.C. color-coded (51 areas).
 // Furthermore, it can show a key to describe the color-coding in place.
 // See https://angular.io/guide/component-interaction as needed for more on component communication.
 export class USMapComponent implements OnChanges {
+    readonly selectedListIDToFocus = input(""); // this is the region list item ID to focus, coming from the parent component when a region list item is clicked, and used to set focus to that item in the list (and only that item) in this component; cleared when map itself is clicked
+
     private globalState = inject(GlobalState);
     private myUSMapManagerService = inject(USMapManagerService);
 
     // TODO: Skipped for migration with "ng generate @angular/core:signal-input-migration" (March 2025) because:
     //  This input is used in a control flow expression (e.g. `@if` or `*ngIf`)
     //  and migrating would break narrowing currently.
-    @Input() distributionToShow: USMapDistribution;
+    @Input() distributionToShow!: USMapDistribution;
+
+    isRegionListItemSelected(regionListItemID: string): boolean {
+        return this.selectedListIDToFocus() === regionListItemID;
+    }
 
     public isMapInitialized: boolean = false;
+    public haveMapDistributionData = signal(false); // set to true when distributionToShow is populated
 
     // Support interfaces for map text detail (accessibility improvement, i.e., text version of the map) hiding and scrolling
     isMapTextDetailShowing: boolean = false;
@@ -73,9 +81,7 @@ export class USMapComponent implements OnChanges {
         this.keyColorBlock = [];
         var oneColorBlock:USMapKeyColorBlock
         for (var i:number = 0; i < this.myBackgroundColorKey.length; i++) {
-            oneColorBlock = new USMapKeyColorBlock();
-            oneColorBlock.fill = this.myBackgroundColorKey[i];
-            oneColorBlock.regionCount = 0; // signalling it is not in use (yet)
+            oneColorBlock = new USMapKeyColorBlock(this.myBackgroundColorKey[i], "", 0); // count of 0 signals this is not in use yet (hence the blank preface string as well)
             this.keyColorBlock.push(oneColorBlock);
         }
         this.mapTextDetailBlock = "";
@@ -89,7 +95,10 @@ export class USMapComponent implements OnChanges {
         // (2) Map distributions into color ranges to assign value of 0 to 7 to the data.
 
         if (this.distributionToShow == null || this.distributionToShow.count == null)
+        {
+            this.haveMapDistributionData.set(false); // be sure interface knows we have nothing
             return; // do nothing without a distribution
+        }
 
         var minBucketCount:number = 0;
         var maxBucketCount:number = 0;
@@ -113,20 +122,15 @@ export class USMapComponent implements OnChanges {
         var linearBlock:MapBucket[] = [];
         var linearStep:number = (maxBucketCount - minBucketCount) / (this.myBackgroundColorKey.length - 1); // likely to be fractional, of course
         var workingMin: number;
-        var oneBucket:MapBucket = new MapBucket();
-        oneBucket.minValue = 0;
-        oneBucket.maxValue = 0;
-        oneBucket.regionCount = 0;
+        var minValToUseForBucket, maxValToUseForBucket: number;
+        var oneBucket:MapBucket = new MapBucket(0, 0, 0, 0); // values will get filled in later
         linearBlock.push(oneBucket); // Always reserve index 0 SOLELY for zero counts.
         if (maxBucketCount > 0) {
             // Continue with data that has at least one non-zero value...
 
             if (!bNonMaximumPositiveValueEncountered) {
                 // An edge case (e.g., happens when filtering to a birth state for biographies) - only one count is in the data: the max count.
-                oneBucket = new MapBucket();
-                oneBucket.regionCount = 0;
-                oneBucket.minValue = maxBucketCount;
-                oneBucket.maxValue = maxBucketCount;
+                oneBucket = new MapBucket(maxBucketCount, maxBucketCount, 0, 0); // some fields will get further updated later
                 linearBlock.push(oneBucket);
             }
             else { // set up buckets across the range
@@ -134,14 +138,13 @@ export class USMapComponent implements OnChanges {
                 if (workingMin == 0)
                     workingMin++; // already have value 0 count tied to block at index 0 of linearBlock
                 for (var i:number = 1; i < this.myBackgroundColorKey.length; i++) {
-                    oneBucket = new MapBucket();
-                    oneBucket.regionCount = 0;
-                    oneBucket.minValue = Math.floor(workingMin);
+                    minValToUseForBucket = Math.floor(workingMin);
                     workingMin += linearStep;
                     if (i < this.myBackgroundColorKey.length - 1)
-                        oneBucket.maxValue = Math.floor(workingMin); // NOTE: it's OK if this is same as minValue for linearStep < 1
+                        maxValToUseForBucket = Math.floor(workingMin); // NOTE: it's OK if this is same as minValue for linearStep < 1
                     else
-                        oneBucket.maxValue = maxBucketCount;
+                        maxValToUseForBucket = maxBucketCount;
+                    oneBucket = new MapBucket(minValToUseForBucket, maxValToUseForBucket, 0, 0);
                     linearBlock.push(oneBucket);
 
                     workingMin = oneBucket.maxValue + 1; // always move next bucket past the prior one
@@ -319,6 +322,8 @@ export class USMapComponent implements OnChanges {
             this.mapTextDetailBlock = this.computeMapTextDetailInformation(linearBlock, whichBlock);
         else
             this.mapTextDetailBlock = "";
+
+        this.haveMapDistributionData.set(true); // be sure interface knows we have a distribution for the map and can now show things
     }
 
     appendedCountToValue(givenValue: string, givenCount: number): string {
@@ -399,25 +404,38 @@ export class USMapComponent implements OnChanges {
         var numericIndexForMap:number;
         var countForThisRegion:number;
         var oneFacetDetail:FacetDetail;
-        if ((this.distributionToShow.regionIDsAlreadyInFilter == null) ||
-          this.distributionToShow.regionIDsAlreadyInFilter.indexOf(twoLetterID) == -1) {
-            // This region is not already in the filter.  Consider it for selection by the user.
-            numericIndexForMap = this.globalState.MapIndexForUSState(twoLetterID);
-            countForThisRegion = this.distributionToShow.count.length > numericIndexForMap? this.distributionToShow.count[numericIndexForMap] : 0;
-            if (countForThisRegion > 0) {
-                  oneFacetDetail = new FacetDetail();
-                  oneFacetDetail.ID = twoLetterID;
-                  oneFacetDetail.value = readableName;
-                  oneFacetDetail.count = countForThisRegion;
-                  this.regionUSStateInsideMapFacets.push(oneFacetDetail);
-            }
+        // Accessibility improvement: Allow user to toggle on/off an item that is already in the filter, instead of hiding it
+        // from the list, so the old way: 
+        //if ((this.distributionToShow.regionIDsAlreadyInFilter == null) ||
+        //  this.distributionToShow.regionIDsAlreadyInFilter.indexOf(twoLetterID) == -1) {
+        //    // This region is not already in the filter.  Consider it for selection by the user.
+        //    numericIndexForMap = this.globalState.MapIndexForUSState(twoLetterID);
+        //    countForThisRegion = this.distributionToShow.count.length > numericIndexForMap? this.distributionToShow.count[numericIndexForMap] : 0;
+        //    if (countForThisRegion > 0) {
+        //          oneFacetDetail = new FacetDetail();
+        //          oneFacetDetail.ID = twoLetterID;
+        //          oneFacetDetail.value = readableName;
+        //          oneFacetDetail.count = countForThisRegion;
+        //          this.regionUSStateInsideMapFacets.push(oneFacetDetail);
+        //    }
+        //}
+        // New way that keeps items in the list even if already in the filter, but allows user to toggle on/off an item that is already in the filter, instead of hiding it from the list:
+        // Consider region for selection by the user (noting that it may already be in the filter) 
+        numericIndexForMap = this.globalState.MapIndexForUSState(twoLetterID);
+        countForThisRegion = this.distributionToShow.count.length > numericIndexForMap? this.distributionToShow.count[numericIndexForMap] : 0;
+        if (countForThisRegion > 0) {
+            oneFacetDetail = new FacetDetail();
+            oneFacetDetail.ID = twoLetterID;
+            oneFacetDetail.active = this.distributionToShow.regionIDsAlreadyInFilter != null && 
+              this.distributionToShow.regionIDsAlreadyInFilter.indexOf(twoLetterID) != -1; // set active to true if this region is already in the filter, false otherwise
+            oneFacetDetail.value = readableName;
+            oneFacetDetail.count = countForThisRegion;
+            this.regionUSStateInsideMapFacets.push(oneFacetDetail);
         }
     }
 
-    private initializeListOfRegions() {
+    private initializeListOfRegions() { // NOTE: caller assumed to have already checked that we have this.distributionToShow to work with
         this.regionUSStateInsideMapFacets = [];
-        if (this.distributionToShow == null || this.distributionToShow.count == null)
-            return; // do nothing further without a distribution
 
         // In alphabetic order by full US state (or D.C.) name, create the list for entries that have non-zero counts.  Leave off those with zero counts.
         this.considerRegionForList("Alabama", "AL");
@@ -474,21 +492,43 @@ export class USMapComponent implements OnChanges {
     }
 
     toggleRegionUSStateFacet(chosenFacet: FacetDetail) {
-      this.onMapClick(chosenFacet.ID);
+      // Unlike a map click which only turns on a region if it is not already in the filter, for the list of regions, 
+      // allow user to toggle on/off an item that is already in the filter.
+        if (this.distributionToShow == null || this.distributionToShow.count == null)
+            return; // do nothing without a distribution
+
+        var regionAcronym: string = chosenFacet.ID;
+        if ((this.distributionToShow.regionIDsAlreadyInFilter == null) ||
+            this.distributionToShow.regionIDsAlreadyInFilter.indexOf(regionAcronym) == -1) {
+            // This particular region is not already in the filter, so toggle it on:
+            var numericIndexForMap:number = this.globalState.MapIndexForUSState(regionAcronym); // use 12 instead of "HI"
+            if (this.distributionToShow.count.length > numericIndexForMap && this.distributionToShow.count[numericIndexForMap] > 0) {
+                this.myUSMapManagerService.makeNoteOfClickedRegionID(regionAcronym, true);
+            }
+        }
+        else {
+            // This particular region is already in the filter, so toggle it off:
+            this.myUSMapManagerService.makeNoteOfRegionIDToClear(regionAcronym);
+        }
+
     }
 
     onMapClick(regionAcronym: string) {
+        this.myUSMapManagerService.clearRegionIDToFocus(); // on map click forget what is being done with list clicks as focus can now be on the map or elsewhere
         if (this.distributionToShow == null || this.distributionToShow.count == null)
-            return; // do nothing without a distribution
+            return; // do nothing else without a distribution
 
         if ((this.distributionToShow.regionIDsAlreadyInFilter == null) ||
             this.distributionToShow.regionIDsAlreadyInFilter.indexOf(regionAcronym) == -1) {
             // This particular region is not already in the filter, so make note of a click on it.
             var numericIndexForMap:number = this.globalState.MapIndexForUSState(regionAcronym); // use 12 instead of "HI"
             if (this.distributionToShow.count.length > numericIndexForMap && this.distributionToShow.count[numericIndexForMap] > 0) {
-                this.myUSMapManagerService.makeNoteOfClickedRegionID(regionAcronym);
+                this.myUSMapManagerService.makeNoteOfClickedRegionID(regionAcronym, false);
             }
         }
+        // NOTE: if the region is already in the filter, do nothing on a map click, i.e., do not toggle it off.  
+        // This is because the map is meant to be a way to turn on regions, but not turn them off.  
+        // The text list of regions is meant to be a way to toggle on/off regions, as well as the filter buttons in its own UI area.
     }
 
     toggleMapTextDetailDisplay() {

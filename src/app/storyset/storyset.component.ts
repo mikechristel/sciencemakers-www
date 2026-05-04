@@ -1,8 +1,7 @@
-﻿﻿// 2026 NOTE with Angular 21 update and especially update of Grid/List/Map to a radiogroup for accessibility improvement:
+﻿// 2026 NOTE with Angular 21 update and especially update of Grid/List/Map to a radiogroup for accessibility improvement:
 // instead of two booleans, cardView and textView, now have one viewStateSignal that is one of AsGrid, AsList, AsMap.
 
 import { Component, OnInit, ElementRef, inject, viewChild, ChangeDetectorRef, signal } from '@angular/core';
-
 import { takeUntil } from "rxjs/operators";
 
 import { ActivatedRoute, Router, Params } from '@angular/router';
@@ -24,7 +23,7 @@ import { Facets } from '../historymakers/facets';
 import { FacetDetail, FacetFamilyContainer } from '../historymakers/facet-detail';
 import { StoryFilterFamilyType, StoryFilterFamilyTypeCount, StoryFacetWithFamily } from './storyfilterfamily-type';
 
-import { GlobalState, ViewState } from '../app.global-state';
+import { GlobalState, ViewState, Nullable } from '../app.global-state';
 import { environment } from '../../environments/environment';
 import { Playlist } from '../playlist-manager/playlist';
 
@@ -55,32 +54,32 @@ import { SearchFormComponent } from '../shared/search-form/search-form.component
 })
 export class StorySetComponent extends BaseComponent implements OnInit {
 
-  // Assign enum ViewState to a property to make it accessible in the html template (e.g., to use AsGrid, AsText, AsMap instead of 1, 2, 3 in the html)
-  protected readonly MyViewState = ViewState;
+    // Assign enum ViewState to a property to make it accessible in the html template (e.g., to use AsGrid, AsText, AsMap instead of 1, 2, 3 in the html)
+    protected readonly MyViewState = ViewState;
 
-  private route = inject(ActivatedRoute);
-  private router = inject(Router);
-  globalState = inject(GlobalState);
-  private historyMakerService = inject(HistoryMakerService);
-  private textSearchService = inject(TextSearchService);
-  private idSearchService = inject(IDSearchService);
-  private tagService = inject(TagService);
-  private titleManagerService = inject(TitleManagerService);
-  private userSettingsManagerService = inject(UserSettingsManagerService);
-  private searchFormService = inject(SearchFormService);
-  private biographyStorySetService = inject(BiographyStorySetService);
-  private liveAnnouncer = inject(LiveAnnouncer);
-  private myUSMapManagerService = inject(USMapManagerService);
-  private playlistManagerService = inject(PlaylistManagerService);
+    private route = inject(ActivatedRoute);
+    private router = inject(Router);
+    globalState = inject(GlobalState);
+    private historyMakerService = inject(HistoryMakerService);
+    private textSearchService = inject(TextSearchService);
+    private idSearchService = inject(IDSearchService);
+    private tagService = inject(TagService);
+    private titleManagerService = inject(TitleManagerService);
+    private userSettingsManagerService = inject(UserSettingsManagerService);
+    private searchFormService = inject(SearchFormService);
+    private biographyStorySetService = inject(BiographyStorySetService);
+    private liveAnnouncer = inject(LiveAnnouncer);
+    private myUSMapManagerService = inject(USMapManagerService);
+    private playlistManagerService = inject(PlaylistManagerService);
 
-  private changeDetectorRef = inject(ChangeDetectorRef);
+    private changeDetectorRef = inject(ChangeDetectorRef);
 
-  readonly radioGroup1_Map = viewChild<ElementRef>('rg1Map');
-  readonly radioGroup1_Text = viewChild<ElementRef>('rg1Text');
-  readonly radioGroup1_Pic = viewChild<ElementRef>('rg1Pic');
-  readonly radioGroup2_Map = viewChild<ElementRef>('rg2Map');
-  readonly radioGroup2_Text = viewChild<ElementRef>('rg2Text');
-  readonly radioGroup2_Pic = viewChild<ElementRef>('rg2Pic');
+    readonly radioGroup1_Map = viewChild<ElementRef>('rg1Map');
+    readonly radioGroup1_Text = viewChild<ElementRef>('rg1Text');
+    readonly radioGroup1_Pic = viewChild<ElementRef>('rg1Pic');
+    readonly radioGroup2_Map = viewChild<ElementRef>('rg2Map');
+    readonly radioGroup2_Text = viewChild<ElementRef>('rg2Text');
+    readonly radioGroup2_Pic = viewChild<ElementRef>('rg2Pic');
 
     readonly MAX_REGION_US_STATES_TO_SHOW_IN_FILTER_AREA:number = 10; // need data from all 50+DC for map view, but don't show all 51, just the top N
 
@@ -92,13 +91,15 @@ export class StorySetComponent extends BaseComponent implements OnInit {
     viewStateSignal = signal<ViewState>(ViewState.AsGrid); // defaults to grid view; never is undefined (all view states mean something)
 
     signalFocusToStoryID: number = -1;
+
+    signalFocusToRegionListItemID: string = ""; // used to signal which region in the list of regions inside a map component should get focus 
+
     signalFocusToRemoveFilterButtonIndicator: number = -1;
-    signalFocusToFirstShownFamily: boolean[];
     signalFocusToPageOne: boolean = false;
     signalFocusToFinalPage: boolean = false;
     signalFocusToCloseFilterButton: boolean = false;
     signalFocusToOpenFilterButton: boolean = false;
-    signalFocusToTitle: boolean; // is used in html rendering of this component
+    signalFocusToTitle: boolean = false; // is used in html rendering of this component
 
     // !!!TBD!!! REVISIT how to signal where focus should go after contents are all refreshed.
     private pending_storyFilterFamily: StoryFilterFamilyType = StoryFilterFamilyType.None;
@@ -109,32 +110,31 @@ export class StorySetComponent extends BaseComponent implements OnInit {
     private pending_focusOnFinalPageButton: boolean = false;
     private pending_focusOnCloseFilterButton: boolean = false;
     private pending_focusOnOpenFilterButton: boolean = false;
+    private pending_focusIntoMapRegionList: boolean = false;
 
-    myID: number;
-    myFullNameAddOn: string;
-    myCurrentQuery: string;
-    myCurrentSearchTitleOnlyFlag: boolean;
-    myCurrentSearchTranscriptOnlyFlag: boolean;
-    myCurrentSearchParentBiographyID: number;
-    myCurrentSearchParentAccession: string;
+    myCurrentQuery: Nullable<string> = null;
+    myCurrentSearchTitleOnlyFlag: boolean = false;
+    myCurrentSearchTranscriptOnlyFlag: boolean = false;
+    myCurrentSearchParentBiographyID: number = this.globalState.NOTHING_CHOSEN;
+    myCurrentSearchParentAccession: string = "";
     myCurrentSearchParentPreferredName: string = ""; // gets filled in perhaps by a service if we get a myCurrentSearchParentAccession
     myCurrentTitleForTextSearchPending: boolean = false; // used when negotiating use of 2 services filling out pieces of title (see myCurrentSearchParentPreferredName)
-    myCurrentInterviewYearRangeFilter: string;
+    myCurrentInterviewYearRangeFilter: Nullable<string> = null;
     myCurrentPage: number = 1;
     myCurrentFilterSpec: string = "";
 
     public myCurrentPageSize: number;
     public myModelledPageSize: number;
 
-    totalStoriesFoundSuffix: string;
-    myStoryList: Story[];
-    totalStoriesFound: number; // a count that may be more than the "kept" page of stories in myStoryList
-    fullResultSetTitleSuffix: string; // cached information about the full result set used in constructing title
+    totalStoriesFoundSuffix: Nullable<string> = null;
+    myStoryList: Nullable<Story[]> = null;
+    totalStoriesFound: number = 0; // a count that may be more than the "kept" page of stories in myStoryList
+    fullResultSetTitleSuffix: string = ""; // cached information about the full result set used in constructing title
 
-    USStateDistribution: USMapDistribution;
+    USStateDistribution: Nullable<USMapDistribution> = null;
 
     myType: StorySetType = StorySetType.None; // gets assigned in ngOnInit via router params
-    transcriptQueryContext: string = null; // gets assigned in ngOnInit via router params
+    transcriptQueryContext: Nullable<string> = null; // gets assigned in ngOnInit via router params
 
     pages: number[] = [];
     lastPageInSet: number = 0;
@@ -145,40 +145,34 @@ export class StorySetComponent extends BaseComponent implements OnInit {
 
     showingMyClipsSet: boolean = false; // needed to gate extra UI for "my clips" marked set of stories
 
-    myClips: Playlist[];
-
-    toggleDetailsLabel: string;
-
-    selectedStoryID: number; // ID of the story, if any, that is selected in the story list
-    isSortableSet: boolean = false; // used to control visibility of sort options
+    myClips: Nullable<Playlist[]> = null;
 
     // NOTE: REVISIT THIS BECAUSE WE HAVE ASSUMPTIONS HERE ON EXACTLY 8 FACET GROUPS IN PARTICULAR FORMS.  MVC works for facets, but are not coded for extensibility at this point!!!
     // NOTE: facet groups are not the same for biographies and stories: with biographies there is a lastInitial facet for example.
     facetFamilies: FacetFamilyContainer[] = []; // initialized once, in constructor, so there is entry for each of the StoryFilterFamilyType values
     activeFacets: StoryFacetWithFamily[] = [];
 
-    // TODO: Later consider whether to have each story set type (my clips,  etc.) in its own component,
+    // TODO: Later consider whether to have each story set type (my clips, etc.) in its own component,
     // inheriting perhaps the base story set features of paging, titling, etc.  For now, all story sets except a single biography's story set
     // are here in this StorySet component.
-
-    // Another "particular" set of features for given ID lists:
     givenIDList: string = "";
 
     // Something just for given ID lists, an optional given title:
     givenIDListTitle: string = "";
 
     // Sorting
-    storySearchSortFields: StorySearchSortField[];
-    myCurrentStorySearchSorting: number; // indicator on the sorting in use
+    isSortableSet: boolean = false; // used to control visibility of sort options
+    storySearchSortFields: Nullable<StorySearchSortField[]> = null;
+    myCurrentStorySearchSorting: number = 0; // indicator on the sorting in use
 
     minYearAllowed: number;
 
-    showStoryUSStateFacetFilter: boolean;
-    showStoryOrganizationFacetFilter: boolean;
-    showStoryDecadeFacetFilter: boolean;
-    showStoryYearFacetFilter: boolean;
-    showStoryJobTypeFacetFilter: boolean;
-    showStoryDecadeOfBirthFacetFilter: boolean;
+    showStoryUSStateFacetFilter: boolean = false;
+    showStoryOrganizationFacetFilter: boolean = false;
+    showStoryDecadeFacetFilter: boolean = false;
+    showStoryYearFacetFilter: boolean = false;
+    showStoryJobTypeFacetFilter: boolean = false;
+    showStoryDecadeOfBirthFacetFilter: boolean = false;
 
     constructor() {
 
@@ -196,13 +190,17 @@ export class StorySetComponent extends BaseComponent implements OnInit {
         this.myCurrentPageSize = this.globalState.StoryPageSize;
         this.myModelledPageSize = this.myCurrentPageSize;
         this.totalStoriesFound = 0;
-        this.selectedStoryID = this.globalState.NOTHING_CHOSEN;
 
-        this.titleForStorySet = "HistoryMaker Story Set";
-        this.screenReaderSummaryTitle = "HistoryMaker Story Set";
+        this.titleForStorySet = "ScienceMaker Story Set";
+        this.screenReaderSummaryTitle = "ScienceMaker Story Set";
 
         myUSMapManagerService.clickedRegionID$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((value) => {
-            this.filterOnUSMapRegion(value);
+            this.filterOnUSMapRegion(value, false);
+            this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
+        });
+
+        myUSMapManagerService.regionIDToClear$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((value) => {
+            this.filterOnUSMapRegion(value, true);
             this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
         });
 
@@ -388,7 +386,7 @@ export class StorySetComponent extends BaseComponent implements OnInit {
             // nothing, and now closes, and there is not really a need for any fetch of different HistoryMakers because the criteria remained the same.
             // So, do NOT change the this.___ state of things yet (aside from this.showingFilterMenu):
             // first collect the "new" state of things for a comparison...
-            var newCurrentQuery: string = null;
+            var newCurrentQuery: Nullable<string> = null;
             var sortOrderChanged: boolean = false;
             var searchStoryTitleOnlyFlag: boolean = this.globalState.SearchTitleOnly;
             var searchStoryTranscriptOnlyFlag: boolean = this.globalState.SearchTranscriptOnly;
@@ -420,7 +418,7 @@ export class StorySetComponent extends BaseComponent implements OnInit {
 
             if (params['so'] !== undefined  && !isNaN(+params['so'])) {
                 var candidateSortOrder:number = +params['so'];
-                if (candidateSortOrder >= 0 && candidateSortOrder < this.storySearchSortFields.length) {
+                if (candidateSortOrder >= 0 && this.storySearchSortFields && candidateSortOrder < this.storySearchSortFields.length) {
                   sortOrderChanged = this.updateStorySearchSorting(candidateSortOrder);
                 }
             }
@@ -486,6 +484,7 @@ export class StorySetComponent extends BaseComponent implements OnInit {
                 this.myCurrentFilterSpec = newSpec;
 
                 this.myCurrentQuery = newCurrentQuery;
+
                 if (this.viewStateSignal() != anticipatedView)
                     this.viewStateSignal.set(anticipatedView);
 
@@ -551,11 +550,6 @@ export class StorySetComponent extends BaseComponent implements OnInit {
                                       this.myCurrentSearchParentPreferredName = "";
                                   }
                                   this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
-                                },
-                                error => {
-                                  // No biography details retrievable, so back out of getting a better label
-                                  this.myCurrentSearchParentPreferredName = "";
-                                  this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
                                 }
                             );
                         }
@@ -577,38 +571,34 @@ export class StorySetComponent extends BaseComponent implements OnInit {
     }
 
     private initializeUSStateCounts(addFilterPrefixToMapKey: boolean) {
-        var postedDistribution: USMapDistribution = new USMapDistribution();
-        postedDistribution.mapRegionListTitle = "U.S. State";
+        var keyTitle, keyEntitySingular, keyEntityPlural: string;
+        var count: number[];
+
         if (addFilterPrefixToMapKey) {
-            postedDistribution.keyTitle = "States Mentioned in Filtered Stories";
-            postedDistribution.keyEntitySingular = "filtered story";
-            postedDistribution.keyEntityPlural = "filtered stories";
+            keyTitle = "States Mentioned in Filtered Stories";
+            keyEntitySingular = "filtered story";
+            keyEntityPlural = "filtered stories";
         }
         else {
-            postedDistribution.keyTitle = "States Mentioned in Stories";
-            postedDistribution.keyEntitySingular = "story";
-            postedDistribution.keyEntityPlural = "stories";
+            keyTitle = "States Mentioned in Stories";
+            keyEntitySingular = "story";
+            keyEntityPlural = "stories";
         }
-        postedDistribution.verbLeadIn = "discuss";
-        postedDistribution.verbLeadInSingular = "discusses";
-        postedDistribution.verbPhrase = "Discussed in";
-        postedDistribution.keySuffix = "";
-        postedDistribution.exceptionDescription = null;
-        postedDistribution.keyEntitySetCount = 0; // update later when this.USStateDistribution region counts are updated
-        postedDistribution.count = [];
+        count = [];
         for (var i = 0; i <= 51; i++)
-            postedDistribution.count.push(0);
-        this.USStateDistribution = postedDistribution;
+            count.push(0);
+        this.USStateDistribution = new USMapDistribution(count, "U.S. State", 0, keyTitle, keyEntitySingular, keyEntityPlural, "", 
+            "discuss", "discusses", "Discussed in", null, ""); // update keyEntitySetCount (now 0) later when this.USStateDistribution region counts are updated
     }
 
-    thinToGivenPage(givenStories: Story[], givenPage: number, givenPageSize: number): Story[] {
-        var retSet:Story[] = givenStories;
-        if (retSet != null) {
-            // Possibly thin down based on the paging information.
+    thinToGivenPage(givenStories: Nullable<Story[]>, givenPage: number, givenPageSize: number): Nullable<Story[]> {
+        var retSet:Nullable<Story[]> = null;
+        if (givenStories != null) {
+            // Possibly thin down based on the paging information but always set retSet to a subset (or all of) givenStories.
 
             // Want to keep items 0 to givenSize - 1 if on page 1, givenSize to (givenSize*2) - 1 if on page 2, ...,
             // i.e., keeping items (givenPage - 1) * givenPageSize to (givenPage * givenPageSize) - 1
-            if (givenPage < 1 || (givenPage - 1) * givenPageSize >= retSet.length)
+            if (givenPage < 1 || (givenPage - 1) * givenPageSize >= givenStories.length)
                 retSet = null; // clear out results - page data invalid or is past the number of results we have
             else {
                 retSet = givenStories.slice((givenPage - 1) * givenPageSize, givenPage * givenPageSize);
@@ -628,8 +618,9 @@ export class StorySetComponent extends BaseComponent implements OnInit {
     public setViewOptionsInFilterMenu(eventCode: string, comingFromPicOption: boolean, comingFromTextOption: boolean) {
         if (comingFromPicOption) {
             // Next is text, back is map, current is pic grid.
-            if (eventCode == "ArrowDown" || eventCode == "ArrowRight")
+            if (eventCode == "ArrowDown" || eventCode == "ArrowRight") {
                 this.focusPicViewInFilterMenuOption(false, true); // set "text"
+            }
             else if (eventCode == "ArrowUp" || eventCode == "ArrowLeft")
                 this.focusPicViewInFilterMenuOption(false, false); // set "map"
             else if (eventCode == " " || eventCode == "Enter")
@@ -642,7 +633,7 @@ export class StorySetComponent extends BaseComponent implements OnInit {
             else if (eventCode == "ArrowUp" || eventCode == "ArrowLeft")
                 this.focusPicViewInFilterMenuOption(true, false); // set "pic"
             else if (eventCode == " " || eventCode == "Enter")
-                this.updateViewOptions(ViewState.AsText, true);
+                this.updateViewOptions(ViewState.AsText, false);
         }
         else {
             // Next is pic, back is text, current is map.
@@ -672,7 +663,7 @@ export class StorySetComponent extends BaseComponent implements OnInit {
             else if (eventCode == "ArrowUp" || eventCode == "ArrowLeft")
                 this.focusPicViewOption(true, false); // set "pic"
             else if (eventCode == " " || eventCode == "Enter")
-                this.updateViewOptions(ViewState.AsText, true);
+                this.updateViewOptions(ViewState.AsText, false);
         }
         else {
             // Next is pic, back is text, current is map.
@@ -766,7 +757,6 @@ export class StorySetComponent extends BaseComponent implements OnInit {
               if (this.givenIDListTitle.length == 0)
                 titleLabelStoryModifier += "\"Story Set\"";
             }
-            this.selectedStoryID = this.globalState.NOTHING_CHOSEN; // assume we have no stories so no selected stories
             this.totalStoriesFound = 0; // typically is reassigned later with a service subscription
 
             this.idSearchService.getIDSearch(IDListToLoad, givenPage, givenPageSize,
@@ -838,46 +828,60 @@ export class StorySetComponent extends BaseComponent implements OnInit {
     private setFocusAsNeeded() {
         var focusSetElsewhere: boolean = false;
 
-        if (this.pending_focusOnPageOneButton) {
-            this.signalFocusToPageOne = true;
-            focusSetElsewhere = true;
+        if (this.pending_focusIntoMapRegionList) {
+            // Check on focus within the map's list of regions.
+            this.signalFocusToRegionListItemID = this.myUSMapManagerService.currentRegionIDToFocus();
+            if (this.signalFocusToRegionListItemID && this.signalFocusToRegionListItemID.length > 0) {
+                focusSetElsewhere = true; // will focus to region list item within the map UI  
+            } 
         }
-        else if (this.pending_focusOnFinalPageButton) {
-            this.signalFocusToFinalPage = true;
-            focusSetElsewhere = true;
-        }
-        else if (this.pending_focusOnCloseFilterButton) {
-            this.signalFocusToCloseFilterButton = true;
-            focusSetElsewhere = true;
-        }
-        else if (this.pending_focusOnOpenFilterButton) {
-            this.signalFocusToOpenFilterButton = true;
-            focusSetElsewhere = true;
-        }
-        else if (this.pending_removeFilterButtonIndicator >= 0 &&
-            this.hasActiveFacet()) {
-            if (this.pending_removeFilterButtonIndicator >= this.activeFacets.length)
-                this.signalFocusToRemoveFilterButtonIndicator = this.activeFacets.length - 1;
-            else
-                this.signalFocusToRemoveFilterButtonIndicator = this.pending_removeFilterButtonIndicator;
-            focusSetElsewhere = true;
-        }
-        else if (this.pending_focusToFirstShownFilterFamily) {
-            for (var i = 0; i < StoryFilterFamilyTypeCount; i++) {
-                if (this.facetFamilies[i].isAllowedToBeShown && this.facetFamilies[i].facets && this.facetFamilies[i].facets.length > 0) {
-                    // Found one to focus!  Set its flag.
-                    this.facetFamilies[i].signalFocusToFamilyParent = true;
-                    focusSetElsewhere = true;
-                    break; // focus on first one only, of course, so break out of loop
+        else
+            this.signalFocusToRegionListItemID = ""; // clear any prior signal to focus to region list item because something else will be focused on instead
+
+        if (!focusSetElsewhere) {
+            if (this.pending_focusOnPageOneButton) {
+                this.signalFocusToPageOne = true;
+                focusSetElsewhere = true;
+            }
+            else if (this.pending_focusOnFinalPageButton) {
+                this.signalFocusToFinalPage = true;
+                focusSetElsewhere = true;
+            }
+            else if (this.pending_focusOnCloseFilterButton) {
+                this.signalFocusToCloseFilterButton = true;
+                focusSetElsewhere = true;
+            }
+            else if (this.pending_focusOnOpenFilterButton) {
+                this.signalFocusToOpenFilterButton = true;
+                focusSetElsewhere = true;
+            }
+            else if (this.pending_removeFilterButtonIndicator >= 0 &&
+                this.hasActiveFacet()) {
+                if (this.pending_removeFilterButtonIndicator >= this.activeFacets.length)
+                    this.signalFocusToRemoveFilterButtonIndicator = this.activeFacets.length - 1;
+                else
+                    this.signalFocusToRemoveFilterButtonIndicator = this.pending_removeFilterButtonIndicator;
+                focusSetElsewhere = true;
+            }
+            else if (this.pending_focusToFirstShownFilterFamily) {
+                var facetFamilyLengthCheck: number;
+                for (var i = 0; i < StoryFilterFamilyTypeCount; i++) {
+                    facetFamilyLengthCheck = this.facetFamilies[i].facets?.length ?? 0;  // if facets for index i null or undefined, treat as length of 0 for this check
+                    if (this.facetFamilies[i].isAllowedToBeShown && facetFamilyLengthCheck > 0) {
+                        // Found one to focus!  Set its flag.
+                        this.facetFamilies[i].signalFocusToFamilyParent = true;
+                        focusSetElsewhere = true;
+                        break; // focus on first one only, of course, so break out of loop
+                    }
                 }
             }
-        }
-        else if (this.pending_storyFilterFamily != StoryFilterFamilyType.None &&
-          this.pending_storyFilterValue != "") {
-            // Signal that the filter within this family with value pending_storyFilterValue is to be focused.
-            this.facetFamilies[this.pending_storyFilterFamily].signalItemToFocus = this.pending_storyFilterValue;
+            else if (this.pending_storyFilterFamily != StoryFilterFamilyType.None &&
+            this.pending_storyFilterValue != "") {
+                // Signal that the filter within this family with value pending_storyFilterValue is to be focused.
+                this.facetFamilies[this.pending_storyFilterFamily].signalItemToFocus = this.pending_storyFilterValue;
 
-            focusSetElsewhere = true;
+                focusSetElsewhere = true;
+            }
         }
 
         // Check on scroll and focus to selected story item once everything is set up, but only do focus/scroll action
@@ -923,21 +927,14 @@ export class StorySetComponent extends BaseComponent implements OnInit {
         this.pending_focusToFirstShownFilterFamily = false;
         this.pending_storyFilterFamily = StoryFilterFamilyType.None;
         this.pending_storyFilterValue = "";
+        this.pending_focusIntoMapRegionList = false;
     }
 
     private computeFacetArguments(filterSpecToUse: string): SearchableFacetSpecifier {
         // Very specific helper function, where given argument is a dash-separated N-value list with N == SearchableFacetSpecifier.FACET_COUNT if not empty
         // for gender, maker, job, birth decade, region (U.S. state), organization facet specifications, etc.  If given argument does not parse as such or is empty,
         // return an empty SearchableFacetSpecifier with all fields set to "".
-        var retVal: SearchableFacetSpecifier = new SearchableFacetSpecifier();
-        retVal.genderFacetSpec = ""; // default each individual spec to empty
-        retVal.makerFacetSpec = "";
-        retVal.jobFacetSpec = "";
-        retVal.birthDecadeFacetSpec = "";
-        retVal.regionUSStateFacetSpec = "";
-        retVal.organizationFacetSpec = "";
-        retVal.namedDecadeFacetSpec = "";
-        retVal.namedYearFacetSpec = "";
+        var retVal: SearchableFacetSpecifier = new SearchableFacetSpecifier("", "", "", "", "", "", "", ""); // default each individual spec to empty
 
         if (filterSpecToUse.length > 0) {
             var filterPieces: string[] = filterSpecToUse.split("-");
@@ -1010,7 +1007,7 @@ export class StorySetComponent extends BaseComponent implements OnInit {
 
         this.myCurrentTitleForTextSearchPending = true;
         this.titleForStorySet = "Searching... (in progress)";
-        this.screenReaderSummaryTitle = "HistoryMaker Story Set, Search Pending";
+        this.screenReaderSummaryTitle = "ScienceMaker Story Set, Search Pending";
 
         // NOTE:  assumes range for givenPage is legal: [1, maxPagesNeeded].
         // Assumes myCurrentQuery are set appropriately to do the query as expected.
@@ -1028,12 +1025,10 @@ export class StorySetComponent extends BaseComponent implements OnInit {
         var sortField:string = ""; // empty string will result in no sort field being used
         var sortInDescendingOrder: boolean = false; // actually will be ignored with an empty sortField
 
-        if (this.globalState.StorySearchSortingPreference >= 0 && this.globalState.StorySearchSortingPreference < this.storySearchSortFields.length) {
+        if (this.globalState.StorySearchSortingPreference >= 0 && this.storySearchSortFields && this.globalState.StorySearchSortingPreference < this.storySearchSortFields.length) {
             sortField = this.storySearchSortFields[this.globalState.StorySearchSortingPreference].sortField;
             sortInDescendingOrder = this.storySearchSortFields[this.globalState.StorySearchSortingPreference].sortInDescendingOrder;
         }
-
-        this.selectedStoryID = this.globalState.NOTHING_CHOSEN; // assume we have no stories so no selected stories
 
         this.textSearchService.getTextSearch(this.myCurrentQuery, this.myCurrentInterviewYearRangeFilter, this.myCurrentSearchParentBiographyID,
             this.myCurrentSearchTitleOnlyFlag, this.myCurrentSearchTranscriptOnlyFlag, givenPage, givenPageSize,
@@ -1070,18 +1065,13 @@ export class StorySetComponent extends BaseComponent implements OnInit {
             // Finally, focus can be set because we have our context and content.
             this.setFocusAsNeeded();
             this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
-          },
-          error => {
-              // TODO: Decide if further error logging/analytics is desired on fail-to-load cases like this
-              this.setInterfaceForEmptyStorySet(givenPageSize, "");
-              this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
-        });
+          });
     }
 
     private readableStringForInterviewYearRange(): string {
         // Use this.myCurrentInterviewYearRangeFilter to determine a readable interview date range.  If not possible, return "".
         var retVal: string = "";
-        if (this.myCurrentInterviewYearRangeFilter.length == 9 && this.myCurrentInterviewYearRangeFilter[4] == "-") {
+        if (this.myCurrentInterviewYearRangeFilter && this.myCurrentInterviewYearRangeFilter.length == 9 && this.myCurrentInterviewYearRangeFilter[4] == "-") {
             // Have xxxx-xxxx as expected.  If each xxxx parses to a valid date, output an appropriate string.
             var earlyYear: number = 0;
             var lateYear: number = 0;
@@ -1119,7 +1109,7 @@ export class StorySetComponent extends BaseComponent implements OnInit {
               givenFacetSpecifier.namedDecadeFacetSpec.length != 0 || givenFacetSpecifier.namedYearFacetSpec.length != 0));
     }
 
-    private processFacetsFromService(totalCount: number, returnedFacets: StoryFacets, givenFacetSpec: SearchableFacetSpecifier) {
+    private processFacetsFromService(totalCount: number, returnedFacets: Nullable<StoryFacets>, givenFacetSpec: Nullable<SearchableFacetSpecifier>) {
         var i: number;
 
         for (i = 0; i < StoryFilterFamilyTypeCount; i++)
@@ -1140,7 +1130,8 @@ export class StorySetComponent extends BaseComponent implements OnInit {
                 oneFacet.ID = this.globalState.FEMALE_ID;
                 oneFacet.count = returnedFacets.gender[i].count;
                 if (givenFacetSpec.genderFacetSpec == "F") oneFacet.active = true;
-                this.facetFamilies[StoryFilterFamilyType.Gender].facets.push(oneFacet);
+                if (this.facetFamilies[StoryFilterFamilyType.Gender].facets) // will always succeed since we start off with empty facet lists [] across all, but put in to reduce typescript warnings
+                    this.facetFamilies[StoryFilterFamilyType.Gender].facets.push(oneFacet);
             }
             else if (returnedFacets.gender[i].value == "M") {
                 oneFacet = new FacetDetail();
@@ -1148,7 +1139,8 @@ export class StorySetComponent extends BaseComponent implements OnInit {
                 oneFacet.ID = this.globalState.MALE_ID;
                 oneFacet.count = returnedFacets.gender[i].count;
                 if (givenFacetSpec.genderFacetSpec == "M") oneFacet.active = true;
-                this.facetFamilies[StoryFilterFamilyType.Gender].facets.push(oneFacet);
+                if (this.facetFamilies[StoryFilterFamilyType.Gender].facets) // will always succeed since we start off with empty facet lists [] across all, but put in to reduce typescript warnings
+                    this.facetFamilies[StoryFilterFamilyType.Gender].facets.push(oneFacet);
             }
         }
         // Handle maker:
@@ -1160,7 +1152,8 @@ export class StorySetComponent extends BaseComponent implements OnInit {
             oneFacet.value = this.historyMakerService.getMaker(oneFacet.ID); // value is the readable string
             if (makerIDsInFilter.indexOf(oneFacet.ID.toString()) !== -1)
                 oneFacet.active = true;
-            this.facetFamilies[StoryFilterFamilyType.Category].facets.push(oneFacet);
+            if (this.facetFamilies[StoryFilterFamilyType.Category].facets) // will always succeed since we start off with empty facet lists [] across all, but put in to reduce typescript warnings
+                this.facetFamilies[StoryFilterFamilyType.Category].facets.push(oneFacet);
         }
         // Handle job type:
         var jobIDsInFilter: string[] = givenFacetSpec.jobFacetSpec.split(",");
@@ -1171,7 +1164,8 @@ export class StorySetComponent extends BaseComponent implements OnInit {
             oneFacet.value = this.historyMakerService.getJobType(oneFacet.ID); // value is the readable string
             if (jobIDsInFilter.indexOf(oneFacet.ID.toString()) !== -1)
                 oneFacet.active = true;
-            this.facetFamilies[StoryFilterFamilyType.JobType].facets.push(oneFacet);
+            if (this.facetFamilies[StoryFilterFamilyType.JobType].facets) // will always succeed since we start off with empty facet lists [] across all, but put in to reduce typescript warnings
+                this.facetFamilies[StoryFilterFamilyType.JobType].facets.push(oneFacet);
         }
         // Handle birth decade:
         var birthDecadesInFilter: string[] = givenFacetSpec.birthDecadeFacetSpec.split(",");
@@ -1182,7 +1176,8 @@ export class StorySetComponent extends BaseComponent implements OnInit {
             oneFacet.value = "Born in " + returnedFacets.birthYear[i].value + "s"; // value is "Born in " and then the year value with "s" at end to convey a decade, e.g., Born in 1950s for 1950 value
             if (birthDecadesInFilter.indexOf(oneFacet.ID.toString()) !== -1)
                 oneFacet.active = true;
-            this.facetFamilies[StoryFilterFamilyType.DecadeOfBirth].facets.push(oneFacet);
+            if (this.facetFamilies[StoryFilterFamilyType.DecadeOfBirth].facets) // will always succeed since we start off with empty facet lists [] across all, but put in to reduce typescript warnings
+                this.facetFamilies[StoryFilterFamilyType.DecadeOfBirth].facets.push(oneFacet);
         }
         // Handle region (U.S. state), and also use this information to initialize this.USStateDistribution.count values across the regions (50 states plus DC)
         var regionCount: number[] = [];
@@ -1200,12 +1195,14 @@ export class StorySetComponent extends BaseComponent implements OnInit {
 
             if (regionUSStateIDsInFilter.indexOf(oneFacet.ID) !== -1)
                 oneFacet.active = true;
-            if (this.facetFamilies[StoryFilterFamilyType.StateInStory].facets.length < this.MAX_REGION_US_STATES_TO_SHOW_IN_FILTER_AREA)
+            if (this.facetFamilies[StoryFilterFamilyType.StateInStory].facets && this.facetFamilies[StoryFilterFamilyType.StateInStory].facets.length < this.MAX_REGION_US_STATES_TO_SHOW_IN_FILTER_AREA)
                 this.facetFamilies[StoryFilterFamilyType.StateInStory].facets.push(oneFacet);
         }
-        this.USStateDistribution.keyEntitySetCount = totalCount;
-        this.USStateDistribution.count = regionCount;
-        this.USStateDistribution.regionIDsAlreadyInFilter = givenFacetSpec.regionUSStateFacetSpec.trim();
+        if (this.USStateDistribution) {
+            this.USStateDistribution.keyEntitySetCount = totalCount;
+            this.USStateDistribution.count = regionCount;
+            this.USStateDistribution.regionIDsAlreadyInFilter = givenFacetSpec.regionUSStateFacetSpec.trim();
+        }
 
         // Handle organization, but only keep as a facet if at least 2+ stories name the organization.  This assumes
         // returnedFacets.entityOrganizations sorted by descending count values.
@@ -1218,7 +1215,8 @@ export class StorySetComponent extends BaseComponent implements OnInit {
             oneFacet.value = this.historyMakerService.getOrganizationName(oneFacet.ID); // value is the readable string
             if (orgsInFilter.indexOf(oneFacet.ID) !== -1)
                 oneFacet.active = true;
-            this.facetFamilies[StoryFilterFamilyType.Organization].facets.push(oneFacet);
+            if (this.facetFamilies[StoryFilterFamilyType.Organization].facets) // will always succeed since we start off with empty facet lists [] across all, but put in to reduce typescript warnings
+                this.facetFamilies[StoryFilterFamilyType.Organization].facets.push(oneFacet);
         }
         // Handle namedDecade (a decade reference/name in the story):
         var namedDecadesInFilter: string[] = givenFacetSpec.namedDecadeFacetSpec.split(",");
@@ -1229,7 +1227,8 @@ export class StorySetComponent extends BaseComponent implements OnInit {
             oneFacet.value = returnedFacets.entityDecades[i].value + "s"; // value is the year value with "s" at end to convey a decade, e.g., 1950s for 1950 value
             if (namedDecadesInFilter.indexOf(oneFacet.ID.toString()) !== -1)
                 oneFacet.active = true;
-            this.facetFamilies[StoryFilterFamilyType.DecadeInStory].facets.push(oneFacet);
+            if (this.facetFamilies[StoryFilterFamilyType.DecadeInStory].facets) // will always succeed since we start off with empty facet lists [] across all, but put in to reduce typescript warnings
+                this.facetFamilies[StoryFilterFamilyType.DecadeInStory].facets.push(oneFacet);
         }
         // Handle namedYear (a year reference/name in the story):
         var namedYearsInFilter: string[] = givenFacetSpec.namedYearFacetSpec.split(",");
@@ -1240,7 +1239,8 @@ export class StorySetComponent extends BaseComponent implements OnInit {
             oneFacet.value = returnedFacets.entityYears[i].value.toString(); // value is the year as is, e.g., "1961" for 1961
             if (namedYearsInFilter.indexOf(oneFacet.ID.toString()) !== -1)
                 oneFacet.active = true;
-            this.facetFamilies[StoryFilterFamilyType.YearInStory].facets.push(oneFacet);
+            if (this.facetFamilies[StoryFilterFamilyType.YearInStory].facets) // will always succeed since we start off with empty facet lists [] across all, but put in to reduce typescript warnings
+                this.facetFamilies[StoryFilterFamilyType.YearInStory].facets.push(oneFacet);
         }
 
         if (this.nonEmptyFacetSpecification(givenFacetSpec))
@@ -1250,7 +1250,7 @@ export class StorySetComponent extends BaseComponent implements OnInit {
     }
 
     private getTagSearchResultsPage(givenPage: number, givenPageSize: number) {
-        var tagIDsToSearch: string = this.myCurrentQuery;
+        var tagIDsToSearch: Nullable<string> = this.myCurrentQuery;
         var titleLabelStoryModifier: string = "";
         this.totalStoriesFound = 0; // service call fills this in after results fetched
 
@@ -1261,23 +1261,21 @@ export class StorySetComponent extends BaseComponent implements OnInit {
         titleLabelStoryModifier += "tagged";
 
         this.titleForStorySet = "Searching... (in progress)";
-        this.screenReaderSummaryTitle = "HistoryMaker Story Set, Search Pending";
+        this.screenReaderSummaryTitle = "ScienceMaker Story Set, Search Pending";
 
         var sortField:string = ""; // empty string will result in no sort field being used
         var sortInDescendingOrder: boolean = false; // actually will be ignored with an empty sortField
 
-        if (this.globalState.StorySearchSortingPreference >= 0 && this.globalState.StorySearchSortingPreference < this.storySearchSortFields.length) {
+        if (this.storySearchSortFields && this.globalState.StorySearchSortingPreference >= 0 && this.globalState.StorySearchSortingPreference < this.storySearchSortFields.length) {
             sortField = this.storySearchSortFields[this.globalState.StorySearchSortingPreference].sortField;
             sortInDescendingOrder = this.storySearchSortFields[this.globalState.StorySearchSortingPreference].sortInDescendingOrder;
         }
 
-        this.selectedStoryID = this.globalState.NOTHING_CHOSEN; // assume we have no stories so no selected stories
-
         this.tagService.getTags().pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(loadedTagTree => { // need to have tag tree loaded in order to be sure tag IDs/tag names are loaded
-                if (tagIDsToSearch.length > 0) {
-
-                  this.tagService.getTagSearch(tagIDsToSearch, givenPage, givenPageSize,
+                if (tagIDsToSearch && tagIDsToSearch.length > 0) {
+                  var confirmedTagsToSearch: string = tagIDsToSearch;
+                  this.tagService.getTagSearch(confirmedTagsToSearch, givenPage, givenPageSize,
                         searchableFacetSpec.genderFacetSpec, searchableFacetSpec.birthDecadeFacetSpec, searchableFacetSpec.makerFacetSpec,
                         searchableFacetSpec.jobFacetSpec, searchableFacetSpec.regionUSStateFacetSpec, searchableFacetSpec.organizationFacetSpec,
                         searchableFacetSpec.namedDecadeFacetSpec, searchableFacetSpec.namedYearFacetSpec, sortField, sortInDescendingOrder)
@@ -1293,30 +1291,19 @@ export class StorySetComponent extends BaseComponent implements OnInit {
                             this.initializeUSStateCounts(addFilterPrefixToMapKey);
 
                             this.isSortableSet = true; // allow sort interface on the tag-search result set
-                            this.calcTitleAndEnablePaging(givenPage, givenPageSize, titleLabelStoryModifier, " with tags: " + this.tagService.getTagNames(tagIDsToSearch));
+                            this.calcTitleAndEnablePaging(givenPage, givenPageSize, titleLabelStoryModifier, " with tags: " + this.tagService.getTagNames(confirmedTagsToSearch));
 
                             this.processFacetsFromService(this.totalStoriesFound, retSet.facets, searchableFacetSpec);
                             // Finally, focus can be set because we have our context and content.
                             this.setFocusAsNeeded();
                             this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
-                        },
-                        error => {
-                            // TODO: Decide if further error logging/analytics is desired on fail-to-load cases like this
-                            this.setInterfaceForEmptyStorySet(givenPageSize, "");
-                            this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
                         });
-
                 }
                 else {
                     this.myCurrentQuery = null;
                     this.setInterfaceForEmptyStorySet(givenPageSize, "No stories found (unknown tag IDs).");
                     this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
                 }
-            },
-            error => {
-                // TODO: Decide if further error logging/analytics is desired on fail-to-load cases like this
-                this.setInterfaceForEmptyStorySet(givenPageSize, "");
-                this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
             });
     }
 
@@ -1334,8 +1321,8 @@ export class StorySetComponent extends BaseComponent implements OnInit {
             this.screenReaderSummaryTitle = "Empty story set";
         }
         // NOTE: At request of our accessibility expert, a descriptive browser title is preferred over a shorter name without paging details,
-        // such as "HistoryMaker Story Set", so use the detailed title with suffix indicating "HistoryMaker Story Set".
-        this.titleManagerService.setTitle(this.titleForStorySet + " | HistoryMaker Story Set");
+        // such as "ScienceMaker Story Set", so use the detailed title with suffix indicating "ScienceMaker Story Set".
+        this.titleManagerService.setTitle(this.titleForStorySet + " | ScienceMaker Story Set");
         this.liveAnnouncer.announce(this.titleForStorySet); // NOTE: using LiveAnnouncer rather than aria-live tag on a heading element
 
         this.needToggleDetails = false;
@@ -1394,7 +1381,7 @@ export class StorySetComponent extends BaseComponent implements OnInit {
                 if (this.showingMyClipsSet)
                     this.screenReaderSummaryTitle = "My Clips";
                 else
-                    this.screenReaderSummaryTitle = "Empty HistoryMaker Story Set";
+                    this.screenReaderSummaryTitle = "Empty ScienceMaker Story Set";
             }
             else {
                 if (this.totalStoriesFound > this.myCurrentPage * this.myCurrentPageSize) {
@@ -1411,14 +1398,14 @@ export class StorySetComponent extends BaseComponent implements OnInit {
                 if (this.showingMyClipsSet)
                     this.screenReaderSummaryTitle = "My Clips";
                 else
-                    this.screenReaderSummaryTitle = "HistoryMaker Story Set";
+                    this.screenReaderSummaryTitle = "ScienceMaker Story Set";
             }
         }
 
         // NOTE: At request of our accessibility expert, a descriptive browser title is preferred over a shorter name without paging details,
-        // such as "HistoryMaker Story Set", so use the detailed title with suffix indicating "HistoryMaker Story Set"
+        // such as "ScienceMaker Story Set", so use the detailed title with suffix indicating "ScienceMaker Story Set"
         // (despite some users wanting a short simple title).
-        this.titleManagerService.setTitle(this.titleForStorySet + " | HistoryMaker Story Set");
+        this.titleManagerService.setTitle(this.titleForStorySet + " | ScienceMaker Story Set");
         this.liveAnnouncer.announce(this.titleForStorySet); // NOTE: using LiveAnnouncer rather than aria-live tag on a heading element
     }
 
@@ -1540,7 +1527,7 @@ export class StorySetComponent extends BaseComponent implements OnInit {
         var IDToCheck: string;
 
         // First: Category
-        if (makerFacetSpec != null) {
+        if (makerFacetSpec != null && this.facetFamilies[StoryFilterFamilyType.Category].facets) {
             itemInCSVList = makerFacetSpec.split(",");
             for (i = 0; i < itemInCSVList.length; i++) {
                 IDToCheck = itemInCSVList[i];
@@ -1578,7 +1565,7 @@ export class StorySetComponent extends BaseComponent implements OnInit {
             }
         }
         // Third, U.S. State
-        if (regionUSStateFacetSpec != null) {
+        if (regionUSStateFacetSpec != null && this.facetFamilies[StoryFilterFamilyType.StateInStory].facets) {
             itemInCSVList = regionUSStateFacetSpec.split(",");
             for (i = 0; i < itemInCSVList.length; i++) {
                 IDToCheck = itemInCSVList[i];
@@ -1599,7 +1586,7 @@ export class StorySetComponent extends BaseComponent implements OnInit {
             }
         }
         // Fourth: Organization
-        if (organizationFacetSpec != null) {
+        if (organizationFacetSpec != null && this.facetFamilies[StoryFilterFamilyType.Organization].facets) {
             itemInCSVList = organizationFacetSpec.split(",");
             for (i = 0; i < itemInCSVList.length; i++) {
                 IDToCheck = itemInCSVList[i];
@@ -1620,7 +1607,7 @@ export class StorySetComponent extends BaseComponent implements OnInit {
             }
         }
         // Fifth: decade in story
-        if (namedDecadeFacetSpec != null) {
+        if (namedDecadeFacetSpec != null && this.facetFamilies[StoryFilterFamilyType.DecadeInStory].facets) {
             itemInCSVList = namedDecadeFacetSpec.split(",");
             for (i = 0; i < itemInCSVList.length; i++) {
                 IDToCheck = itemInCSVList[i];
@@ -1641,7 +1628,7 @@ export class StorySetComponent extends BaseComponent implements OnInit {
             }
         }
         // Sixth: year in story
-        if (namedYearFacetSpec != null) {
+        if (namedYearFacetSpec != null && this.facetFamilies[StoryFilterFamilyType.YearInStory].facets) {
             itemInCSVList = namedYearFacetSpec.split(",");
             for (i = 0; i < itemInCSVList.length; i++) {
                 IDToCheck = itemInCSVList[i];
@@ -1662,7 +1649,7 @@ export class StorySetComponent extends BaseComponent implements OnInit {
             }
         }
         // Seventh: job in story
-        if (jobFacetSpec != null) {
+        if (jobFacetSpec != null && this.facetFamilies[StoryFilterFamilyType.JobType].facets) {
             itemInCSVList = jobFacetSpec.split(",");
             for (i = 0; i < itemInCSVList.length; i++) {
                 IDToCheck = itemInCSVList[i];
@@ -1683,7 +1670,7 @@ export class StorySetComponent extends BaseComponent implements OnInit {
             }
         }
         // Eighth: decade of birth
-        if (birthDecadeFacetSpec != null) {
+        if (birthDecadeFacetSpec != null && this.facetFamilies[StoryFilterFamilyType.DecadeOfBirth].facets) {
             itemInCSVList = birthDecadeFacetSpec.split(",");
             for (i = 0; i < itemInCSVList.length; i++) {
                 IDToCheck = itemInCSVList[i];
@@ -1776,7 +1763,7 @@ export class StorySetComponent extends BaseComponent implements OnInit {
         // NOTE: filter-forced-update, ffu, is a new parameter added to force a contents refresh because the filter changed contents or
         // became empty and so regardless of any other changes, a contents refresh is demanded (by setting the ffu parameter).
         if (isFilterForcedUpdate)
-            moreParams['ffu'] = "1";
+        moreParams['ffu'] = "1";
 
         // Take care of some other typical arguments like page, page size, etc.
         moreParams['pg'] = pageToLoad;
@@ -1798,7 +1785,7 @@ export class StorySetComponent extends BaseComponent implements OnInit {
         if (currentView == ViewState.AsText)
             moreParams['tv'] = "1";
         else if (currentView == ViewState.AsMap)
-            moreParams['mv'] = "1";
+            moreParams['mv'] = "1"; // map view, i.e., 'mv'
         // else no parameters for the default of AsGrid view 
 
         // Based on this.myType and other context variables, set parameters used for routing/navigation.
@@ -1807,27 +1794,34 @@ export class StorySetComponent extends BaseComponent implements OnInit {
             // !!!TBD!!! TODO: revisit this code and similar routing "wiring up" in story.component.ts and elsewhere, to reduce details known across all component pages.
             if (this.myType == StorySetType.TextSearch) {
                 if (this.myCurrentQuery != null) {
-                    moreParams['q'] = this.globalState.cleanedQueryRouterParameter(this.myCurrentQuery);
-                    if (this.myCurrentSearchTitleOnlyFlag)
-                        moreParams['sT'] = "1";
-                    else
-                        moreParams['sT'] = "0";
-                    if (this.myCurrentSearchTranscriptOnlyFlag)
-                        moreParams['sS'] = "1";
-                    else
-                        moreParams['sS'] = "0";
-                    if (this.myCurrentSearchParentBiographyID != this.globalState.NOTHING_CHOSEN &&
-                      this.myCurrentSearchParentAccession != this.globalState.NO_ACCESSION_CHOSEN) {
-                        moreParams['ip'] = this.myCurrentSearchParentBiographyID;
-                        moreParams['ia'] = this.myCurrentSearchParentAccession;
+                    // NOTE:  since query is not null, cleanedQueryRouterParameter should not be null, either, but make the check explicit to reduce typescript warnings.
+                    var cleanedQuery: Nullable<string> = this.globalState.cleanedQueryRouterParameter(this.myCurrentQuery);
+                    if (cleanedQuery != null) {
+                        moreParams['q'] = cleanedQuery;
+                        if (this.myCurrentSearchTitleOnlyFlag)
+                            moreParams['sT'] = "1";
+                        else
+                            moreParams['sT'] = "0";
+                        if (this.myCurrentSearchTranscriptOnlyFlag)
+                            moreParams['sS'] = "1";
+                        else
+                            moreParams['sS'] = "0";
+                        if (this.myCurrentSearchParentBiographyID != this.globalState.NOTHING_CHOSEN &&
+                        this.myCurrentSearchParentAccession != this.globalState.NO_ACCESSION_CHOSEN) {
+                            moreParams['ip'] = this.myCurrentSearchParentBiographyID;
+                            moreParams['ia'] = this.myCurrentSearchParentAccession;
+                        }
+                        if (this.myCurrentInterviewYearRangeFilter != null && this.myCurrentInterviewYearRangeFilter.length > 0)
+                            moreParams['iy'] = this.myCurrentInterviewYearRangeFilter;
                     }
-                    if (this.myCurrentInterviewYearRangeFilter != null && this.myCurrentInterviewYearRangeFilter.length > 0)
-                        moreParams['iy'] = this.myCurrentInterviewYearRangeFilter;
                 }
             }
             else if (this.myType == StorySetType.TagSearch) {
                 if (this.myCurrentQuery != null) {
-                    moreParams['q'] = this.globalState.cleanedQueryRouterParameter(this.myCurrentQuery);
+                    // NOTE:  since query is not null, cleanedQueryRouterParameter should not be null, either, but make the check explicit to reduce typescript warnings.
+                    var cleanedQuery: Nullable<string> = this.globalState.cleanedQueryRouterParameter(this.myCurrentQuery);
+                    if (cleanedQuery != null) 
+                        moreParams['q'] = cleanedQuery;
                 }
             }
             else if (this.myType == StorySetType.GivenIDSet) {
@@ -1855,7 +1849,7 @@ export class StorySetComponent extends BaseComponent implements OnInit {
     updateStorySearchSorting(newSortingPreference: number): boolean {
         var isLegalChangeInSortSelection: boolean = false;
         // Returns true iff new sorting preference is legal and different from what is currently used.
-        if (newSortingPreference >= 0 && newSortingPreference < this.storySearchSortFields.length) {
+        if (this.storySearchSortFields && newSortingPreference >= 0 && newSortingPreference < this.storySearchSortFields.length) {
             // Legal value.  Check if different.
             if (newSortingPreference != this.globalState.StorySearchSortingPreference) {
                 isLegalChangeInSortSelection = true;
@@ -1914,7 +1908,7 @@ export class StorySetComponent extends BaseComponent implements OnInit {
         }
     }
 
-    goToPage(pageVal) {
+    goToPage(pageVal: number) {
         if (pageVal != this.myCurrentPage)
             this.routeToPage(pageVal, false);
     }
@@ -1923,19 +1917,19 @@ export class StorySetComponent extends BaseComponent implements OnInit {
         if (this.viewStateSignal() != ViewState.AsMap) {
             // Only if we are NOT in AsMap (map view) will page fetching actually take place.
             this.titleForStorySet = "Fetching Page " + newPageIdentifier + "... (in progress)";
-            this.screenReaderSummaryTitle = "HistoryMaker Story Set, Page Fetch Pending";
+            this.screenReaderSummaryTitle = "ScienceMaker Story Set, Page Fetch Pending";
             this.titleManagerService.setTitle(this.screenReaderSummaryTitle);
         }
 
         // Accumulate routing parameters specifying filter specification, page information, etc.
         this.setOptionsAndRouteToPage(filterPageSortPageSizeEtcForcedUpdate, newPageIdentifier,
-          this.myCurrentPageSize, false, -1, StoryFilterFamilyType.None, "", false, false);
+          this.myCurrentPageSize, false, -1, StoryFilterFamilyType.None, "", false, false, false);
     }
 
     private setOptionsAndRouteToPage(isFilterForcedUpdate: boolean, pageToLoad: number, pageSize: number,
       isClearActionFromRemoveFilterButton: boolean, whichRemoveFilterButtonToFocus: number,
       focusWithinFilterFamily: StoryFilterFamilyType, focusValueWithinFilterFamily: string,
-      focusOnCloseOutFilterInterface: boolean, focusOnOpenUpFilterInterface: boolean) {
+      focusOnCloseOutFilterInterface: boolean, focusOnOpenUpFilterInterface: boolean, focusIntoMapRegionList: boolean) {
       // OLD: just storySetTypeIndicator: StorySetType, newPageIdentifier: number, isFilterPageSortSizeEtcForcedUpdate: boolean for routeToPage!!!TBD!!!
 
         // Set up focus flags so that after routing we set focus to appropriate element.
@@ -1943,6 +1937,7 @@ export class StorySetComponent extends BaseComponent implements OnInit {
         this.pending_storyFilterValue = focusValueWithinFilterFamily;
         this.pending_focusOnCloseFilterButton = focusOnCloseOutFilterInterface;
         this.pending_focusOnOpenFilterButton = focusOnOpenUpFilterInterface;
+        this.pending_focusIntoMapRegionList = focusIntoMapRegionList;
 
         if (isClearActionFromRemoveFilterButton) {
             // Focus will be to a remaining remove-filter button in the proper order, or to the first shown filter family.
@@ -2050,7 +2045,7 @@ export class StorySetComponent extends BaseComponent implements OnInit {
     }
 
     clearActiveFacetChoice(facetSetOwningTheClear: StoryFilterFamilyType, facetIDToClear: string,
-      isClearActionFromRemoveFilterButton: boolean) {
+      isClearActionFromRemoveFilterButton: boolean, itemClearedFromMapActions: boolean) {
         // NOTE: purpose of isClearActionFromRemoveFilterButton: communicate that after the facet is cleared
         // focus is to return to the remove-buttons list (if isClearActionFromRemoveFilterButton) or to the
         // facet set where a toggle action happened to turn back off a facet (if !isClearActionFromRemoveFilterButton)
@@ -2073,7 +2068,7 @@ export class StorySetComponent extends BaseComponent implements OnInit {
         }
         if (facetCleared) {
             this.processClearedFilter(isClearActionFromRemoveFilterButton, itemClearedOrder,
-              facetSetOwningTheClear, facetValueToClear);
+              facetSetOwningTheClear, facetValueToClear, itemClearedFromMapActions);
         }
     }
 
@@ -2090,7 +2085,7 @@ export class StorySetComponent extends BaseComponent implements OnInit {
                 chosenFacet.active = false;
                 // Note with third parameter isClearActionFromRemoveFilterButton as false
                 // that this action is coming from a toggle handler:
-                this.clearActiveFacetChoice(facetSetOwningTheToggle, chosenFacetID, false);
+                this.clearActiveFacetChoice(facetSetOwningTheToggle, chosenFacetID, false, false);
                 break;
             }
         }
@@ -2101,14 +2096,15 @@ export class StorySetComponent extends BaseComponent implements OnInit {
             oneFacet.value = chosenFacetValue;
             chosenFacet.active = true;
             this.insertIntoProperPlaceNewActiveFacetItem(oneFacet);
-            this.processUpdatedFilter(facetSetOwningTheToggle, chosenFacetValue);
+            this.processUpdatedFilter(facetSetOwningTheToggle, chosenFacetValue, false);
         }
     }
 
-    filterOnUSMapRegion(chosenUSMapRegionID: string) {
-        // If given region is already picked, do nothing.
+    filterOnUSMapRegion(chosenUSMapRegionID: string, isClearAction: boolean) {
+        // If given region is already picked and !isClearAction, do nothing.
+        // If given region not already picked and isClearAction, do nothing.
         // Else, filter on it.  NOTE: this is DIFFERENT behavior from toggleActiveFacetChoice()
-        // where selecting something already selected would clear it.
+        // because callers are deciding more nuanced "toggle" logic (since a click on a map region only turns on, never clears).
         var itemAlreadyChosen: boolean = false;
         for (var i = 0; i < this.activeFacets.length; i++) {
             if (this.activeFacets[i].setID == StoryFilterFamilyType.StateInStory &&
@@ -2117,19 +2113,24 @@ export class StorySetComponent extends BaseComponent implements OnInit {
                 break;
             }
         }
-        if (!itemAlreadyChosen) {
+        if (itemAlreadyChosen && isClearAction) { // clear this action
+            // Note with third parameter isClearActionFromRemoveFilterButton as false
+            // that this action is coming from a toggle handler:
+            this.clearActiveFacetChoice(StoryFilterFamilyType.StateInStory, chosenUSMapRegionID, false, true);
+        }
+        else if (!itemAlreadyChosen && !isClearAction) { // set this action     
             var oneFacet: StoryFacetWithFamily = new StoryFacetWithFamily();
             oneFacet.setID = StoryFilterFamilyType.StateInStory;
             oneFacet.ID = chosenUSMapRegionID;
             oneFacet.value = this.globalState.NameForUSState(chosenUSMapRegionID); // e.g., get "Hawaii" from "HI"
             this.insertIntoProperPlaceNewActiveFacetItem(oneFacet);
-            this.processUpdatedFilter(StoryFilterFamilyType.StateInStory, oneFacet.value);
+            this.processUpdatedFilter(StoryFilterFamilyType.StateInStory, oneFacet.value, true);
         }
     }
 
     clearFilters() {// CLears both data state and updates the UI accordingly.
         this.activeFacets = [];
-        this.processUpdatedFilter(StoryFilterFamilyType.None, "");
+        this.processUpdatedFilter(StoryFilterFamilyType.None, "", false);
     }
 
     appendedCountToValue(givenValue: string, givenCount: number): string {
@@ -2141,33 +2142,33 @@ export class StorySetComponent extends BaseComponent implements OnInit {
     }
 
     private processClearedFilter(isClearActionFromRemoveFilterButton: boolean, whichRemoveFilterButtonToFocus: number,
-      focusWithinFilterFamily: StoryFilterFamilyType, focusValueWithinFilterFamily: string) {
+      focusWithinFilterFamily: StoryFilterFamilyType, focusValueWithinFilterFamily: string, focusIntoMapRegionList: boolean) {
         if (this.activeFacets.length > 0) {
             this.titleForStorySet = "Fetching Filtered Page 1... (in progress)";
-            this.screenReaderSummaryTitle = "HistoryMaker Story Set, Results Pending";
+            this.screenReaderSummaryTitle = "ScienceMaker Story Set, Results Pending";
             this.titleManagerService.setTitle(this.screenReaderSummaryTitle);
             // Fold in filter spec, too, which will happen with call to this.specStringFromActiveFacets() within this.setOptionsAndRouteToPage().
         }
         else {
             // Special case: we just removed the last remaining filter, i.e., there are no filters left.
             this.titleForStorySet = "Fetching Page 1... (in progress)";
-            this.screenReaderSummaryTitle = "HistoryMaker Story Set, Results Pending";
+            this.screenReaderSummaryTitle = "ScienceMaker Story Set, Results Pending";
             this.titleManagerService.setTitle(this.screenReaderSummaryTitle);
         }
         this.setOptionsAndRouteToPage(true, 1, this.myCurrentPageSize,
           isClearActionFromRemoveFilterButton, whichRemoveFilterButtonToFocus,
-          focusWithinFilterFamily, focusValueWithinFilterFamily, false, false);
+          focusWithinFilterFamily, focusValueWithinFilterFamily, false, false, focusIntoMapRegionList);
     }
 
-    private processUpdatedFilter(focusWithinFilterFamily: StoryFilterFamilyType, focusValueWithinFilterFamily: string) {
+    private processUpdatedFilter(focusWithinFilterFamily: StoryFilterFamilyType, focusValueWithinFilterFamily: string, focusIntoMapRegionList: boolean) {
         // Do the filtering by calling the router with an updated spec argument, returning to page 1 of the newly filtered set:
         this.titleForStorySet = "Fetching Filtered Page 1... (in progress)";
         this.screenReaderSummaryTitle = "Fetching Filtered Page 1";
-        this.titleManagerService.setTitle("HistoryMaker Story Set, Results Pending");
+        this.titleManagerService.setTitle("ScienceMaker Story Set, Results Pending");
 
         // Accumulate routing parameters specifying filter specification, page information, etc.
         this.setOptionsAndRouteToPage(true, 1, this.myCurrentPageSize,
-          false, -1, focusWithinFilterFamily, focusValueWithinFilterFamily, false, false);
+          false, -1, focusWithinFilterFamily, focusValueWithinFilterFamily, false, false, focusIntoMapRegionList);
     }
 
     openPickFilterMenu() {
@@ -2177,7 +2178,7 @@ export class StorySetComponent extends BaseComponent implements OnInit {
         // NOTE: on refresh of the route the button to close out the pick filter menu should get the focus since the
         // button that was focused to get this action will no longer be part of the rendering.
         this.setOptionsAndRouteToPage(false, this.myCurrentPage, this.myCurrentPageSize,
-          false, -1, StoryFilterFamilyType.None, "", true, false);
+          false, -1, StoryFilterFamilyType.None, "", true, false, false);
     }
 
     closePickFilterMenu() {
@@ -2187,11 +2188,12 @@ export class StorySetComponent extends BaseComponent implements OnInit {
         // NOTE: on refresh of the route the button to open the pick filter menu should get the focus since the
         // button that was focused to get this action will no longer be part of the rendering.
         this.setOptionsAndRouteToPage(false, this.myCurrentPage, this.myCurrentPageSize,
-          false, -1, StoryFilterFamilyType.None, "", false, true);
+          false, -1, StoryFilterFamilyType.None, "", false, true, false);
     }
 
     copyIntoMyClips() {
       // Add in all of this.myStoryList in order into My Clips (of course if there already, don't add again)
-      this.playlistManagerService.appendToMyClips(this.myStoryList);
+      if (this.myStoryList)
+        this.playlistManagerService.appendToMyClips(this.myStoryList);
     }
 }

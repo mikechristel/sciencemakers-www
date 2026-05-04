@@ -1,6 +1,5 @@
 // CREDIT: greatly inspired by mat-video (https://github.com/nkoehler/mat-video) with subset of that functionality here;
-// see https://github.com/nkoehler/mat-video/blob/master/projects/mat-video/src/lib/video.component.ts 
-//
+// see https://github.com/nkoehler/mat-video/blob/master/projects/mat-video/src/lib/video.component.ts
 // Feb. 2022 NOTE: The repo was abandoned in July 2020 and will not work in Angular 13.  Sadly, as browsers update, it may fail since recent 2022 Firefox versions (e.g., 97) also showed video player issues (no CC text).
 // So, this component may need to either be replaced (but will accessibility and CC support still be there as expected?!?!), or overhauled with a re-inspection of the latest
 // documentation on HTML5 video player support.
@@ -14,7 +13,7 @@
 
 // Dec. 2023 update: let the parent component know the first time a video play initiates, i.e., the first time "playing" updates within this component from false to true.
 // This is done for COUNTER logging of events: that first "play" action is something to be logged.
-//
+
 // April 2026 update: with Angular 21 and zoneless/signals, this line formerly in the component html was problematic:
 // <p class="playtime">{{ video?.currentTime | secondsToTime }} / {{ video?.duration | secondsToTime }}</p> (with secondsToTime a pipe to convert string number to years:months:days:hh:mm:ss)
 // Instead, now doing (with simplification in moving from secondsToTime pipe (code formerly in ./seconds-to-time.pipe) to secondsToTimeString() local procedure which only does hh:mm:ss):
@@ -29,11 +28,10 @@ import { EventService } from "./services/event.service";
 
 import { UserSettingsManagerService } from '../../user-settings/user-settings-manager.service';
 import {LiveAnnouncer} from '@angular/cdk/a11y'; // used to read changes to closed captioning, as asked for by accessibility experts
-import { GlobalState }          from '../../app.global-state';
+import { GlobalState, Nullable }          from '../../app.global-state';
 
 import { of } from 'rxjs';
 import { delay } from 'rxjs/operators';
-import { NgClass } from "@angular/common";
 import { MyVideoPlayButtonComponent } from "./ui/my-video-play-button/my-video-play-button.component";
 import { MyVideoRewindButtonComponent } from "./ui/my-video-rewind-button/my-video-rewind-button.component";
 import { MyVideoFastForwardButtonComponent } from "./ui/my-video-ffwd-button/my-video-ffwd-button.component";
@@ -44,7 +42,7 @@ import { MyVideoSpinnerComponent } from "./ui/my-video-spinner/my-video-spinner.
     selector: 'my-video',
     templateUrl: './my-video.component.html',
     styleUrls: ['./my-video.component.scss'],
-    imports: [NgClass, MyVideoPlayButtonComponent, MyVideoRewindButtonComponent, MyVideoFastForwardButtonComponent, MyVideoClosedCaptionButtonComponent, MyVideoSpinnerComponent]
+    imports: [MyVideoPlayButtonComponent, MyVideoRewindButtonComponent, MyVideoFastForwardButtonComponent, MyVideoClosedCaptionButtonComponent, MyVideoSpinnerComponent]
 })
 
 export class MyVideoComponent implements OnInit, AfterViewInit, OnChanges, OnDestroy {
@@ -54,22 +52,22 @@ export class MyVideoComponent implements OnInit, AfterViewInit, OnChanges, OnDes
   private liveAnnouncer = inject(LiveAnnouncer);
   private userSettingsManagerService = inject(UserSettingsManagerService);
 
-  @ViewChild('thmplayer', { static: false }) player: ElementRef;
-  @ViewChild('video', { static: false }) video: ElementRef;
+  @ViewChild('thmplayer', { static: false }) player!: ElementRef;
+  @ViewChild('video', { static: false }) video!: ElementRef;
 
   // communicates transcript time and end of video to parent component
   @Output() timeChange: EventEmitter<number> = new EventEmitter();
   @Output() mediaEndIssued: EventEmitter<any> = new EventEmitter();
 
-  readonly src = input<string | MediaSource | Blob>(null);
+  readonly src = input<string | MediaSource | Blob>();
   // TODO: Skipped for migration with "ng generate @angular/core:signal-input-migration" (March 2025) because:
   //  This input is used in a control flow expression (e.g. `@if` or `*ngIf`)
   //  and migrating would break narrowing currently.
-  @Input() urlToCCIndicator: string = null;
+  @Input() urlToCCIndicator: Nullable<string> = null;
   // TODO: Skipped for migration with "ng generate @angular/core:signal-input-migration" (March 2025) because:
   //  This input is used in a control flow expression (e.g. `@if` or `*ngIf`)
   //  and migrating would break narrowing currently.
-  @Input() poster: string = null;
+  @Input() poster: Nullable<string> = null;
   readonly initialSeek = input<number>(0); // if greater than zero, seek to this as currentTime (seconds) when first loaded
 
   readonly keyboard = input(true);
@@ -100,6 +98,7 @@ export class MyVideoComponent implements OnInit, AfterViewInit, OnChanges, OnDes
 
       const MEANINGFUL_TIME_DELTA = 0.0001; // ignore any jitters at values at or under this threshold
       const videoPerhaps: HTMLVideoElement | null = this.getVideoTag();
+
       var endOfMediaReached: boolean = false;
       var actualCurTimePercent: number;
 
@@ -141,8 +140,8 @@ export class MyVideoComponent implements OnInit, AfterViewInit, OnChanges, OnDes
 
   playing = false;
 
-  videoWidth: number;
-  videoHeight: number;
+  videoWidth!: number;
+  videoHeight!: number;
   lastTime: number = -1;
   curTimePercent: number = 0;
   isPercentInFlux: boolean = false;
@@ -153,7 +152,7 @@ export class MyVideoComponent implements OnInit, AfterViewInit, OnChanges, OnDes
 
   activeCCPiece: string = ""; // used to support Braille readers wanting control over active closed caption
 
-  private srcObjectURL: string;
+  private srcObjectURL: Nullable<string> = null;
 
   // NOTE: With migration to Angular 17, NodeJS.Timer was causing "cannot find namespace issues" which led to a Google search that
   // brought in AI advice to use RxJS delay operator instead. That is done here.
@@ -163,13 +162,13 @@ export class MyVideoComponent implements OnInit, AfterViewInit, OnChanges, OnDes
   // NOTE:  with Angular 21 now need to use signals to trigger when mouse UI should be shown or not (starting with mouse to be shown)
   showMouseInUI = signal(true);
 
-  private events: EventHandler[];
+  private events!: EventHandler[];
 
   // NOTE: There are many cautions against using autoplay, e.g., https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/autoplay --
   // leave it up to the user to turn it on if he/she so desires.
-  defaultAutoPlay: boolean;
+  defaultAutoPlay!: boolean;
 
-  currentCCDisplayState: boolean;
+  currentCCDisplayState!: boolean;
 
   ngOnInit(): void {
     this.defaultAutoPlay = this.userSettingsManagerService.currentAutoplay();
@@ -279,7 +278,7 @@ export class MyVideoComponent implements OnInit, AfterViewInit, OnChanges, OnDes
       of(null).pipe(delay(this.isMouseMovingTimeout)).subscribe(() => {
         // Code to be executed after this.isMouseMovingTimeout milliseconds
         this.isMouseMoving = false;
-         this.showMouseInUI.set(!this.playing); // always is equal to !this.playing || this.isMouseMoving which is !this.playing since this.isMouseMoving == false at this point
+        this.showMouseInUI.set(!this.playing); // always is equal to !this.playing || this.isMouseMoving which is !this.playing since this.isMouseMoving == false at this point
       });
     }
   }
@@ -339,8 +338,8 @@ export class MyVideoComponent implements OnInit, AfterViewInit, OnChanges, OnDes
       return !this.playing || this.isMouseMoving ? activeClass : inactiveClass;
   }
 
-  private setVideoSrc(src: string | MediaSource | Blob): void {
-    if (this.srcObjectURL) {
+  private setVideoSrc(src: string | MediaSource | Blob | null | undefined): void {
+    if (this.srcObjectURL != null) {
       URL.revokeObjectURL(this.srcObjectURL);
       this.srcObjectURL = null;
     }
@@ -353,7 +352,7 @@ export class MyVideoComponent implements OnInit, AfterViewInit, OnChanges, OnDes
     // Older versions of the Media Source specification required using createObjectURL() to create an object URL then setting src to that URL.
     // Now you can just set srcObject to the MediaStream directly.
 
-    if (!src) {
+    if (src == null) { // note in TypeScript this concisely tests for src being either null or undefined
       this.video.nativeElement.src = null;
       if ("srcObject" in HTMLVideoElement.prototype) {
         this.video.nativeElement.srcObject = new MediaStream();
@@ -432,12 +431,10 @@ export class MyVideoComponent implements OnInit, AfterViewInit, OnChanges, OnDes
 
   updatePlayingState(newState: boolean) {
     this.playing = newState;
-
     // if mouse is not moving, then set signal this.showMouseInUI based on opposite of playing state (playing --> hide mouse, not playing --> show mouse) but don't bother if mouse moving as
     // then we are wired into showing the mouse in the UI.
     if (!this.isMouseMoving)
         this.showMouseInUI.set(!this.playing); // always is equal to !this.playing || this.isMouseMoving which is !this.playing since this.isMouseMoving == false at this point
-    
     if (newState && !this.firstPlayInitiated)
     {
       this.firstPlayInitiated = true;
@@ -454,17 +451,24 @@ export class MyVideoComponent implements OnInit, AfterViewInit, OnChanges, OnDes
     }
   }
 
-  handleCueChange($event) {
-    let cues = $event.target.track.activeCues;
-    if (cues && cues.length && cues.length > 0) {
-        // For this corpus, the length should always be 1, i.e., at most 1 timed text item active for any given time.
-        // Say the first, which ideally is the "only"
-        this.activeCCPiece = this.removeLeadin(cues[0].text);
-        this.liveAnnouncer.announce(this.activeCCPiece); // as asked for by accessibility experts, announce the closed captioning
+  handleCueChange($event: Event) {
+  if ($event.target instanceof HTMLTrackElement) {
+    // TypeScript now knows $event.target has a .track property
+      const currentCues = $event.target.track.activeCues;
+      if (currentCues && currentCues.length && currentCues.length > 0) {
+          // For this corpus, the length should always be 1, i.e., at most 1 timed text item active for any given time.
+          // Say the first, which ideally is the "only"
+          const firstCue = currentCues[0];
+          if (firstCue instanceof VTTCue) {
+            // TypeScript automatically knows .text exists here
+            this.activeCCPiece = this.removeLeadin(firstCue.text);
+            this.liveAnnouncer.announce(this.activeCCPiece); // as asked for by accessibility experts, announce the closed captioning
+          }
+      }
     }
   }
 
-  removeLeadin(givenCueText): string {
+  removeLeadin(givenCueText: string): string {
       if (givenCueText && givenCueText.length && givenCueText.length > 0) {
         var cueText: string = givenCueText;
         if (cueText.search("<v") == 0) {

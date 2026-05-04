@@ -10,6 +10,12 @@ export enum ViewState {
     AsMap = 3
 }
 
+export enum HowToReorder {
+    KeyboardReorder = 1,
+    DragAndDropReorder = 2,
+    PointerReorder = 3
+}
+
 @Injectable()
 export class GlobalState {
 
@@ -44,7 +50,7 @@ export class GlobalState {
     FEMALE_ID: string = "0";
     MALE_ID: string = "1";
 
-    matchSetContext: SearchResult;
+    matchSetContext: Nullable<SearchResult> = null;
 
     PageSizeCandidates: number[] = [10, 30, 60, 100, 300];
 
@@ -291,8 +297,10 @@ export class GlobalState {
     // NOTE that new logic will handle cleaning up the "givenString" argument to this routine such that it should not have
     // arguments such as %2B any further as entered by the user in search query input.  So, no replacement of any %# sequences takes place here,
     // except for the troublesome %2B which may be kept as a signal to have a + ...handle just that replacement out of extra care.
-    cleanedQueryRouterParameter(givenString: string): string {
-        return givenString
+    cleanedQueryRouterParameter(givenString: Nullable<string>): Nullable<string> {
+        var cleanedString: Nullable<string> = null;
+        if (givenString != null) {
+            cleanedString = givenString
             .replace(/\?/gi, '')
             .replace(/\//gi, '')
             .replace(/“/gi, '"')
@@ -302,6 +310,8 @@ export class GlobalState {
             .replace(/\;/gi, '')
             .replace(/\%2B/gi, this.PLUS_CHAR_MARKER)
             .replace(/\+/gi, this.PLUS_CHAR_MARKER);
+        }
+        return cleanedString;
     }
 
     // The user could cause messes by putting in encoded versions of characters like %20, %2B, etc., as the query string.

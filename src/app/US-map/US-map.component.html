@@ -1,10 +1,8 @@
 @if (!isMapInitialized) {
   <p>Map pending...</p>
 }
-@if (isMapInitialized && distributionToShow) {
+@if (isMapInitialized && haveMapDistributionData()) {
   <span class="sr-only">United States map with color-coded states</span>
-}
-@if (isMapInitialized && distributionToShow) {
   <svg aria-hidden="true" class="myMapStyling"
     viewBox="0 0 961.84375 582.625"
     width="100%"
@@ -499,7 +497,7 @@
     </g>
   </svg>
 }
-@if (isMapInitialized && distributionToShow) {
+@if (isMapInitialized && haveMapDistributionData()) {
   <div aria-hidden="true" >
     @if (distributionToShow.keyTitle) {
       <p>{{distributionToShow.keyTitle}}</p>
@@ -542,7 +540,7 @@
     }
   </div>
 }
-@if (distributionToShow && regionUSStateInsideMapFacets && regionUSStateInsideMapFacets.length > 0) {
+@if (haveMapDistributionData() && regionUSStateInsideMapFacets && regionUSStateInsideMapFacets.length > 0) {
   <my-panel
     title="{{distributionToShow.mapRegionListTitle}}" [opened]="mapDistributionListOpened"
     (toggle)="mapDistributionListOpened = !mapDistributionListOpened">
@@ -550,7 +548,7 @@
       @for (regionStateInsideMap of regionUSStateInsideMapFacets; track regionStateInsideMap) {
         <li class="filter-choices">
           <button class="filter-one-choice" [attr.aria-label]="appendedCountToValue(regionStateInsideMap.value, regionStateInsideMap.count)"
-            [attr.aria-pressed]="regionStateInsideMap.active"
+            [attr.aria-pressed]="regionStateInsideMap.active" [thdaIsFocused]="isRegionListItemSelected(regionStateInsideMap.ID)"
             [class.active]="regionStateInsideMap.active" (click)="toggleRegionUSStateFacet(regionStateInsideMap)">
             <span class="field-list-parent">
               @if (regionStateInsideMap.active) {

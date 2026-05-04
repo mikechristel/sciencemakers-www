@@ -1,4 +1,6 @@
 ﻿export class StoryHighlight {
-    public title: string[];
-    public transcript: string[];
+    constructor(
+        public title: string[],
+        public transcript: string[]
+    ) {}
 }

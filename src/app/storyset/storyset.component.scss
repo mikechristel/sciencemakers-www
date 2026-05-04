@@ -3,7 +3,6 @@
 @use '../shared/theme/base';
 @use '../shared/theme/search-helpers';
 @use '../shared/theme/filter-helpers';
-@use '../shared/theme/view-option-helpers';
 @use '../shared/theme/pagination-helpers';
 @use '../shared/theme/myF';
 
@@ -67,7 +66,7 @@
   color: #fff;
   font-size: 2rem;
   margin: myF.em(12) 0 myF.em(8) 0; /* top right bottom left */
-  padding: myF.em(8) myF.em(10);;
+  padding: myF.em(8) myF.em(10);
   position: relative; /* needed to get descending triangle magic to work... */
 
   &:after { /* magic to draw descending triangle */
@@ -204,27 +203,6 @@
   margin-top: myF.em(6);
 }
 
-.unstyled-list-nowhitespace-rowlayout {
-  /* changing to (to match how biography-storyset does this):  fxFlex.lt-md="100%" fxLayout="row" fxLayoutAlign="space-between end" fxLayoutGap="10px" */
-  box-sizing: border-box;
-  display: flex !important;
-  flex-direction: row;
-  place-content: flex-end space-between; /* note: shorthand for align-content: flex-end; justify-content: space-between */
-  align-items: flex-end;
-  *:not(:last-child) {
-    margin-right: 10px;
-  }
-
-  @media screen and (max-width: myF.bp(afl_medium_just_before))
-  {
-    flex: 1 1 auto;
-  }
-
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
 .radiogroup-nowhitespace-rowlayout {
   box-sizing: border-box;
   display: flex !important;
@@ -253,15 +231,15 @@
   box-sizing: border-box;
   max-height: 100%;
 }
-
-.unstyled-list-nowhitespace-narrow-filter {
-  /* fxLayout="row wrap" fxLayoutAlign="space-between center" fxLayoutGap.lt-md="0" fxLayoutGap="calc(0.5em)" */
+/* RETIRED - was used for narrow views to put Grid, Text, Map options one per row but instead we are using 
+  pad-top-a-bit-but-maybe-hide to hide icons so these three will always fit on a single row even in narrow views, so no need for this class anymore.
+.unstyled-list-nowhitespace-narrow-filter which would have been renamed radiogroup-nowhitespace-narrow-filter but instead is retired {
   box-sizing: border-box;
   display: flex !important;
   flex-direction: row;
   flex-flow: row wrap;
   flex: 1 1 1e-9px;
-  place-content: center space-between; /* note: shorthand for align-content: center; justify-content: space-between */
+  place-content: center space-between; 
   align-items: center;
 
   @media screen and (min-width: myF.bp(afl_medium))
@@ -274,6 +252,7 @@
   margin: 0;
   padding: 0;
 }
+---end of commented out RETIRED class*/
 
 .container-for-storyset {
   /* fxLayout="column" fxLayoutAlign="space-between stretch" */

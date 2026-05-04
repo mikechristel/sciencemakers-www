@@ -27,22 +27,23 @@ export class UserSettingsComponent extends BaseComponent implements OnInit {
 
     private changeDetectorRef = inject(ChangeDetectorRef);
 
-    settingsPageTitle: string;
-    settingsPageTitleLong: string;
+    settingsPageTitle!: string;
+    settingsPageTitleLong!: string;
     signalFocusToTitle: boolean = false; // is used in html rendering of this component
 
-    defaultAutoPlay: boolean;
-    defaultAutoAdvance: boolean;
-    showBiographyLastNameFacetFilter: boolean;
-    showBiographyDecadeOfBirthFacetFilter: boolean;
-    showBiographyBirthStateFacetFilter: boolean;
-    showBiographyJobTypeFacetFilter: boolean;
-    showStoryUSStateFacetFilter: boolean;
-    showStoryOrganizationFacetFilter: boolean;
-    showStoryDecadeFacetFilter: boolean;
-    showStoryYearFacetFilter: boolean;
-    showStoryJobTypeFacetFilter: boolean;
-    showStoryDecadeOfBirthFacetFilter: boolean;
+    defaultAutoPlay!: boolean;
+    defaultAutoAdvance!: boolean;
+    showBiographyLastNameFacetFilter!: boolean;
+    showBiographyDecadeOfBirthFacetFilter!: boolean;
+    showBiographyBirthStateFacetFilter!: boolean;
+    showBiographyJobTypeFacetFilter!: boolean;
+    showStoryUSStateFacetFilter!: boolean;
+    showStoryOrganizationFacetFilter!: boolean;
+    showStoryDecadeFacetFilter!: boolean;
+    showStoryYearFacetFilter!: boolean;
+    showStoryJobTypeFacetFilter!: boolean;
+    showStoryDecadeOfBirthFacetFilter!: boolean;
+    defaultHomeMixtape!: boolean;
 
     constructor() {
 
@@ -107,6 +108,7 @@ export class UserSettingsComponent extends BaseComponent implements OnInit {
 
         this.defaultAutoPlay = this.userSettingsManagerService.currentAutoplay();
         this.defaultAutoAdvance = this.userSettingsManagerService.currentAutoadvance();
+        // NOTE: formerly, this was something that could be hidden, but THM wishes Topic Search to be shown ALWAYS: this.defaultHideTopicSearch = this.userSettingsManagerService.currentHideTopicSearch();
 
         this.showBiographyBirthStateFacetFilter = this.userSettingsManagerService.currentShowBiographyBirthStateFacetFilter();
         this.showBiographyDecadeOfBirthFacetFilter = this.userSettingsManagerService.currentShowBiographyDecadeOfBirthFacetFilter();

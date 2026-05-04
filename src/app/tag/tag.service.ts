@@ -7,9 +7,11 @@ import { TagTree } from './tag-tree';
 
 import { SearchResult } from '../storyset/search-result';
 import { TagSearchResult } from './tag-search-result';
+import { TagFacets } from './tag-facets';
 
 import { HistoryMakerService } from '../historymakers/historymaker.service';
 import { environment } from '../../environments/environment';
+import { Nullable } from '../app.global-state';
 
 @Injectable()
 export class TagService {
@@ -21,7 +23,7 @@ export class TagService {
     private tagSearchURL = 'TagSearch?csvTagList='; // require csvTagList. so it is already tacked on
 
     // NOTE:  Tag tree structure assumed to be very stable and hence will be cached.
-    private cachedTagTree: TagTree;
+    private cachedTagTree: Nullable<TagTree>;
     // NOTE:  Tag tree has branches with UNIQUE identifiers: push this data into a cached dictionary.
     private tagMap: { [key: string]: string } = {};
 
@@ -97,8 +99,8 @@ export class TagService {
 
     getTagSearchInfo(csvTagList: string): Observable<TagSearchResult> {
         if (csvTagList == null || csvTagList.length == 0) {
-          var emptyOne: TagSearchResult = new TagSearchResult();
-          emptyOne.count = 0;
+          var emptyFacet: TagFacets = new TagFacets([]);
+          var emptyOne: TagSearchResult = new TagSearchResult(emptyFacet, 0);
           return of(emptyOne);
         }
         else {

@@ -56,7 +56,8 @@ export class TagComponent extends BaseComponent implements OnInit, OnDestroy {
     tagMatchSummary: string = "";
     hasNoTagSpec: boolean = true;
     descForSubset: string = "";
-    tagBranches: SelectableTagBranch[] = null; // when populated, exactly EXPECTED_TAG_BRANCHES elements are expected
+    haveTagBranches = signal(false); // set to true when tags are fully populated into tagBranches
+    tagBranches: SelectableTagBranch[] = []; // when populated, exactly EXPECTED_TAG_BRANCHES elements are expected
     clearIsPending: boolean;
 
     contextGroupOpened: boolean = true;
@@ -72,8 +73,6 @@ export class TagComponent extends BaseComponent implements OnInit, OnDestroy {
         this.hasNoTagSpec = true;
         this.tagMatchCountForSummary = 0;
         this.clearIsPending = false;
-
-        this.tagBranches = null;
     }
 
     ngOnInit() {
@@ -100,7 +99,7 @@ export class TagComponent extends BaseComponent implements OnInit, OnDestroy {
                     // with embedded code to fill a particular nested set of views for a particular tag tree, give up if
                     // the service data does not have EXPECTED_TAG_BRANCHES.
                     if (tagTreeFromService.branches == null || tagTreeFromService.branches.length != this.EXPECTED_TAG_BRANCHES) {
-                        this.tagBranches = null;
+                        this.haveTagBranches.set(false);
                     }
                     else {
                         this.tagBranches = [];
@@ -108,10 +107,7 @@ export class TagComponent extends BaseComponent implements OnInit, OnDestroy {
                         var oneBranchItem: SelectableTagDetail;
                         var j: number;
                         for (var i = 0; i < this.EXPECTED_TAG_BRANCHES; i++) {
-                            oneBranch = new SelectableTagBranch();
-                            oneBranch.branchName = tagTreeFromService.branches[i].branchName;
-                            oneBranch.branchOpened = false; // initially start with branch closed (user must open it in UI)
-                            oneBranch.branchValues = [];
+                            oneBranch = new SelectableTagBranch(tagTreeFromService.branches[i].branchName, false, []); // initially start with branch closed (user must open it in UI)
                             for (var j = 0; j < tagTreeFromService.branches[i].branchValues.length; j++) {
                                 oneBranchItem = new SelectableTagDetail(
                                     tagTreeFromService.branches[i].branchValues[j].id,
@@ -121,6 +117,7 @@ export class TagComponent extends BaseComponent implements OnInit, OnDestroy {
                             }
                             this.tagBranches.push(oneBranch);
                         }
+                        this.haveTagBranches.set(true); // signal that this.tagBranches is now populated
                     }
                     // NOTE: one way to init this display might be to always clear the chosen tag set,
                     // as in: this.tagDetailService.clear()
@@ -163,7 +160,7 @@ export class TagComponent extends BaseComponent implements OnInit, OnDestroy {
         // The interface in ngOnInit gets populated with tag names and IDs, but everything is unchecked.
         // There may be a chosen tag set in play with some things set already.
 
-        if (this.tagBranches != null && this.tagChosenSetService.chosenTags.length > 0) {
+        if (this.haveTagBranches() && this.tagChosenSetService.chosenTags.length > 0) {
             var branchIndex: number;
             var leafIndex: number;
             var j: number;
@@ -228,7 +225,7 @@ export class TagComponent extends BaseComponent implements OnInit, OnDestroy {
 
             // Only pursue showing story set for given tag query if a query is specified.
 
-            var moreParams = [];
+            var moreParams: Record<string, string | number> = {};
             // NOTE: no need for this.globalState.restorePlusAsNeeded() here with
             // this.tagChosenSetService.tagSpec as tags are "clean" and not typed by the user.
             moreParams['q'] = this.tagChosenSetService.tagSpec;

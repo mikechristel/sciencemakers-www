@@ -6,6 +6,8 @@ import { HttpClient } from '@angular/common/http';
 import { DetailedStory } from './detailed-story';
 import { environment } from '../../environments/environment';
 
+import { Nullable } from '../app.global-state';
+
 @Injectable()
 export class StoryDetailService {
     private http = inject(HttpClient);
@@ -14,7 +16,7 @@ export class StoryDetailService {
     private storyDetailsQueryTermsArgument = '&queryTerms=';
     private readonly WILDCARD_TO_MATCH_ALL = "*";
 
-    getStorySpecifics(ID: number, queryTerms: string): Observable<DetailedStory> {
+    getStorySpecifics(ID: number, queryTerms: Nullable<string>): Observable<DetailedStory> {
         // NOTE: If ID not found in the data set, then null is returned to caller
         var serviceURL: string = environment.serviceBase + this.storyDetailsURL + ID;
 

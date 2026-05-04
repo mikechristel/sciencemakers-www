@@ -1,4 +1,7 @@
-﻿import { Component, OnInit, ElementRef, AfterViewChecked, inject, viewChild, viewChildren, ChangeDetectorRef } from '@angular/core';
+﻿// 2026 NOTE with Angular 21 update and especially update of Grid/List/Map to a radiogroup for accessibility improvement:
+// instead of two booleans, cardView and textView, now have one viewStateSignal that is one of AsGrid, AsList, AsMap.
+
+import { Component, OnInit, ElementRef, AfterViewChecked, inject, viewChild, viewChildren, ChangeDetectorRef, signal } from '@angular/core';
 import { takeUntil } from "rxjs/operators";
 
 import { BriefBio } from './brief-bio';
@@ -8,7 +11,7 @@ import { TitleManagerService } from '../shared/title-manager.service';
 import { SearchFormService } from '../shared/search-form/search-form.service';
 import { Facets } from './facets';
 import { FacetDetail, FacetFamilyContainer } from './facet-detail';
-import { GlobalState } from '../app.global-state';
+import { GlobalState, ViewState, Nullable } from '../app.global-state';
 import { BiographySearchSortField } from './biography-search-sort-field';
 
 import { UserSettingsManagerService } from '../user-settings/user-settings-manager.service';
@@ -38,41 +41,45 @@ import { SearchFormComponent } from '../shared/search-form/search-form.component
 })
 
 export class HistoryMakersComponent extends BaseComponent implements OnInit, AfterViewChecked {
-  private route = inject(ActivatedRoute);
-  private router = inject(Router);
-  globalState = inject(GlobalState);
-  private historyMakerService = inject(HistoryMakerService);
-  private titleManagerService = inject(TitleManagerService);
-  private userSettingsManagerService = inject(UserSettingsManagerService);
-  private liveAnnouncer = inject(LiveAnnouncer);
-  private myUSMapManagerService = inject(USMapManagerService);
-  private searchFormService = inject(SearchFormService);
+    
+    // Assign enum ViewState to a property to make it accessible in the html template (e.g., to use AsGrid, AsText, AsMap instead of 1, 2, 3 in the html)
+    protected readonly MyViewState = ViewState;
 
-  private changeDetectorRef = inject(ChangeDetectorRef);
+    private route = inject(ActivatedRoute);
+    private router = inject(Router);
+    globalState = inject(GlobalState);
+    private historyMakerService = inject(HistoryMakerService);
+    private titleManagerService = inject(TitleManagerService);
+    private userSettingsManagerService = inject(UserSettingsManagerService);
+    private liveAnnouncer = inject(LiveAnnouncer);
+    private myUSMapManagerService = inject(USMapManagerService);
+    private searchFormService = inject(SearchFormService);
 
-  readonly radioGroup1_Map = viewChild<ElementRef>('rg1Map');
-  readonly radioGroup1_Text = viewChild<ElementRef>('rg1Text');
-  readonly radioGroup1_Pic = viewChild<ElementRef>('rg1Pic');
-  readonly radioGroup2_Map = viewChild<ElementRef>('rg2Map');
-  readonly radioGroup2_Text = viewChild<ElementRef>('rg2Text');
-  readonly radioGroup2_Pic = viewChild<ElementRef>('rg2Pic');
-  readonly lastInitialInFilterMenu_Parent = viewChild<ElementRef>('rgLastInitialParentInFilterMenu');
-  readonly lastInitial_Parent = viewChild<ElementRef>('rgLastInitialParent');
-  readonly lastInitialItemsInFilterMenu = viewChildren<ElementRef>('rgLastInitialInFilterMenu');
-  readonly lastInitialItems = viewChildren<ElementRef>('rgLastInitial');
+    private changeDetectorRef = inject(ChangeDetectorRef);
+
+    readonly radioGroup1_Map = viewChild<ElementRef>('rg1Map');
+    readonly radioGroup1_Text = viewChild<ElementRef>('rg1Text');
+    readonly radioGroup1_Pic = viewChild<ElementRef>('rg1Pic');
+    readonly radioGroup2_Map = viewChild<ElementRef>('rg2Map');
+    readonly radioGroup2_Text = viewChild<ElementRef>('rg2Text');
+    readonly radioGroup2_Pic = viewChild<ElementRef>('rg2Pic');
+    readonly lastInitialInFilterMenu_Parent = viewChild<ElementRef>('rgLastInitialParentInFilterMenu');
+    readonly lastInitial_Parent = viewChild<ElementRef>('rgLastInitialParent');
+    readonly lastInitialItemsInFilterMenu = viewChildren<ElementRef>('rgLastInitialInFilterMenu');
+    readonly lastInitialItems = viewChildren<ElementRef>('rgLastInitial');
 
     readonly MAX_REGION_US_STATES_TO_SHOW_IN_FILTER_AREA:number = 10; // need data from all 50+DC for map view, but don't show all 51, just the top N
     readonly NO_US_BIRTHSTATE_FOR_SOME_LABEL_SUFFIX:string = " born outside the U.S. or with unrecorded birth location."; // of form: prefix # ScienceMaker(s) and this suffix
 
     biographySetTitle: string; // includes a count
     screenReaderSummaryTitle: string; // abbreviated form (no count, paging, etc., given in this summary)
-    totalBiographiesFoundSuffix: string; // used in html rendering of this component
-    fullResultSetTitleSuffix: string; // cached information about the full result set used in constructing title
-    showingAllHistoryMakers: boolean;
-    biographies: BriefBio[];
+    totalBiographiesFoundSuffix: Nullable<string> = null; // used in html rendering of this component
+    fullResultSetTitleSuffix: string = ""; // cached information about the full result set used in constructing title
+
+    myBiographyList: Nullable<BriefBio[]> = null; // the biographies to show on the current page, 
     totalBiographiesFound: number; // a count that may be more than the "kept" page of bios in biographies
 
-    USStateDistribution: USMapDistribution;
+    USStateDistribution: Nullable<USMapDistribution> = null;
 
     needPrevPage: boolean = false;
     needNextPage: boolean = false;
@@ -82,19 +89,20 @@ export class HistoryMakersComponent extends BaseComponent implements OnInit, Aft
     public myCurrentPageSize: number;
     public myModelledPageSize: number;
 
-    myCurrentBiographySearchSorting: number; // indicator on the sorting in use
-    bioSearchSortFields: BiographySearchSortField[];
+    myCurrentBiographySearchSorting: number = 0; // indicator on the sorting in use
+    bioSearchSortFields: Nullable<BiographySearchSortField[]> = null;
 
-    cardView: boolean = true;
-    textView: boolean = false; // NOTE: it may be that BOTH cardView and textView are false (e.g., for a U.S. states map view)
+    viewStateSignal = signal<ViewState>(ViewState.AsGrid); // defaults to grid view; never is undefined (all view states mean something)
 
     signalFocusMoveToFirstLastInitial: boolean = false;
     signalFocusMoveToFirstLastInitial_FilterMenu: boolean = false;
     signalFocusMoveToMenu_LastInitial: boolean = false;
     signalFocusMoveToFilterMenu_LastInitial: boolean = false;
     signalFocusToBiographyID: string = "";
+    
+    signalFocusToRegionListItemID: string = ""; // used to signal which region in the list of regions inside a map component should get focus 
+
     signalFocusToRemoveFilterButtonIndicator: number = -1;
-    signalFocusToFirstShownFamily: boolean[];
     signalFocusToPageOne: boolean = false;
     signalFocusToFinalPage: boolean = false;
     signalFocusToCloseFilterButton: boolean = false;
@@ -112,6 +120,7 @@ export class HistoryMakersComponent extends BaseComponent implements OnInit, Aft
     private pending_focusOnFinalPageButton: boolean = false;
     private pending_focusOnCloseFilterButton: boolean = false;
     private pending_focusOnOpenFilterButton: boolean = false;
+    private pending_focusIntoMapRegionList: boolean = false;
 
     // NOTE: REVISIT THIS BECAUSE WE HAVE ASSUMPTIONS HERE ON EXACTLY 6 FACET GROUPS IN PARTICULAR FORMS.  MVC works for facets, but are not coded for extensibility at this point!!!
     // NOTE: facet groups are not the same for biographies and stories: with biographies there is a lastInitial facet.
@@ -126,13 +135,14 @@ export class HistoryMakersComponent extends BaseComponent implements OnInit, Aft
     private lastNameOpened: boolean = false; // see elsewhere if this is initialized differently based on client request...
     // Remainder are in facetFamilies[].isOpened...
 
-    private myCurrentPage: number;
-    private myCurrentQuery: string;
-    private myCurrentSearchLastNameOnlyFlag: boolean;
-    private myCurrentSearchPreferredNameOnlyFlag: boolean;
-    private myBornThisTimeFilterFlag: boolean;
+    private myCurrentPage: number = 1;
+    readonly UNIQUE_DEFAULT_TEXT:string = "^%FORCE_FIRST_LOAD!!"; // a string that is not null but also is not a real query or empty string or null 
+    private myCurrentQuery: Nullable<string> = this.UNIQUE_DEFAULT_TEXT; // depending on caller either null (for return ALL) or a real query will be passed in and will NOT equal this strange default start text 
+    private myCurrentSearchLastNameOnlyFlag: boolean = false;
+    private myCurrentSearchPreferredNameOnlyFlag: boolean = false;
+    private myBornThisTimeFilterFlag: boolean = false;
 
-    bioSearchFieldsMask:number;
+    bioSearchFieldsMask:number = 0; // will be set immediately in OnInit based on userSettingsManagerService.currentBioSearchFieldsMask(), but needs to be initialized here to avoid problems with pipes in html that may use it before OnInit runs
 
     showingFilterMenu: boolean = false; // changes the display of the page: filters on side with other items, or just filters in a menu
 
@@ -152,7 +162,7 @@ export class HistoryMakersComponent extends BaseComponent implements OnInit, Aft
         this.myModelledPageSize = this.myCurrentPageSize;
         this.totalBiographiesFound = 0;
 
-        this.biographySetTitle = "ScienceMakers";
+        this.biographySetTitle = "The ScienceMakers";
         this.screenReaderSummaryTitle = "Maker Directory";
 
         this.searchFormService.setSearchOptions(new SearchFormOptions(true, this.globalState.NOTHING_CHOSEN, this.globalState.NO_ACCESSION_CHOSEN, false));
@@ -161,7 +171,12 @@ export class HistoryMakersComponent extends BaseComponent implements OnInit, Aft
         // below in this component wherever .subscribe is used:
 
         myUSMapManagerService.clickedRegionID$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((value) => {
-            this.filterOnUSMapRegion(value);
+            this.filterOnUSMapRegion(value, false);
+            this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
+        });
+
+        myUSMapManagerService.regionIDToClear$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((value) => {
+            this.filterOnUSMapRegion(value, true);
             this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
         });
 
@@ -315,22 +330,21 @@ export class HistoryMakersComponent extends BaseComponent implements OnInit, Aft
 
             // NOTE: need to document meaning of parameters as we are getting a parameter explosion with increased capabilities and client requests,
             // e.g., 'ln' signal search just the last name field, 'pn' just preferred name field, so signals search field sorting order,
-            // bt signals a filter to those born this time as in day or week, etc.
+            // bt signals a filter to those born this time as in a week
             // A better design:  routing with less parameters, or a better way to deal with the "pass throughs" that are only there to allow a "back" in-page navigation item.
             // Much simplification is possible if we back away from in-page "go back" options and rely on browser back button to go back to prior "page".
 
             // Determine current "state" of the page (remember, this code "fires" if only parameters change) to see if there is really a need for lots of work,
-            // e.g., for getting a new fetch of HistoryMakers meeting some criteria.  It may be, for example, that the filter menu was opened, adjusted little or
-            // nothing, and now closes, and there is not really a need for any fetch of different HistoryMakers because the criteria remained the same.
+            // e.g., for getting a new fetch of ScienceMakers meeting some criteria.  It may be, for example, that the filter menu was opened, adjusted little or
+            // nothing, and now closes, and there is not really a need for any fetch of different ScienceMakers because the criteria remained the same.
             // So, do NOT change the this.___ state of things yet (aside from this.showingFilterMenu):
             // first collect the "new" state of things for a comparison...
             var newBornThisTimeFilterFlag: boolean = false;
-            var newCurrentQuery: string = null;
+            var newCurrentQuery: Nullable<string> = null;
             var sortOrderChanged: boolean = false;
             var searchLastNameOnlyFlag: boolean = this.globalState.BiographySearchLastNameOnly;
             var searchPreferredNameOnlyFlag: boolean = this.globalState.BiographySearchPreferredNameOnly;
-            var anticipatedMapView: boolean = !this.cardView; // NOTE: doing it this way so that this.cardView = true will be a default state
-            var anticipatedTextView: boolean = this.textView;
+            var anticipatedView: ViewState = this.viewStateSignal();
 
             var newSpec = "";
 
@@ -342,17 +356,14 @@ export class HistoryMakersComponent extends BaseComponent implements OnInit, Aft
             // else newSpec remains ""
 
             if (params['mv'] != undefined && params['mv'] == "1") {
-                anticipatedMapView = true;
-                anticipatedTextView = false;
+                anticipatedView = ViewState.AsMap;
             }
             else {
-                anticipatedMapView = false;
-
                 if (params['tv'] != undefined && params['tv'] == "1") {
-                    anticipatedTextView = true;
+                    anticipatedView = ViewState.AsText;
                 }
                 else {
-                    anticipatedTextView = false;
+                    anticipatedView = ViewState.AsGrid;
                 }
             }
 
@@ -377,7 +388,7 @@ export class HistoryMakersComponent extends BaseComponent implements OnInit, Aft
 
                 if (params['so'] !== undefined  && !isNaN(+params['so'])) {
                     var candidateSortOrder:number = +params['so'];
-                    if (candidateSortOrder >= 0 && candidateSortOrder < this.bioSearchSortFields.length) {
+                    if (this.bioSearchSortFields && candidateSortOrder >= 0 && candidateSortOrder < this.bioSearchSortFields.length) {
                         sortOrderChanged = this.updateBioSearchSorting(candidateSortOrder);
                     }
                 }
@@ -387,24 +398,19 @@ export class HistoryMakersComponent extends BaseComponent implements OnInit, Aft
               this.myCurrentSearchLastNameOnlyFlag != searchLastNameOnlyFlag || this.myCurrentSearchPreferredNameOnlyFlag != searchPreferredNameOnlyFlag ||
               this.myCurrentPage != givenPageIndicator || this.myCurrentPageSize != givenPageSize ||
               this.specStringFromActiveFacets() != newSpec) {
-                // A re-fetch of HistoryMakers is needed because context changed in some way.
+                // A re-fetch of ScienceMakers is needed because context changed in some way.
                 // Update context in this... for query and page state and view (with sort order already updated and noted via sortOrderChanged)
                 this.myBornThisTimeFilterFlag = newBornThisTimeFilterFlag;
                 this.myCurrentQuery = newCurrentQuery;
                 this.myCurrentSearchLastNameOnlyFlag = searchLastNameOnlyFlag;
                 this.myCurrentSearchPreferredNameOnlyFlag = searchPreferredNameOnlyFlag;
 
-                this.textView = anticipatedTextView;
-                if (anticipatedTextView)
-                    this.cardView = false;
-                else
-                    this.cardView = !anticipatedMapView;
+                this.viewStateSignal.set(anticipatedView); // update the view state signal to anticipated view (which will trigger UI updates in Angular 21 zoneless world)
 
-                this.getHistoryMakers(givenPageIndicator, givenPageSize, newSpec);
+                this.getHistoryMakersPage(givenPageIndicator, givenPageSize, newSpec);
             }
-            else if (this.textView != anticipatedTextView || (!this.textView && (this.cardView == anticipatedMapView))) {
-                // Either text view should be toggled, or it is off and the card view should be toggled (which also toggles the map view since text view is off)
-                this.updateViewOptions(!anticipatedMapView, anticipatedTextView); // changes titling, etc., based on changed view
+            else if (anticipatedView != this.viewStateSignal()) {
+                this.updateViewOptions(anticipatedView, true); // changes titling, etc., based on changed view noting that we already checked that there is a change in view state
             }
             else {
                 // Contents and context in hand already: check if there is any pending focus signalling to follow
@@ -417,10 +423,14 @@ export class HistoryMakersComponent extends BaseComponent implements OnInit, Aft
     ngAfterViewChecked() {
         // Accessibility concerns on last initial set of buttons: when container for it "opens" then
         // focus to the first item within; when that set is escaped out, set focus to the container menu.
+
+        // Angular 21 update note: viewChildren() returns a Signal, not a QueryList or an array 
+        // Will get error: Element implicitly has an 'any' type because expression of type '0' can't be used to index type 'Signal<readonly ElementRef<any> unless using ? for null check.
+
         if (this.signalFocusMoveToFirstLastInitial_FilterMenu) {
             if (this.lastInitialItemsInFilterMenu().length > 0) {
-                if (this.lastInitialItemsInFilterMenu[0].nativeElement)
-                    this.lastInitialItemsInFilterMenu[0].nativeElement.focus();
+                if (this.lastInitialItemsInFilterMenu()?.[0].nativeElement)
+                    this.lastInitialItemsInFilterMenu()?.[0].nativeElement.focus();
 
                 this.signalFocusMoveToFirstLastInitial_FilterMenu = false;
                 this.onFocusChangeLastInitialOptions(0, true);
@@ -428,8 +438,8 @@ export class HistoryMakersComponent extends BaseComponent implements OnInit, Aft
         }
         else if (this.signalFocusMoveToFirstLastInitial) {
             if (this.lastInitialItems().length > 0) {
-                if (this.lastInitialItems[0].nativeElement)
-                  this.lastInitialItems[0].nativeElement.focus();
+                if (this.lastInitialItems()?.[0].nativeElement)
+                  this.lastInitialItems()?.[0].nativeElement.focus();
 
                 this.signalFocusMoveToFirstLastInitial = false;
                 this.onFocusChangeLastInitialOptions(0, true);
@@ -450,10 +460,13 @@ export class HistoryMakersComponent extends BaseComponent implements OnInit, Aft
         }
         ...this will not work because the element lastInitial_Parent is NOT a nativeElement but is an Angular component.
         So, instead, these signals are used in the renderer (html) to signal the component to focus appropriately.
+
+        NOTE:  this comment is from Angular 19 and before.  This whole "last initial" UI should be revisited/updated with signals, radio group accessibility improvements,
+        and other Angular 21 updates if time permits for 2026 forward....
         */
     }
 
-    getHistoryMakers(givenPage: number, givenPageSize: number, filterSpecToUse: string) {
+    getHistoryMakersPage(givenPage: number, givenPageSize: number, filterSpecToUse: string) {
         // NOTE:  assumes range for givenPage is legal: [1, maxPagesNeeded] and that
         //  myCurrentQuery is set appropriately for a query, or cleared for no query
 
@@ -489,7 +502,7 @@ export class HistoryMakersComponent extends BaseComponent implements OnInit, Aft
         // NOTE: these are NOT used with getHistoryMakersBornThisWeek service.
         var sortField:string = ""; // empty string will result in service's default sort field being used
         var sortInDescendingOrder: boolean = false; // actually will be ignored with an empty sortField
-        if (this.globalState.BiographySearchSortingPreference >= 0 && this.globalState.BiographySearchSortingPreference < this.bioSearchSortFields.length) {
+        if (this.bioSearchSortFields && this.globalState.BiographySearchSortingPreference >= 0 && this.globalState.BiographySearchSortingPreference < this.bioSearchSortFields.length) {
             sortField = this.bioSearchSortFields[this.globalState.BiographySearchSortingPreference].sortField;
             sortInDescendingOrder = this.bioSearchSortFields[this.globalState.BiographySearchSortingPreference].sortInDescendingOrder;
         }
@@ -500,7 +513,7 @@ export class HistoryMakersComponent extends BaseComponent implements OnInit, Aft
                 this.myCurrentPage = givenPage;
                 this.myCurrentPageSize = givenPageSize;
                 this.myModelledPageSize = givenPageSize;
-                this.biographies = retSet.biographies;
+                this.myBiographyList = retSet.biographies;
                 this.totalBiographiesFound = retSet.count;
                 this.initializeUSStateCounts(addFilterPrefixToMapKey);
                 this.initializeTitleAndPaging(givenPage, givenPageSize, retSet.count, titleLabelSuffix);
@@ -509,6 +522,7 @@ export class HistoryMakersComponent extends BaseComponent implements OnInit, Aft
                 // Finally, focus can be set because we have our context and content.
                 this.setFocusAsNeeded();
                 this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
+
             });
         }
         else {
@@ -521,7 +535,7 @@ export class HistoryMakersComponent extends BaseComponent implements OnInit, Aft
                 this.myCurrentPage = givenPage;
                 this.myCurrentPageSize = givenPageSize;
                 this.myModelledPageSize = givenPageSize;
-                this.biographies = retSet.biographies;
+                this.myBiographyList = retSet.biographies;
                 this.totalBiographiesFound = retSet.count;
                 this.initializeUSStateCounts(addFilterPrefixToMapKey);
                 this.initializeTitleAndPaging(givenPage, givenPageSize, retSet.count, titleLabelSuffix);
@@ -541,57 +555,71 @@ export class HistoryMakersComponent extends BaseComponent implements OnInit, Aft
     private setFocusAsNeeded() {
         var focusSetElsewhere: boolean = false;
 
-        if (this.pending_focusOnPageOneButton) {
-            this.signalFocusToPageOne = true;
-            focusSetElsewhere = true;
+        if (this.pending_focusIntoMapRegionList) {
+            // Check on focus within the map's list of regions.
+            this.signalFocusToRegionListItemID = this.myUSMapManagerService.currentRegionIDToFocus();
+            if (this.signalFocusToRegionListItemID && this.signalFocusToRegionListItemID.length > 0) {
+                focusSetElsewhere = true; // will focus to region list item within the map UI  
+            } 
         }
-        else if (this.pending_focusOnFinalPageButton) {
-            this.signalFocusToFinalPage = true;
-            focusSetElsewhere = true;
-        }
-        else if (this.pending_focusOnCloseFilterButton) {
-            this.signalFocusToCloseFilterButton = true;
-            focusSetElsewhere = true;
-        }
-        else if (this.pending_focusOnOpenFilterButton) {
-            this.signalFocusToOpenFilterButton = true;
-            focusSetElsewhere = true;
-        }
-        else if (this.pending_signalFocusMoveToFilterMenu_LastInitial) {
-            this.signalFocusMoveToFilterMenu_LastInitial = true;
-            focusSetElsewhere = true;
-        }
-        else if (this.pending_signalFocusMoveToMenu_LastInitial) {
-            this.signalFocusMoveToMenu_LastInitial = true;
+        else
+            this.signalFocusToRegionListItemID = ""; // clear any prior signal to focus to region list item because something else will be focused on instead
 
-            focusSetElsewhere = true;
-        }
-        else if (this.pending_removeFilterButtonIndicator >= 0 &&
-            this.hasActiveFacet()) {
-            if (this.pending_removeFilterButtonIndicator >= this.activeFacets.length)
-                this.signalFocusToRemoveFilterButtonIndicator = this.activeFacets.length - 1;
-            else
-                this.signalFocusToRemoveFilterButtonIndicator = this.pending_removeFilterButtonIndicator;
-            focusSetElsewhere = true;
-        }
-        else if (this.pending_focusToFirstShownFilterFamily) {
-            for (var i = 0; i < BioFilterFamilyTypeCount; i++) {
-                if (this.facetFamilies[i].isAllowedToBeShown && (i == BioFilterFamilyType.LastNameInitial ||
-                  (this.facetFamilies[i].facets && this.facetFamilies[i].facets.length > 0))) {
-                    // Found one to focus!  Set its flag.  Funny clause above is due to LastNameInitial not using facets set as others
-                    // due to its unique UI.
-                    this.facetFamilies[i].signalFocusToFamilyParent = true;
-                    focusSetElsewhere = true;
-                    break; // focus on first one only, of course, so break out of loop
+        if (!focusSetElsewhere) {
+            if (this.pending_focusOnPageOneButton) {
+                this.signalFocusToPageOne = true;
+                focusSetElsewhere = true;
+            }
+            else if (this.pending_focusOnFinalPageButton) {
+                this.signalFocusToFinalPage = true;
+                focusSetElsewhere = true;
+            }
+            else if (this.pending_focusOnCloseFilterButton) {
+                this.signalFocusToCloseFilterButton = true;
+                focusSetElsewhere = true;
+            }
+            else if (this.pending_focusOnOpenFilterButton) {
+                this.signalFocusToOpenFilterButton = true;
+                focusSetElsewhere = true;
+            }
+            else if (this.pending_signalFocusMoveToFilterMenu_LastInitial) {
+                this.signalFocusMoveToFilterMenu_LastInitial = true;
+                focusSetElsewhere = true;
+            }
+            else if (this.pending_signalFocusMoveToMenu_LastInitial) {
+                this.signalFocusMoveToMenu_LastInitial = true;
+
+                focusSetElsewhere = true;
+            }
+            else if (this.pending_removeFilterButtonIndicator >= 0 &&
+                this.hasActiveFacet()) {
+                if (this.pending_removeFilterButtonIndicator >= this.activeFacets.length)
+                    this.signalFocusToRemoveFilterButtonIndicator = this.activeFacets.length - 1;
+                else
+                    this.signalFocusToRemoveFilterButtonIndicator = this.pending_removeFilterButtonIndicator;
+                focusSetElsewhere = true;
+            }
+            else if (this.pending_focusToFirstShownFilterFamily) {
+                var facetFamilyLengthCheck: number;
+                for (var i = 0; i < BioFilterFamilyTypeCount; i++) {
+                    facetFamilyLengthCheck = this.facetFamilies[i].facets?.length ?? 0;  // if facets for index i null or undefined, treat as length of 0 for this check
+                    if (this.facetFamilies[i].isAllowedToBeShown && (i == BioFilterFamilyType.LastNameInitial ||
+                    (this.facetFamilies[i].facets && facetFamilyLengthCheck > 0))) {
+                        // Found one to focus!  Set its flag.  Funny clause above is due to LastNameInitial not using facets set as others
+                        // due to its unique UI.
+                        this.facetFamilies[i].signalFocusToFamilyParent = true;
+                        focusSetElsewhere = true;
+                        break; // focus on first one only, of course, so break out of loop
+                    }
                 }
             }
-        }
-        else if (this.pending_bioFilterFamily != BioFilterFamilyType.None &&
-          this.pending_bioFilterValue != "") {
-            // Signal that the filter within this family with value pending_bioFilterValue is to be focused.
-            this.facetFamilies[this.pending_bioFilterFamily].signalItemToFocus = this.pending_bioFilterValue;
+            else if (this.pending_bioFilterFamily != BioFilterFamilyType.None &&
+              this.pending_bioFilterValue != "") {
+                // Signal that the filter within this family with value pending_bioFilterValue is to be focused.
+                this.facetFamilies[this.pending_bioFilterFamily].signalItemToFocus = this.pending_bioFilterValue;
 
-            focusSetElsewhere = true;
+                focusSetElsewhere = true;
+            }
         }
 
         // Check on scroll and focus to selected biography item once everything is set up, but only do focus/scroll action
@@ -607,7 +635,7 @@ export class HistoryMakersComponent extends BaseComponent implements OnInit, Aft
             this.userSettingsManagerService.updateBioIDToFocus(this.globalState.NO_ACCESSION_CHOSEN);
         }
 
-        // Forget some signalling to other routes, given this context of "Maker Set" such as there is no selected story.
+        // Forget some signalling to other routes, given this context of "Maker Set" such as there is no selected mixtape or story.
         this.userSettingsManagerService.updateStoryIDToFocus(this.globalState.NOTHING_CHOSEN); // no single story context
 
         if (this.globalState.IsInternalRoutingWithinSPA) {
@@ -637,45 +665,38 @@ export class HistoryMakersComponent extends BaseComponent implements OnInit, Aft
         this.pending_focusToFirstShownFilterFamily = false;
         this.pending_bioFilterFamily = BioFilterFamilyType.None;
         this.pending_bioFilterValue = "";
+        this.pending_focusIntoMapRegionList = false;
     }
 
     private initializeUSStateCounts(addFilterPrefixToMapKey: boolean) {
-        var postedDistribution: USMapDistribution = new USMapDistribution();
-        postedDistribution.mapRegionListTitle = "Birth State";
-        postedDistribution.exceptionDescription = ""; // might get filled in later if the count for no-region is nonzero
+        var keyTitle, keyEntitySingular, keyEntityPlural: string;
+        var count: number[];
+
         if (addFilterPrefixToMapKey) {
-            postedDistribution.keyTitle = "Birth State for Filtered ScienceMakers";
-            postedDistribution.keyEntitySingular = "filtered ScienceMaker";
-            postedDistribution.keyEntityPlural = "filtered ScienceMakers";
+            keyTitle = "Birth State for Filtered ScienceMakers";
+            keyEntitySingular = "filtered ScienceMaker";
+            keyEntityPlural = "filtered ScienceMakers";
 
         }
         else {
-            postedDistribution.keyTitle = "Birth State of ScienceMaker";
-            postedDistribution.keyEntitySingular = "ScienceMaker";
-            postedDistribution.keyEntityPlural = "ScienceMakers";
+            keyTitle = "Birth State of ScienceMakers";
+            keyEntitySingular = "ScienceMaker";
+            keyEntityPlural = "ScienceMakers";
         }
-        postedDistribution.verbLeadIn = "are born in";
-        postedDistribution.verbLeadInSingular = "is born in";
-        postedDistribution.verbPhrase = "Birthplace of";
-        postedDistribution.keySuffix = "born here"; // used to compose key message of form: "1 ScienceMaker born here" or "20 ScienceMakers born here"
-
-        postedDistribution.keyEntitySetCount = 0; // update later when this.biographies is set
-        postedDistribution.count = [];
-        // Initialize with zero counts, and set later with actual U.S. state counts from the birthState facet on this.biographies.
+        count = [];
+        // Initialize with zero counts, and set later with actual U.S. state counts from the birthState facet on this.myBiographyList.
         for (var i = 0; i <= 51; i++)
-            postedDistribution.count.push(0);
+            count.push(0);
 
-        this.USStateDistribution = postedDistribution;
+        // Fields within USMapDistribution used to compose key message of form: "1 ScienceMaker born here" or "20 ScienceMakers born here"
+        this.USStateDistribution = new USMapDistribution(count, "Birth State", 0, keyTitle, keyEntitySingular, keyEntityPlural, 
+            "born here", "are born in", "is born in", "Birthplace of", "", ""); // update keyEntitySetCount later when this.myBiographyList is set
     }
 
-    public updateViewOptions(newPicOptionSetting: boolean, newTextOptionSetting: boolean) {
-        if (this.cardView != newPicOptionSetting || this.textView != newTextOptionSetting) {
-            this.cardView = newPicOptionSetting;
-            this.textView = newTextOptionSetting;
-            // Also, change the title for the page (needed when moving in/out of a card or text view and the map view
-            // since the map view is for the WHOLE set and not a page of the WHOLE set).
-
-            // Update title, which is dependent on this.cardView and this.textView:
+    public updateViewOptions(anticipatedView: ViewState, isCheckAlreadyDone: boolean) {
+        if (isCheckAlreadyDone || anticipatedView != this.viewStateSignal()) {
+            this.viewStateSignal.set(anticipatedView);
+            // Update title, which is dependent on the view state:
             this.initTitleForPage();
         }
     }
@@ -688,7 +709,7 @@ export class HistoryMakersComponent extends BaseComponent implements OnInit, Aft
             else if (eventCode == "ArrowUp" || eventCode == "ArrowLeft")
                 this.focusPicViewInFilterMenuOption(false, false); // set "map"
             else if (eventCode == " " || eventCode == "Enter")
-                this.updateViewOptions(true, false);
+                this.updateViewOptions(ViewState.AsGrid, false);
         }
         else if (comingFromTextOption) {
             // Next is map, back is pic, current is text.
@@ -697,7 +718,7 @@ export class HistoryMakersComponent extends BaseComponent implements OnInit, Aft
             else if (eventCode == "ArrowUp" || eventCode == "ArrowLeft")
                 this.focusPicViewInFilterMenuOption(true, false); // set "pic"
             else if (eventCode == " " || eventCode == "Enter")
-                this.updateViewOptions(false, true);
+                this.updateViewOptions(ViewState.AsText, false);
         }
         else {
             // Next is pic, back is text, current is map.
@@ -706,7 +727,7 @@ export class HistoryMakersComponent extends BaseComponent implements OnInit, Aft
             else if (eventCode == "ArrowUp" || eventCode == "ArrowLeft")
                 this.focusPicViewInFilterMenuOption(false, true); // set "text"
             else if (eventCode == " " || eventCode == "Enter")
-                this.updateViewOptions(false, false);
+                this.updateViewOptions(ViewState.AsMap, false);
         }
     }
 
@@ -718,7 +739,7 @@ export class HistoryMakersComponent extends BaseComponent implements OnInit, Aft
             else if (eventCode == "ArrowUp" || eventCode == "ArrowLeft")
                 this.focusPicViewOption(false, false); // set "map"
             else if (eventCode == " " || eventCode == "Enter")
-                this.updateViewOptions(true, false);
+                this.updateViewOptions(ViewState.AsGrid, false);
         }
         else if (comingFromTextOption) {
             // Next is map, back is pic, current is text.
@@ -727,7 +748,7 @@ export class HistoryMakersComponent extends BaseComponent implements OnInit, Aft
             else if (eventCode == "ArrowUp" || eventCode == "ArrowLeft")
                 this.focusPicViewOption(true, false); // set "pic"
             else if (eventCode == " " || eventCode == "Enter")
-                this.updateViewOptions(false, true);
+                this.updateViewOptions(ViewState.AsText, false);
         }
         else {
             // Next is pic, back is text, current is map.
@@ -736,7 +757,7 @@ export class HistoryMakersComponent extends BaseComponent implements OnInit, Aft
             else if (eventCode == "ArrowUp" || eventCode == "ArrowLeft")
                 this.focusPicViewOption(false, true); // set "text"
             else if (eventCode == " " || eventCode == "Enter")
-                this.updateViewOptions(false, false);
+                this.updateViewOptions(ViewState.AsMap, false);
         }
     }
 
@@ -860,14 +881,14 @@ export class HistoryMakersComponent extends BaseComponent implements OnInit, Aft
             if (nextIndex >= 0) {
                 if (isInFilterMenu) {
                     if (nextIndex < this.lastInitialItemsInFilterMenu().length) {
-                      if (this.lastInitialItemsInFilterMenu[nextIndex].nativeElement)
-                        this.lastInitialItemsInFilterMenu[nextIndex].nativeElement.focus();
+                      if (this.lastInitialItemsInFilterMenu()?.[nextIndex].nativeElement)
+                        this.lastInitialItemsInFilterMenu()?.[nextIndex].nativeElement.focus();
                     }
                 }
                 else {
                     if (nextIndex < this.lastInitialItems().length) {
-                        if (this.lastInitialItems[nextIndex].nativeElement)
-                          this.lastInitialItems[nextIndex].nativeElement.focus();
+                        if (this.lastInitialItems()?.[nextIndex].nativeElement)
+                          this.lastInitialItems()?.[nextIndex].nativeElement.focus();
                     }
                 }
             }
@@ -879,7 +900,7 @@ export class HistoryMakersComponent extends BaseComponent implements OnInit, Aft
         // this.cardView, this.textView, this.totalBiographiesFound, this.myCurrentPageSize, and this.fullResultsSetTitleSuffix.
         // Two approaches for title: if cardView or textView, we look at a page of results only, so put page info in title.
         // But, for map, look at ALL the results, so do not put page info in title.
-        if (!this.cardView && !this.textView) {
+        if (this.viewStateSignal() == ViewState.AsMap) {
             if (this.totalBiographiesFound > 0) {
                 this.biographySetTitle = "Map view of " + this.totalBiographiesFound + " " + this.fullResultSetTitleSuffix;
                 this.screenReaderSummaryTitle = "Map view of ScienceMakers set";
@@ -893,8 +914,8 @@ export class HistoryMakersComponent extends BaseComponent implements OnInit, Aft
             var countReturned: number;
             var totalPages: number = Math.ceil(this.totalBiographiesFound / this.myCurrentPageSize);
 
-            if (this.biographies != null && this.biographies.length > 0)
-                countReturned = this.biographies.length;
+            if (this.myBiographyList != null && this.myBiographyList.length > 0)
+                countReturned = this.myBiographyList.length;
             else
                 countReturned = 0;
 
@@ -917,7 +938,7 @@ export class HistoryMakersComponent extends BaseComponent implements OnInit, Aft
                 }
                 else {
                     if (this.myBornThisTimeFilterFlag)
-                        this.biographySetTitle = "No ScienceMakers born this week."; // NOTE: here we assume "time" is a "week" rather than "this day"
+                        this.biographySetTitle = "No ScienceMakers born this week."; // NOTE: here we assume "time" is "this week"
                     else
                         this.biographySetTitle = "No results for " + this.fullResultSetTitleSuffix;
                 }
@@ -987,15 +1008,15 @@ export class HistoryMakersComponent extends BaseComponent implements OnInit, Aft
             }
         }
 
-        if (this.biographies != null && this.biographies.length > 0)
-            countReturned = this.biographies.length;
+        if (this.myBiographyList != null && this.myBiographyList.length > 0)
+            countReturned = this.myBiographyList.length;
         else
             countReturned = 0;
 
         if (countReturned != 1)
             titleLabelSuffix += "s"; // e.g., "0 ScienceMakers" or "23 ScienceMakers"
         if (this.myBornThisTimeFilterFlag) {
-            titleLabelSuffix += " born this week"; // NOTE: here we assume "time" is a "week" rather than "this day", i.e., service call getHistoryMakersBornThisWeek used
+            titleLabelSuffix += " born this week"; // NOTE: here we assume "time" is "this week", i.e., service call getHistoryMakersBornThisWeek used
             addFoundSuffixToTotalSummary = true; // for born this week, tack on a " Found" to this.totalBiographiesFoundSuffix
         }
         else if (this.myCurrentQuery != null && this.myCurrentQuery.length > 0 && this.myCurrentQuery != "*") {
@@ -1051,7 +1072,11 @@ export class HistoryMakersComponent extends BaseComponent implements OnInit, Aft
                 oneFacet.ID = this.globalState.FEMALE_ID;
                 oneFacet.count = returnedFacets.gender[i].count;
                 if (genderFacetSpec == "F") oneFacet.active = true;
-                this.facetFamilies[BioFilterFamilyType.Gender].facets.push(oneFacet);
+                if (this.facetFamilies[BioFilterFamilyType.Gender].facets) { 
+                    // NOTE: assignment to this.facetFamilies[X] for all X makes this always be true, but error checking not clever enough to pick it up, 
+                    // so have this redundant check in case of future code changes that might make this.facetFamilies[X] not be assigned for some X
+                    this.facetFamilies[BioFilterFamilyType.Gender].facets.push(oneFacet);
+                }
             }
             else if (returnedFacets.gender[i].value == "M") {
                 oneFacet = new FacetDetail();
@@ -1059,7 +1084,11 @@ export class HistoryMakersComponent extends BaseComponent implements OnInit, Aft
                 oneFacet.ID = this.globalState.MALE_ID;
                 oneFacet.count = returnedFacets.gender[i].count;
                 if (genderFacetSpec == "M") oneFacet.active = true;
-                this.facetFamilies[BioFilterFamilyType.Gender].facets.push(oneFacet);
+                if (this.facetFamilies[BioFilterFamilyType.Gender].facets) { 
+                    // NOTE: assignment to this.facetFamilies[X] for all X makes this always be true, but error checking not clever enough to pick it up, 
+                    // so have this redundant check in case of future code changes that might make this.facetFamilies[X] not be assigned for some X
+                    this.facetFamilies[BioFilterFamilyType.Gender].facets.push(oneFacet);
+                }
             }
         }
 
@@ -1101,7 +1130,11 @@ export class HistoryMakersComponent extends BaseComponent implements OnInit, Aft
             oneFacet.count = returnedFacets.makerCategories[i].count;
             oneFacet.value = this.historyMakerService.getMaker(oneFacet.ID); // value is the readable string
             if (makerIDsInFilter.indexOf(oneFacet.ID) !== -1) oneFacet.active = true;
-            this.facetFamilies[BioFilterFamilyType.Category].facets.push(oneFacet);
+            if (this.facetFamilies[BioFilterFamilyType.Category].facets) { 
+                // NOTE: assignment to this.facetFamilies[X] for all X makes this always be true, but error checking not clever enough to pick it up, 
+                // so have this redundant check in case of future code changes that might make this.facetFamilies[X] not be assigned for some X
+                this.facetFamilies[BioFilterFamilyType.Category].facets.push(oneFacet);
+            }
         }
         // Handle job type:
         var jobIDsInFilter: string[] = jobFacetSpec.split(",");
@@ -1111,7 +1144,11 @@ export class HistoryMakersComponent extends BaseComponent implements OnInit, Aft
             oneFacet.count = returnedFacets.occupationTypes[i].count;
             oneFacet.value = this.historyMakerService.getJobType(oneFacet.ID); // value is the readable string
             if (jobIDsInFilter.indexOf(oneFacet.ID.toString()) !== -1) oneFacet.active = true;
-            this.facetFamilies[BioFilterFamilyType.JobType].facets.push(oneFacet);
+            if (this.facetFamilies[BioFilterFamilyType.JobType].facets) { 
+                // NOTE: assignment to this.facetFamilies[X] for all X makes this always be true, but error checking not clever enough to pick it up, 
+                // so have this redundant check in case of future code changes that might make this.facetFamilies[X] not be assigned for some X
+                this.facetFamilies[BioFilterFamilyType.JobType].facets.push(oneFacet);
+            }
         }
         // Handle "decade" (a decade ten-year marker):
         var decadeValuesInFilter: string[] = birthDecadeFacetSpec.split(",");
@@ -1121,7 +1158,11 @@ export class HistoryMakersComponent extends BaseComponent implements OnInit, Aft
             oneFacet.count = returnedFacets.birthYear[i].count;
             oneFacet.value = "Born in " + returnedFacets.birthYear[i].value + "s"; // value is "Born in " and string form of the numeric value followed by "s", e.g., Born in 1950s for 1950
             if (decadeValuesInFilter.indexOf(oneFacet.ID.toString()) !== -1) oneFacet.active = true;
-            this.facetFamilies[BioFilterFamilyType.BirthDecade].facets.push(oneFacet);
+            if (this.facetFamilies[BioFilterFamilyType.BirthDecade].facets) { 
+                // NOTE: assignment to this.facetFamilies[X] for all X makes this always be true, but error checking not clever enough to pick it up, 
+                // so have this redundant check in case of future code changes that might make this.facetFamilies[X] not be assigned for some X
+                this.facetFamilies[BioFilterFamilyType.BirthDecade].facets.push(oneFacet);
+            }
         }
 
         // Handle region (US state), and also use this information to initialize this.USStateDistribution.count values across the regions (50 states plus DC)
@@ -1146,20 +1187,25 @@ export class HistoryMakersComponent extends BaseComponent implements OnInit, Aft
 
                 if (regionUSStateIDsInFilter.indexOf(oneFacet.ID.toString()) !== -1)
                     oneFacet.active = true;
-                if (this.facetFamilies[BioFilterFamilyType.BirthState].facets.length < this.MAX_REGION_US_STATES_TO_SHOW_IN_FILTER_AREA)
+                if (this.facetFamilies[BioFilterFamilyType.BirthState].facets &&
+                    this.facetFamilies[BioFilterFamilyType.BirthState].facets.length < this.MAX_REGION_US_STATES_TO_SHOW_IN_FILTER_AREA) { 
+                    // NOTE: assignment to this.facetFamilies[X] for all X makes this always be true, but error checking not clever enough to pick it up, 
+                    // so have this redundant check in case of future code changes that might make this.facetFamilies[X] not be assigned for some X
                     this.facetFamilies[BioFilterFamilyType.BirthState].facets.push(oneFacet);
+                }
             }
         }
-        this.USStateDistribution.keyEntitySetCount = totalCount;
-        this.USStateDistribution.regionIDsAlreadyInFilter = regionUSStateFacetSpec.trim();
-        this.USStateDistribution.count = regionCount;
-
-        if (countForNonUSState > 0) {
-            // Setting exceptionDescription to read: NOTE: # ScienceMakers <suffix> or # filtered ScienceMakers <suffix>
-            if (countForNonUSState == 1)
-                this.USStateDistribution.exceptionDescription = "NOTE: 1 " + this.USStateDistribution.keyEntitySingular + this.NO_US_BIRTHSTATE_FOR_SOME_LABEL_SUFFIX;
-            else
-                this.USStateDistribution.exceptionDescription = "NOTE: " + countForNonUSState + " " + this.USStateDistribution.keyEntityPlural + this.NO_US_BIRTHSTATE_FOR_SOME_LABEL_SUFFIX;
+        if (this.USStateDistribution) {
+            this.USStateDistribution.keyEntitySetCount = totalCount;
+            this.USStateDistribution.regionIDsAlreadyInFilter = regionUSStateFacetSpec.trim();
+            this.USStateDistribution.count = regionCount;
+            if (countForNonUSState > 0) {
+                // Setting exceptionDescription to read: NOTE: # ScienceMakers <suffix> or # filtered ScienceMakers <suffix>
+                if (countForNonUSState == 1)
+                    this.USStateDistribution.exceptionDescription = "NOTE: 1 " + this.USStateDistribution.keyEntitySingular + this.NO_US_BIRTHSTATE_FOR_SOME_LABEL_SUFFIX;
+                else
+                    this.USStateDistribution.exceptionDescription = "NOTE: " + countForNonUSState + " " + this.USStateDistribution.keyEntityPlural + this.NO_US_BIRTHSTATE_FOR_SOME_LABEL_SUFFIX;
+            }
         }
 
         if (genderFacetSpec.length > 0 || makerFacetSpec.length > 0 || jobFacetSpec.length > 0 || birthDecadeFacetSpec.length > 0 ||
@@ -1198,7 +1244,7 @@ export class HistoryMakersComponent extends BaseComponent implements OnInit, Aft
             }
         }
 
-        if (makerFacetSpec != null) {
+        if (makerFacetSpec != null && this.facetFamilies[BioFilterFamilyType.Category].facets) {
             itemInCSVList = makerFacetSpec.split(",");
             for (i = 0; i < itemInCSVList.length; i++) {
                 IDToCheck = itemInCSVList[i];
@@ -1237,7 +1283,7 @@ export class HistoryMakersComponent extends BaseComponent implements OnInit, Aft
             }
         }
 
-        if (birthDecadeFacetSpec != null) {
+        if (birthDecadeFacetSpec != null && this.facetFamilies[BioFilterFamilyType.BirthDecade].facets) {
             itemInCSVList = birthDecadeFacetSpec.split(",");
             for (i = 0; i < itemInCSVList.length; i++) {
                 IDToCheck = itemInCSVList[i];
@@ -1258,7 +1304,7 @@ export class HistoryMakersComponent extends BaseComponent implements OnInit, Aft
             }
         }
 
-        if (regionUSStateFacetSpec != null) {
+        if (regionUSStateFacetSpec != null && this.facetFamilies[BioFilterFamilyType.BirthState].facets) {
           itemInCSVList = regionUSStateFacetSpec.split(",");
           for (i = 0; i < itemInCSVList.length; i++) {
               IDToCheck = itemInCSVList[i];
@@ -1279,7 +1325,7 @@ export class HistoryMakersComponent extends BaseComponent implements OnInit, Aft
           }
       }
 
-      if (jobFacetSpec != null) {
+      if (jobFacetSpec != null && this.facetFamilies[BioFilterFamilyType.JobType].facets) {
           itemInCSVList = jobFacetSpec.split(",");
           for (i = 0; i < itemInCSVList.length; i++) {
               IDToCheck = itemInCSVList[i];
@@ -1349,12 +1395,12 @@ export class HistoryMakersComponent extends BaseComponent implements OnInit, Aft
       this.activeFacets.splice(insertionPoint, 0, givenNewFacet); // put newly added facet in where it belongs
   }
 
-  private setOptionsAndRouteToPage(isFilterForcedUpdate: boolean, overrideToBornThisTime: boolean, queryToUse: string, pageToLoad: number, pageSize: number,
+  private setOptionsAndRouteToPage(isFilterForcedUpdate: boolean, overrideToBornThisTime: boolean, queryToUse: Nullable<string>, pageToLoad: number, pageSize: number,
       searchLastNameOnlyFlag: boolean, searchPreferredNameOnlyFlag: boolean, sortOrderSpecifier: number, filterSpecInPlay: string,
       focusFirstOnLastInitialMenu: boolean, focusFirstOnLastInitialFilterMenu: boolean,
       isClearActionFromRemoveFilterButton: boolean, whichRemoveFilterButtonToFocus: number,
       focusWithinFilterFamily: BioFilterFamilyType, focusValueWithinFilterFamily: string,
-      focusOnCloseOutFilterInterface: boolean, focusOnOpenUpFilterInterface: boolean) {
+      focusOnCloseOutFilterInterface: boolean, focusOnOpenUpFilterInterface: boolean, focusIntoMapRegionList: boolean) {
 
         // Set up focus flags so that after routing we set focus to appropriate element.
         this.pending_signalFocusMoveToMenu_LastInitial = focusFirstOnLastInitialMenu;
@@ -1363,6 +1409,7 @@ export class HistoryMakersComponent extends BaseComponent implements OnInit, Aft
         this.pending_bioFilterValue = focusValueWithinFilterFamily;
         this.pending_focusOnCloseFilterButton = focusOnCloseOutFilterInterface;
         this.pending_focusOnOpenFilterButton = focusOnOpenUpFilterInterface;
+        this.pending_focusIntoMapRegionList = focusIntoMapRegionList;
 
         if (isClearActionFromRemoveFilterButton) {
             // Focus will be to a remaining remove-filter button in the proper order, or to the first shown filter family.
@@ -1377,7 +1424,8 @@ export class HistoryMakersComponent extends BaseComponent implements OnInit, Aft
         else
             this.pending_removeFilterButtonIndicator = -1; // signal not relevant because of !isClearActionFromRemoveFilterButton
 
-        var moreOptions = [];
+        var moreOptions:Record<string, string | number> = {};
+
         // Accumulate routing parameters specifying filter specification, page information, etc.
 
         // NOTE: filter-forced-update, ffu, is a new parameter added to force a contents refresh because the filter changed contents or
@@ -1388,18 +1436,23 @@ export class HistoryMakersComponent extends BaseComponent implements OnInit, Aft
         if (this.showingFilterMenu)
             moreOptions['menu'] = "1";
 
-        if (this.textView)
+        var currentView: ViewState = this.viewStateSignal();
+        if (currentView == ViewState.AsText)
             moreOptions['tv'] = "1";
-        else if (!this.cardView)
-            moreOptions['mv'] = "1"; // NOTE: !textView && !cardView means it is map view, i.e., 'mv'
+        else if (currentView == ViewState.AsMap)
+            moreOptions['mv'] = "1"; // map view, i.e., 'mv'
+        // else no parameters for the default of AsGrid view 
 
         if (overrideToBornThisTime) {
             // NOTE: "born this time" always trumps the query specification and is used in its place
             moreOptions['bt'] = "1";
         }
         else {
-            if (queryToUse != null && queryToUse.length > 0)
-                moreOptions['q'] = this.globalState.cleanedQueryRouterParameter(queryToUse);
+            var cleanedQuery: Nullable<string> = this.globalState.cleanedQueryRouterParameter(queryToUse);
+            if (cleanedQuery != null) {
+                moreOptions['q'] = cleanedQuery;
+            }
+
             if (searchLastNameOnlyFlag)
                 moreOptions['ln'] = "1"; // search just the last name field
             else
@@ -1469,14 +1522,14 @@ export class HistoryMakersComponent extends BaseComponent implements OnInit, Aft
         }
     }
 
-    goToPage(pageVal) {
+    goToPage(pageVal: number) {
         if (pageVal != this.myCurrentPage)
             this.routeToPage(pageVal, false);
     }
 
     private routeToPage(newPageIdentifier: number, filterPageSortPageSizeEtcForcedUpdate: boolean) {
-        if (this.cardView || this.textView) {
-            // Only if we are in cardView or textView will page fetching actually take place.
+        if (this.viewStateSignal() != ViewState.AsMap) {
+            // Only if we are NOT in AsMap (map view) will page fetching actually take place.
             this.biographySetTitle = "Fetching Page " + newPageIdentifier + "... (in progress)";
             this.screenReaderSummaryTitle = "Maker Directory, Page Fetch Pending";
 
@@ -1486,7 +1539,7 @@ export class HistoryMakersComponent extends BaseComponent implements OnInit, Aft
         // Accumulate routing parameters specifying filter specification, page information, etc.
         this.setOptionsAndRouteToPage(filterPageSortPageSizeEtcForcedUpdate, this.myBornThisTimeFilterFlag, this.myCurrentQuery, newPageIdentifier, this.myCurrentPageSize,
             this.myCurrentSearchLastNameOnlyFlag, this.myCurrentSearchPreferredNameOnlyFlag, this.myCurrentBiographySearchSorting, this.specStringFromActiveFacets(),
-            false, false, false, -1, BioFilterFamilyType.None, "", false, false);
+            false, false, false, -1, BioFilterFamilyType.None, "", false, false, false);
     }
 
     private specStringFromActiveFacets(): string {
@@ -1545,7 +1598,7 @@ export class HistoryMakersComponent extends BaseComponent implements OnInit, Aft
     }
 
     clearActiveFacetChoice(facetSetOwningTheClear: BioFilterFamilyType, facetIDToClear: string,
-      isClearActionFromRemoveFilterButton: boolean) {
+      isClearActionFromRemoveFilterButton: boolean, itemClearedFromMapActions: boolean) {
         // NOTE: purpose of isClearActionFromRemoveFilterButton: communicate that after the facet is cleared
         // focus is to return to the remove-buttons list (if isClearActionFromRemoveFilterButton) or to the
         // facet set where a toggle action happened to turn back off a facet (if !isClearActionFromRemoveFilterButton)
@@ -1572,7 +1625,7 @@ export class HistoryMakersComponent extends BaseComponent implements OnInit, Aft
           // parameters instead of "false, false" for when !isClearActionFromRemoveFilterButton; see
           // clearLastInitialFacet().
             this.processClearedFilter(false, false, isClearActionFromRemoveFilterButton, itemClearedOrder,
-              facetSetOwningTheClear, facetValueToClear);
+              facetSetOwningTheClear, facetValueToClear, itemClearedFromMapActions);
         }
     }
 
@@ -1595,7 +1648,7 @@ export class HistoryMakersComponent extends BaseComponent implements OnInit, Aft
             // based on their UI, and so rather than keep them like the others with its arguments to processClearedFilter, instead
             // make use of specialty flas isInFilterMenu and keep the filter family as none
             this.processClearedFilter(focusFirstOnLastInitialMenu, focusFirstOnLastInitialFilterMenu,
-              false, -1, BioFilterFamilyType.None, "");
+              false, -1, BioFilterFamilyType.None, "", false);
         }
     }
 
@@ -1612,7 +1665,7 @@ export class HistoryMakersComponent extends BaseComponent implements OnInit, Aft
                 chosenFacet.active = false;
                 // Note with third parameter isClearActionFromRemoveFilterButton as false
                 // that this action is coming from a toggle handler:
-                this.clearActiveFacetChoice(facetSetOwningTheToggle, chosenFacetID, false);
+                this.clearActiveFacetChoice(facetSetOwningTheToggle, chosenFacetID, false, false);
                 break;
             }
         }
@@ -1623,7 +1676,7 @@ export class HistoryMakersComponent extends BaseComponent implements OnInit, Aft
             oneFacet.value = chosenFacetValue;
             chosenFacet.active = true;
             this.insertIntoProperPlaceNewActiveFacetItem(oneFacet);
-            this.processUpdatedFilter(false, false, facetSetOwningTheToggle, chosenFacetValue);
+            this.processUpdatedFilter(false, false, facetSetOwningTheToggle, chosenFacetValue, false);
         }
     }
 
@@ -1654,14 +1707,15 @@ export class HistoryMakersComponent extends BaseComponent implements OnInit, Aft
             // NOTE: accessibility expert advice is to treat the last name initial collection differently from the other filter menus
             // based on their UI, and so rather than keep them like the others with its arguments to processUpdatedFilter, instead
             // make use of specialty flas isInFilterMenu and keep the filter family as none
-            this.processUpdatedFilter(!isInFilterMenu, isInFilterMenu, BioFilterFamilyType.None, "");
+            this.processUpdatedFilter(!isInFilterMenu, isInFilterMenu, BioFilterFamilyType.None, "", false);
         }
     }
 
-    filterOnUSMapRegion(chosenUSMapRegionID: string) {
-        // If given region is already picked, do nothing.
+    filterOnUSMapRegion(chosenUSMapRegionID: string, isClearAction: boolean) {
+        // If given region is already picked and !isClearAction, do nothing.
+        // If given region not already picked and isClearAction, do nothing.
         // Else, filter on it.  NOTE: this is DIFFERENT behavior from toggleActiveFacetChoice()
-        // where selecting something already selected would clear it.
+        // because callers are deciding more nuanced "toggle" logic (since a click on a map region only turns on, never clears).
         var itemAlreadyChosen: boolean = false;
         for (var i = 0; i < this.activeFacets.length; i++) {
             if (this.activeFacets[i].setID == BioFilterFamilyType.BirthState &&
@@ -1670,19 +1724,24 @@ export class HistoryMakersComponent extends BaseComponent implements OnInit, Aft
                 break;
             }
         }
-        if (!itemAlreadyChosen) {
+        if (itemAlreadyChosen && isClearAction) { // clear this action
+            // Note with third parameter isClearActionFromRemoveFilterButton as false
+            // that this action is coming from a toggle handler:
+            this.clearActiveFacetChoice(BioFilterFamilyType.BirthState, chosenUSMapRegionID, false, true);
+        }
+        else if (!itemAlreadyChosen && !isClearAction) { // set this action     
             var oneFacet: FacetWithFamily = new FacetWithFamily();
             oneFacet.setID = BioFilterFamilyType.BirthState;
             oneFacet.ID = chosenUSMapRegionID;
             oneFacet.value = this.globalState.NameForUSState(chosenUSMapRegionID); // e.g., get "Hawaii" from "HI"
             this.insertIntoProperPlaceNewActiveFacetItem(oneFacet);
-            this.processUpdatedFilter(false, false, BioFilterFamilyType.BirthState, oneFacet.value);
+            this.processUpdatedFilter(false, false, BioFilterFamilyType.BirthState, oneFacet.value, true);
         }
     }
 
     clearFilters() {
         this.activeFacets = [];
-        this.processUpdatedFilter(false, false, BioFilterFamilyType.None, "");
+        this.processUpdatedFilter(false, false, BioFilterFamilyType.None, "", false);
     }
 
     setBiographyPageSize() {
@@ -1717,7 +1776,7 @@ export class HistoryMakersComponent extends BaseComponent implements OnInit, Aft
     updateBioSearchSorting(newSortingPreference: number): boolean {
         var isLegalChangeInSortSelection: boolean = false;
         // Returns true iff new sorting preference is legal and different from what is currently used.
-        if (newSortingPreference >= 0 && newSortingPreference < this.bioSearchSortFields.length) {
+        if (this.bioSearchSortFields && newSortingPreference >= 0 && newSortingPreference < this.bioSearchSortFields.length) {
             // Legal value.  Check if different.
             if (newSortingPreference != this.globalState.BiographySearchSortingPreference) {
                 isLegalChangeInSortSelection = true;
@@ -1733,7 +1792,7 @@ export class HistoryMakersComponent extends BaseComponent implements OnInit, Aft
 
     private processClearedFilter(focusFirstOnLastInitialMenu: boolean, focusFirstOnLastInitialFilterMenu: boolean,
       isClearActionFromRemoveFilterButton: boolean, whichRemoveFilterButtonToFocus: number,
-      focusWithinFilterFamily: BioFilterFamilyType, focusValueWithinFilterFamily: string) {
+      focusWithinFilterFamily: BioFilterFamilyType, focusValueWithinFilterFamily: string, focusIntoMapRegionList: boolean) {
         if (this.activeFacets.length > 0) {
             this.biographySetTitle = "Fetching Filtered Page 1... (in progress)";
             this.screenReaderSummaryTitle = "Maker Directory, Results Pending";
@@ -1758,11 +1817,11 @@ export class HistoryMakersComponent extends BaseComponent implements OnInit, Aft
             this.myCurrentBiographySearchSorting, this.specStringFromActiveFacets(),
             focusFirstOnLastInitialMenu, focusFirstOnLastInitialFilterMenu,
             isClearActionFromRemoveFilterButton, whichRemoveFilterButtonToFocus,
-            focusWithinFilterFamily, focusValueWithinFilterFamily, false, false);
+            focusWithinFilterFamily, focusValueWithinFilterFamily, false, false, focusIntoMapRegionList);
     }
 
     private processUpdatedFilter(focusFirstOnLastInitialMenu: boolean, focusFirstOnLastInitialFilterMenu: boolean,
-      focusWithinFilterFamily: BioFilterFamilyType, focusValueWithinFilterFamily: string) {
+      focusWithinFilterFamily: BioFilterFamilyType, focusValueWithinFilterFamily: string, focusIntoMapRegionList: boolean) {
         // Do the filtering by calling the router with an updated spec argument, returning to page 1 of the newly filtered set:
         this.biographySetTitle = "Fetching Filtered Page 1... (in progress)";
         this.screenReaderSummaryTitle = "Maker Directory, Results Pending";
@@ -1772,7 +1831,7 @@ export class HistoryMakersComponent extends BaseComponent implements OnInit, Aft
         this.setOptionsAndRouteToPage(true, this.myBornThisTimeFilterFlag, this.myCurrentQuery, 1, this.myCurrentPageSize,
             this.myCurrentSearchLastNameOnlyFlag, this.myCurrentSearchPreferredNameOnlyFlag, this.myCurrentBiographySearchSorting, this.specStringFromActiveFacets(),
             focusFirstOnLastInitialMenu, focusFirstOnLastInitialFilterMenu, false, -1,
-            focusWithinFilterFamily, focusValueWithinFilterFamily, false, false);
+            focusWithinFilterFamily, focusValueWithinFilterFamily, false, false, focusIntoMapRegionList);
     }
 
     openPickFilterMenu() {
@@ -1782,7 +1841,7 @@ export class HistoryMakersComponent extends BaseComponent implements OnInit, Aft
         this.setOptionsAndRouteToPage(false, this.myBornThisTimeFilterFlag, this.myCurrentQuery, this.myCurrentPage, this.myCurrentPageSize,
           this.myCurrentSearchLastNameOnlyFlag, this.myCurrentSearchPreferredNameOnlyFlag,
           this.myCurrentBiographySearchSorting, this.specStringFromActiveFacets(),
-          false, false, false, -1, BioFilterFamilyType.None, "", true, false); // 2nd last parm is true to focus on close Filter Menu
+          false, false, false, -1, BioFilterFamilyType.None, "", true, false, false); // 3rd last parm is true to focus on close Filter Menu
     }
 
     closePickFilterMenu() {
@@ -1792,7 +1851,7 @@ export class HistoryMakersComponent extends BaseComponent implements OnInit, Aft
         this.setOptionsAndRouteToPage(false, this.myBornThisTimeFilterFlag, this.myCurrentQuery, this.myCurrentPage, this.myCurrentPageSize,
           this.myCurrentSearchLastNameOnlyFlag, this.myCurrentSearchPreferredNameOnlyFlag,
           this.myCurrentBiographySearchSorting, this.specStringFromActiveFacets(),
-          false, false, false, -1, BioFilterFamilyType.None, "", false, true); // last parm is true to focus on open Filter Menu
+          false, false, false, -1, BioFilterFamilyType.None, "", false, true, false); // 2nd last parm is true to focus on open Filter Menu
     }
 
     removeLastInitialLabel(theInitial:string): string {
