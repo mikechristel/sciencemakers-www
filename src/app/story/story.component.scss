@@ -560,20 +560,6 @@
 
 }
 
-.spaceForWordyLabel { /* hide on narrow views exactly the inverse of range for needTightLabel */
-  @media screen and (max-width: myF.bp(thmda_wideenough_just_before)) {
-    display: none !important;
-  }
-  flex-grow: 1; /* used where we formerly had fxFlex="grow" */
-}
-
-.needTightLabel { /* hide on wide views exactly the inverse of range for spaceForWordyLabel */
-  @media screen and (min-width: myF.bp(thmda_wideenough)) {
-    display: none !important;
-  }
-  flex-grow: 1; /* used where we formerly had fxFlex="grow" */
-}
-
 .slight-gap-above {
   margin-top: 0.4em;
 }
@@ -655,14 +641,8 @@
   }
 }
 
-.myclips-add-icon {
+.myclips-star-icon {
   flex: 0 0 16px;
-  height: 1rem;
-  margin-left: 0.5rem;
-}
-
-.myclips-delete-icon {
-  flex: 0 0 15px;
   height: 1rem;
   margin-left: 0.5rem;
 }

@@ -16,7 +16,7 @@ export class MyVideoPlayButtonComponent implements AfterViewInit, OnDestroy {
   private renderer = inject(Renderer2);
   private evt = inject(EventService);
 
-  readonly video = input<HTMLVideoElement>(undefined);
+  readonly video = input<HTMLVideoElement>();
 
   // TODO: Skipped for migration with "ng generate @angular/core:signal-input-migration" (March 2025) because:
   //  Your application code writes to the input. This prevents migration.
@@ -30,16 +30,16 @@ export class MyVideoPlayButtonComponent implements AfterViewInit, OnDestroy {
 
   readonly keyboard = input(true);
 
-  private events: EventHandler[];
+  private events!: EventHandler[]; // set up in ngAfterViewInit
 
   ngAfterViewInit(): void {
     this.events = [
-      { element: this.video(), name: "play", callback: event => this.setVideoPlayback(true), dispose: null },
-      { element: this.video(), name: "pause", callback: event => this.setVideoPlayback(false), dispose: null },
-      // no longer used: { element: this.video, name: "durationchange", callback: event => this.noteDurationChange(), dispose: null },
-      // no longer used: { element: this.video, name: "ended", callback: event => this.noteEndOfMediaReached(), dispose: null },
-      { element: this.video(), name: "click", callback: event => this.toggleVideoPlayback(), dispose: null }
+      { element: this.video(), name: "play", callback: () => this.setVideoPlayback(true), dispose: null },
+      { element: this.video(), name: "pause", callback: () => this.setVideoPlayback(false), dispose: null },
+      { element: this.video(), name: "click", callback: () => this.toggleVideoPlayback(), dispose: null }
     ];
+    // NOTE: no longer used: { element: this.video, name: "durationchange", callback: event => this.noteDurationChange(), dispose: null },
+    // no longer used: { element: this.video, name: "ended", callback: event => this.noteEndOfMediaReached(), dispose: null },
 
     this.evt.addEvents(this.renderer, this.events);
   }
@@ -71,8 +71,14 @@ export class MyVideoPlayButtonComponent implements AfterViewInit, OnDestroy {
   }
 
   updateVideoPlayback(): void {
-    this.play ? this.video().play() : this.video().pause();
-    this.playChanged.emit(this.play);
+    const videoElement = this.video();
+    if (videoElement != null) {
+      if (this.play)
+        videoElement.play();
+      else
+        videoElement.pause();
+      this.playChanged.emit(this.play);
+    }
   }
 
   @HostListener("document:keyup.space", ["$event"])

@@ -17,13 +17,13 @@ export class TextSearchService {
     private txtSearchURL = 'StorySearch?query=';
 
     getTextSearch(query: Nullable<string>, interviewYearFilter: Nullable<string>, parentBiographyForAllStories: Nullable<number>, matchTitleOnly: boolean, matchTranscriptOnly: boolean,
-      givenPage: Nullable<number>, givenPageSize: Nullable<number>, genderFacet: Nullable<string>, birthDecadeFacets: Nullable<string>, 
-      makerFacets: Nullable<string>, jobFacets: Nullable<string>, regionUSStateFacets: Nullable<string>, 
-      organizationFacets: Nullable<string>, namedDecadeFacets:Nullable<string>, namedYearFacets: Nullable<string>,
+      givenPage: Nullable<number>, givenPageSize: Nullable<number>, genderFacet: Nullable<string>, birthDecadeFacets: Nullable<string>, makerFacets: Nullable<string>, jobFacets: Nullable<string>,
+      regionUSStateFacets: Nullable<string>, organizationFacets: Nullable<string>, namedDecadeFacets:Nullable<string>, namedYearFacets: Nullable<string>,
       sortField: Nullable<string>, sortInDescendingOrder: boolean): Observable<SearchResult> {
         var queryToUse: string = ""; // unclear what to do for callers passing in null query - send to service as empty string
         if (query != null)
             queryToUse = query;
+
         var addedArgs: string = "";
         if (parentBiographyForAllStories != this.globalState.NOTHING_CHOSEN)
             addedArgs = addedArgs + "&parentBiographyID=" + parentBiographyForAllStories;

@@ -17,7 +17,7 @@ export class MyVideoSpinnerComponent implements AfterViewInit, OnDestroy {
   private renderer = inject(Renderer2);
   private evt = inject(EventService);
 
-  readonly video = input<HTMLVideoElement>(undefined);
+  readonly video = input<HTMLVideoElement>();
 
   videoBuffering = false;
 
@@ -32,13 +32,17 @@ export class MyVideoSpinnerComponent implements AfterViewInit, OnDestroy {
       { element: this.video(), name: "durationchange", callback: event => (this.videoBuffering = true), dispose: null }
     ];
 
-    this.video().onloadeddata = () => (this.videoBuffering = false);
+    const videoElement = this.video();
+    if (videoElement != null)
+        videoElement.onloadeddata = () => (this.videoBuffering = false);
 
     this.evt.addEvents(this.renderer, this.events);
   }
 
   ngOnDestroy(): void {
-    this.video().onloadeddata = null;
+    const videoElement = this.video();
+    if (videoElement != null)
+        videoElement.onloadeddata = null;
 
     this.evt.removeEvents(this.events);
   }

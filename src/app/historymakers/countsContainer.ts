@@ -1,5 +1,7 @@
 export class CountsContainer {
-  public all: number;
-  public tagged: number;
-  public scienceMakerCount: number;
+    constructor(
+      public all: number,
+      public scienceMakerCount: number,
+      public tagged: number
+    ) { }
 }

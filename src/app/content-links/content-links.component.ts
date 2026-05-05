@@ -6,7 +6,8 @@ import { ActivatedRoute, Router, Params } from '@angular/router';
 import { PlaylistManagerService } from '../playlist-manager/playlist-manager.service';
 import { Playlist } from '../playlist-manager/playlist';
 import { FeedbackService } from '../feedback/feedback.service';
-import { WindowService, RouterHistoryService } from '../shared/services';
+import { WindowService } from '../shared/services/window.service';
+import { RouterHistoryService } from '../shared/services/router-history.service';
 import { TitleManagerService } from '../shared/title-manager.service';
 
 import { BaseComponent } from '../shared/base.component';
@@ -39,11 +40,11 @@ export class ContentLinksComponent extends BaseComponent implements OnInit, Afte
     contentLinksPageTitleLong: string;
     initialFocusMade: boolean = false;
 
-    public myClips: Playlist[]; // needs to be public as it is seen/used in the .html template
-    myClipsWithCountMsg: string;
+    public myClips!: Playlist[]; // needs to be public as it is seen/used in the .html template - will be set via playlistManagerService
+    myClipsWithCountMsg!: string;
 
-    priorRoute: string; // used to compute extraDetailsOnPriorRoute
-    extraDetailsOnPriorRoute: string; // used to decorate further the "Back" button label
+    priorRoute!: string; // used to compute extraDetailsOnPriorRoute - will be set via routerHistoryService
+    extraDetailsOnPriorRoute!: string; // used to decorate further the "Back" button label
 
     constructor() {
 

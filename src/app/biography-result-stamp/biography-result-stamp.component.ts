@@ -23,9 +23,9 @@ export class BiographyResultStampComponent {
     // TODO: Skipped for migration with "ng generate @angular/core:signal-input-migration" (March 2025) because:
     //  This input is used in a control flow expression (e.g. `@if` or `*ngIf`)
     //  and migrating would break narrowing currently.
-    @Input() bio: BriefBio;
+    @Input() bio!: BriefBio; // definitely assigned when component is used
     readonly selectedBiographyID = input<string>(undefined, { alias: "selectedID" });
-    readonly cardView = input<boolean>(undefined);
+    readonly cardView = input<boolean>(true);
 
     public myMediaBase: string;
 
