@@ -1,4 +1,4 @@
-import { enableProdMode, importProvidersFrom, provideBrowserGlobalErrorListeners, provideCheckNoChangesConfig } from '@angular/core';
+import { enableProdMode, importProvidersFrom, provideBrowserGlobalErrorListeners } from '@angular/core';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { provideRouter } from '@angular/router';
 
@@ -101,8 +101,7 @@ if (_browserTestsPassed) {
         StoryPlayLogService,
         GlobalState,
         provideHttpClient(withInterceptorsFromDi()),
-        provideBrowserGlobalErrorListeners(),
-        provideCheckNoChangesConfig({exhaustive: true, interval: 5000})
+        provideBrowserGlobalErrorListeners()
     ]
 })
     .catch(err => console.log(err));
