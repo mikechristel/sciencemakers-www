@@ -14,13 +14,7 @@ export class StoryPlayLogService extends BaseComponent {
     private postStoryPlayEventURL = 'StoryPlayEvent';
 
     postStoryPlayEvent(storyID: string, accession: string, sessionOrder: number, tapeOrder: number, storyOrder: number, title: string) {
-        var storyPlayLogInfo: StoryPlayLogInfo = new StoryPlayLogInfo();
-        storyPlayLogInfo.storyID = storyID;
-        storyPlayLogInfo.accession = accession;
-        storyPlayLogInfo.sessionOrder = sessionOrder;
-        storyPlayLogInfo.tapeOrder = tapeOrder;
-        storyPlayLogInfo.storyOrder = storyOrder;
-        storyPlayLogInfo.title = title;
+        var storyPlayLogInfo: StoryPlayLogInfo = new StoryPlayLogInfo(storyID, accession, sessionOrder, tapeOrder, storyOrder, title);
 
         const headers = new HttpHeaders({'Content-Type':'application/json; charset=utf-8'});
         this.http.post(environment.serviceBase + this.postStoryPlayEventURL, storyPlayLogInfo, {headers: headers}).pipe(takeUntil(this.ngUnsubscribe)).subscribe(

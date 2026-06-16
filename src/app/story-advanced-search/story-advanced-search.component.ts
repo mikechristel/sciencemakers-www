@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewChecked, inject, viewChild } from '@angular/core';
+import { Component, OnInit, AfterViewChecked, inject, viewChild, signal } from '@angular/core';
 
 import { ActivatedRoute, Params, RouterLink, RouterLinkActive } from '@angular/router';
 
@@ -29,10 +29,10 @@ export class StoryAdvancedSearchComponent extends BaseComponent implements OnIni
 
     readonly mySearchFormElement = viewChild<SearchFormComponent>('myStorySearchForm');
 
-    public biographyIDForLimitingSearch: number = null; // used to modify UI in associated html (hence public)
+    public haveBioIDForLimitingSearch = signal(false); // at times when there is a bioID to limit search to just one person - this will be set to true
 
-    storyAdvSearchPageTitle: string;
-    storyAdvSearchPageTitleLong: string;
+    storyAdvSearchPageTitle: string = "";
+    storyAdvSearchPageTitleLong: string = "";
     signalFocusToTitle: boolean = false; // is used in html rendering of this component
 
     constructor() {
@@ -53,7 +53,7 @@ export class StoryAdvancedSearchComponent extends BaseComponent implements OnIni
                 var candidateID: number = +params['ip'];
                 var candidateAccession: string = params['ia'];
                 if (candidateID != this.globalState.NOTHING_CHOSEN) {
-                    this.biographyIDForLimitingSearch = candidateID;
+                    this.haveBioIDForLimitingSearch.set(true);
                     // NOTE: when searching within a non-empty accession, the advanced search options (to filter by interview date) are turned off!
                     // So, last parameter is false here because we have candidateAccession != this.globalState.NO_ACCESSION_CHOSEN
                     this.searchFormService.setSearchOptions(new SearchFormOptions(false, candidateID, candidateAccession,

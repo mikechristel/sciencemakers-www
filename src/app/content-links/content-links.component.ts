@@ -1,4 +1,4 @@
-import { Component, OnInit, ElementRef, AfterViewChecked, inject, viewChild } from '@angular/core';
+import { Component, OnInit, ElementRef, AfterViewChecked, inject, viewChild, ChangeDetectorRef } from '@angular/core';
 import { takeUntil } from "rxjs/operators";
 
 import { ActivatedRoute, Router, Params } from '@angular/router';
@@ -6,7 +6,8 @@ import { ActivatedRoute, Router, Params } from '@angular/router';
 import { PlaylistManagerService } from '../playlist-manager/playlist-manager.service';
 import { Playlist } from '../playlist-manager/playlist';
 import { FeedbackService } from '../feedback/feedback.service';
-import { WindowService, RouterHistoryService } from '../shared/services';
+import { WindowService } from '../shared/services/window.service';
+import { RouterHistoryService } from '../shared/services/router-history.service';
 import { TitleManagerService } from '../shared/title-manager.service';
 
 import { BaseComponent } from '../shared/base.component';
@@ -31,17 +32,19 @@ export class ContentLinksComponent extends BaseComponent implements OnInit, Afte
     private titleManagerService = inject(TitleManagerService);
     private liveAnnouncer = inject(LiveAnnouncer);
 
+    private changeDetectorRef = inject(ChangeDetectorRef);
+
     readonly topBackItemElement = viewChild<ElementRef>('topBackButton');
 
     contentLinksPageTitle: string;
     contentLinksPageTitleLong: string;
     initialFocusMade: boolean = false;
 
-    public myClips: Playlist[]; // needs to be public as it is seen/used in the .html template
-    myClipsWithCountMsg: string;
+    public myClips!: Playlist[]; // needs to be public as it is seen/used in the .html template - will be set via playlistManagerService
+    myClipsWithCountMsg!: string;
 
-    priorRoute: string; // used to compute extraDetailsOnPriorRoute
-    extraDetailsOnPriorRoute: string; // used to decorate further the "Back" button label
+    priorRoute!: string; // used to compute extraDetailsOnPriorRoute - will be set via routerHistoryService
+    extraDetailsOnPriorRoute!: string; // used to decorate further the "Back" button label
 
     constructor() {
 
@@ -60,11 +63,13 @@ export class ContentLinksComponent extends BaseComponent implements OnInit, Afte
         playlistManagerService.myClips$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((value) => {
             this.myClips = value;
             this.setMyClipsCountMessage();
+            this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
         });
 
         routerHistoryService.previousUrl$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((value) => {
             this.priorRoute = value;
             this.setBackButtonDetail();
+            this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
         });
     }
 

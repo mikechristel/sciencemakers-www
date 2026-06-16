@@ -3,6 +3,7 @@ import { Subject }    from 'rxjs';
 
 import { Playlist } from './playlist';
 import { Story } from '../storyset/story';
+import { DetailedStory } from '../story/detailed-story';
 
 @Injectable()
 export class PlaylistManagerService {
@@ -66,7 +67,7 @@ export class PlaylistManagerService {
       this.presentClipsLoadForm.next(true);
   }
 
-  toggleAddToMyClips(story) {
+  toggleAddToMyClips(story: DetailedStory) {
     var idx: number;
     var item: Playlist;
 

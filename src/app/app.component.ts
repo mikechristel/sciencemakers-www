@@ -1,4 +1,4 @@
-﻿import { Component, ElementRef, inject, viewChild }       from '@angular/core';
+﻿import { Component, ElementRef, inject, viewChild, ChangeDetectorRef }       from '@angular/core';
 import { Router, NavigationEnd, RouterLinkActive, RouterLink } from '@angular/router';
 
 import { FeedbackService } from './feedback/feedback.service';
@@ -12,7 +12,7 @@ import { SearchFormOptions } from './shared/search-form/search-form-options';
 
 import { TitleManagerService } from './shared/title-manager.service';
 
-import { RouterHistoryService } from './shared/services';
+import { RouterHistoryService } from './shared/services/router-history.service';
 
 import { BaseComponent } from './shared/base.component';
 import { UserSettingsManagerService } from './user-settings/user-settings-manager.service';
@@ -23,6 +23,7 @@ import { AppContentsComponent } from './app-contents/app-contents.component';
 import { CdkTrapFocus } from '@angular/cdk/a11y';
 import { FormsModule } from '@angular/forms';
 import { CdkCopyToClipboard } from '@angular/cdk/clipboard';
+import { Nullable } from './app.global-state'; // for Nullable type
 
 @Component({
     selector: 'my-app',
@@ -41,15 +42,17 @@ export class AppComponent extends BaseComponent {
     private playlistManagerService = inject(PlaylistManagerService);
     private authManagerService = inject(AuthManagerService);
 
+    private changeDetectorRef = inject(ChangeDetectorRef);
+
     readonly feedbackInputArea = viewChild<ElementRef>('feedbackInput');
     readonly myClipsTitleInputArea = viewChild<ElementRef>('myClipsTitleInput');
     readonly clipsListInputArea = viewChild<ElementRef>('clipsListInput');
 
-    public givenFeedback: string = null;
-    public optionalFeedbackEmail: string = null;
-    public givenLoadClips: string = null;
-    public myClips: Playlist[];
-    public myClipsWithCountMsg: string;
+    public givenFeedback: Nullable<string> = null;
+    public optionalFeedbackEmail: Nullable<string> = null;
+    public givenLoadClips: Nullable<string> = null;
+    public myClips!: Playlist[]; // initialized via service playlistManagerService
+    public myClipsWithCountMsg!: string;
 
     public showMyContactUsModalForm: boolean = false;
     public showMyExportMyClipsModalForm: boolean = false;
@@ -61,8 +64,8 @@ export class AppComponent extends BaseComponent {
     public inContentLinksRoute: boolean = false;
     public inShowingManyItemsRoute: boolean = false; // for any of biography set, story set, one biography story set
 
-    public cachedTitle: string;
-    public myClipsTitleCandidate: string;
+    public cachedTitle: string = "";;
+    public myClipsTitleCandidate: string = "";;
     public myClipsTitleMaxLength: number = 140;
     public myClipsTitleLengthHelper: string = "lengthLimitInfoForMyClipsTitle"; // ID for which char count in title is given
     public myClipsURLCopyActionFresh: boolean = false;
@@ -84,6 +87,7 @@ export class AppComponent extends BaseComponent {
         playlistManagerService.myClips$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((value) => {
             this.myClips = value;
             this.setMyClipsCountMessage();
+            this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
         });
 
         playlistManagerService.presentMyClipsExportForm$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((value) => {
@@ -115,24 +119,37 @@ export class AppComponent extends BaseComponent {
         this.router.events.pipe(takeUntil(this.ngUnsubscribe)).subscribe(event => {
           if (event instanceof NavigationEnd) {
 
+            var somethingChanged: boolean = false;
             var inspectedURL: string = event.urlAfterRedirects;
+            var updated_inSearchFormRoute: boolean;
+            var updated_inContentLinksRoute: boolean = this.inContentLinksRoute;
+            var updated_inShowingManyItemsRoute: boolean = this.inShowingManyItemsRoute;
 
-            this.inSearchFormRoute = (inspectedURL.startsWith("/search") || inspectedURL.startsWith("/storyadvs")
+            updated_inSearchFormRoute = (inspectedURL.startsWith("/search") || inspectedURL.startsWith("/storyadvs")
                                        || inspectedURL.startsWith("/bioadvs") || inspectedURL.startsWith("/tag")); // NOTE: considering tag/topic search route a search form, too
-            if (this.inSearchFormRoute) {
-              this.inContentLinksRoute = false;
-              this.inShowingManyItemsRoute = false;
+            if (updated_inSearchFormRoute) {
+              updated_inContentLinksRoute = false;
+              updated_inShowingManyItemsRoute = false;
             }
             else
             {
-              this.inShowingManyItemsRoute = (inspectedURL.startsWith("/all") || inspectedURL.startsWith("/stories/")
+              updated_inShowingManyItemsRoute = (inspectedURL.startsWith("/all") || inspectedURL.startsWith("/stories/")
                 || inspectedURL.startsWith("/storiesForBio"));
-              if (this.inShowingManyItemsRoute) {
-                this.inContentLinksRoute = false;
+              if (updated_inShowingManyItemsRoute) {
+                updated_inContentLinksRoute = false;
               }
               else {
-                this.inContentLinksRoute = inspectedURL.startsWith("/contentlinks");
+                updated_inContentLinksRoute = inspectedURL.startsWith("/contentlinks");
               }
+            }
+            somethingChanged = (updated_inSearchFormRoute != this.inSearchFormRoute) || (updated_inContentLinksRoute != this.inContentLinksRoute) || 
+              (updated_inShowingManyItemsRoute != this.inShowingManyItemsRoute);
+
+            if (somethingChanged) {
+                this.inSearchFormRoute = updated_inSearchFormRoute;
+                this.inContentLinksRoute = updated_inContentLinksRoute;
+                this.inShowingManyItemsRoute = updated_inShowingManyItemsRoute;
+                this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
             }
           }
         });
@@ -166,12 +183,13 @@ export class AppComponent extends BaseComponent {
             if (anchor) {
                 anchor.focus();
                 anchor.scrollIntoView();
+                this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
             }
         });
     }
 
     isRouteActive(routeToCheck: string): boolean {
-        return (this.router && this.router.url && this.router.url == routeToCheck);
+        return (this.router && this.router.url.length > 0 && this.router.url == routeToCheck);
     }
 
     setNavChoice(newRoute: string) {
@@ -186,7 +204,7 @@ export class AppComponent extends BaseComponent {
         // This search takes different forms, depending on the status of the search form service.
         // Pass the form in router parameters so that on a series of browser "go back" operations the
         // appropriate state of the search will be returned to (e.g., search stories, or just one person's stories, etc.).
-        var moreNavigationParams = {};
+        var moreNavigationParams: Record<string, string> = {};
         var currentSearchOptions: SearchFormOptions = this.searchFormService.currentSearchOptions();
 
         if (currentSearchOptions.searchingBiographies)
@@ -225,7 +243,7 @@ export class AppComponent extends BaseComponent {
 
     postFeedbackAndCloseMyModal() {
         var feedbackMessage: string;
-        var feedbackEmail: string = null;
+        var feedbackEmail: Nullable<string> = null;
 
         if (this.givenFeedback) {
             feedbackMessage = this.givenFeedback.trim();
@@ -327,7 +345,7 @@ export class AppComponent extends BaseComponent {
                   { // have at least one numeric ID in given list, so continue with the route navigation
                       thinnedGivenIDListString = thinnedGivenIDListString.substring(0, thinnedGivenIDListString.length - 1); // take off extraneous comma at the end
 
-                      var moreParams = {};
+                      var moreParams: Record<string, string> = {};
 
                       moreParams['IDList'] = thinnedGivenIDListString;
                       if (givenClipSetTitle.length > 0)
@@ -446,7 +464,10 @@ export class AppComponent extends BaseComponent {
     private handleMyClipsTitleInputBlur() {
         // Used to help label the characters left in the given myClips title in a modal form according to accessibility expert advice.
         // On "blur", restore the described by attribute for the textarea input element (bound to myClipsTitleLengthHelper)
-        setTimeout(() => this.myClipsTitleLengthHelper = "lengthLimitInfoForMyClipsTitle", 0);
+        setTimeout(() => {
+            this.myClipsTitleLengthHelper = "lengthLimitInfoForMyClipsTitle";
+            this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
+        }, 0);
     }
     private thinToLegalMyClipsTitleKeyUp() {
         // Purpose: thin out characters just like titledMyClipsAsURL behaves, i.e.,

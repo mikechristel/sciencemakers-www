@@ -15,7 +15,7 @@ import { ScrollToMeDirective } from '../shared/scroll-to-me.directive';
 // It takes as input the biography details in the form of a BriefBio object, and the ID of whatever biography might be
 // selected to appropriately decorate the selected biography in a grid.
 export class BiographyStampComponent {
-    readonly bio = input<BriefBio>(undefined);
+    readonly bio = input<BriefBio>();
     readonly selectedBiographyID = input<string>(undefined, { alias: "selectedID" });
 
     public myMediaBase: string;

@@ -25,7 +25,7 @@ There are two primary configuration environments as follows:
 1) Continuous Deployment (CD) is not currently available; production archive must be updated manually.
 2) For authentication to work properly, the Angular application must be bundled and deployed together with the .NET API.
 This .NET API should be locked down to "ScienceMakers only" for this ScienceMakers Digital Archive.
-3) Deployment is handled by Visual Studio 2022, refer to the digital-archive-api documentation for publishing specifics.
+3) Deployment is handled by Visual Studio 2026, refer to the digital-archive-api documentation for publishing specifics.
 
 ## Browsers
 
@@ -35,20 +35,16 @@ We primarily develop using Chrome and as a result, it is the browser that is bes
 ### Tested
 We actively test the latest versions of the following browsers:
 
-- Chrome (must be version 90 or later; most recent two releases are best supported)
-- Safari (must be version 16 or later; most recent two releases are best supported)
+- Chrome (most recent two releases are supported)
+- Safari (most recent two releases are supported)
 
 We occasionally test the following browser:
 - Edge  
-
-## Known Issues
-* IE support was retired in 2020.
 
 ## Resources 
 Font sizing has been implemented using rems and ems. For more information see: https://css-tricks.com/rems-ems/.
 
 ## Dependencies
-* [Angular](https://angular.io/) - Web application framework (version 19.2, from 2025) (Angular Material no longer needed)
+* [Angular](https://angular.io/) - Web application framework (version 21.2.7, from April 2026)
 * [Angular CLI](https://cli.angular.io/) - A command line interface for Angular
 * [angular-hmr](https://github.com/gdi2290/angular-hmr) - Angular Hot Module Replacement. Used by default when when running `ng serve`.
-

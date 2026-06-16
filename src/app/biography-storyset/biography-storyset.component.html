@@ -1,5 +1,11 @@
 ﻿<!-- NOTE: main content "skip" targets of mmainHeader (mobile) and dmainHeader (desktop) unusual here,
 targeting a paragraph on total segment count rather than a non-existent top-level h1 element. -->
+
+@let currentView = viewStateSignal();
+@let isGrid = currentView === MyViewState.AsGrid;
+@let isText = currentView === MyViewState.AsText;
+@let isMap = currentView === MyViewState.AsMap;
+
 @if (titleForEmptyStorySet) {
   <div>
     <h1 id="mmainHeader" [thdaIsFocused]="signalFocusToTitle" tabindex="-1" class="page-title mobile-only" (mousedown)="noMouseFocus($event)">{{titleForEmptyStorySet}}</h1>
@@ -93,11 +99,7 @@ targeting a paragraph on total segment count rather than a non-existent top-leve
         <p id="mmainHeader" [thdaIsFocused]="signalFocusToTitle" tabindex="-1" class="total-segments-mobile" (mousedown)="noMouseFocus($event)">{{tailoredStorySummationNarrow}}</p>
       </div>
       <div class="storyPresentationOptionsArea">
-        <!-- Toggle button group to toggle item presentation as picture stamp or text or map -->
         <div class="mobile-controls-line">
-          @if (isNonemptyContent) {
-            <p class="sr-only" id="rg1_label">Story Presentation Options</p>
-          }
           <div class="mobile-controls-row-container">
             <!--Summaries button-->
             @if (isNonemptyContent) {
@@ -118,10 +120,11 @@ targeting a paragraph on total segment count rather than a non-existent top-leve
             </button>
           </div>
           @if (isNonemptyContent) {
-            <ul class="unstyled-list-nowhitespace-row2ndlayout" aria-labelledby="rg1_label">
-              <li #rg1Pic class="filter-section-rg-item" [class.selected]="cardView"
-                [attr.tabindex]="cardView ? 0 : -1" role="button" [attr.aria-pressed]="cardView"
-                (click)="cardView = true; textView = false" (keydown)="setViewOptionsInNarrowContainer($event.key, true, false)">
+            <!-- Radio group to toggle item presentation as picture stamp or text or map -->
+            <div role="radiogroup" class="radiogroup-nowhitespace-row2ndlayout" aria-labelledby="rg1_label">
+              <p class="sr-only" id="rg1_label">Story Presentation Options</p>
+              <div #rg1Pic role="radio" class="filter-section-rg-item" [class.selected]="isGrid" [attr.aria-checked]="isGrid" [attr.tabindex]="isGrid ? 0 : -1"
+                (click)="updateViewOptions(MyViewState.AsGrid)" (keydown)="setViewOptionsInNarrowContainer($event.key, true, false)">
                 <span class="sr-only">Picture stamp grid view</span>
                 <span class="icon-and-text">
                   <span class="pad-top-a-bit">
@@ -134,10 +137,9 @@ targeting a paragraph on total segment count rather than a non-existent top-leve
                   </span>
                   <span class="flexPlainAuto">Grid</span>
                 </span>
-              </li>
-              <li #rg1Text class="filter-section-rg-item" [class.selected]="textView"
-                [attr.tabindex]="textView ? 0 : -1" role="button" [attr.aria-pressed]="textView"
-                (click)="textView = true; cardView = false" (keydown)="setViewOptionsInNarrowContainer($event.key, false, true)">
+              </div>
+              <div #rg1Text role="radio" class="filter-section-rg-item" [class.selected]="isText" [attr.aria-checked]="isText" [attr.tabindex]="isText ? 0 : -1"
+                (click)="updateViewOptions(MyViewState.AsText)" (keydown)="setViewOptionsInNarrowContainer($event.key, false, true)">
                 <span class="sr-only">Text-only grid view</span>
                 <span class="icon-and-text">
                   <span class="pad-top-a-bit">
@@ -150,10 +152,9 @@ targeting a paragraph on total segment count rather than a non-existent top-leve
                   </span>
                   <span class="flexPlainAuto">List</span>
                 </span>
-              </li>
-              <li #rg1Map class="filter-section-rg-item" [class.selected]="!cardView && !textView"
-                [attr.tabindex]="cardView || textView ? -1 : 0" role="button" [attr.aria-pressed]="!cardView && !textView"
-                (click)="cardView = false; textView = false" (keydown)="setViewOptionsInNarrowContainer($event.key, false, false)">
+              </div>
+              <div #rg1Map role="radio" class="filter-section-rg-item" [class.selected]="isMap" [attr.aria-checked]="isMap" [attr.tabindex]="isMap ? 0 : -1"
+                (click)="updateViewOptions(MyViewState.AsMap)" (keydown)="setViewOptionsInNarrowContainer($event.key, false, false)">
                 <span class="sr-only">U.S. state map view</span>
                 <span class="icon-and-text">
                   <span class="pad-top-a-bit">
@@ -166,13 +167,13 @@ targeting a paragraph on total segment count rather than a non-existent top-leve
                   </span>
                   <span class="flexPlainAuto">Map</span>
                 </span>
-              </li>
-            </ul>
+              </div>
+            </div>
           }
         </div>
       </div>
       <!-- Tape details and story stamps for mobile -->
-      @if (cardView || textView) {
+      @if (isGrid || isText) {
         <div class="biography-storyset flex100Basis">
           @for (oneSummary of tapeSummariesCache; track $index; let m = $index) {
             <div>
@@ -182,12 +183,12 @@ targeting a paragraph on total segment count rather than a non-existent top-leve
               }
               <!-- FYI, lay out the items using CSS grid, hiding interview date as that is elsewhere in this UI -->
               <ul [attr.aria-labelledby]="'tape_' + m"
-                [ngClass]="{'tapes': cardView,'tapes-as-list':!cardView}">
+                [ngClass]="{'tapes': isGrid,'tapes-as-list':!isGrid}">
                 @for (oneStory of myStoryListByTape[m]; track oneStory.storyID; let j = $index) {
-                  <li [ngClass]="{'tape': cardView,'tape-as-list':!cardView}"
+                  <li [ngClass]="{'tape': isGrid,'tape-as-list':!isGrid}"
                     >
                     <thda-story
-                      [cardView]="cardView"
+                      [cardView]="isGrid"
                       hideInterviewDate="true"
                       overrideToH4Nesting="true"
                       [story]="myStoryListByTape[m][j]"
@@ -201,8 +202,11 @@ targeting a paragraph on total segment count rather than a non-existent top-leve
           }
         </div>
       }
-      @if (!cardView && !textView) {
+      @if (isMap) {
         <div class="flex100Basis">
+          <!-- Note that map interactions will trigger a route elsewhere, so less is needed here with respect to focus management than elsewhere where 
+               us-map is used with selectedListIDToFocus having to be set to ensure focus goes to the right region in the list of regions that is part 
+               of the text details that accompany the map. -->
           <us-map [distributionToShow]="USStateDistribution"></us-map>
         </div>
       }
@@ -299,11 +303,7 @@ targeting a paragraph on total segment count rather than a non-existent top-leve
             <p id="dmainHeader" [thdaIsFocused]="signalFocusToTitle" tabindex="-1" class="total-segments" (mousedown)="noMouseFocus($event)">{{tailoredStorySummationWide}}</p>
           </div>
           <!--View toggles-->
-          <!-- Toggle button group to toggle item presentation as picture stamp or text or map -->
           <div class="bio-filter-section-desktop-only">
-            @if (isNonemptyContent) {
-              <p class="sr-only" id="rg2_label">Story Presentation Options</p>
-            }
             <div class="bio-story-pres-options-area">
               <!--Summaries button-->
               @if (isNonemptyContent) {
@@ -324,10 +324,11 @@ targeting a paragraph on total segment count rather than a non-existent top-leve
               </button>
             </div>
             @if (isNonemptyContent) {
-              <ul class="unstyled-list-nowhitespace-row3rdlayout" aria-labelledby="rg2_label">
-                <li #rg2Pic class="filter-section-rg-item" [class.selected]="cardView"
-                  [attr.tabindex]="cardView ? 0 : -1" role="button" [attr.aria-pressed]="cardView"
-                  (click)="cardView = true; textView = false" (keydown)="setViewOptions($event.key, true, false)">
+              <!-- Radio group to toggle item presentation as picture stamp or text or map -->
+              <div role="radiogroup" class="radiogroup-nowhitespace-row3rdlayout" aria-labelledby="rg2_label">
+                <p class="sr-only" id="rg2_label">Story Presentation Options</p>
+                <div #rg2Pic role="radio" class="filter-section-rg-item" [class.selected]="isGrid" [attr.aria-checked]="isGrid" [attr.tabindex]="isGrid ? 0 : -1"
+                  (click)="updateViewOptions(MyViewState.AsGrid)" (keydown)="setViewOptions($event.key, true, false)">
                   <span class="sr-only">Picture stamp grid view</span>
                   <span class="icon-and-text">
                     <span class="pad-top-a-bit">
@@ -340,10 +341,9 @@ targeting a paragraph on total segment count rather than a non-existent top-leve
                     </span>
                     <span class="flexPlainAuto">Grid</span>
                   </span>
-                </li>
-                <li #rg2Text class="filter-section-rg-item" [class.selected]="textView"
-                  [attr.tabindex]="textView ? 0 : -1" role="button" [attr.aria-pressed]="textView"
-                  (click)="textView = true; cardView = false" (keydown)="setViewOptions($event.key, false, true)">
+                </div>
+                <div #rg2Text role="radio" class="filter-section-rg-item" [class.selected]="isText" [attr.aria-checked]="isText" [attr.tabindex]="isText ? 0 : -1"
+                  (click)="updateViewOptions(MyViewState.AsText)" (keydown)="setViewOptions($event.key, false, true)">
                   <span class="sr-only">Text-only grid view</span>
                   <span class="icon-and-text">
                     <span class="pad-top-a-bit">
@@ -356,10 +356,9 @@ targeting a paragraph on total segment count rather than a non-existent top-leve
                     </span>
                     <span class="flexPlainAuto">List</span>
                   </span>
-                </li>
-                <li #rg2Map class="filter-section-rg-item" [class.selected]="!cardView && !textView"
-                  [attr.tabindex]="cardView || textView ? -1 : 0" role="button" [attr.aria-pressed]="!cardView && !textView"
-                  (click)="cardView = false; textView = false" (keydown)="setViewOptions($event.key, false, false)">
+                </div>
+                <div #rg2Map role="radio" class="filter-section-rg-item" [class.selected]="isMap" [attr.aria-checked]="isMap" [attr.tabindex]="isMap ? 0 : -1"
+                  (click)="updateViewOptions(MyViewState.AsMap)" (keydown)="setViewOptions($event.key, false, false)">
                   <span class="sr-only">U.S. state map view</span>
                   <span class="icon-and-text">
                     <span class="pad-top-a-bit">
@@ -372,13 +371,13 @@ targeting a paragraph on total segment count rather than a non-existent top-leve
                     </span>
                     <span class="flexPlainAuto">Map</span>
                   </span>
-                </li>
-              </ul>
+                </div>
+              </div>
             }
           </div>
         </div>
         <!-- Tape details and story stamps for desktop -->
-        @if (cardView || textView) {
+        @if (isGrid || isText) {
           <div class="flex100Basis">
             @for (oneSummary of tapeSummariesCache; track $index; let m = $index) {
               <div>
@@ -388,12 +387,12 @@ targeting a paragraph on total segment count rather than a non-existent top-leve
                 }
                 <!-- FYI, lay out the items using CSS grid, hiding interview date as that is elsewhere in this UI -->
                 <ul [attr.aria-labelledby]="'tape__' + m"
-                  [ngClass]="{'tapes': cardView,'tapes-as-list':!cardView}">
+                  [ngClass]="{'tapes': isGrid,'tapes-as-list':!isGrid}">
                   @for (oneStory of myStoryListByTape[m]; track oneStory.storyID; let j = $index) {
-                    <li [ngClass]="{'tape': cardView,'tape-as-list':!cardView}"
+                    <li [ngClass]="{'tape': isGrid,'tape-as-list':!isGrid}"
                       >
                       <thda-story
-                        [cardView]="cardView"
+                        [cardView]="isGrid"
                         hideInterviewDate="true"
                         overrideToH4Nesting="true"
                         [story]="myStoryListByTape[m][j]"
@@ -407,7 +406,7 @@ targeting a paragraph on total segment count rather than a non-existent top-leve
             }
           </div>
         }
-        @if (!cardView && !textView) {
+        @if (isMap) {
           <div class="flex100Basis">
             <us-map [distributionToShow]="USStateDistribution"></us-map>
           </div>

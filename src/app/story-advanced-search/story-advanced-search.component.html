@@ -4,19 +4,17 @@
 <div class="myFlexRowContainer">
   <div class="myFlexChild">
     <!-- Search Form (capped at a max width in container div) and with
-    showAdvancedStoryOptions as !biographyIDForLimitingSearch, i.e., only show advanced
+    showAdvancedStoryOptions as !haveBioIDForLimitingSearch(), i.e., only show advanced
     options when not searching inside a person, to show more advanced options within it (the parameter
     showAdvancedSearchLink is false because we are already at advanced search info). -->
     <search-form #myStorySearchForm [showAdvancedSearchLink]="false" [showFieldOptions]="true"
-    [showAdvancedStoryOptions]="!biographyIDForLimitingSearch" ></search-form>
+    [showAdvancedStoryOptions]="!haveBioIDForLimitingSearch()" ></search-form>
   </div>
 </div>
 
-<!-- Optionally describe searching within a person first (elements conditional on biographyIDForLimitingSearch). -->
-@if (biographyIDForLimitingSearch) {
+<!-- Optionally describe searching within a person first (elements conditional on reverse of haveBioIDForLimitingSearch). -->
+@if (haveBioIDForLimitingSearch()) {
   <h3 class="mysubheading-gap-before">Searching Inside a Single Person</h3>
-}
-@if (biographyIDForLimitingSearch) {
   <p class="helptext">You are in a single person's landing page,
     and your search will be just inside that person's stories, clued in via the "Search this person's stories..."
     prompt in the query input area.  From the <a routerLink="/home" routerLinkActive="active">Home</a> page,
@@ -24,10 +22,10 @@
 }
 
 <!-- Same heading, different style, dependent on  biographyIDForLimitingSearch -->
-@if (biographyIDForLimitingSearch) {
+@if (haveBioIDForLimitingSearch()) {
   <h3 class="mysubheading">Search Syntax and Special Characters</h3>
 }
-@if (!biographyIDForLimitingSearch) {
+@else {
   <h3 class="mysubheading-gap-before">Search Syntax and Special Characters</h3>
 }
 

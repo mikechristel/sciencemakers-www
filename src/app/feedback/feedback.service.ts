@@ -7,6 +7,7 @@ import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http
 import { FeedbackInfo } from './feedback-info';
 import { environment } from '../../environments/environment';
 import { BaseComponent } from '../shared/base.component';
+import { Nullable } from '../app.global-state'; // for Nullable type
 
 declare var _aname: any; // Declaration of js variable holding account name (or "" if not set)
 
@@ -25,16 +26,16 @@ export class FeedbackService extends BaseComponent {
         this.presentFeedbackInputForm.next(true);
     }
 
-    postFeedback(feedbackMessage: string, feedbackEmail: string) {
+    postFeedback(feedbackMessage: string, feedbackEmail: Nullable<string>) {
         var feedbackInfo: FeedbackInfo = new FeedbackInfo();
 
-        var resolutionInfo: string = null;
+        var resolutionInfo: Nullable<string> = null;
         if (window != null && window.navigator != null) {
             if (window.innerWidth != null && window.innerHeight != null)
                 resolutionInfo = window.innerWidth + "x" + window.innerHeight;
         }
 
-        var myURL: string = null;
+        var myURL: Nullable<string> = null;
         if (window != null && window.location != null && window.location.href != null) {
           var currentURL = window.location.href;
           if (currentURL.length > 0)

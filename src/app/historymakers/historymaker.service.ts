@@ -11,7 +11,7 @@ import { CorpusSpecifics } from './corpus-specifics';
 import { BiographySearchFacetsDetails, StorySearchFacetsDetails } from './search-facets-details';
 
 import { environment } from '../../environments/environment';
-import { GlobalState } from '../app.global-state';
+import { GlobalState, Nullable } from '../app.global-state';
 
 @Injectable()
 export class HistoryMakerService {
@@ -26,12 +26,12 @@ export class HistoryMakerService {
     private storySearchFacetsURL = 'StoryFacets';
 
     // NOTE:  Caching the string labels for numeric IDs used for Maker and OccupationTypes via an api/facetList call:
-    private cachedBiographyFacetDetails: BiographySearchFacetsDetails = null;
-    private cachedStoryFacetDetails: StorySearchFacetsDetails = null;
+    private cachedBiographyFacetDetails: Nullable<BiographySearchFacetsDetails> = null;
+    private cachedStoryFacetDetails: Nullable<StorySearchFacetsDetails> = null;
     private cachedMakerCategories = new Map<string, string>();
     private cachedOccupationTypes = new Map<string, string>();
     private cachedOrganizationNames = new Map<string, string>();
-    private cachedCorpusSpecifics: CorpusSpecifics = null;
+    private cachedCorpusSpecifics: Nullable<CorpusSpecifics> = null;
 
     private storeCorpusSpecifics(givenSpecifics: CorpusSpecifics) {
         if (this.cachedCorpusSpecifics != null)
@@ -65,9 +65,7 @@ export class HistoryMakerService {
         if (alsoCopyIntoCachedBiographyFacetDetails && (this.cachedBiographyFacetDetails == null)) {
             // Assign a non-null into this.cachedBiographyFacetDetails, but NOTE that this assumes the real data is in this.cachedOccupationTypes and this.cachedMakerCategories.
             // So, this.cachedBiographyFacetDetails is made non-null but also not filled in.
-            this.cachedBiographyFacetDetails = new BiographySearchFacetsDetails();
-            this.cachedBiographyFacetDetails.makerCategories = [];
-            this.cachedBiographyFacetDetails.occupationTypes = [];
+            this.cachedBiographyFacetDetails = new BiographySearchFacetsDetails([], []); // makerCategories and occupationTypes both empty lists
         }
         // else don't mess with cachedBiographyFacetDetails if it is not wholly consumed by cachedStoryFacetDetails.
 
@@ -137,9 +135,9 @@ export class HistoryMakerService {
         }
     }
 
-    getHistoryMakersBornThisWeek(givenPage: number, givenPageSize: number,
-      genderFacet: string, birthDecadeFacet: string, makerFacets: string, jobFacets: string,
-      lastInitialFacetSpec: string, regionUSStateFacetSpec: string): Observable<TableOfContents> {
+    getHistoryMakersBornThisWeek(givenPage: Nullable<number>, givenPageSize: Nullable<number>,
+      genderFacet: Nullable<string>, birthDecadeFacet: Nullable<string>, makerFacets: Nullable<string>, jobFacets: Nullable<string>,
+      lastInitialFacetSpec: Nullable<string>, regionUSStateFacetSpec: Nullable<string>): Observable<TableOfContents> {
         var addedArgs: string = "";
         if (givenPage != null && givenPage > 0)
             addedArgs = addedArgs + "&currentPage=" + givenPage;
@@ -177,7 +175,7 @@ export class HistoryMakerService {
         );
     }
 
-    getHistoryMakers(givenQuery: string, givenSearchFieldsMask: number,
+    getHistoryMakers(givenQuery: Nullable<string>, givenSearchFieldsMask: number,
       searchJustLastNameFieldFlag: boolean, searchJustPreferredFieldFlag: boolean,
       givenPage: number, givenPageSize: number, genderFacet: string, birthDecadeFacet: string, makerFacets: string,
       jobFacets: string, lastInitialFacet: string, regionUSStateFacetSpec: string, sortField: string, sortInDescendingOrder: boolean): Observable<TableOfContents> {
@@ -253,7 +251,7 @@ export class HistoryMakerService {
             if ((givenSearchFieldsMask & this.globalState.BiographySearchPreferredName_On) != 0)
                 csvFieldsToSearch += "preferredName,";
             if (csvFieldsToSearch.length > 0)
-                csvFieldsToSearch = csvFieldsToSearch.substr(0, csvFieldsToSearch.length - 1); // take off spurious , at end
+                csvFieldsToSearch = csvFieldsToSearch.substring(0, csvFieldsToSearch.length - 1); // take off spurious , at end
             else // NOTE: never allow no fields to be chosen.  Default to just last name
                 csvFieldsToSearch = "lastName";
         }
@@ -307,21 +305,21 @@ export class HistoryMakerService {
     getJobType(chosenJobType: string): string {
         var retVal: string = "";
         if (this.cachedOccupationTypes && this.cachedOccupationTypes.has(chosenJobType))
-            retVal = this.cachedOccupationTypes.get(chosenJobType);
+            retVal = this.cachedOccupationTypes.get(chosenJobType) ?? ""; // ending "?? ''" is just to satisfy the compiler that retVal is always assigned a string value, even if the get() call returns undefined (which it shouldn't if has() returned true, but just to be safe).
         return retVal;
     }
 
     getMaker(chosenMaker: string): string {
         var retVal: string = "";
         if (this.cachedMakerCategories && this.cachedMakerCategories.has(chosenMaker))
-            retVal = this.cachedMakerCategories.get(chosenMaker);
+            retVal = this.cachedMakerCategories.get(chosenMaker) ?? "";
         return retVal;
     }
 
     getOrganizationName(chosenOrganization: string): string {
         var retVal: string = "";
         if (this.cachedOrganizationNames && this.cachedOrganizationNames.has(chosenOrganization))
-            retVal = this.cachedOrganizationNames.get(chosenOrganization);
+            retVal = this.cachedOrganizationNames.get(chosenOrganization) ?? "";
         return retVal;
     }
 

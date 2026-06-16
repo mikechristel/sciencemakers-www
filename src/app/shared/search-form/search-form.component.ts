@@ -1,8 +1,8 @@
-import { Component, OnInit, ElementRef, Pipe, PipeTransform, EventEmitter, Output, inject, input, viewChild } from '@angular/core';
+import { Component, OnInit, ElementRef, Pipe, PipeTransform, EventEmitter, Output, inject, input, viewChild, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { takeUntil } from "rxjs/operators";
 
-import { GlobalState } from '../../app.global-state';
+import { GlobalState, Nullable } from '../../app.global-state';
 import { StorySetType } from '../../storyset/storyset-type';
 import { SearchFormService } from './search-form.service';
 import { SearchFormOptions } from './search-form-options';
@@ -41,6 +41,8 @@ export class SearchFormComponent extends BaseComponent implements OnInit {
     private userSettingsManagerService = inject(UserSettingsManagerService);
     private storyAdvancedSearchSettingsManagerService = inject(StoryAdvancedSearchSettingsManagerService);
 
+    private changeDetectorRef = inject(ChangeDetectorRef);
+
     readonly queryInputArea = viewChild<ElementRef>('queryInput');
 
     readonly showAdvancedSearchLink = input<boolean>(false);   // if true, show link to advanced search UI element (else keep it out of UI)
@@ -49,7 +51,7 @@ export class SearchFormComponent extends BaseComponent implements OnInit {
     readonly showFieldOptions = input<boolean>(false); // If true then show select UI to choose what field to search into
 
     searchOptions: SearchFormOptions;
-    possibleSearchableBioFields: ChosenBioSearchFieldInfo[];
+    possibleSearchableBioFields!: ChosenBioSearchFieldInfo[];
 
     private filterByInterviewDate: boolean = false; // toggles via ngModel in associated html view
     private minYearForDateFilter: number = 0;
@@ -60,21 +62,21 @@ export class SearchFormComponent extends BaseComponent implements OnInit {
     inputPlaceholder: string = ""; // label for input
     advancedLinkText: string = ""; // label for advanced search
 
-    searchTitleOnly: boolean;
-    searchTranscriptOnly: boolean;
-    searchLastNameOnly: boolean;
-    searchPreferredNameOnly: boolean;
-    searchFieldList: SearchFieldListItem[];
+    searchTitleOnly!: boolean;
+    searchTranscriptOnly!: boolean;
+    searchLastNameOnly!: boolean;
+    searchPreferredNameOnly!: boolean;
+    searchFieldList!: SearchFieldListItem[];
     activeSearchFieldItem: number = -1; // -1 for 'not set yet'
     initialFocusMade: boolean = false; // false for 'not set yet'
 
-    earliestInterviewYear: number;
-    latestInterviewYear: number;
-    modelledEarliestYear: number;
-    modelledLatestYear: number;
+    earliestInterviewYear!: number;
+    latestInterviewYear!: number;
+    modelledEarliestYear!: number;
+    modelledLatestYear!: number;
 
-    interviewYears: number[];
-    minYearAllowed: number;
+    interviewYears!: number[];
+    minYearAllowed!: number;
 
     constructor() {
 
@@ -84,14 +86,17 @@ export class SearchFormComponent extends BaseComponent implements OnInit {
 
         storyAdvancedSearchSettingsManagerService.filterByInterviewDate$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((value) => {
           this.filterByInterviewDate = value;
+          this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
         });
 
         storyAdvancedSearchSettingsManagerService.minYear$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((value) => {
           this.minYearForDateFilter = value;
+          this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
         });
 
         storyAdvancedSearchSettingsManagerService.maxYear$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((value) => {
           this.maxYearForDateFilter = value;
+          this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
         });
 
         // Set default options to current state of things:
@@ -104,6 +109,7 @@ export class SearchFormComponent extends BaseComponent implements OnInit {
         searchFormService.searchOptions$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((value) => {
             this.searchOptions = value;
             this.initInterfaceForOptions();
+            this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
         });
     }
 
@@ -256,17 +262,22 @@ export class SearchFormComponent extends BaseComponent implements OnInit {
             case 5:
                 bitFieldOperand = this.globalState.BiographySearchPreferredName_On;
                 break;
+            default:
+                bitFieldOperand = -1; // negative value to do nothing below
+                break;
         }
-        var bioSearchFieldsMask = this.userSettingsManagerService.currentBioSearchFieldsMask();
-        if (isChecked) {
-            // If bit is not already on to mark the field as in the default chosen fields set, do so now.
-            if ((bioSearchFieldsMask & bitFieldOperand) == 0)
-                this.userSettingsManagerService.updateBioSearchFieldsMask(bioSearchFieldsMask + bitFieldOperand);
-        }
-        else {
-            // If bit is not already cleared to mark the field as NOT in the default chosen fields set, do so now.
-            if ((bioSearchFieldsMask | bitFieldOperand) != 0)
-                this.userSettingsManagerService.updateBioSearchFieldsMask(bioSearchFieldsMask - bitFieldOperand);
+        if (bitFieldOperand >= 0) { // assume all non-negative bit field markers make sense
+            var bioSearchFieldsMask = this.userSettingsManagerService.currentBioSearchFieldsMask();
+            if (isChecked) {
+                // If bit is not already on to mark the field as in the default chosen fields set, do so now.
+                if ((bioSearchFieldsMask & bitFieldOperand) == 0)
+                    this.userSettingsManagerService.updateBioSearchFieldsMask(bioSearchFieldsMask + bitFieldOperand);
+            }
+            else {
+                // If bit is not already cleared to mark the field as NOT in the default chosen fields set, do so now.
+                if ((bioSearchFieldsMask | bitFieldOperand) != 0)
+                    this.userSettingsManagerService.updateBioSearchFieldsMask(bioSearchFieldsMask - bitFieldOperand);
+            }
         }
     }
 
@@ -317,83 +328,89 @@ export class SearchFormComponent extends BaseComponent implements OnInit {
         // Accumulate routing parameters specifying filter specification, page information, etc.
         if (this.txtQuery != null && this.txtQuery.length > 0) {
 
-            // Non-empty query, so proceed with a "do search" action dependent on this.searchOptions.
-            var moreOptions = [];
+            var cleanedQuery: Nullable<string> = this.globalState.cleanedQueryRouterParameter(this.globalState.removeEncodedSequences(this.txtQuery));
 
-            moreOptions['q'] = this.globalState.cleanedQueryRouterParameter(this.globalState.removeEncodedSequences(this.txtQuery));
+            if (cleanedQuery != null) {
+                // Non-empty query, so proceed with a "do search" action dependent on this.searchOptions.
+                var moreOptions:Record<string, string | number> = {};
 
-            // IMPORTANT:  use tracking for this search query (so set a 'ut' parameter in the route to flag it for tracking/logging)
-            moreOptions['ut'] = "1";
+                moreOptions['q'] = cleanedQuery;
 
-            moreOptions['pg'] = 1; // always show page 1 of new query
+                // IMPORTANT:  use tracking for this search query (so set a 'ut' parameter in the route to flag it for tracking/logging)
+                moreOptions['ut'] = "1";
 
-            if (this.searchOptions.searchingBiographies) { // biography search
-                moreOptions['pgS'] = this.globalState.BiographyPageSize; // use global context biography page size
-                this.globalState.BiographySearchLastNameOnly = this.searchLastNameOnly;
-                this.globalState.BiographySearchPreferredNameOnly = this.searchPreferredNameOnly;
+                moreOptions['pg'] = 1; // always show page 1 of new query
 
-                if (this.searchLastNameOnly)
-                    moreOptions['ln'] = "1"; // search just the last name field
-                else
-                    moreOptions['ln'] = "0";
-                if (this.searchPreferredNameOnly)
-                    moreOptions['pn'] = "1"; // search just the preferred name field
-                else
-                    moreOptions['pn'] = "0";
+                if (this.searchOptions.searchingBiographies) { // biography search
+                    moreOptions['pgS'] = this.globalState.BiographyPageSize; // use global context biography page size
+                    this.globalState.BiographySearchLastNameOnly = this.searchLastNameOnly;
+                    this.globalState.BiographySearchPreferredNameOnly = this.searchPreferredNameOnly;
 
-                this.router.navigate(['/all', moreOptions]);
+                    if (this.searchLastNameOnly)
+                        moreOptions['ln'] = "1"; // search just the last name field
+                    else
+                        moreOptions['ln'] = "0";
+                    if (this.searchPreferredNameOnly)
+                        moreOptions['pn'] = "1"; // search just the preferred name field
+                    else
+                        moreOptions['pn'] = "0";
 
-            }
-            else { // story search
-                moreOptions['pgS'] = this.globalState.StoryPageSize; // use global context story page size
-                this.globalState.SearchTitleOnly = this.searchTitleOnly;
-                this.globalState.SearchTranscriptOnly = this.searchTranscriptOnly;
+                    this.router.navigate(['/all', moreOptions]);
 
-                if (this.searchTitleOnly) // use explicit "search-title-only" indicator of sT if true
-                    moreOptions['sT'] = "1";
-                else if (this.searchTranscriptOnly) // use explicit "search-transcript-only" indicator of sS (search spoken) if true
-                    moreOptions['sS'] = "1";
-                // else default to "both" without the use of an explicit flag
-
-                if ((this.searchOptions.biographyIDForLimitingSearch != this.globalState.NOTHING_CHOSEN))
-                {
-                    moreOptions['ip'] = this.searchOptions.biographyIDForLimitingSearch; // flag that an "inside THIS person" search context will be set and used
-                    moreOptions['ia'] = this.searchOptions.biographyAccessionID;
                 }
+                else { // story search
+                    moreOptions['pgS'] = this.globalState.StoryPageSize; // use global context story page size
+                    this.globalState.SearchTitleOnly = this.searchTitleOnly;
+                    this.globalState.SearchTranscriptOnly = this.searchTranscriptOnly;
 
-                if (this.searchOptions.allowAdvancedStorySearchSettings) {
-                    var filterByInterviewDate: boolean = this.storyAdvancedSearchSettingsManagerService.currentFilterByInterviewDateSetting();
-                    if (filterByInterviewDate) {
-                        // Check advanced story search settings and tack on additional qualifications to moreOptions as needed.
-                        // NOTE: if date range is "backward" as in end < start, go ahead and correct it using the advanced story search options service, too.
-                        var minYear: number = this.storyAdvancedSearchSettingsManagerService.currentMinYearForFilterByInterviewDate();
-                        var maxYear: number = this.storyAdvancedSearchSettingsManagerService.currentMaxYearForFilterByInterviewDate();
-                        var currentYear = new Date().getFullYear();
-                        // Quick check that a filter is in existence, i.e., the choice is not [min, max] which is the same as no filter at all
-                        if ((minYear != 0 || maxYear != 0) && (minYear > environment.firstInterviewYear || maxYear < currentYear)) {
-                            // A filter not equal to (0, 0) or [min, max] is given.  Pass it in the route.
-                            // One last fix: if user put in max, min rather than min, max, do the fix here and in this.globalState tracking variables.
-                            var minForRange: number = minYear;
-                            var maxForRange: number = maxYear;
-                            if (minYear > maxYear) {
-                                minForRange = maxYear;
-                                this.storyAdvancedSearchSettingsManagerService.updateMinYearForFilterByInterviewDate(minForRange);
-                                maxForRange = minYear;
-                                this.storyAdvancedSearchSettingsManagerService.updateMaxYearForFilterByInterviewDate(maxForRange);
+                    if (this.searchTitleOnly) // use explicit "search-title-only" indicator of sT if true
+                        moreOptions['sT'] = "1";
+                    else if (this.searchTranscriptOnly) // use explicit "search-transcript-only" indicator of sS (search spoken) if true
+                        moreOptions['sS'] = "1";
+                    // else default to "both" without the use of an explicit flag
+
+                    if ((this.searchOptions.biographyIDForLimitingSearch != this.globalState.NOTHING_CHOSEN))
+                    {
+                        moreOptions['ip'] = this.searchOptions.biographyIDForLimitingSearch; // flag that an "inside THIS person" search context will be set and used
+                        moreOptions['ia'] = this.searchOptions.biographyAccessionID;
+                    }
+
+                    if (this.searchOptions.allowAdvancedStorySearchSettings) {
+                        var filterByInterviewDate: boolean = this.storyAdvancedSearchSettingsManagerService.currentFilterByInterviewDateSetting();
+                        if (filterByInterviewDate) {
+                            // Check advanced story search settings and tack on additional qualifications to moreOptions as needed.
+                            // NOTE: if date range is "backward" as in end < start, go ahead and correct it using the advanced story search options service, too.
+                            var minYear: number = this.storyAdvancedSearchSettingsManagerService.currentMinYearForFilterByInterviewDate();
+                            var maxYear: number = this.storyAdvancedSearchSettingsManagerService.currentMaxYearForFilterByInterviewDate();
+                            var currentYear = new Date().getFullYear();
+                            // Quick check that a filter is in existence, i.e., the choice is not [min, max] which is the same as no filter at all
+                            if ((minYear != 0 || maxYear != 0) && (minYear > environment.firstInterviewYear || maxYear < currentYear)) {
+                                // A filter not equal to (0, 0) or [min, max] is given.  Pass it in the route.
+                                // One last fix: if user put in max, min rather than min, max, do the fix here and in this.globalState tracking variables.
+                                var minForRange: number = minYear;
+                                var maxForRange: number = maxYear;
+                                if (minYear > maxYear) {
+                                    minForRange = maxYear;
+                                    this.storyAdvancedSearchSettingsManagerService.updateMinYearForFilterByInterviewDate(minForRange);
+                                    maxForRange = minYear;
+                                    this.storyAdvancedSearchSettingsManagerService.updateMaxYearForFilterByInterviewDate(maxForRange);
+                                }
+                                if (minForRange == 0)
+                                    minForRange = environment.firstInterviewYear;
+                                if (maxForRange == 0)
+                                    maxForRange = currentYear;
+                                moreOptions['iy'] = minForRange + "-" + maxForRange;
                             }
-                            if (minForRange == 0)
-                                minForRange = environment.firstInterviewYear;
-                            if (maxForRange == 0)
-                                maxForRange = currentYear;
-                            moreOptions['iy'] = minForRange + "-" + maxForRange;
                         }
                     }
+                    this.router.navigate(['/stories', StorySetType.TextSearch, moreOptions]);
                 }
-                this.router.navigate(['/stories', StorySetType.TextSearch, moreOptions]);
-            }
 
-            this.txtQuery = "";
-          }
+                this.txtQuery = "";
+            }
+            else 
+                this.txtQuery = ""; // highly improbable: nonempty text query cleaned into a null value - so just clear out that text query then
+        }
     }
 
     setFocusToQueryInput() {
@@ -415,7 +432,7 @@ export class SearchFormComponent extends BaseComponent implements OnInit {
             this.router.navigate(['/bioadvs']);
         }
         else { // route to advanced story search (one of two types, inside person or across all)
-            var moreOptions = [];
+            var moreOptions:Record<string, string | number> = {};
 
             if (this.searchOptions.biographyIDForLimitingSearch != this.globalState.NOTHING_CHOSEN) {
                 moreOptions['ip'] = this.searchOptions.biographyIDForLimitingSearch; // flag that an "inside THIS person" search context will be set and used

@@ -3,7 +3,6 @@
 @use '../shared/theme/helpers';
 @use '../shared/theme/base';
 @use '../shared/theme/button-helpers';
-@use '../shared/theme/view-option-helpers';
 
 .myFlexRowWrap {
   /* fxLayout="row wrap" */
@@ -190,6 +189,7 @@
     border: 1px solid myF.color(primary);
     background-color:  #fff;
     color: myF.color(secondary);
+    cursor: pointer;
   }
 }
 
@@ -202,6 +202,7 @@
 .filter-section-rg-item:focus {
   box-shadow: 0 0 0 3px myF.color(tertiary);
   outline: 3px solid transparent; /* For Windows high contrast mode. */
+  cursor: pointer;
 }
 
 .icon-and-text {
@@ -543,7 +544,7 @@
   padding: 0;
 }
 
-.unstyled-list-nowhitespace-row2ndlayout {
+.radiogroup-nowhitespace-row2ndlayout {
   list-style: none;
   margin: 0;
   padding: 0;
@@ -565,7 +566,11 @@
 
 }
 
-.unstyled-list-nowhitespace-row3rdlayout {
+.radiogroup-nowhitespace-row2ndlayout:focus {
+  outline: none;
+}
+
+.radiogroup-nowhitespace-row3rdlayout {
   /*  fxFlex.lt-md="100%" fxFlex="50%" fxLayout="row" fxLayoutAlign="space-between end" fxLayoutGap.gt-xs="10px" fxLayoutGap.lt-sm="20px" */
   box-sizing: border-box;
   display: flex !important;
@@ -601,4 +606,8 @@
   list-style: none;
   margin: 0;
   padding: 0;
+}
+
+.radiogroup-nowhitespace-row3rdlayout:focus {
+  outline: none;
 }

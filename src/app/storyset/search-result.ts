@@ -2,7 +2,9 @@
 import { Story } from './story';
 
 export class SearchResult {
-    public facets: StoryFacets;
-    public stories: Story[];
-    public count: number;
+    constructor(
+        public facets: StoryFacets,
+        public stories: Story[],
+        public count: number
+    ) {}
 }

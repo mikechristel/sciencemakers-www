@@ -1,4 +1,6 @@
 ﻿export class TranscriptTiming {
-    public offset: number;
-    public time: number;
+    constructor(
+        public offset: number,
+        public time: number
+    ) {}
 }

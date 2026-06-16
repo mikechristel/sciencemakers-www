@@ -1,5 +1,4 @@
-import 'zone.js'; // Included with Angular CLI
-import { enableProdMode, importProvidersFrom } from '@angular/core';
+import { enableProdMode, importProvidersFrom, provideBrowserGlobalErrorListeners } from '@angular/core';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { provideRouter } from '@angular/router';
 
@@ -101,7 +100,8 @@ if (_browserTestsPassed) {
         USMapManagerService,
         StoryPlayLogService,
         GlobalState,
-        provideHttpClient(withInterceptorsFromDi())
+        provideHttpClient(withInterceptorsFromDi()),
+        provideBrowserGlobalErrorListeners()
     ]
 })
     .catch(err => console.log(err));

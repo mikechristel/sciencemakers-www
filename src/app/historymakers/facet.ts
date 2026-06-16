@@ -1,4 +1,6 @@
 ﻿export class Facet {
-    public ID: string;
-    public value: string;
+    constructor(
+        public ID: string,
+        public value: string
+    ) { }
 }

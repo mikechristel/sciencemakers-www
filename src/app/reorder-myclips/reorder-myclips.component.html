@@ -1,66 +1,157 @@
+<!-- This is the replacement tabbed view showing one of 2 interfaces for reordering without a title as that consumes too much of the available space.
+     Instead, have the tab labels indicate the purpose of each interface. 
+-->
+@let currentView = reorderMannerSignal();
+@let isKeyboardReorder = currentView === MyHowToReorder.KeyboardReorder;
+@let isDragAndDrop = currentView === MyHowToReorder.DragAndDropReorder;
+@let isPointerDriven = currentView === MyHowToReorder.PointerReorder;
+
 <h1 id="mmainHeader" [thdaIsFocused]="signalFocusToTitle" tabindex="-1" class="page-title mobile-only" (mousedown)="noMouseFocus($event)">{{reorderMyClipsPageTitle}}</h1>
 <h1 id="dmainHeader" [thdaIsFocused]="signalFocusToTitle" tabindex="-1" class="page-title desktop-only" (mousedown)="noMouseFocus($event)">{{reorderMyClipsPageTitleLong}}</h1>
-@if (dragDropUIForKeyboardShown) {
-  <div class="flex100Basis">
+<div class="tabs">
+  <h3 id="tabsDescription" class="sr-only">Reorder Task Interface Options</h3>
+  <div role="tablist" aria-labelledby="tabsDescription" class="packedTabs"> <!-- pack three tabs together at left -->
+    <button #tab1 id="tab-KeyboardReorder" role="tab" [attr.aria-selected]="isKeyboardReorder" aria-controls="tabpanel-KeyboardReorder"
+      class="tabs__tab packedTabItem"
+      [class.tabs__tab--active]="isKeyboardReorder"
+      (click)="reorderInterfaceClick(MyHowToReorder.KeyboardReorder)" (keydown)="setReorderOption($event.key, MyHowToReorder.KeyboardReorder)"
+    >
+      <span class="focus">Keyboard Reorder</span>
+    </button>
+    <button #tab2 id="tab-DragAndDropReorder" role="tab" [attr.aria-selected]="isDragAndDrop" aria-controls="tabpanel-DragAndDropReorder"
+      class="tabs__tab packedTabItem"
+      [class.tabs__tab--active]="isDragAndDrop"
+      (click)="reorderInterfaceClick(MyHowToReorder.DragAndDropReorder)" (keydown)="setReorderOption($event.key, MyHowToReorder.DragAndDropReorder)"
+    >
+      <span class="focus">Drag and Drop</span>
+    </button>
+    <button #tab3 id="tab-PointerReorder" role="tab" [attr.aria-selected]="isPointerDriven" aria-controls="tabpanel-PointerReorder"
+      class="tabs__tab packedTabItem"
+      [class.tabs__tab--active]="isPointerDriven"
+      (click)="reorderInterfaceClick(MyHowToReorder.PointerReorder)" (keydown)="setReorderOption($event.key, MyHowToReorder.PointerReorder)"
+    >
+      <span class="focus">Pointer Driven</span>
+    </button>
+  </div>
+</div>
+<div id="tabpanel-KeyboardReorder" role="tabpanel" aria-labelledby="tab-KeyboardReorder" [class.tabpanel--hidden]="!isKeyboardReorder">
     @if (droppedTargetIndex == -1) {
-      <p>Use Tab and shift-Tab keys to focus through the list, and Enter or space to select that focused item to move.</p>
-    }
-    @if (droppedTargetIndex == -1) {
-      <p>If interested in a drag-and-drop interface,
-        <a href="javascript:void(0)" tabindex="0" role="link" class="linkToChangeDragDropUI" (click)="toggleDragDropUI()">click here</a>.</p>
+    <button class="toggleTextAnnouncementEcho" [aria-pressed]="showKeyboardActionDescription" (click)="toggleShowingKeyboardAction()">
+      <!-- Extra leading visual decoration, but only need aria-pressed to communicate for accessibility -->
+      @if (showKeyboardActionDescription) { <!-- show checked when "on" -->
+        <svg aria-hidden="true" class="announcements-check-icon" width="16" height="16" fill="#fff" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+          <title>
+            Checked circle and hence active
+          </title>
+          <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+          <path d="m10.97 4.97-.02.022-3.473 4.425-2.093-2.094a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-1.071-1.05"/>
+        </svg>
       }
-      @if (droppedTargetIndex == -1) {
-        <p>To toggle showing the keyboard action announcement,
-          <a href="javascript:void(0)" tabindex="0" role="link" class="linkToChangeDragDropUI" (click)="toggleShowingKeyboardAction()">click here</a>.</p>
-        }
-        @if (droppedTargetIndex != -1) {
-          <p>Use the arrow keys to reorder the list. Press Enter to confirm, or Esc (escape) to cancel the reordering.</p>
-        }
-        <!-- The div shows at times for user; but always announce the other one with sr-only (screen-reader only) style -->
-        @if (showKeyboardActionDescription && reorderStatus.length > 0) {
-          <div class="actionDesc">
-            <span aria-hidden="true">Action:&nbsp;</span><span>{{reorderStatus}}</span>
-          </div>
-        }
-        <p id="srReorderStatusMsg" class="sr-only">{{reorderStatus}}</p>
-        <ul class="clips-set-packed" aria-describedby="srReorderStatusMsg">
-          @for (oneStory of clipSet; track oneStory.storyID; let i = $index) {
-            <li #clipSetToReorder class="one-clip-info"
-              [class.selected]="clipIsSelected[i]" tabindex="0" (click)="processClick(i)" (keydown)="setClipArranging($event.key, i)"
-              (focus)="clipItemFocused(i)">
-              @if (droppedTargetIndex == i) {
-                <span class="flexReorderClipOps">
-                  <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="21" height="18" viewBox="0 0 21 21">
-                    <g fill="none" fill-rule="evenodd" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" transform="translate(2 8)">
-                      <polyline points="7.327 1.669 7.327 7.326 1.673 7.328" transform="scale(1 -1) rotate(45 15.36 0)"/>
-                      <line x1="4.5" x2="4.5" y1=".5" y2="12.5"/>
-                      <g transform="translate(8)">
-                        <polyline points="7.291 5.687 7.366 11.419 1.634 11.344" transform="scale(-1 1) rotate(45 0 -2.31)"/>
-                        <line x1="4.5" x2="4.5" y1=".5" y2="12.5"/>
-                      </g>
-                    </g>
-                  </svg>
-                </span>
-              }
-              <span aria-hidden="true">
-                {{i+1}}.&nbsp;{{oneStory.title}}
-              </span>
-              <span class="sr-only">Item {{i+1}}</span>
-            </li>
-          }
-        </ul>
+      @if (!showKeyboardActionDescription) { <!-- show empty circle when "off" -->
+        <svg aria-hidden="true" class="announcements-check-icon" width="16" height="16" fill="#fff" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+          <title>
+            Unchecked circle and hence inactive
+          </title>
+          <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+        </svg>
+      }
+      <span class="flexGrow">&nbsp;&nbsp;Show Keyboard Actions as Text</span> <!-- Via April 2026 accessibility review, keep this label the same. -->
+    </button>
+  }
+  <div class="flex100Basis">
+    <p id="helperKeyboardMsg">{{helperKeyboardOpsMsg}}</p>
+    <!-- The div shows at times for user; but always announce the other one with sr-only (screen-reader only) style -->
+    @if (showKeyboardActionDescription) {
+      <div class="actionDesc">
+        <span aria-hidden="true">Action:&nbsp;</span><span>{{reorderStatus}}</span>
       </div>
     }
-    @if (!dragDropUIForKeyboardShown) {
-      <div>
-        <p id="mouseOtherUIHelp">This is a traditional drag-and-drop interface. If interested in keyboard drag and drop,
-          <a href="javascript:void(0)" tabindex="0" role="link" class="linkToChangeDragDropUI" (click)="toggleDragDropUI()">click here</a>.</p>
-          <div cdkDropListGroup class="clips-container">
-            <div cdkDropList [cdkDropListData]="clipSet" class="clips-list" (cdkDropListDropped)="dropInClipsList($event)">
-              @for (oneStory of clipSet; track oneStory.storyID) {
-                <div cdkDrag class="oneClip">{{oneStory.title}}</div>
-              }
-            </div>
-          </div>
-        </div>
+    <!-- Added role="status" for accessibility of the srReorderStatusMsg -->
+    <p id="srReorderStatusMsg" class="sr-only" role="status">{{reorderStatus}}</p>
+    <ul class="clips-set-packed" aria-describedby="helperKeyboardMsg">
+      @for (oneStory of clipSet; track oneStory.storyID; let i = $index) {
+        <li #clipSetToReorder class="one-clip-info"
+          [class.selected]="droppedTargetIndex == i" tabindex="0" 
+          (focus)="clipItemFocused(i)" (click)="processClick(i)" (keydown)="setClipArranging($event.key, i)" >
+          <button class="buttonWithinList" [class.selected]="droppedTargetIndex == i" [attr.aria-pressed]="droppedTargetIndex == i" tabindex="-1">  
+            @if (droppedTargetIndex == i) {
+              <span class="flexReorderClipOps">
+                <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="21" height="18" viewBox="0 0 21 21">
+                  <g fill="none" fill-rule="evenodd" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" transform="translate(2 8)">
+                    <polyline points="7.327 1.669 7.327 7.326 1.673 7.328" transform="scale(1 -1) rotate(45 15.36 0)"/>
+                    <line x1="4.5" x2="4.5" y1=".5" y2="12.5"/>
+                    <g transform="translate(8)">
+                      <polyline points="7.291 5.687 7.366 11.419 1.634 11.344" transform="scale(-1 1) rotate(45 0 -2.31)"/>
+                      <line x1="4.5" x2="4.5" y1=".5" y2="12.5"/>
+                    </g>
+                  </g>
+                </svg>
+              </span>
+            }
+            <span>
+              {{i+1}}.&nbsp;{{oneStory.title}}
+            </span>
+          </button>
+        </li>
       }
+    </ul>
+  </div>
+</div>
+<div id="tabpanel-DragAndDropReorder" role="tabpanel" aria-labelledby="tab-DragAndDropReorder" [class.tabpanel--hidden]="!isDragAndDrop">
+    <p id="helperDragDropMsg">Locate the pointer on an item, drag it to a targeted position, and drop it there.</p>
+    <div cdkDropListGroup class="clips-container">
+      <div cdkDropList [cdkDropListData]="clipSet" class="clips-list" (cdkDropListDropped)="dropInClipsList($event)">
+        @for (oneStory of clipSet; track oneStory.storyID) {
+          <div cdkDrag class="oneClip">{{oneStory.title}}</div>
+        }
+      </div>
+    </div>
+</div>
+<div id="tabpanel-PointerReorder" role="tabpanel" aria-labelledby="tab-PointerReorder" [class.tabpanel--hidden]="!isPointerDriven">
+  <div class="flex100Basis">
+    <p id="helperPointerMsg">Select a list item to move, then select up and down buttons to move the item.</p>
+    @if (grabbedSourceIndexSignal() != -1) {
+      <div class="pointerlist-btn-container">
+        <div class="pointerlist-btn-row">
+          <button class="pointerlist-action-button" [disabled]="grabbedSourceIndexSignal() == 0" (click)="processClickUpwardInReorderByPointerList()">
+            <!-- ONLY visual decoration, needing a sr-only text descriptor -->
+            <span class="flexPointerListButtonContext">
+              <svg aria-hidden="true" width="16px" height="16px" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+                <g fill="none" fill-rule="evenodd" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M8 15a.5.5 0 0 0 .5-.5V2.707l3.146 3.147a.5.5 0 0 0 .708-.708l-4-4a.5.5 0 0 0-.708 0l-4 4a.5.5 0 1 0 .708.708L7.5 2.707V14.5a.5.5 0 0 0 .5.5"/>
+                </g>
+              </svg>
+            </span>
+            <span class="sr-only">Move Up In List</span>
+          </button>
+          <button class="pointerlist-action-button" [disabled]="grabbedSourceIndexSignal() == clipSet.length - 1"  (click)="processClickDownwardInReorderByPointerList()">
+            <!-- ONLY visual decoration, needing a sr-only text descriptor -->
+            <span class="flexPointerListButtonContext">
+              <svg aria-hidden="true" width="16px" height="16px" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+                <g fill="none" fill-rule="evenodd" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path fill-rule="evenodd" d="M8 1a.5.5 0 0 1 .5.5v11.793l3.146-3.147a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 .708-.708L7.5 13.293V1.5A.5.5 0 0 1 8 1"/>
+                </g>
+              </svg>
+            </span>
+            <span class="sr-only">Move Down In List</span>
+          </button>
+        </div>
+        <div class="pointerlist-btn-expltext">
+            <p id="pointerReorderMovedItemMsg" class="pointerlist-just-expltext">{{grabbedSourceIndexSignal()+1}}.&nbsp;{{clipSet[grabbedSourceIndexSignal()].title}}</p>
+        </div>
+      </div>
+    }
+    <ul class="clips-set-packed" aria-describedby="helperPointerMsg">
+      @for (oneStory of clipSet; track oneStory.storyID; let i = $index) {
+        <li #clipSetToReorderByPointer class="one-clip-info-within-pointer-list"
+          [class.selected]="grabbedSourceIndexSignal() == i" tabindex="0" (click)="processClickInPointerList(i)" (keydown)="setClickInPointerList($event.key, i)">
+          <button class="buttonWithinList" [class.selected]="grabbedSourceIndexSignal() == i" [attr.aria-pressed]="grabbedSourceIndexSignal() == i" tabindex="-1">  
+            <span>
+              {{i+1}}.&nbsp;{{oneStory.title}}
+            </span>
+          </button>
+        </li>
+      }
+    </ul>
+  </div>    
+</div>

@@ -23,7 +23,7 @@ import { FocusMeDirective } from '../focus-me.directive';
 
 export class MyPanelComponent extends BaseComponent {
   readonly opened = input<boolean>(false);
-  readonly title = input<string>(undefined);
+  readonly title = input<string>();
   readonly markAsGrandparent = input<boolean>(false);
   readonly overrideToH4Nesting = input<boolean>(false);
   readonly markAsReverse = input<boolean>(false);

@@ -12,21 +12,22 @@ lt-md for at or under 959 and gt-sm for at or over 960. -->
     <div class="home-item-100 desktop-only">
       <h1 id="dmainHeader" [thdaIsFocused]="signalFocusToTitle" tabindex="-1" class="page-title" (mousedown)="noMouseFocus($event)">Welcome to The ScienceMakers Digital Archive</h1>
     </div>
-    <!-- Speak this welcome here right after the <h1> heading. -->
-    @if (scienceMakersBiographyCount && scienceMakersStoryCount && fullBiographyCount) {
-      <p class="sr-only">{{scienceMakersStoryCount}} stories are assembled here from life oral history interviews
-              with {{scienceMakersBiographyCount}} historically significant African Americans in the sciences, i.e., ScienceMakers, {{lastUpdateDatePhrase}}.
-              The full HistoryMakers Digital Archive holds {{fullStoryCount}} stories from {{fullBiographyCount}} HistoryMakers.
-	  </p>
+    <!-- Speak this welcome here right after the <h1> heading as long as corpus counts are loaded. -->
+    @if (corpusCountsLoaded()) {
+      @if (scienceMakersBiographyCount && scienceMakersStoryCount && fullBiographyCount) {
+        <p class="sr-only">{{scienceMakersStoryCount}} stories are assembled here from life oral history interviews
+                with {{scienceMakersBiographyCount}} historically significant African Americans in the sciences, i.e., ScienceMakers, {{lastUpdateDatePhrase}}.
+                The full HistoryMakers Digital Archive holds {{fullStoryCount}} stories from {{fullBiographyCount}} HistoryMakers.
+      </p>
+      }
+      @if (fullBiographyCount && (!scienceMakersBiographyCount || !scienceMakersStoryCount)) {
+        <p class="sr-only">
+                  Stories are assembled here from life oral history interviews with
+                  historically significant African Americans in the sciences, i.e., ScienceMakers, taken from a larger set.
+                  The full HistoryMakers Digital Archive holds {{fullStoryCount}} stories from {{fullBiographyCount}} HistoryMakers {{lastUpdateDatePhrase}}.
+        </p>
+      }
     }
-	@if (fullBiographyCount && (!scienceMakersBiographyCount || !scienceMakersStoryCount)) {
-	  <p class="sr-only">
-              Stories are assembled here from life oral history interviews with
-              historically significant African Americans in the sciences, i.e., ScienceMakers, taken from a larger set.
-              The full HistoryMakers Digital Archive holds {{fullStoryCount}} stories from {{fullBiographyCount}} HistoryMakers {{lastUpdateDatePhrase}}.
-	  </p>
-	}
-
     <div class="home-item-100 desktop-only extra-margin-whitespace">
       <div class="home-item-max-width-limit">
         <!-- Search Form (capped at max width in container div) -->
@@ -36,17 +37,19 @@ lt-md for at or under 959 and gt-sm for at or over 960. -->
   </div>
   <div class="home-top-right">
     <!-- Rather than speak this welcome here, speak it sooner right after the <h1> heading. -->
-    @if (fullBiographyCount && scienceMakersBiographyCount && scienceMakersStoryCount) {
-      <p class="welcome-paragraph" aria-hidden="true"><span class="welcome-paragraph__stories">
-              {{scienceMakersStoryCount}}</span> stories are assembled here from life oral history interviews
-              with {{scienceMakersBiographyCount}} historically significant African Americans in the sciences, i.e., ScienceMakers, {{lastUpdateDatePhrase}}.
-              The full HistoryMakers Digital Archive holds {{fullStoryCount}} stories from {{fullBiographyCount}} HistoryMakers.</p>
-    }
-	@if (fullBiographyCount && (!scienceMakersBiographyCount || !scienceMakersStoryCount)) {
-      <p class="welcome-paragraph" aria-hidden="true">
-              Stories are assembled here from life oral history interviews with
-              historically significant African Americans in the sciences, i.e., ScienceMakers, taken from a larger set.
-              The full HistoryMakers Digital Archive holds {{fullStoryCount}} stories from {{fullBiographyCount}} HistoryMakers {{lastUpdateDatePhrase}}.</p>
+    @if (corpusCountsLoaded()) {
+      @if (fullBiographyCount && scienceMakersBiographyCount && scienceMakersStoryCount) {
+        <p class="welcome-paragraph" aria-hidden="true"><span class="welcome-paragraph__stories">
+                {{scienceMakersStoryCount}}</span> stories are assembled here from life oral history interviews
+                with {{scienceMakersBiographyCount}} historically significant African Americans in the sciences, i.e., ScienceMakers, {{lastUpdateDatePhrase}}.
+                The full HistoryMakers Digital Archive holds {{fullStoryCount}} stories from {{fullBiographyCount}} HistoryMakers.</p>
+      }
+	    @if (fullBiographyCount && (!scienceMakersBiographyCount || !scienceMakersStoryCount)) {
+        <p class="welcome-paragraph" aria-hidden="true">
+                Stories are assembled here from life oral history interviews with
+                historically significant African Americans in the sciences, i.e., ScienceMakers, taken from a larger set.
+                The full HistoryMakers Digital Archive holds {{fullStoryCount}} stories from {{fullBiographyCount}} HistoryMakers {{lastUpdateDatePhrase}}.</p>
+      }
     }
   </div>
 </div>
@@ -60,7 +63,7 @@ lt-md for at or under 959 and gt-sm for at or over 960. -->
 	<p class="birthdays__empty-message">There are no ScienceMakers born on a day of this week.</p>
   </div>
 }
-@if (biographies && biographies.length > 0) {
+@if (biographiesLoaded() && biographies && biographies.length > 0) {
   <div class="home-item-100">
 	<!-- FYI, lay out the items using CSS grid (note the thda component has ONLY a card grid layout, nothing else).
 	That is, biographies are ALWAYS shown in a card view in this layout. -->

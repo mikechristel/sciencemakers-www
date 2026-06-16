@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { Subject }    from 'rxjs';
-import { GlobalState } from '../app.global-state';
+import { GlobalState, HowToReorder } from '../app.global-state';
 
 // The purpose of this service is to retrieve and store in localStorage the autoplay and autoadvance user settings.
 // NOTE: for ScienceMakers, Topic Search is never shown; also there is no UI to turn these following facets on, i.e., they are always hidden:
@@ -86,8 +86,8 @@ export class UserSettingsManagerService {
     private localBioIDToFocus: string;
     private localStoryIDToFocus: number;
 
-    private currentReorderViaKeyboardSetting: boolean = true; // will be set in constructor, but default setting is "1" (true) so signal that here with default setting of true...
-
+    private localReorderSetting: HowToReorder = HowToReorder.KeyboardReorder; // will be set in constructor, but default setting is the most accessible one (KeyboardReorder)
+    
     constructor() {
         var temp: string;
         temp = JSON.parse(localStorage.getItem(this.AUTOPLAY_SETTING_NAME) || "0");
@@ -143,13 +143,39 @@ export class UserSettingsManagerService {
         this.localShowStoryDecadeOfBirthFacetFilter = (temp == "1");
         this.showStoryDecadeOfBirthFacetFilter.next(this.localShowStoryDecadeOfBirthFacetFilter);
 
-        temp = JSON.parse(localStorage.getItem(this.REORDER_VIA_KEYBOARD) || "1"); // default is yes, reorder via keyboard, a more accessible interface
-        this.currentReorderViaKeyboardSetting = (temp == "1");
+        temp = JSON.parse(localStorage.getItem(this.REORDER_VIA_KEYBOARD) || "1"); // default is "1" to signal reorder via keyboard, a more accessible interface
+        this.localReorderSetting = this.mapStringToHowToReorder(temp);
 
         this.localBioIDToFocus = this.globalState.NO_ACCESSION_CHOSEN;
         this.bioIDToFocus.next(this.localBioIDToFocus);
         this.localStoryIDToFocus = this.globalState.NOTHING_CHOSEN;
         this.storyIDToFocus.next(this.localStoryIDToFocus);
+    }
+
+    private mapStringToHowToReorder(input: string): HowToReorder {
+        switch (input) {
+            case "1":
+                return HowToReorder.KeyboardReorder;
+            case "2":
+                return HowToReorder.DragAndDropReorder;
+            case "3":
+                return HowToReorder.PointerReorder;
+            default:
+                return HowToReorder.KeyboardReorder; // default to the most accessible option
+        }
+    }
+
+    private mapHowToReorderToString(input: HowToReorder): string {
+        switch (input) {
+            case HowToReorder.KeyboardReorder:
+                return "1";
+            case HowToReorder.DragAndDropReorder:
+                return "2";
+            case HowToReorder.PointerReorder:
+                return "3";
+            default:
+                return "1"; // default to string representing the most accessible option
+        }
     }
 
     ngOnInit() {
@@ -401,24 +427,18 @@ export class UserSettingsManagerService {
         }
     }
 
-    // NOTE: unlike most other settings, the UI to change the reorderViaKeyboard boolean is within the reorder-myclips component, not in a settings page.
-    // Furthermore, there is no event for this setting - the UI in reorderViaKeyboard assumes all control over it without listening in.
-    public currentReorderByKeyboard(): boolean {
-        return this.currentReorderViaKeyboardSetting;
+    // NOTE: unlike most other settings, the UI to change the reorderViaKeyboard enum is within the reorder-myclips component, 
+    // not in a settings page. Furthermore, there is no event for this setting - 
+    // the UI in reorder... assumes all control over it without listening in.
+    public currentReorderSetting(): HowToReorder {
+        return this.localReorderSetting;
     }
-    public updateReorderByKeyboard(newSetting: boolean) {
-        var temp: string;
-        if (newSetting)
-          temp = "1";
-        else
-          temp = "0";
-        var newBooleanSetting: boolean = (temp == "1");
-        if (this.currentReorderViaKeyboardSetting != newBooleanSetting) {
-            localStorage.setItem(this.REORDER_VIA_KEYBOARD, temp);
-            this.currentReorderViaKeyboardSetting = newBooleanSetting;
+    public updateReorderSetting(newSetting: HowToReorder) {
+        if (this.localReorderSetting != newSetting) {													 
+            localStorage.setItem(this.REORDER_VIA_KEYBOARD, this.mapHowToReorderToString(newSetting));
+            this.localReorderSetting = newSetting;
         }
     }
-
 
     public currentBioIDToFocus(): string {
         return this.localBioIDToFocus;

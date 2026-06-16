@@ -12,13 +12,13 @@ export class TagChosenSetService {
     private thdaChosenTags: ChosenTagInfo[];
 
     // Internal record of the tags as readable string (exposed via read-only property description):
-    private myDescription: string;
+    private myDescription: string = "";
 
     // Internal record of the tags as short parseable string (exposed via read-only property tagSpec):
-    private myTagSpec: string;
+    private myTagSpec: string = "";
 
     // Indicator that the set of items in the tag set changed
-    private refreshNeededForTags: boolean;
+    private refreshNeededForTags: boolean = false;
 
     constructor() {
         this.thdaChosenTags = [];

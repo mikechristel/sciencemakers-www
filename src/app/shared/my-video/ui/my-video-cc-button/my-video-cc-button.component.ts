@@ -10,7 +10,7 @@ import { Component, EventEmitter, HostListener, Input, Output, input } from "@an
 })
 
 export class MyVideoClosedCaptionButtonComponent {
-  readonly video = input<HTMLVideoElement>(undefined);
+  readonly video = input<HTMLVideoElement>();
 
   // TODO: Skipped for migration with "ng generate @angular/core:signal-input-migration" (March 2025) because:
   //  Your application code writes to the input. This prevents migration.

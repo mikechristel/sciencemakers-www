@@ -21,19 +21,19 @@ import { ScrollToMeDirective } from '../shared/scroll-to-me.directive';
 // It takes as input the story details in the form of a StoryDocument object, and the ID of whatever story might be
 // selected to appropriately focus the selected story in a grid/list.
 export class StoryStampComponent extends BaseComponent {
-    readonly story = input<StoryDocument>(undefined);
+    readonly story = input<StoryDocument>();
     // TODO: Skipped for migration with "ng generate @angular/core:signal-input-migration" (March 2025) because:
     //  This input is used in a control flow expression (e.g. `@if` or `*ngIf`)
     //  and migrating would break narrowing currently.
-    @Input() highlights: StoryHighlight;
+    @Input() highlights!: StoryHighlight;
     readonly hideInterviewDate = input<boolean>(false);
     readonly overrideToH4Nesting = input<boolean>(false);
     readonly selectedStoryID = input<number>(undefined, { alias: "selectedID" });
-    readonly cardView = input<boolean>(undefined);
+    readonly cardView = input<boolean>(true);
     // TODO: Skipped for migration with "ng generate @angular/core:signal-input-migration" (March 2025) because:
     //  This input is used in a control flow expression (e.g. `@if` or `*ngIf`)
     //  and migrating would break narrowing currently.
-    @Input() queryForTranscript: string; // used to preserve query-into-transcript context for later match term lookup by a detailed story renderer
+    @Input() queryForTranscript!: string; // used to preserve query-into-transcript context for later match term lookup by a detailed story renderer
 
     public myMediaBase: string;
 
@@ -100,7 +100,7 @@ export class StoryStampComponent extends BaseComponent {
 
         if (givenDate != null && givenDate.length >= 10) {
             // NOTE:  Date form starts yyyy-mm-dd
-            monthAsNumber = +givenDate.substr(5, 2);
+            monthAsNumber = +givenDate.substring(5, 7);
             switch (monthAsNumber) {
                 case 1: month = "Jan."; break;
                 case 2: month = "Feb."; break;
@@ -115,11 +115,11 @@ export class StoryStampComponent extends BaseComponent {
                 case 11: month = "Nov."; break;
                 case 12: month = "Dec."; break;
             }
-            if (givenDate.substr(8, 1) == "0")
-                day = givenDate.substr(9, 1); // drop leading zero
+            if (givenDate.substring(8, 9) == "0")
+                day = givenDate.substring(9, 10); // drop leading zero
             else
-                day = givenDate.substr(8, 2);
-            return month + " " + day + ", " + givenDate.substr(0, 4);
+                day = givenDate.substring(8, 10);
+            return month + " " + day + ", " + givenDate.substring(0, 4);
         }
         else
             return ""; // give up on bad input data

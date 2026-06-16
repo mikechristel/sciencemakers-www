@@ -13,8 +13,8 @@ Further, the hierarchical arrangement of branches into parent panels is hard-cod
 NOTE: a side effect of having the content now neatly nested as unordered lists in unordered lists in unordered lists
 is that the ul groupings need their own styling instead of using Angular Flex as was done before.
 -->
-<h1 id="mmainHeader" [thdaIsFocused]="signalFocusToTitle" tabindex="-1" class="page-title mobile-only" (mousedown)="noMouseFocus($event)">Topic Search</h1>
-<h1 id="dmainHeader" [thdaIsFocused]="signalFocusToTitle" tabindex="-1" class="page-title desktop-only" (mousedown)="noMouseFocus($event)">Topic Search</h1>
+<h1 id="mmainHeader" [thdaIsFocused]="signalFocusToTitle()" tabindex="-1" class="page-title mobile-only" (mousedown)="noMouseFocus($event)">Topic Search</h1>
+<h1 id="dmainHeader" [thdaIsFocused]="signalFocusToTitle()" tabindex="-1" class="page-title desktop-only" (mousedown)="noMouseFocus($event)">Topic Search</h1>
 @if (tagMatchOpeningExcuse.length > 0 && !tagMatchSummary || tagMatchSummary.length == 0) {
   <p>{{tagMatchOpeningExcuse}}</p>
 }
@@ -28,7 +28,7 @@ is that the ul groupings need their own styling instead of using Angular Flex as
 
 <!-- Bottom Section -->
 <h2 id="tagCategoryHeading" class="sr-only">Tag Categories</h2>
-@if (tagBranches && tagBranches.length == 12) {
+@if (haveTagBranches() && tagBranches.length == 12) {
   <div class="limitMaxWidth"> <!-- EXPECTED_TAG_BRANCHES == 12 -->
     <ul class="top-ul" aria-labelledby="tagCategoryHeading">
       <!-- Block 1 -->

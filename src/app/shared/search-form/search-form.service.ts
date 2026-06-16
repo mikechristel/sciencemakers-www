@@ -8,7 +8,7 @@ export class SearchFormService {
   private globalState = inject(GlobalState);
 
   private _notsetyet: boolean = true;
-  private localSearchOptions: SearchFormOptions;
+  private localSearchOptions!: SearchFormOptions;
   public searchOptions: Subject<SearchFormOptions> = new Subject<SearchFormOptions>();
   public searchOptions$ = this.searchOptions.asObservable();
 

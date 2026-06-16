@@ -1,4 +1,4 @@
-﻿import { Component, OnInit, inject } from '@angular/core';
+﻿import { Component, OnInit, inject, ChangeDetectorRef, signal } from '@angular/core';
 import { takeUntil } from "rxjs/operators";
 
 import { HistoryMakerService } from '../historymakers/historymaker.service';
@@ -33,21 +33,26 @@ export class HomeComponent extends BaseComponent implements OnInit {
     private searchFormService = inject(SearchFormService);
     private liveAnnouncer = inject(LiveAnnouncer);
 
+    private changeDetectorRef = inject(ChangeDetectorRef);
+
     txtQuery: string = ""; // this is the query string as edited by the user
 
-    scienceMakersStoryCount: string;
-    fullStoryCount: string;
-    scienceMakersBiographyCount: string;
-    fullBiographyCount: string;
+    corpusCountsLoaded = signal(false); // signals when UI can show the story and biography counts (which are loaded asynchronously)
+
+    scienceMakersStoryCount: string = ""; // don't worry that this will be revealed in UI as empty string at first, because corpusCountsLoaded signal will prevent it from being shown until it is loaded
+    fullStoryCount: string = "";
+    scienceMakersBiographyCount: string = "";
+    fullBiographyCount: string = "";
     lastUpdateDatePhrase: string = "";
     today: number = Date.now();
 
-    biographies: BriefBio[];
-    signalFocusToBiographyID: string; // is used in html rendering of this component
+    biographiesLoaded = signal(false); // signals when UI can show the biographies of people (which are loaded asynchronously)
+    biographies?: BriefBio[];
+    signalFocusToBiographyID: string = ""; // is used in html rendering of this component
 
-    confirmedNoBirthdays: boolean;
+    confirmedNoBirthdays: boolean = false;
 
-    signalFocusToTitle: boolean;
+    signalFocusToTitle: boolean = false;
     public myMediaBase: string;
 
     constructor() {
@@ -64,26 +69,26 @@ export class HomeComponent extends BaseComponent implements OnInit {
     }
 
     ngOnInit() {
-        this.titleManagerService.setTitle("ScienceMakers Digital Archive (May 19, 2025)");
+        this.titleManagerService.setTitle("ScienceMakers Digital Archive (June 11, 2026)");
         this.liveAnnouncer.announce("ScienceMakers Digital Archive"); // NOTE: using LiveAnnouncer to eliminate possible double-speak
 
         this.historyMakerService.getCorpusSpecifics().pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(corpusDetails => {
-              this.fullStoryCount = corpusDetails.stories.all.toLocaleString();
-			  // NOTE: when testing, we may not have specific ScienceMakers counts, as that is a "special" API that might not be in the testing infrastructure.
-			  // So, do not presume the existence of these counts.
-			  if (corpusDetails.biographies.scienceMakerCount)
-				  this.scienceMakersBiographyCount = corpusDetails.biographies.scienceMakerCount.toLocaleString();
-			  if (corpusDetails.stories.scienceMakerCount)
-				  this.scienceMakersStoryCount = corpusDetails.stories.scienceMakerCount.toLocaleString();
-			  var lastUpdateDateString:string = corpusDetails.lastUpdated;
-			  if (lastUpdateDateString && lastUpdateDateString.length > 0) {
-				  var lastUpdateDate: Date = new Date(lastUpdateDateString);
-				  this.lastUpdateDatePhrase = "as of " +
-					this.globalState.cleanedMonthDayYearFromNumbers(lastUpdateDate.getMonth(), lastUpdateDate.getDate(),
-					  lastUpdateDate.getFullYear());
-			  }
-			  this.fullBiographyCount = corpusDetails.biographies.all.toLocaleString();
+                this.fullStoryCount = corpusDetails.stories.all.toLocaleString();
+                if (corpusDetails.biographies.scienceMakerCount)
+                    this.scienceMakersBiographyCount = corpusDetails.biographies.scienceMakerCount.toLocaleString();
+                if (corpusDetails.stories.scienceMakerCount)
+                    this.scienceMakersStoryCount = corpusDetails.stories.scienceMakerCount.toLocaleString();
+                var lastUpdateDateString:string = corpusDetails.lastUpdated;
+                if (lastUpdateDateString && lastUpdateDateString.length > 0) {
+                    var lastUpdateDate: Date = new Date(lastUpdateDateString);
+                    this.lastUpdateDatePhrase = "as of " +
+                        this.globalState.cleanedMonthDayYearFromNumbers(lastUpdateDate.getMonth(), lastUpdateDate.getDate(),
+                        lastUpdateDate.getFullYear());
+                }
+                this.fullBiographyCount = corpusDetails.biographies.all.toLocaleString();
+                this.corpusCountsLoaded.set(true); // signal that counts are loaded, so they can be shown in the UI, obviating the need for markForCheck call 
+                // not needed when signal is in place: this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
             });
 
         // Do not qualify the people born this week in any way (i.e., no filtering, no paging): just get them all (hence null filtering/paging parameters):
@@ -93,6 +98,8 @@ export class HomeComponent extends BaseComponent implements OnInit {
                 if (this.biographies == null || this.biographies.length == 0) {
                     this.confirmedNoBirthdays = true;
                 }
+                this.biographiesLoaded.set(true); // signal that biographies are loaded, so they can be shown in the UI, obviating the need for markForCheck call 
+                // not needed when signal is in place: this.changeDetectorRef.markForCheck(); // trigger UI update in Angular 21 zoneless world
                 this.setFocusAsNeeded(); // with contents fully loaded - set the focus
             });
     }

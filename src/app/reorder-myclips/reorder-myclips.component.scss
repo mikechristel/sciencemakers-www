@@ -3,14 +3,115 @@
 @use '../shared/theme/base';
 @use '../shared/theme/myF';
 
-.clips-set-packed {
-  /* !!!TBD!!! fxLayout="row wrap" fxLayoutAlign="start center"
-  flex-flow: wrap;
+.tabs {
+  display: flex;
+  box-sizing: border-box;
+  flex-direction: row;
+  place-content: flex-end space-between;
+  align-items: flex-end;
+
+  border-bottom: 1px solid myF.color(ok-grey);
+  font-size: 1rem;
+  margin: myF.gutter(thmda-tiny) 0 0 0; /* top right bottom left */
+
+  padding: 0;
+
+  *:not(:last-child) {
+    margin-right: 10px;
+  }
+} 
+
+.tabs__tab {
+  @include myGlobals.source-sans-bold;
+
+  background-color: myF.color(light-grey);
+  border-radius: 0;
+  color: myF.color(ok-grey);
+  font-size: 1rem;
+  height: myGlobals.$buttonHeight;
+
+  &:hover {
+      cursor: pointer;
+  }
+
+  &--active {
+      background-color: myF.color(secondary);
+      color: #fff;
+  }
+
+  @media screen and (max-width: myF.bp(thmda_narrow_just_before)) {
+    font-size: 0.8rem;
+  }
+}
+
+.tabs__tab:focus {
+  box-shadow: inset 0 0 3px rgba(51,51,51,.6);
+  cursor: pointer;
+}
+
+.packedTabs {
+  /* fxFlex="0 0 calc(24em)" fxLayout="row" fxLayoutAlign="start end" */
   box-sizing: border-box;
   display: flex !important;
-  place-content: center flex-start;
-  align-items: center; */
+  flex-direction: row;
+  place-content: flex-start; /* !!!TBD!!! check if this is OK, which is just fxLayoutAlign="start" and NOT fxLayoutAlign="start end" */
+  align-items: flex-start;
+  flex: 0 0 calc(36em);
 
+  @media screen and (max-width: myF.bp(afl_small_just_before)) {
+    flex: 0 0 calc(18em);
+  }
+}
+
+.packedTabItem {
+  flex-basis: 33%;
+}
+
+.tabpanel {
+  @include myGlobals.source-sans-bold;
+
+  &--hidden {
+    display: none;
+  }
+}
+
+.toggleTextAnnouncementEcho { /* height of 2rem, no margin nor narrow width media query */
+  /* fxLayout="row" fxLayoutAlign="center center" */
+  box-sizing: border-box;
+  display: flex !important;
+  flex-direction: row;
+  place-content: center;
+  align-items: center;
+
+  @include myGlobals.oswald;
+
+  background-color: myF.color(primary);
+  border: 1px solid myF.color(primary); /* note: added for accessibility, to provide a button border in high contrast mode */
+  border-radius: 0;
+  color: #fff;
+  cursor: pointer;
+  font-size: 1rem;
+  height: myGlobals.$buttonHeight;
+  margin: myF.em(8) myF.em(2) myF.em(4) myF.em(2); /* top right bottom left */
+  padding: 0 4px;
+  text-align: center;
+
+  transition: box-shadow .15s ease-in-out;
+
+  &:hover,
+  &:focus {
+    box-shadow: inset 0 0 5px rgba(51,51,51,.6);
+    background-color: myF.color(secondary);
+  }
+}
+
+.announcements-check-icon {
+  flex: 0 0 16px;
+  height: 1rem;
+  margin-left: 0.5rem;
+}
+
+.clips-set-packed {
   list-style: none;
   margin: 0;
   padding: 0;
@@ -32,18 +133,37 @@
   max-width: 21px;
 }
 
+.buttonWithinList { /* UI is essentially in the parent .one-clip-info, but this button is added for accessibility to provide an aria-pressed state for screen readers to announce the selected state of the clip item */
+  flex: 1 1 80%;
+  @include myGlobals.source-sans-semi-bold;
+
+  font-size: 1rem; /* must stay small because we want to show as many as possible for easier reordering */
+  font-weight: normal;
+  margin: 0;
+  padding: 0;
+  border: 0; /* note: border and effects are handled by the parent element */
+  background: none;
+  color: myF.color(unchosen-shade);
+  text-align: left;
+  align-items: flex-start;
+}
+
+.buttonWithinList.selected  {
+  color: myF.color(secondary);
+}
+
 .one-clip-info {
   flex: 0 0 auto;
   @include myGlobals.source-sans-semi-bold;
 
   font-size: 1rem; /* must stay small because we want to show as many as possible for easier reordering */
+  font-weight: normal;
   margin: 0 0 4px 0;
   padding: 0 0 2px 0;
   border: 1px solid myF.color(primary); /* note: added for accessibility, to provide a button border in high contrast mode */
   border-radius: 0;
   background: none;
   color: myF.color(unchosen-shade);
-  font-weight: normal;
 
   &:focus {
     box-shadow: inset 0 0 5px rgba(51,51,51,.6);
@@ -57,9 +177,100 @@
   box-shadow: inset 0 0 5px rgba(51,51,51,.6);
 }
 
-.linkToChangeDragDropUI {
-  @include myGlobals.source-sans;
+/* Styles for pointer interaction with up and down buttons on ONE selected clip's list location. */
+.one-clip-info-within-pointer-list {
+  @include myGlobals.source-sans-semi-bold;
+
+  /* fxFlex="100%" fxLayout="row wrap" fxLayoutAlign="space-around flex-start" */
+  box-sizing: border-box;
+  display: flex !important;
+  flex-flow: row wrap;
+  place-content: flex-start space-around;
+  align-items: flex-start;
+  flex: 1 1 100%;
+
+  width: 100%; /* desktop-only */
+
+  font-size: 1rem; /* must stay small because we want to show as many as possible for easier reordering */
+  font-weight: normal;
+  margin: 0 0 4px 0;
+  padding: 0 0 2px 0;
+  border: 1px solid myF.color(primary); /* note: added for accessibility, to provide a button border in high contrast mode */
+  border-radius: 0;
+  background: none;
+  color: myF.color(unchosen-shade);
+
+  &:focus {
+    box-shadow: inset 0 0 5px rgba(51,51,51,.6);
+    border: 2px solid myF.color(primary);
+  }
+}
+
+.one-clip-info-within-pointer-list.selected  {
+  border: 1px solid myF.color(secondary);
+  color: myF.color(secondary);
+  box-shadow: inset 0 0 5px rgba(51,51,51,.6);
+}
+
+.pointerlist-btn-row {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  *:not(:last-child) {
+    margin-right: 8px;
+  }
+  width: 104px;
+  flex: 0 0 104px;
+}
+
+.pointerlist-btn-expltext {
+  box-sizing: border-box;
+  flex: 1;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+}
+
+.pointerlist-just-expltext {
+  margin: myF.em(2) 0 myF.em(2); /* top, left and right, bottom */
+}
+
+.pointerlist-btn-container {
+  display: flex; /*flex: 0 0 auto; */
+}
+
+.pointerlist-action-button {
+  display: flex;
+  align-items: center; /* Vertical center */
+  justify-content: center; /* Horizontal center */
+
+  background-color: myF.color(primary);
+  border: 1px solid myF.color(primary); /* note: added for accessibility, to provide a button border in high contrast mode */
+  border-radius: 0;
   cursor: pointer;
+  margin-top: myF.gutter(thmda-tiny);
+  margin-bottom: myF.gutter(thmda-tiny);
+
+  padding-left: 12px;
+  height: myGlobals.$shorterButtonHeight;
+
+  &:hover,
+  &:focus {
+      box-shadow: inset 0 0 5px rgba(51,51,51,.6);
+      background-color: myF.color(secondary);
+  }
+
+  &:disabled {
+      cursor: not-allowed;
+      opacity: .4;
+  }
+
+}
+
+.flexPointerListButtonContext {
+  flex: 1 1 16px;
+  min-width: 16px;
+  max-width: 16px;
 }
 
 /* Styles for the drag and drop interface are below: oneClip, clips-list, clips-container */

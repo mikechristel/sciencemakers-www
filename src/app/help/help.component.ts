@@ -24,8 +24,8 @@ export class HelpComponent extends ThinBaseComponent implements OnInit {
     private searchFormService = inject(SearchFormService);
     private liveAnnouncer = inject(LiveAnnouncer);
 
-    helpPageTitle: string;
-    helpPageTitleLong: string;
+    helpPageTitle!: string; // value set in ngOnInit
+    helpPageTitleLong!: string;
     signalFocusToTitle: boolean = false; // is used in html rendering of this component
 
     constructor() {

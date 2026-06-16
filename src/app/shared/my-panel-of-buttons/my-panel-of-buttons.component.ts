@@ -25,7 +25,7 @@ export class MyPanelOfButtonsComponent extends BaseComponent {
   readonly opened = input<boolean>(false);
   readonly hasMenu = input<boolean>(true);
   readonly overrideToH4Nesting = input<boolean>(false);
-  readonly title = input<string>(undefined);
+  readonly title = input<string>();
   readonly markAsGrandparent = input<boolean>(false);
   readonly markAsReverse = input<boolean>(false);
   readonly setFocusToButtonHoldingMenu = input<boolean>(false);

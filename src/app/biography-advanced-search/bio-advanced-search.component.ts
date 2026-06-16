@@ -25,8 +25,8 @@ export class BiographyAdvancedSearchComponent extends ThinBaseComponent implemen
     private liveAnnouncer = inject(LiveAnnouncer);
 
     readonly mySearchFormElement = viewChild<SearchFormComponent>('myBioSearchForm');
-    bioAdvSearchPageTitle: string;
-    bioAdvSearchPageTitleLong: string;
+    bioAdvSearchPageTitle: string = "";
+    bioAdvSearchPageTitleLong: string = "";
     signalFocusToTitle: boolean = false; // is used in html rendering of this component
 
     constructor() {

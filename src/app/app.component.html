@@ -207,7 +207,7 @@ as not to disturb the scroll-bar mechanics used in the rest of this page layout.
     <div class="mymodal-body">
       <div class="noSpacingFlexGrow">
         <label for="myClipsTitleInput">Story Set Title:</label>
-        <textarea #myClipsTitleInput class="form-control textarea-feedback" [(ngModel)]="myClipsTitleCandidate"
+        <textarea id="myClipsTitleInput" #myClipsTitleInput class="form-control textarea-feedback" [(ngModel)]="myClipsTitleCandidate"
           [attr.maxLength]="myClipsTitleMaxLength" rows="4" placeholder="Your title goes here..."
           [attr.aria-describedby]="myClipsTitleLengthHelper"(keyup)="thinToLegalMyClipsTitleKeyUp()"
         (input)="handleMyClipsTitleInput()" (blur)="handleMyClipsTitleInputBlur()"></textarea>
@@ -228,7 +228,7 @@ as not to disturb the scroll-bar mechanics used in the rest of this page layout.
       }
       <div class="noSpacingFlexGrow">
         <label for="myClipsURLEchoArea">Story Set URL (read-only):</label>
-        <textarea readonly #myClipsURLEchoArea class="form-control textarea-feedback"
+        <textarea readonly id="myClipsURLEchoArea" #myClipsURLEchoArea class="form-control textarea-feedback"
         rows="4">{{myTitledMyClipsURI()}}</textarea>
       </div>
     </div>
